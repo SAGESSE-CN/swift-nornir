@@ -1,0 +1,599 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0C0C8E4A1BAD470A00573160 /* SIMLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C0C8E431BAD470A00573160 /* SIMLog.swift */; settings = {ASSET_TAGS = (); }; };
+		0C0C8E4B1BAD470A00573160 /* SIMChat.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0C0C8E451BAD470A00573160 /* SIMChat.xcassets */; settings = {ASSET_TAGS = (); }; };
+		0C0C8E4C1BAD470A00573160 /* SIMChatBubbleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C0C8E471BAD470A00573160 /* SIMChatBubbleView.swift */; settings = {ASSET_TAGS = (); }; };
+		0C0C8E4D1BAD470A00573160 /* SIMChatPortraitView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C0C8E481BAD470A00573160 /* SIMChatPortraitView.swift */; settings = {ASSET_TAGS = (); }; };
+		0C0C8E4E1BAD470A00573160 /* SIMChatVisitCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C0C8E491BAD470A00573160 /* SIMChatVisitCardView.swift */; settings = {ASSET_TAGS = (); }; };
+		0C42DA861BAD449000371CC7 /* SIMChatTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C42DA851BAD449000371CC7 /* SIMChatTests.swift */; };
+		0C42DA911BAD449000371CC7 /* SIMChatUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C42DA901BAD449000371CC7 /* SIMChatUITests.swift */; };
+		0C42DAA71BAD44BB00371CC7 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C42DA9F1BAD44BB00371CC7 /* AppDelegate.swift */; settings = {ASSET_TAGS = (); }; };
+		0C42DAA81BAD44BB00371CC7 /* SIMChatDemo.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0C42DAA01BAD44BB00371CC7 /* SIMChatDemo.xcassets */; settings = {ASSET_TAGS = (); }; };
+		0C42DAA91BAD44BB00371CC7 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0C42DAA11BAD44BB00371CC7 /* LaunchScreen.storyboard */; settings = {ASSET_TAGS = (); }; };
+		0C42DAAA1BAD44BB00371CC7 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0C42DAA31BAD44BB00371CC7 /* Main.storyboard */; settings = {ASSET_TAGS = (); }; };
+		0C42DAAC1BAD44BB00371CC7 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C42DAA61BAD44BB00371CC7 /* ViewController.swift */; settings = {ASSET_TAGS = (); }; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		0C42DA821BAD449000371CC7 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0C42DA651BAD449000371CC7 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 0C42DA6C1BAD449000371CC7;
+			remoteInfo = SIMChat;
+		};
+		0C42DA8D1BAD449000371CC7 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0C42DA651BAD449000371CC7 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 0C42DA6C1BAD449000371CC7;
+			remoteInfo = SIMChat;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		0C0C8E431BAD470A00573160 /* SIMLog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SIMLog.swift; sourceTree = "<group>"; };
+		0C0C8E451BAD470A00573160 /* SIMChat.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = SIMChat.xcassets; sourceTree = "<group>"; };
+		0C0C8E471BAD470A00573160 /* SIMChatBubbleView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SIMChatBubbleView.swift; sourceTree = "<group>"; };
+		0C0C8E481BAD470A00573160 /* SIMChatPortraitView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SIMChatPortraitView.swift; sourceTree = "<group>"; };
+		0C0C8E491BAD470A00573160 /* SIMChatVisitCardView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SIMChatVisitCardView.swift; sourceTree = "<group>"; };
+		0C42DA6D1BAD449000371CC7 /* SIMChat.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SIMChat.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		0C42DA811BAD449000371CC7 /* SIMChatTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SIMChatTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		0C42DA851BAD449000371CC7 /* SIMChatTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SIMChatTests.swift; sourceTree = "<group>"; };
+		0C42DA871BAD449000371CC7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		0C42DA8C1BAD449000371CC7 /* SIMChatUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SIMChatUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		0C42DA901BAD449000371CC7 /* SIMChatUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SIMChatUITests.swift; sourceTree = "<group>"; };
+		0C42DA921BAD449000371CC7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		0C42DA9F1BAD44BB00371CC7 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		0C42DAA01BAD44BB00371CC7 /* SIMChatDemo.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = SIMChatDemo.xcassets; sourceTree = "<group>"; };
+		0C42DAA21BAD44BB00371CC7 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		0C42DAA41BAD44BB00371CC7 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		0C42DAA51BAD44BB00371CC7 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		0C42DAA61BAD44BB00371CC7 /* ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		0C42DA6A1BAD449000371CC7 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		0C42DA7E1BAD449000371CC7 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		0C42DA891BAD449000371CC7 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		0C0C8E3F1BAD470A00573160 /* SIMChat */ = {
+			isa = PBXGroup;
+			children = (
+				0C0C8E401BAD470A00573160 /* Controllers */,
+				0C0C8E411BAD470A00573160 /* Models */,
+				0C0C8E421BAD470A00573160 /* Others */,
+				0C0C8E441BAD470A00573160 /* Resources */,
+				0C0C8E461BAD470A00573160 /* Views */,
+			);
+			path = SIMChat;
+			sourceTree = "<group>";
+		};
+		0C0C8E401BAD470A00573160 /* Controllers */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Controllers;
+			sourceTree = "<group>";
+		};
+		0C0C8E411BAD470A00573160 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		0C0C8E421BAD470A00573160 /* Others */ = {
+			isa = PBXGroup;
+			children = (
+				0C0C8E431BAD470A00573160 /* SIMLog.swift */,
+			);
+			path = Others;
+			sourceTree = "<group>";
+		};
+		0C0C8E441BAD470A00573160 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				0C0C8E451BAD470A00573160 /* SIMChat.xcassets */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		0C0C8E461BAD470A00573160 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				0C0C8E471BAD470A00573160 /* SIMChatBubbleView.swift */,
+				0C0C8E481BAD470A00573160 /* SIMChatPortraitView.swift */,
+				0C0C8E491BAD470A00573160 /* SIMChatVisitCardView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		0C42DA641BAD449000371CC7 = {
+			isa = PBXGroup;
+			children = (
+				0C0C8E3F1BAD470A00573160 /* SIMChat */,
+				0C42DA9E1BAD44BB00371CC7 /* SIMChatDemo */,
+				0C42DA841BAD449000371CC7 /* SIMChatTests */,
+				0C42DA8F1BAD449000371CC7 /* SIMChatUITests */,
+				0C42DA6E1BAD449000371CC7 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		0C42DA6E1BAD449000371CC7 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				0C42DA6D1BAD449000371CC7 /* SIMChat.app */,
+				0C42DA811BAD449000371CC7 /* SIMChatTests.xctest */,
+				0C42DA8C1BAD449000371CC7 /* SIMChatUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		0C42DA841BAD449000371CC7 /* SIMChatTests */ = {
+			isa = PBXGroup;
+			children = (
+				0C42DA851BAD449000371CC7 /* SIMChatTests.swift */,
+				0C42DA871BAD449000371CC7 /* Info.plist */,
+			);
+			path = SIMChatTests;
+			sourceTree = "<group>";
+		};
+		0C42DA8F1BAD449000371CC7 /* SIMChatUITests */ = {
+			isa = PBXGroup;
+			children = (
+				0C42DA901BAD449000371CC7 /* SIMChatUITests.swift */,
+				0C42DA921BAD449000371CC7 /* Info.plist */,
+			);
+			path = SIMChatUITests;
+			sourceTree = "<group>";
+		};
+		0C42DA9E1BAD44BB00371CC7 /* SIMChatDemo */ = {
+			isa = PBXGroup;
+			children = (
+				0C42DAA51BAD44BB00371CC7 /* Info.plist */,
+				0C42DA9F1BAD44BB00371CC7 /* AppDelegate.swift */,
+				0C42DAA61BAD44BB00371CC7 /* ViewController.swift */,
+				0C42DAA31BAD44BB00371CC7 /* Main.storyboard */,
+				0C42DAA11BAD44BB00371CC7 /* LaunchScreen.storyboard */,
+				0C42DAA01BAD44BB00371CC7 /* SIMChatDemo.xcassets */,
+			);
+			path = SIMChatDemo;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		0C42DA6C1BAD449000371CC7 /* SIMChat */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 0C42DA951BAD449000371CC7 /* Build configuration list for PBXNativeTarget "SIMChat" */;
+			buildPhases = (
+				0C42DA691BAD449000371CC7 /* Sources */,
+				0C42DA6A1BAD449000371CC7 /* Frameworks */,
+				0C42DA6B1BAD449000371CC7 /* Resources */,
+				0C42DAAD1BAD44E100371CC7 /* ShellScript */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SIMChat;
+			productName = SIMChat;
+			productReference = 0C42DA6D1BAD449000371CC7 /* SIMChat.app */;
+			productType = "com.apple.product-type.application";
+		};
+		0C42DA801BAD449000371CC7 /* SIMChatTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 0C42DA981BAD449000371CC7 /* Build configuration list for PBXNativeTarget "SIMChatTests" */;
+			buildPhases = (
+				0C42DA7D1BAD449000371CC7 /* Sources */,
+				0C42DA7E1BAD449000371CC7 /* Frameworks */,
+				0C42DA7F1BAD449000371CC7 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				0C42DA831BAD449000371CC7 /* PBXTargetDependency */,
+			);
+			name = SIMChatTests;
+			productName = SIMChatTests;
+			productReference = 0C42DA811BAD449000371CC7 /* SIMChatTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		0C42DA8B1BAD449000371CC7 /* SIMChatUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 0C42DA9B1BAD449000371CC7 /* Build configuration list for PBXNativeTarget "SIMChatUITests" */;
+			buildPhases = (
+				0C42DA881BAD449000371CC7 /* Sources */,
+				0C42DA891BAD449000371CC7 /* Frameworks */,
+				0C42DA8A1BAD449000371CC7 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				0C42DA8E1BAD449000371CC7 /* PBXTargetDependency */,
+			);
+			name = SIMChatUITests;
+			productName = SIMChatUITests;
+			productReference = 0C42DA8C1BAD449000371CC7 /* SIMChatUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		0C42DA651BAD449000371CC7 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0700;
+				ORGANIZATIONNAME = Sagesse;
+				TargetAttributes = {
+					0C42DA6C1BAD449000371CC7 = {
+						CreatedOnToolsVersion = 7.0;
+						DevelopmentTeam = 75W7979FX6;
+					};
+					0C42DA801BAD449000371CC7 = {
+						CreatedOnToolsVersion = 7.0;
+						TestTargetID = 0C42DA6C1BAD449000371CC7;
+					};
+					0C42DA8B1BAD449000371CC7 = {
+						CreatedOnToolsVersion = 7.0;
+						TestTargetID = 0C42DA6C1BAD449000371CC7;
+					};
+				};
+			};
+			buildConfigurationList = 0C42DA681BAD449000371CC7 /* Build configuration list for PBXProject "SIMChat" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 0C42DA641BAD449000371CC7;
+			productRefGroup = 0C42DA6E1BAD449000371CC7 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				0C42DA6C1BAD449000371CC7 /* SIMChat */,
+				0C42DA801BAD449000371CC7 /* SIMChatTests */,
+				0C42DA8B1BAD449000371CC7 /* SIMChatUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		0C42DA6B1BAD449000371CC7 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0C42DAAA1BAD44BB00371CC7 /* Main.storyboard in Resources */,
+				0C42DAA91BAD44BB00371CC7 /* LaunchScreen.storyboard in Resources */,
+				0C0C8E4B1BAD470A00573160 /* SIMChat.xcassets in Resources */,
+				0C42DAA81BAD44BB00371CC7 /* SIMChatDemo.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		0C42DA7F1BAD449000371CC7 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		0C42DA8A1BAD449000371CC7 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		0C42DAAD1BAD44E100371CC7 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "echo $CONFIGURATION\n\nif [ \"Release\" == \"${CONFIGURATION}\" ]\n\nthen\n\nbuildNumber=$(/usr/libexec/PlistBuddy -c \"Print CFBundleVersion\" \"${INFOPLIST_FILE}\")\n\nbuildNumber=$(($buildNumber + 1))\n\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $buildNumber\" \"${INFOPLIST_FILE}\"\n\necho \"build number increase\"\n\nfi";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		0C42DA691BAD449000371CC7 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0C0C8E4A1BAD470A00573160 /* SIMLog.swift in Sources */,
+				0C0C8E4E1BAD470A00573160 /* SIMChatVisitCardView.swift in Sources */,
+				0C0C8E4D1BAD470A00573160 /* SIMChatPortraitView.swift in Sources */,
+				0C0C8E4C1BAD470A00573160 /* SIMChatBubbleView.swift in Sources */,
+				0C42DAAC1BAD44BB00371CC7 /* ViewController.swift in Sources */,
+				0C42DAA71BAD44BB00371CC7 /* AppDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		0C42DA7D1BAD449000371CC7 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0C42DA861BAD449000371CC7 /* SIMChatTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		0C42DA881BAD449000371CC7 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0C42DA911BAD449000371CC7 /* SIMChatUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		0C42DA831BAD449000371CC7 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 0C42DA6C1BAD449000371CC7 /* SIMChat */;
+			targetProxy = 0C42DA821BAD449000371CC7 /* PBXContainerItemProxy */;
+		};
+		0C42DA8E1BAD449000371CC7 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 0C42DA6C1BAD449000371CC7 /* SIMChat */;
+			targetProxy = 0C42DA8D1BAD449000371CC7 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		0C42DAA11BAD44BB00371CC7 /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				0C42DAA21BAD44BB00371CC7 /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+		0C42DAA31BAD44BB00371CC7 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				0C42DAA41BAD44BB00371CC7 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		0C42DA931BAD449000371CC7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		0C42DA941BAD449000371CC7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		0C42DA961BAD449000371CC7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				INFOPLIST_FILE = "$(SRCROOT)/SIMChatDemo/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = SA.SIMChat;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		0C42DA971BAD449000371CC7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				INFOPLIST_FILE = "$(SRCROOT)/SIMChatDemo/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = SA.SIMChat;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		0C42DA991BAD449000371CC7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				INFOPLIST_FILE = SIMChatTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = SA.SIMChatTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SIMChat.app/SIMChat";
+			};
+			name = Debug;
+		};
+		0C42DA9A1BAD449000371CC7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				INFOPLIST_FILE = SIMChatTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = SA.SIMChatTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SIMChat.app/SIMChat";
+			};
+			name = Release;
+		};
+		0C42DA9C1BAD449000371CC7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				INFOPLIST_FILE = SIMChatUITests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = SA.SIMChatUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_TARGET_NAME = SIMChat;
+				USES_XCTRUNNER = YES;
+			};
+			name = Debug;
+		};
+		0C42DA9D1BAD449000371CC7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				INFOPLIST_FILE = SIMChatUITests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = SA.SIMChatUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_TARGET_NAME = SIMChat;
+				USES_XCTRUNNER = YES;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		0C42DA681BAD449000371CC7 /* Build configuration list for PBXProject "SIMChat" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0C42DA931BAD449000371CC7 /* Debug */,
+				0C42DA941BAD449000371CC7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		0C42DA951BAD449000371CC7 /* Build configuration list for PBXNativeTarget "SIMChat" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0C42DA961BAD449000371CC7 /* Debug */,
+				0C42DA971BAD449000371CC7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		0C42DA981BAD449000371CC7 /* Build configuration list for PBXNativeTarget "SIMChatTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0C42DA991BAD449000371CC7 /* Debug */,
+				0C42DA9A1BAD449000371CC7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		0C42DA9B1BAD449000371CC7 /* Build configuration list for PBXNativeTarget "SIMChatUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0C42DA9C1BAD449000371CC7 /* Debug */,
+				0C42DA9D1BAD449000371CC7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 0C42DA651BAD449000371CC7 /* Project object */;
+}
