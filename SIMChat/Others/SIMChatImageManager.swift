@@ -10,4 +10,7 @@ import UIKit
 
 class SIMChatImageManager: NSObject {
 
+    
+    /// 默认头像
+    static let defaultPortrait = UIImage(named: "simchat_portrait_default")
 }

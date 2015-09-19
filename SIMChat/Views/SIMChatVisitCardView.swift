@@ -8,5 +8,43 @@
 
 import UIKit
 
-class SIMChatVisitCardView: UIView {
+//
+// +----------+
+// | +------+ |
+// | +------+ |
+// +----------+
+//
+
+///
+/// 聊天名片
+///
+class SIMChatVisitCardView: SIMView {
+    
+    /// 构建
+    override func build() {
+        super.build()
+        
+        let vs = ["t" : titleLabel]
+        
+        // config
+        titleLabel.font = UIFont.systemFontOfSize(14)
+        titleLabel.textColor = UIColor.whiteColor()
+        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+        
+        // add views
+        addSubview(titleLabel)
+        
+        // add contstraints
+        addConstraints(NSLayoutConstraintMake("H:|-(8)-[t]-(8)-|", views: vs))
+        addConstraints(NSLayoutConstraintMake("V:|-(0)-[t]-(0)-|", views: vs))
+    }
+    
+    /// 关联的用户
+    var user: SIMChatUser? {
+        willSet {
+            titleLabel.text = newValue?.name ?? newValue?.identifier ?? "<Unknow>"
+        }
+    }
+    
+    private(set) lazy var titleLabel = UILabel()
 }

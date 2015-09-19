@@ -8,11 +8,19 @@
 
 import UIKit
 
+
 class ViewController: UIViewController {
 
+    var tv = UIImageView()
+    var tv2 = UIView()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
+        
+    }
+    
+    @IBAction func test() {
     }
 
     override func didReceiveMemoryWarning() {

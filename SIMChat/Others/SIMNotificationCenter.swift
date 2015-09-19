@@ -11,3 +11,6 @@ import UIKit
 class SIMNotificationCenter: NSNotificationCenter {
 
 }
+
+
+let SIMChatUserInfoChangedNotification = "SIMChatUserInfoChangedNotification"
