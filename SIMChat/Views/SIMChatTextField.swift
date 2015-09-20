@@ -25,16 +25,16 @@ class SIMChatTextField : SIMView {
         super.build()
         
         let line = SIMChatLine()
-        let items = (leftItems as [UIView])  + [contentView] + (rightItems as [UIView])
+        let items = (leftItems as [UIView])  + [textView] + (rightItems as [UIView])
         
         // configs
-        contentView.font = UIFont.systemFontOfSize(16)
-        contentView.backgroundColor = UIColor.clearColor()
-        contentView.scrollIndicatorInsets = UIEdgeInsetsMake(2, 0, 2, 0)
-        contentView.returnKeyType = .Send
-        contentView.delegate = self
-        contentBackgroundView.image = SIMChatImageManager.defautlInputBackground
-        contentBackgroundView.translatesAutoresizingMaskIntoConstraints = false
+        textView.font = UIFont.systemFontOfSize(16)
+        textView.backgroundColor = UIColor.clearColor()
+        textView.scrollIndicatorInsets = UIEdgeInsetsMake(2, 0, 2, 0)
+        textView.returnKeyType = .Send
+        textView.delegate = self
+        backgroundView.image = SIMChatImageManager.defautlInputBackground
+        backgroundView.translatesAutoresizingMaskIntoConstraints = false
         // line使用am
         line.frame = CGRectMake(0, 0, bounds.width, 1)
         line.contentMode = .Top
@@ -42,7 +42,7 @@ class SIMChatTextField : SIMView {
         line.tintColor = UIColor(hex: 0xBDBDBD)
         
         // add view
-        addSubview(contentBackgroundView)
+        addSubview(backgroundView)
         for item in items {
             // disable translates
             item.translatesAutoresizingMaskIntoConstraints = false
@@ -57,17 +57,17 @@ class SIMChatTextField : SIMView {
         
         // add constraints
         
-        addConstraint(NSLayoutConstraintMake(contentBackgroundView, .Top, .Equal, contentView, .Top))
-        addConstraint(NSLayoutConstraintMake(contentBackgroundView, .Left, .Equal, contentView, .Left))
-        addConstraint(NSLayoutConstraintMake(contentBackgroundView, .Right, .Equal, contentView, .Right))
-        addConstraint(NSLayoutConstraintMake(contentBackgroundView, .Bottom, .Equal, contentView, .Bottom))
+        addConstraint(NSLayoutConstraintMake(backgroundView, .Top, .Equal, textView, .Top))
+        addConstraint(NSLayoutConstraintMake(backgroundView, .Left, .Equal, textView, .Left))
+        addConstraint(NSLayoutConstraintMake(backgroundView, .Right, .Equal, textView, .Right))
+        addConstraint(NSLayoutConstraintMake(backgroundView, .Bottom, .Equal, textView, .Bottom))
         
         // ..
         for idx in 0 ..< items.count {
             // ...
             let item = items[idx]
             // top
-            if item is UITextView { // is contentView
+            if item is UITextView { // is textView
                 addConstraint(NSLayoutConstraintMake(item, .Top,    .Equal, self,   .Top, 5))
             } else {
                 addConstraint(NSLayoutConstraintMake(item, .Top,    .Equal, self,   .Top, 6))
@@ -85,7 +85,7 @@ class SIMChatTextField : SIMView {
                 addConstraint(NSLayoutConstraintMake(item, .Right,  .Equal, self,   .Right, -5))
             }
             // bottom
-            if item is UITextView { // is contentView
+            if item is UITextView { // is textView
                 addConstraint(NSLayoutConstraintMake(item, .Bottom, .Equal, self,   .Bottom, -5))
             } else {
                 addConstraint(NSLayoutConstraintMake(item, .Width,  .Equal, nil,    .Width, 34))
@@ -93,23 +93,73 @@ class SIMChatTextField : SIMView {
             }
         }
     }
-    
+    /// 当前焦点
+    override func isFirstResponder() -> Bool {
+        return super.isFirstResponder() || self.textView.isFirstResponder()
+    }
+    /// 放弃焦点
+    override func resignFirstResponder() -> Bool {
+        if self.selectedItem != nil {
+            self.selectedItem = nil
+            self.selectedStyle = .None
+        }
+        if self.isFirstResponder() {
+            return super.resignFirstResponder() || self.textView.resignFirstResponder()
+        }
+        return false
+    }
+    /// 重新取得焦点
+    override func becomeFirstResponder() -> Bool {
+        return self.textView.becomeFirstResponder()
+    }
+    /// ...
     override func intrinsicContentSize() -> CGSize {
-        return CGSizeMake(0, max(contentView.contentSize.height + 10, 44))
+        return CGSizeMake(bounds.width, max(textView.contentSize.height + 10, 44))
+    }
+    /// 代理
+    weak var delegate: SIMChatTextFieldDelegate?
+    /// 内容
+    var text: String! {
+        set {
+            self.textView.text = newValue
+            self.textViewDidChange(textView)
+//            func scrollViewToBottom() {
+//                let textView = input.content
+//                
+//                let ch = textView.contentSize.height
+//                let bh = textView.bounds.height
+//                let py = textView.contentOffset.y
+//                
+//                if ch - bh > py {
+//                    textView.setContentOffset(CGPointMake(0, ch - bh), animated: true)
+//                }
+//            }
+        }
+        get {
+            return self.textView.text
+        }
+    }
+    /// 当前选中的
+    var selectedStyle: SIMChatTextFieldItemStyle = .None {
+        didSet {
+            self.delegate?.chatTextField?(self, didSelectItem: selectedStyle.rawValue)
+        }
     }
     
-    private(set) lazy var contentView = UITextView()
-    private(set) lazy var contentBackgroundView = UIImageView()
+    private var selectedItem: SIMChatTextFieldItem? {
+        willSet { self.selectedItem?.actived = false }
+        didSet  { self.selectedItem?.actived = true }
+    }
+    private lazy var textView = UITextView()
+    private lazy var backgroundView = UIImageView()
     
-    private(set) lazy var leftItems: [SIMChatTextFieldItem] = [
+    private lazy var leftItems: [SIMChatTextFieldItem] = [
         SIMChatTextFieldItem(style: .Voice)
     ]
-    private(set) lazy var rightItems: [SIMChatTextFieldItem] = [
+    private lazy var rightItems: [SIMChatTextFieldItem] = [
         SIMChatTextFieldItem(style: .Emoji),
         SIMChatTextFieldItem(style: .Tool)
     ]
-    
-    private(set) var currentItem: SIMChatTextFieldItem?
 }
 
 
@@ -125,12 +175,14 @@ extension SIMChatTextField {
             self.style = .Keyboard
             super.init(coder: aDecoder)
             self.update(self.style)
+            self.tag = self.style.rawValue
         }
         /// 初始化
         init(style: SIMChatTextFieldItemStyle) {
             self.style = style
             super.init(frame: CGRectZero)
             self.update(self.style)
+            self.tag = style.rawValue
         }
         /// 按钮类型
         var style: SIMChatTextFieldItemStyle {
@@ -162,7 +214,6 @@ extension SIMChatTextField {
             }
         }
     }
-    
 }
 
 
@@ -170,7 +221,45 @@ extension SIMChatTextField : UITextViewDelegate {
     
     /// 将要编辑文本
     func textViewShouldBeginEditing(textView: UITextView) -> Bool {
-        return true
+        if delegate?.chatTextFieldShouldBeginEditing?(self) ?? true {
+            // 取消选中
+            self.selectedItem = nil
+            self.selectedStyle = .Keyboard
+            // ok
+            return true
+        }
+        return false
+    }
+    /// 己经开始编辑了
+    func textViewDidBeginEditing(textView: UITextView) {
+        delegate?.chatTextFieldDidBeginEditing?(self)
+    }
+    /// 将要结束
+    func textViewShouldEndEditing(textView: UITextView) -> Bool {
+        if delegate?.chatTextFieldShouldEndEditing?(self) ?? true {
+            return true
+        }
+        return false
+    }
+    /// 己经结束
+    func textViewDidEndEditing(textView: UITextView) {
+        delegate?.chatTextFieldDidEndEditing?(self)
+    }
+    /// 文本将要改变
+    func textView(textView: UITextView, shouldChangeTextInRange range: NSRange, replacementText text: String) -> Bool {
+        if delegate?.chatTextField?(self, shouldChangeCharactersInRange: range, replacementString: text) ?? true {
+            // 这是换行
+            if text == "\n" {
+                return self.delegate?.chatTextFieldShouldReturn?(self) ?? true
+            }
+            // 这是clear
+            if text.isEmpty && self.text.startIndex.advancedBy(range.length) == self.text.endIndex {
+                return self.delegate?.chatTextFieldShouldClear?(self) ?? true
+            }
+            // 其他
+            return true
+        }
+        return false
     }
     /// 文本己经改变.
     func textViewDidChange(textView: UITextView) {
@@ -180,6 +269,10 @@ extension SIMChatTextField : UITextViewDelegate {
             self.layoutIfNeeded()
             self.superview?.layoutIfNeeded()
         }
+        // 更新offset
+        textView.setContentOffset(CGPointZero, animated: true)
+        // 通知
+        delegate?.chatTextFieldDidChange?(self)
     }
 }
 
@@ -189,12 +282,34 @@ extension SIMChatTextField {
     ///
     /// 事件
     ///
-    func onEvent(sender: SIMChatTextFieldItem?) {
-        SIMLog.trace()
-        
-        currentItem?.actived = false
-        currentItem = sender
-        currentItem?.actived = true
-        
+    func onEvent(sender: SIMChatTextFieldItem) {
+        if sender.actived {
+            self.selectedItem = nil
+            self.selectedStyle = .Keyboard
+            self.textView.becomeFirstResponder()
+        } else {
+            self.selectedItem = sender
+            self.selectedStyle = sender.style
+            self.textView.resignFirstResponder()
+        }
     }
+}
+
+
+/// 代理 
+@objc protocol SIMChatTextFieldDelegate : NSObjectProtocol {
+    
+    optional func chatTextField(chatTextField: SIMChatTextField, didSelectItem item: Int)
+    
+    optional func chatTextFieldShouldBeginEditing(chatTextField: SIMChatTextField) -> Bool
+    optional func chatTextFieldDidBeginEditing(chatTextField: SIMChatTextField)
+    
+    optional func chatTextFieldShouldEndEditing(chatTextField: SIMChatTextField) -> Bool
+    optional func chatTextFieldDidEndEditing(chatTextField: SIMChatTextField)
+    
+    optional func chatTextFieldDidChange(chatTextField: SIMChatTextField)
+    optional func chatTextField(chatTextField: SIMChatTextField, shouldChangeCharactersInRange range: NSRange, replacementString string: String) -> Bool
+    
+     optional func chatTextFieldShouldClear(chatTextField: SIMChatTextField) -> Bool
+     optional func chatTextFieldShouldReturn(chatTextField: SIMChatTextField) -> Bool
 }

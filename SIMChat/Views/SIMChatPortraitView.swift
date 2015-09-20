@@ -41,11 +41,11 @@ class SIMChatPortraitView: SIMView {
     override var bounds: CGRect {
         willSet { contentView.layer.cornerRadius = contentView.bounds.width / 2 }
     }
-    
+   
     /// 关联的用户
     var user: SIMChatUser? {
         willSet {
-            contentView.image = SIMChatImageManager.defaultPortrait
+            contentView.image = SIMChatImageManager.defaultPortrait1
             //imageView.sd_setImageWithURL(NSURL(string: newValue?.portrait ?? ""), placeholderImage: SIMPortraitView.defaultPortrait)
         }
     }

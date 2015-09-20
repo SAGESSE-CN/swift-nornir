@@ -69,6 +69,7 @@ class SIMViewController : UIViewController {
 
 ///
 enum SIMChatTextFieldItemStyle : Int {
+    case None       = 0x0000
     case Keyboard   = 0x0100
     case Voice      = 0x0101
     case Emoji      = 0x0102

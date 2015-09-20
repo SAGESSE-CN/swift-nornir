@@ -10,10 +10,15 @@ import UIKit
 
 class SIMChatImageManager: NSObject {
 
+
+    static let deleteImageNor = UIImage(named: "simchat_button_delete_nor")
+    static let deleteImagePress = UIImage(named: "simchat_button_delete_press")
+
     /// 默认聊天背景
     static let defaultBackground = UIImage(named: "simchat_background_default")
     /// 默认头像
-    static let defaultPortrait = UIImage(named: "simchat_portrait_default")
+    static let defaultPortrait1 = UIImage(named: "simchat_portrait_default1")
+    static let defaultPortrait2 = UIImage(named: "simchat_portrait_default2")
     
     static let defautlInputBackground = UIImage(named: "chat_bottom_textfield")
     static let inputItemImages: [SIMChatTextFieldItemStyle : (n: UIImage?, h: UIImage?)] = [
