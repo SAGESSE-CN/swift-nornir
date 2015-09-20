@@ -18,7 +18,6 @@ import UIKit
 /// 聊天输入栏
 ///
 class SIMChatTextField : SIMView {
-
     /// 构建
     override func build() {
         super.build()

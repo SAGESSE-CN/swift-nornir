@@ -33,7 +33,6 @@ func NSLayoutConstraintMake(format: String, views: [String : AnyObject], options
 
 /// 添加build
 class SIMView : UIView {
-    
     /// 序列化
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -51,7 +50,6 @@ class SIMView : UIView {
 
 /// 添加build
 class SIMViewController : UIViewController {
-    
     /// 序列化
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)

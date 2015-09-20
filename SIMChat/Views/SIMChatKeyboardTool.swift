@@ -80,7 +80,6 @@ class SIMChatKeyboardTool: SIMView {
 
 /// MARK: - /// UICollectionViewDelegate or UICollectionViewDataSource
 extension SIMChatKeyboardTool : UICollectionViewDelegate, UICollectionViewDataSource {
-    
     /// 滑动完成
     func scrollViewDidEndDecelerating(scrollView: UIScrollView) {
         pageControl.currentPage = Int((scrollView.contentOffset.x + scrollView.frame.width / 2.0) / scrollView.frame.width)
@@ -225,7 +224,6 @@ extension UIBarButtonItem {
 
 /// MARK: - /// Events
 extension SIMChatKeyboardTool {
-    
     /// 选择了
     func onItem(item: UIBarButtonItem) {
         delegate?.chatKeyboardTool?(self, didSelectedItem: item)

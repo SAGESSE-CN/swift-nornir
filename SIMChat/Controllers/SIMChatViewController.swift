@@ -9,18 +9,15 @@
 import UIKit
 
 class SIMChatViewController: SIMViewController {
-    
     /// 构建
     override func build() {
         super.build()
     }
-
     /// 加载完成
     override func viewDidLoad() {
         super.viewDidLoad()
         
         let vs = ["tf" : textField]
-        
         
         // 设置背景
         view.backgroundColor = UIColor.clearColor()
@@ -146,7 +143,6 @@ class SIMChatViewController: SIMViewController {
 
 /// MARK: - /// Keyboard
 extension SIMChatViewController {
-    
     /// 获取键盘.
     func keyboard(style: SIMChatTextFieldItemStyle) -> UIView? {
         // 己经加载过了?
@@ -305,7 +301,6 @@ extension SIMChatViewController {
 
 /// MARK: - /// Text Field
 extension SIMChatViewController : SIMChatTextFieldDelegate {
-
     /// 选中..
     func chatTextField(chatTextField: SIMChatTextField, didSelectItem item: Int) {
         SIMLog.trace()
@@ -313,5 +308,4 @@ extension SIMChatViewController : SIMChatTextFieldDelegate {
             self.keyboard = keyboard(style)
         }
     }
-    
 }

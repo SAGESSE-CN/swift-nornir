@@ -9,7 +9,6 @@
 import UIKit
 
 class SIMChatLine : UIView {
-
     /// 自定义子层布局
     override func layoutSublayersOfLayer(layer: CALayer) {
         super.layoutSublayersOfLayer(layer)
@@ -35,7 +34,6 @@ class SIMChatLine : UIView {
         
         lineLayer.frame = nframe
     }
-    
     /// 线的layer
     lazy var lineLayer: CAShapeLayer = {
         let layer = CAShapeLayer()
@@ -47,21 +45,17 @@ class SIMChatLine : UIView {
         
         return layer
     }()
-   
     /// 线宽
     @IBInspectable var lineWith: CGFloat = 0.5 {
         willSet { 
             self.setNeedsLayout()  
         }
     }
-    
     /// 线的颜色
     @IBInspectable var lineColor: UIColor? {
         set { return lineLayer.backgroundColor = newValue?.CGColor }
         get { return lineLayer.backgroundColor == nil ? nil : UIColor(CGColor: lineLayer.backgroundColor!) }
     }
-    
-    
     ///      Top
     ///      +--+
     /// Left |  | Right

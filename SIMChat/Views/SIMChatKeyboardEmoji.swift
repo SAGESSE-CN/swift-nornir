@@ -63,9 +63,9 @@ class SIMChatKeyboardEmoji: SIMView {
         addConstraints(NSLayoutConstraintMake("H:|-(0)-[c]-(0)-|", views: vs))
         addConstraints(NSLayoutConstraintMake("H:|-(0)-[p]-(0)-|", views: vs))
         addConstraints(NSLayoutConstraintMake("H:|-(0)-[l]-(0)-|", views: vs))
-        addConstraints(NSLayoutConstraintMake("V:|-(0)-[c][l(1)]-(40)-|", views: vs))
-        addConstraints(NSLayoutConstraintMake("V:[p(24)]-(49)-|", views: vs))
+        addConstraints(NSLayoutConstraintMake("V:|-(0)-[c]-(0)-[l(1)]-(40)-|", views: vs))
         
+        addConstraints(NSLayoutConstraintMake("V:[p(24)]-(49)-|", views: vs))
         addConstraints(NSLayoutConstraintMake("H:[b(64)]-(0)-|", views: vs))
         addConstraints(NSLayoutConstraintMake("V:[b(41)]-(0)-|", views: vs))
         
@@ -136,7 +136,6 @@ extension SIMChatKeyboardEmoji : UICollectionViewDelegate, UICollectionViewDataS
         
         return cell
     }
-    
 }
 
 /// MAKR: - /// Type

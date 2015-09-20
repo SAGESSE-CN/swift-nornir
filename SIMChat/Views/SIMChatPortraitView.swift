@@ -19,7 +19,6 @@ import UIKit
 /// 聊天头像
 ///
 class SIMChatPortraitView: SIMView {
-   
     /// 构建.
     override func build() {
         super.build()
@@ -41,7 +40,6 @@ class SIMChatPortraitView: SIMView {
     override var bounds: CGRect {
         willSet { contentView.layer.cornerRadius = contentView.bounds.width / 2 }
     }
-   
     /// 关联的用户
     var user: SIMChatUser? {
         willSet {

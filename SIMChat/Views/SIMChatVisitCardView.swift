@@ -19,7 +19,6 @@ import UIKit
 /// 聊天名片
 ///
 class SIMChatVisitCardView: SIMView {
-    
     /// 构建
     override func build() {
         super.build()
@@ -38,7 +37,6 @@ class SIMChatVisitCardView: SIMView {
         addConstraints(NSLayoutConstraintMake("H:|-(8)-[t]-(8)-|", views: vs))
         addConstraints(NSLayoutConstraintMake("V:|-(0)-[t]-(0)-|", views: vs))
     }
-    
     /// 关联的用户
     var user: SIMChatUser? {
         willSet {

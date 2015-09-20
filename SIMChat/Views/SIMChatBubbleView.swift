@@ -20,7 +20,6 @@ import UIKit
 /// 聊天气泡
 ///
 class SIMChatBubbleView : SIMView {
-    
     /// 构建
     override func build() {
         super.build()
@@ -46,7 +45,6 @@ class SIMChatBubbleView : SIMView {
         addConstraints(NSLayoutConstraintMake("H:|-(9)-[c]-(9)-|", views: vs))
         addConstraints(NSLayoutConstraintMake("V:|-(7)-[c]-(7)-|", views: vs))
     }
-    
     /// 背景图
     var backgroundImage: UIImage? {
         set { return backgroundView.image = newValue }
@@ -59,20 +57,16 @@ class SIMChatBubbleView : SIMView {
 
 /// 消息转发
 extension SIMChatBubbleView {
-    
     override var gestureRecognizers: [UIGestureRecognizer]? {
         set { return contentView.gestureRecognizers = newValue }
         get { return contentView.gestureRecognizers }
     }
-    
     override func addGestureRecognizer(gestureRecognizer: UIGestureRecognizer) {
         return contentView.addGestureRecognizer(gestureRecognizer)
     }
-    
     override func removeGestureRecognizer(gestureRecognizer: UIGestureRecognizer) {
         return contentView.removeGestureRecognizer(gestureRecognizer)
     }
-    
     override func gestureRecognizerShouldBegin(gestureRecognizer: UIGestureRecognizer) -> Bool {
         return contentView.gestureRecognizerShouldBegin(gestureRecognizer)
     }
