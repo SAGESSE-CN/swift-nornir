@@ -29,6 +29,10 @@ class SIMChatKeyboardAudio: SIMView {
     override func build() {
         super.build()
     }
+    /// 固定大小
+    override func intrinsicContentSize() -> CGSize {
+        return CGSizeMake(0, 216)
+    }
     
 //    func buildUI() {
 //        
@@ -87,10 +91,7 @@ class SIMChatKeyboardAudio: SIMView {
 //        finishButton.addTarget(self, action: "touchUpOfSend", forControlEvents: .TouchUpInside)
 //    }
 //
-//    override func intrinsicContentSize() -> CGSize {
-//        return CGSizeMake(0, 216)
-//    }
-//    
+//
 //
 //    weak var delegate: SIMChatInputAudioViewDelegate?
 //    
@@ -346,6 +347,69 @@ class SIMChatKeyboardAudio: SIMView {
 //    }()
 //
 //    private var timer: NSTimer?
+    
+    
+    private(set) lazy var toolbar: UIView = {
+        let view = UIView()
+        let send = UIButton()
+        let cancel = UIButton()
+        
+        // config
+        
+        view.backgroundColor = UIColor.clearColor()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        
+        send.setTitle("发送", forState: .Normal)
+        send.setTitleColor(UIColor(hex: 0x18B4ED), forState: .Normal)
+        send.setBackgroundImage(UIImage(named: "simchat_button_record_send"), forState: .Normal)
+        send.setBackgroundImage(UIImage(named: "simchat_button_record_send_press"), forState: .Highlighted)
+        send.translatesAutoresizingMaskIntoConstraints = false
+        
+        cancel.setTitle("取消", forState: .Normal)
+        cancel.setTitleColor(UIColor(hex: 0x18B4ED), forState: .Normal)
+        cancel.setBackgroundImage(UIImage(named: "simchat_button_record_cancel"), forState: .Normal)
+        cancel.setBackgroundImage(UIImage(named: "simchat_button_record_cancel_press"), forState: .Highlighted)
+        cancel.translatesAutoresizingMaskIntoConstraints = false
+        
+        // add views
+        view.addSubview(send)
+        view.addSubview(cancel)
+        self.addSubview(view)
+        
+        // add constraints
+        view.addConstraint(NSLayoutConstraintMake(send,   .Width,  .Equal, cancel, .Width))
+        view.addConstraint(NSLayoutConstraintMake(send,   .Top,    .Equal, view,   .Top))
+        view.addConstraint(NSLayoutConstraintMake(send,   .Right,  .Equal, view,   .Right))
+        view.addConstraint(NSLayoutConstraintMake(send,   .Bottom, .Equal, view,   .Bottom))
+        view.addConstraint(NSLayoutConstraintMake(send,   .Left,   .Equal, cancel, .Right))
+        view.addConstraint(NSLayoutConstraintMake(cancel, .Top,    .Equal, view,   .Top))
+        view.addConstraint(NSLayoutConstraintMake(cancel, .Left,   .Equal, view,   .Left))
+        view.addConstraint(NSLayoutConstraintMake(cancel, .Bottom, .Equal, view,   .Bottom))
+        
+        self.addConstraint(NSLayoutConstraintMake(view,   .Height, .Equal, nil,  .Height, 44))
+        self.addConstraint(NSLayoutConstraintMake(view,   .Left,   .Equal, self, .Left))
+        self.addConstraint(NSLayoutConstraintMake(view,   .Right,  .Equal, self, .Right))
+        self.addConstraint(NSLayoutConstraintMake(view,   .Top,    .Equal, self, .Bottom))
+        
+        // add events
+        send.addTarget(self, action: "onSend:", forControlEvents: .TouchUpInside)
+        cancel.addTarget(self, action: "onCancel:", forControlEvents: .TouchUpInside)
+        
+        // ok
+        return view
+    }()
+}
+
+/// MARK: - /// Event
+extension SIMChatKeyboardAudio {
+    /// 发送
+    func onSend() {
+        SIMLog.trace()
+    }
+    /// 取消
+    func onCancel() {
+        SIMLog.trace()
+    }
 }
 
 //extension SIMChatInputAudioView {

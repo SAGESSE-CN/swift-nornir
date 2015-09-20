@@ -57,7 +57,7 @@ class SIMChatKeyboardTool: SIMView {
         pageControl.numberOfPages = (contentView.numberOfItemsInSection(0) + 8 - 1) / 8
         pageControl.hidesForSinglePage = true
     }
-    /// ...
+    /// 固定大小
     override func intrinsicContentSize() -> CGSize {
         return CGSizeMake(0, 216)
     }

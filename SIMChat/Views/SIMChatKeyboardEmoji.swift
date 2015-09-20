@@ -74,7 +74,7 @@ class SIMChatKeyboardEmoji: SIMView {
         pageControl.addTarget(self, action: "onPageChanged:", forControlEvents: .ValueChanged)
         contentView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: "onItem:"))
     }
-    /// ...
+    /// 固定大小
     override func intrinsicContentSize() -> CGSize {
         return CGSizeMake(0, 216)
     }

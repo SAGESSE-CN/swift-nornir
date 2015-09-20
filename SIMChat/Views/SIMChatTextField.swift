@@ -16,7 +16,6 @@ import UIKit
 
 ///
 /// 聊天输入栏
-/// - TODO: 未考虑扩展问题
 ///
 class SIMChatTextField : SIMView {
 
@@ -326,6 +325,6 @@ extension SIMChatTextField {
     optional func chatTextFieldDidChange(chatTextField: SIMChatTextField)
     optional func chatTextField(chatTextField: SIMChatTextField, shouldChangeCharactersInRange range: NSRange, replacementString string: String) -> Bool
     
-     optional func chatTextFieldShouldClear(chatTextField: SIMChatTextField) -> Bool
-     optional func chatTextFieldShouldReturn(chatTextField: SIMChatTextField) -> Bool
+    optional func chatTextFieldShouldClear(chatTextField: SIMChatTextField) -> Bool
+    optional func chatTextFieldShouldReturn(chatTextField: SIMChatTextField) -> Bool
 }

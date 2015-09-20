@@ -158,7 +158,7 @@ extension SIMChatViewController {
         // 创建.
         switch style {
         case .Emoji: kb = SIMChatKeyboardEmoji(delegate: self)
-        case .Voice: kb = UIView()
+        case .Voice: kb = SIMChatKeyboardAudio()
         case .Tool:  kb = SIMChatKeyboardTool(delegate: self, dataSource: self)
         default:     kb = nil
         }
