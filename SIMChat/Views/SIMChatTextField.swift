@@ -263,9 +263,11 @@ extension SIMChatTextField : UITextViewDelegate {
     }
     /// 文本己经改变.
     func textViewDidChange(textView: UITextView) {
+        // 必须要先更新一下, 否则高度计算不准确
+        self.textView.layoutIfNeeded()
         let src = textView.bounds.height
         let dst = textView.contentSize.height
-        
+        // 只有不同才会调整
         if src != dst {
             if textView.contentSize.height < maxHeight {
                 SIMLog.trace("src: \(src), dst: \(dst)")

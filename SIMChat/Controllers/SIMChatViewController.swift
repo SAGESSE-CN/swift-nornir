@@ -185,19 +185,23 @@ extension SIMChatViewController {
     }
     /// 键盘显示
     func onKeyboardWillShow(sender: NSNotification) {
-        SIMLog.trace()
         // 获取高度
         if let r1 = sender.userInfo?[UIKeyboardFrameEndUserInfoKey]?.CGRectValue {
-            // 取消隐藏动画
-            self.keyboardHiddenAnimation = false
-            self.onKeyboardShow(r1)
+            if self.keyboardHeight != r1.height {
+                SIMLog.trace()
+                // 取消隐藏动画
+                self.keyboardHiddenAnimation = false
+                self.onKeyboardShow(r1)
+            }
         }
     }
     /// 键盘隐藏
     func onKeyboardWillHide(sender: NSNotification) {
-        SIMLog.trace()
-        // 转发
-        self.onKeyboardHidden(self.keyboard?.frame ?? CGRectZero, delay: false)
+        if self.keyboardHeight != 0 {
+            SIMLog.trace()
+            // 转发
+            self.onKeyboardHidden(self.keyboard?.frame ?? CGRectZero, delay: false)
+        }
     }
     ///
     /// 工具栏显示
