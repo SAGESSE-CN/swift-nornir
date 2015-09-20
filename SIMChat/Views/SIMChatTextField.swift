@@ -50,7 +50,7 @@ class SIMChatTextField : SIMView {
             addSubview(item)
             // add tag, if need
             if let btn = item as? SIMChatTextFieldItem {
-                btn.addTarget(self, action: "onEvent:", forControlEvents: .TouchUpInside)
+                btn.addTarget(self, action: "onItem:", forControlEvents: .TouchUpInside)
             }
         }
         addSubview(line)
@@ -114,26 +114,17 @@ class SIMChatTextField : SIMView {
     }
     /// ...
     override func intrinsicContentSize() -> CGSize {
-        return CGSizeMake(bounds.width, max(textView.contentSize.height + 10, 44))
+        if textView.contentSize.height > maxHeight {
+            // 不要改变
+            return CGSizeMake(bounds.width, bounds.height)
+        }
+        return CGSizeMake(bounds.width, max(textView.contentSize.height, 36) + 10)
     }
-    /// 代理
-    weak var delegate: SIMChatTextFieldDelegate?
     /// 内容
     var text: String! {
         set {
             self.textView.text = newValue
             self.textViewDidChange(textView)
-//            func scrollViewToBottom() {
-//                let textView = input.content
-//                
-//                let ch = textView.contentSize.height
-//                let bh = textView.bounds.height
-//                let py = textView.contentOffset.y
-//                
-//                if ch - bh > py {
-//                    textView.setContentOffset(CGPointMake(0, ch - bh), animated: true)
-//                }
-//            }
         }
         get {
             return self.textView.text
@@ -144,6 +135,17 @@ class SIMChatTextField : SIMView {
         didSet {
             self.delegate?.chatTextField?(self, didSelectItem: selectedStyle.rawValue)
         }
+    }
+    /// 最大高度
+    var maxHeight: CGFloat = 80
+    /// 代理
+    weak var delegate: SIMChatTextFieldDelegate?
+    
+    var contentSize: CGSize {
+        return textView.contentSize
+    }
+    var contentOffset: CGPoint {
+        return textView.contentOffset
     }
     
     private var selectedItem: SIMChatTextFieldItem? {
@@ -162,9 +164,8 @@ class SIMChatTextField : SIMView {
     ]
 }
 
-
+/// MARK: - /// Type
 extension SIMChatTextField {
-    
     ///
     /// 输入输的选项
     ///
@@ -216,9 +217,8 @@ extension SIMChatTextField {
     }
 }
 
-
+/// MARK: - /// Text View Delegate and Forward
 extension SIMChatTextField : UITextViewDelegate {
-    
     /// 将要编辑文本
     func textViewShouldBeginEditing(textView: UITextView) -> Bool {
         if delegate?.chatTextFieldShouldBeginEditing?(self) ?? true {
@@ -253,7 +253,7 @@ extension SIMChatTextField : UITextViewDelegate {
                 return self.delegate?.chatTextFieldShouldReturn?(self) ?? true
             }
             // 这是clear
-            if text.isEmpty && self.text.startIndex.advancedBy(range.length) == self.text.endIndex {
+            if text.isEmpty {
                 return self.delegate?.chatTextFieldShouldClear?(self) ?? true
             }
             // 其他
@@ -263,26 +263,41 @@ extension SIMChatTextField : UITextViewDelegate {
     }
     /// 文本己经改变.
     func textViewDidChange(textView: UITextView) {
-        //self.layoutIfNeeded()
-        UIView.animateWithDuration(0.25) {
-            self.invalidateIntrinsicContentSize()
-            self.layoutIfNeeded()
-            self.superview?.layoutIfNeeded()
+        let src = textView.bounds.height
+        let dst = textView.contentSize.height
+        
+        if src != dst {
+            if textView.contentSize.height < maxHeight {
+                SIMLog.trace("src: \(src), dst: \(dst)")
+                UIView.animateWithDuration(0.25) {
+                    self.invalidateIntrinsicContentSize()
+                    self.layoutIfNeeded()
+                    self.superview?.layoutIfNeeded()
+                }
+                // 更新offset
+                textView.setContentOffset(CGPointZero, animated: true)
+            }
         }
-        // 更新offset
-        textView.setContentOffset(CGPointZero, animated: true)
+        
         // 通知
         delegate?.chatTextFieldDidChange?(self)
     }
+    /// 滚动到最后
+    func scrollViewToBottom() {
+        SIMLog.trace()
+        let ch = textView.contentSize.height
+        let bh = textView.bounds.height
+        let py = textView.contentOffset.y
+        if ch - bh > py {
+            textView.setContentOffset(CGPointMake(0, ch - bh), animated: true)
+        }
+    }
 }
 
-
+/// MARK: - /// Event
 extension SIMChatTextField {
-    
-    ///
-    /// 事件
-    ///
-    func onEvent(sender: SIMChatTextFieldItem) {
+    /// 选项
+    func onItem(sender: SIMChatTextFieldItem) {
         if sender.actived {
             self.selectedItem = nil
             self.selectedStyle = .Keyboard
@@ -295,8 +310,7 @@ extension SIMChatTextField {
     }
 }
 
-
-/// 代理 
+/// 代理
 @objc protocol SIMChatTextFieldDelegate : NSObjectProtocol {
     
     optional func chatTextField(chatTextField: SIMChatTextField, didSelectItem item: Int)
@@ -312,4 +326,12 @@ extension SIMChatTextField {
     
      optional func chatTextFieldShouldClear(chatTextField: SIMChatTextField) -> Bool
      optional func chatTextFieldShouldReturn(chatTextField: SIMChatTextField) -> Bool
+}
+
+@objc protocol SIMChatKeyboardDelegate {
+
+    optional func chatKeyboardDidDelete(chatKeyboard: AnyObject)
+    optional func chatKeyboardDidReturn(chatKeyboard: AnyObject)
+    
+    optional func chatKeyboard(chatKeyboard: AnyObject, didSelectEmoji emoji: String)
 }

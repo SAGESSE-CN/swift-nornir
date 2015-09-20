@@ -10,18 +10,20 @@ import UIKit
 
 class SIMChatKeyboardEmoji: SIMView {
     
-//    convenience init(delegate: SIMChatInputEmojiViewDelegate?) {
-//        self.init()
-//        self.delegate = delegate
-//    }
-    
+    /// 初始化
+    convenience init(delegate: SIMChatKeyboardDelegate) {
+        self.init(frame: CGRectZero)
+        self.delegate = delegate
+    }
     /// 构建
     override func build() {
         super.build()
         
         let line = SIMChatLine()
+        let button = UIButton(type: .System)
         let vs = ["c" : contentView,
                   "l" : line,
+                  "b" : button,
                   "p" : pageControl]
         
         // config
@@ -43,14 +45,19 @@ class SIMChatKeyboardEmoji: SIMView {
         line.tintColor = UIColor(hex: 0xBDBDBD)
         line.translatesAutoresizingMaskIntoConstraints = false
         
+        button.tintColor = UIColor(hex: 0x7B7B7B)
+        button.setTitle("发送", forState: .Normal)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        
         pageControl.currentPage = 0
         pageControl.numberOfPages = (contentView.numberOfItemsInSection(0) + 21 - 1) / 21
         pageControl.hidesForSinglePage = true
         
         // add views
         addSubview(contentView)
-        addSubview(line)
         addSubview(pageControl)
+        addSubview(line)
+        addSubview(button)
         
         // add constraints
         addConstraints(NSLayoutConstraintMake("H:|-(0)-[c]-(0)-|", views: vs))
@@ -58,76 +65,22 @@ class SIMChatKeyboardEmoji: SIMView {
         addConstraints(NSLayoutConstraintMake("H:|-(0)-[l]-(0)-|", views: vs))
         addConstraints(NSLayoutConstraintMake("V:|-(0)-[c][l(1)]-(40)-|", views: vs))
         addConstraints(NSLayoutConstraintMake("V:[p(24)]-(49)-|", views: vs))
+        
+        addConstraints(NSLayoutConstraintMake("H:[b(64)]-(0)-|", views: vs))
+        addConstraints(NSLayoutConstraintMake("V:[b(41)]-(0)-|", views: vs))
+        
+        // add events
+        button.addTarget(self, action: "onSend:", forControlEvents: .TouchUpInside)
+        pageControl.addTarget(self, action: "onPageChanged:", forControlEvents: .ValueChanged)
+        contentView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: "onItem:"))
     }
-
-//    convenience init(delegate: SIMChatInputEmojiViewDelegate?) {
-//        self.init()
-//        self.delegate = delegate
-//    }
-//    
-//    func buildUI() {
-//        
-//        addSubview(content)
-//        addSubview(page)
-//        addSubview(send)
-//        addSubview(line)
-//        
-//        let cm = NSLayoutConstraint.constraintsWithVisualFormat
-//        let addConstraints = self.addConstraints
-//        let vs = ["vc": content,
-//                  "vp": page,
-//                  "vb": send,
-//                  "vl": line]
-//        
-//        addConstraints(cm("H:|[vc]|", options: .allZeros, metrics: nil, views: vs))
-//        addConstraints(cm("H:|[vl]|", options: .allZeros, metrics: nil, views: vs))
-//        addConstraints(cm("H:[vb(64)]|", options: .allZeros, metrics: nil, views: vs))
-//        addConstraints(cm("V:|[vc][vl(1)]-40-|", options: .allZeros, metrics: nil, views: vs))
-//        addConstraints(cm("H:|[vp]|", options: .allZeros, metrics: nil, views: vs))
-//        addConstraints(cm("V:[vp(24)]-49-|", options: .allZeros, metrics: nil, views: vs))
-//        addConstraints(cm("V:[vb(41)]-0-|", options: .allZeros, metrics: nil, views: vs))
-//        
-//        page.currentPage = 0
-//        page.numberOfPages = (content.numberOfItemsInSection(0) + 21 - 1) / 21
-//        page.hidesForSinglePage = true
-//        
-//        // add events
-//        page.addTarget(self, action: "onPageSwitch:", forControlEvents: .ValueChanged)
-//        send.addTarget(self, action: "onSendClicked:", forControlEvents: .TouchUpInside)
-//        content.addGestureRecognizer(event)
-//    }
-//
     /// ...
     override func intrinsicContentSize() -> CGSize {
         return CGSizeMake(0, 216)
     }
-//
-//    weak var delegate: SIMChatInputEmojiViewDelegate?
-//   
-//    private(set) lazy var event: UIGestureRecognizer = {
-//        let e = UITapGestureRecognizer(target: self, action: "onItemSelected:")
-//        return e
-//    }()
-//    
-//    private(set) lazy var send: UIButton = {
-//        let v = UIButton.buttonWithType(UIButtonType.System) as! UIButton
-//        
-//        v.tintColor = UIColor.blueColor()
-//        v.setTitle("发送", forState: .Normal)
-//        v.setTranslatesAutoresizingMaskIntoConstraints(false)
-//        
-//        return v
-//    }()
-//    private(set) lazy var line: SFLineView = {
-//        let v = SFLineView()
-//        
-//        v.contentMode = .Top
-//        v.tintColor = UIColor(red: 189/255.0, green: 189/255.0, blue: 189/255.0, alpha: 1)
-//        v.setTranslatesAutoresizingMaskIntoConstraints(false)
-//        
-//        return v
-//    }()
-
+    /// 代理.
+    weak var delegate: SIMChatKeyboardDelegate?
+    
     private(set) lazy var pageControl = UIPageControl()
     private(set) lazy var contentView = UICollectionView(frame: CGRectZero, collectionViewLayout: SIMChatKeyboardEmojiContentLayout())
     
@@ -163,36 +116,8 @@ class SIMChatKeyboardEmoji: SIMView {
 //
 /// MARK: - /// UICollectionViewDelegate or UICollectionViewDataSource
 extension SIMChatKeyboardEmoji : UICollectionViewDelegate, UICollectionViewDataSource {
-//
-//    /// 发送
-//    func onSendClicked(sender: UIButton) {
-//        if delegate?.chatInputEmojiViewShouldSendText?(self) ?? true {
-//            delegate?.chatInputEmojiViewDidSendText?(self)
-//        }
-//    }
-//    
-//    /// 选中.
-//    func onItemSelected(sender: UIGestureRecognizer) {
-//        let pt = sender.locationInView(content)
-//        if let idx = content.indexPathForItemAtPoint(pt) {
-//            if let cell = content.cellForItemAtIndexPath(idx) {
-//                if let value = cell.valueForKey("title") as? String {
-//                    if value == "\u{7F}" {
-//                        if delegate?.chatInputEmojiViewShouldDeleteText?(self) ?? true {
-//                            delegate?.chatInputEmojiViewDidDeleteText?(self)
-//                        }
-//                    } else {
-//                        if delegate?.chatInputEmojiView?(self, shouldSelectEmoji: value) ?? true {
-//                            delegate?.chatInputEmojiView?(self, didSelectEmoji: value)
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//    }
-    
     /// 切换页面
-    func onPageSwitch(sender: UIPageControl) {
+    func onPageChanged(sender: UIPageControl) {
         contentView.setContentOffset(CGPointMake(contentView.bounds.width * CGFloat(sender.currentPage), 0), animated: true)
     }
     /// 滑动
@@ -224,7 +149,6 @@ extension SIMChatKeyboardEmoji : UICollectionViewDelegate, UICollectionViewDataS
 
 /// MAKR: - /// Type
 extension SIMChatKeyboardEmoji {
-    
     /// 单元格
     private class SIMChatKeyboardEmojiContentCell : UICollectionViewCell {
         /// 初始化
@@ -329,15 +253,25 @@ extension SIMChatKeyboardEmoji {
     }
 }
 
-//
-//@objc protocol SIMChatInputEmojiViewDelegate : NSObjectProtocol {
-//    
-//    optional func chatInputEmojiView(chatInputEmojiView: SIMChatInputEmojiView, shouldSelectEmoji emoji: String) -> Bool
-//    optional func chatInputEmojiView(chatInputEmojiView: SIMChatInputEmojiView, didSelectEmoji emoji: String)
-//    
-//    optional func chatInputEmojiViewShouldDeleteText(chatInputEmojiView: SIMChatInputEmojiView) -> Bool
-//    optional func chatInputEmojiViewDidDeleteText(chatInputEmojiView: SIMChatInputEmojiView)
-//    
-//    optional func chatInputEmojiViewShouldSendText(chatInputEmojiView: SIMChatInputEmojiView) -> Bool
-//    optional func chatInputEmojiViewDidSendText(chatInputEmojiView: SIMChatInputEmojiView)
-//}
+/// MARK: - /// Event 
+extension SIMChatKeyboardEmoji {
+    /// 发送
+    func onSend(sender: AnyObject) {
+        delegate?.chatKeyboardDidReturn?(self)
+    }
+    /// 选中选项
+    func onItem(sender: UIGestureRecognizer) {
+        let pt = sender.locationInView(contentView)
+        if let idx = contentView.indexPathForItemAtPoint(pt) {
+            if let cell = contentView.cellForItemAtIndexPath(idx) as? SIMChatKeyboardEmojiContentCell {
+                if let value = cell.title {
+                    if value == "\u{7F}" {
+                        delegate?.chatKeyboardDidDelete?(self)
+                    } else {
+                        delegate?.chatKeyboard?(self, didSelectEmoji: value)
+                    }
+                }
+            }
+        }
+    }
+}

@@ -145,9 +145,45 @@ class SIMChatViewController: SIMViewController {
 }
 
 /// MARK: - /// Keyboard
-extension SIMChatViewController {
+extension SIMChatViewController : SIMChatKeyboardDelegate {
     
-    /// 键盘显示 
+    /// 获取键盘.
+    func keyboard(style: SIMChatTextFieldItemStyle) -> UIView? {
+        // 己经加载过了?
+        if let view = keyboards[style] {
+            return view
+        }
+        // 并没有
+        var kb: UIView!
+        // 创建.
+        switch style {
+        case .Emoji: kb = SIMChatKeyboardEmoji(delegate: self)
+        case .Voice: kb = UIView()
+        case .Tool:  kb = UIView()
+        default:     kb = nil
+        }
+        // 并没有创建成功?
+        guard kb != nil else {
+            return nil
+        }
+        
+        // config
+        kb.translatesAutoresizingMaskIntoConstraints = false
+        kb.backgroundColor = textField.backgroundColor
+        // add view
+        view.addSubview(kb)
+        // add constraints
+        view.addConstraint(NSLayoutConstraintMake(kb, .Left,  .Equal, view, .Left))
+        view.addConstraint(NSLayoutConstraintMake(kb, .Right, .Equal, view, .Right))
+        view.addConstraint(NSLayoutConstraintMake(kb, .Top,   .Equal, view, .Bottom))
+        ///
+        kb.layoutIfNeeded()
+        // 缓存
+        keyboards[style] = kb
+        // ok
+        return kb
+    }
+    /// 键盘显示
     func onKeyboardWillShow(sender: NSNotification) {
         SIMLog.trace()
         // 获取高度
@@ -157,14 +193,12 @@ extension SIMChatViewController {
             self.onKeyboardShow(r1)
         }
     }
-    
     /// 键盘隐藏
     func onKeyboardWillHide(sender: NSNotification) {
         SIMLog.trace()
         // 转发
         self.onKeyboardHidden(self.keyboard?.frame ?? CGRectZero, delay: false)
     }
-    
     ///
     /// 工具栏显示
     ///
@@ -179,7 +213,6 @@ extension SIMChatViewController {
             self.keyboardHeight = frame.height
         }
     }
-    
     ///
     /// 工具栏显示 
     ///
@@ -211,45 +244,32 @@ extension SIMChatViewController {
             block()
         }
     }
-    
-    /// 获取键盘.
-    func keyboard(style: SIMChatTextFieldItemStyle) -> UIView? {
-        // 己经加载过了?
-        if let view = keyboards[style] {
-            return view
+    /// 选择了表情
+    func chatKeyboard(chatKeyboard: AnyObject, didSelectEmoji emoji: String) {
+        let src = textField.contentSize.height
+        // = . =更新value
+        textField.text = (textField.text ?? "") + emoji
+        // 更新contetnOffset, 如果需要的话..
+        if src != textField.contentSize.height {
+            textField.scrollViewToBottom()
         }
-        // 并没有
-        var kb: UIView!
-        // 创建.
-        switch style {
-        case .Emoji: kb = SIMChatKeyboardEmoji()
-        case .Voice: kb = UIView()
-        case .Tool:  kb = UIView()
-        default:     kb = nil
+    }
+    /// 选择了后退
+    func chatKeyboardDidDelete(chatKeyboard: AnyObject) {
+        let src = textField.contentSize.height
+        var str = textField.text
+        // ..
+        if str?.endIndex != str?.startIndex {
+            str = str.substringToIndex(str.endIndex.advancedBy(-1))
         }
-        // 并没有创建成功?
-        guard kb != nil else {
-            return nil
+        // =. =更差value
+        textField.text = str
+        // 更新contetnOffset, 如果需要的话..
+        if src != textField.contentSize.height {
+            textField.scrollViewToBottom()
         }
-        
-        // config
-        kb.translatesAutoresizingMaskIntoConstraints = false
-        kb.backgroundColor = textField.backgroundColor
-        // add view
-        view.addSubview(kb)
-        // add constraints
-        view.addConstraint(NSLayoutConstraintMake(kb, .Left,  .Equal, view, .Left))
-        view.addConstraint(NSLayoutConstraintMake(kb, .Right, .Equal, view, .Right))
-        view.addConstraint(NSLayoutConstraintMake(kb, .Top,   .Equal, view, .Bottom))
-        ///
-        kb.layoutIfNeeded()
-        // 缓存
-        keyboards[style] = kb
-        // ok
-        return kb
     }
 }
-
 
 /// MARK: - /// Text Field
 extension SIMChatViewController : SIMChatTextFieldDelegate {

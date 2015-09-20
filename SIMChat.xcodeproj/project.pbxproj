@@ -152,14 +152,12 @@
 		0C0C8E421BAD470A00573160 /* Others */ = {
 			isa = PBXGroup;
 			children = (
+				0C44F70F1BAEE8A2005642B4 /* Ex */,
 				0C0C8E5D1BAD671300573160 /* SIMAttr.swift */,
 				0C0C8E431BAD470A00573160 /* SIMLog.swift */,
 				0C0C8E571BAD506300573160 /* SIMHelper.swift */,
 				0C0C8E5F1BAD67B100573160 /* SIMNotificationCenter.swift */,
 				0C0C8E611BAD717000573160 /* SIMChatImageManager.swift */,
-				0CEB52B11BAE48B5009C5521 /* UIColor+Hex.swift */,
-				0CEB52B31BAE48ED009C5521 /* UIImage+FixOrientation.swift */,
-				0CEB52B51BAE49FA009C5521 /* UIViewController+Transition.swift */,
 			);
 			path = Others;
 			sourceTree = "<group>";
@@ -264,6 +262,16 @@
 				0C42DAA01BAD44BB00371CC7 /* SIMChatDemo.xcassets */,
 			);
 			path = SIMChatDemo;
+			sourceTree = "<group>";
+		};
+		0C44F70F1BAEE8A2005642B4 /* Ex */ = {
+			isa = PBXGroup;
+			children = (
+				0CEB52B11BAE48B5009C5521 /* UIColor+Hex.swift */,
+				0CEB52B31BAE48ED009C5521 /* UIImage+FixOrientation.swift */,
+				0CEB52B51BAE49FA009C5521 /* UIViewController+Transition.swift */,
+			);
+			name = Ex;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
