@@ -34,7 +34,7 @@ class SIMChatVisitCardView: SIMView {
         // add views
         addSubview(titleLabel)
         
-        // add contstraints
+        // add constraints
         addConstraints(NSLayoutConstraintMake("H:|-(8)-[t]-(8)-|", views: vs))
         addConstraints(NSLayoutConstraintMake("V:|-(0)-[t]-(0)-|", views: vs))
     }

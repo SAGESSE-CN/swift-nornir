@@ -1,5 +1,5 @@
 //
-//  SIMLine.swift
+//  SIMChatLine.swift
 //  SIMChat
 //
 //  Created by sagesse on 9/20/15.
@@ -8,9 +8,7 @@
 
 import UIKit
 
-import UIKit
-
-class SIMLine : UIView {
+class SIMChatLine : UIView {
 
     /// 自定义子层布局
     override func layoutSublayersOfLayer(layer: CALayer) {

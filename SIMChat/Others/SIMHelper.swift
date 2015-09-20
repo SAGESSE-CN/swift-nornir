@@ -31,7 +31,6 @@ func NSLayoutConstraintMake(format: String, views: [String : AnyObject], options
     return NSLayoutConstraint.constraintsWithVisualFormat(format, options: opts, metrics: metrics, views: views)
 }
 
-
 /// 添加build
 class SIMView : UIView {
     
@@ -48,5 +47,31 @@ class SIMView : UIView {
     /// 构建
     func build() {
     }
+}
+
+/// 添加build
+class SIMViewController : UIViewController {
+    
+    /// 序列化
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+        self.build()
+    }
+    /// 初始化
+    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: NSBundle?) {
+        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+        self.build()
+    }
+    /// 构建
+    func build() {
+    }
+}
+
+///
+enum SIMChatTextFieldItemStyle : Int {
+    case Keyboard   = 0x0100
+    case Voice      = 0x0101
+    case Emoji      = 0x0102
+    case Tool       = 0x0103
 }
 
