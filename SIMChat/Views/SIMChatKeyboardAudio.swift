@@ -8,6 +8,7 @@
 
 import UIKit
 
+/// 自定义键盘-音频
 class SIMChatKeyboardAudio: SIMView {
     
     enum State : Int {

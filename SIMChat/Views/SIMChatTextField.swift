@@ -327,11 +327,3 @@ extension SIMChatTextField {
      optional func chatTextFieldShouldClear(chatTextField: SIMChatTextField) -> Bool
      optional func chatTextFieldShouldReturn(chatTextField: SIMChatTextField) -> Bool
 }
-
-@objc protocol SIMChatKeyboardDelegate {
-
-    optional func chatKeyboardDidDelete(chatKeyboard: AnyObject)
-    optional func chatKeyboardDidReturn(chatKeyboard: AnyObject)
-    
-    optional func chatKeyboard(chatKeyboard: AnyObject, didSelectEmoji emoji: String)
-}

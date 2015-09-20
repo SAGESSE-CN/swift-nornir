@@ -8,10 +8,10 @@
 
 import UIKit
 
+/// 自定义键盘-表情面板
 class SIMChatKeyboardEmoji: SIMView {
-    
     /// 初始化
-    convenience init(delegate: SIMChatKeyboardDelegate) {
+    convenience init(delegate: SIMChatKeyboardEmojiDelegate) {
         self.init(frame: CGRectZero)
         self.delegate = delegate
     }
@@ -79,7 +79,7 @@ class SIMChatKeyboardEmoji: SIMView {
         return CGSizeMake(0, 216)
     }
     /// 代理.
-    weak var delegate: SIMChatKeyboardDelegate?
+    weak var delegate: SIMChatKeyboardEmojiDelegate?
     
     private(set) lazy var pageControl = UIPageControl()
     private(set) lazy var contentView = UICollectionView(frame: CGRectZero, collectionViewLayout: SIMChatKeyboardEmojiContentLayout())
@@ -94,9 +94,7 @@ class SIMChatKeyboardEmoji: SIMView {
                 return NSString(bytes: $0, length: sizeof(idx.dynamicType), encoding: NSUTF8StringEncoding) as! String
             }
         }
-        
         var rs = [String]()
-        
         for i:UInt32 in 0x1F600 ..< 0x1F64F {
             if i < 0x1F641 || i > 0x1F644 {
                 rs.append(emoji(i))
@@ -108,18 +106,12 @@ class SIMChatKeyboardEmoji: SIMView {
         for i:UInt32 in 0x1F6A5 ..< 0x1F6C5 {
             rs.append(emoji(i))
         }
-        
         return rs
     }()
 }
-//
-//
+
 /// MARK: - /// UICollectionViewDelegate or UICollectionViewDataSource
 extension SIMChatKeyboardEmoji : UICollectionViewDelegate, UICollectionViewDataSource {
-    /// 切换页面
-    func onPageChanged(sender: UIPageControl) {
-        contentView.setContentOffset(CGPointMake(contentView.bounds.width * CGFloat(sender.currentPage), 0), animated: true)
-    }
     /// 滑动
     func scrollViewDidEndDecelerating(scrollView: UIScrollView) {
         pageControl.currentPage = Int((scrollView.contentOffset.x + scrollView.frame.width / 2.0) / scrollView.frame.width)
@@ -257,7 +249,7 @@ extension SIMChatKeyboardEmoji {
 extension SIMChatKeyboardEmoji {
     /// 发送
     func onSend(sender: AnyObject) {
-        delegate?.chatKeyboardDidReturn?(self)
+        delegate?.chatKeyboardEmojiDidReturn?(self)
     }
     /// 选中选项
     func onItem(sender: UIGestureRecognizer) {
@@ -266,12 +258,25 @@ extension SIMChatKeyboardEmoji {
             if let cell = contentView.cellForItemAtIndexPath(idx) as? SIMChatKeyboardEmojiContentCell {
                 if let value = cell.title {
                     if value == "\u{7F}" {
-                        delegate?.chatKeyboardDidDelete?(self)
+                        delegate?.chatKeyboardEmojiDidDelete?(self)
                     } else {
-                        delegate?.chatKeyboard?(self, didSelectEmoji: value)
+                        delegate?.chatKeyboardEmoji?(self, didSelectEmoji: value)
                     }
                 }
             }
         }
     }
+    /// 切换页面
+    func onPageChanged(sender: UIPageControl) {
+        contentView.setContentOffset(CGPointMake(contentView.bounds.width * CGFloat(sender.currentPage), 0), animated: true)
+    }
+}
+
+/// 代理
+@objc protocol SIMChatKeyboardEmojiDelegate {
+
+    optional func chatKeyboardEmojiDidDelete(chatKeyboardEmoji: SIMChatKeyboardEmoji)
+    optional func chatKeyboardEmojiDidReturn(chatKeyboardEmoji: SIMChatKeyboardEmoji)
+    
+    optional func chatKeyboardEmoji(chatKeyboardEmoji: SIMChatKeyboardEmoji, didSelectEmoji emoji: String)
 }

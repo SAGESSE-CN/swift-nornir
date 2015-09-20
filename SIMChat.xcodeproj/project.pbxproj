@@ -90,7 +90,7 @@
 		0CEB52B71BAE4D1E009C5521 /* SIMChatLine.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SIMChatLine.swift; path = ../Others/SIMChatLine.swift; sourceTree = "<group>"; };
 		0CEB52B91BAE773A009C5521 /* SIMChatKeyboardAudio.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SIMChatKeyboardAudio.swift; sourceTree = "<group>"; };
 		0CEB52BB1BAE7767009C5521 /* SIMChatKeyboardEmoji.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SIMChatKeyboardEmoji.swift; sourceTree = "<group>"; wrapsLines = 0; };
-		0CEB52BD1BAE77A1009C5521 /* SIMChatKeyboardTool.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SIMChatKeyboardTool.swift; sourceTree = "<group>"; };
+		0CEB52BD1BAE77A1009C5521 /* SIMChatKeyboardTool.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SIMChatKeyboardTool.swift; sourceTree = "<group>"; wrapsLines = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */

@@ -145,7 +145,7 @@ class SIMChatViewController: SIMViewController {
 }
 
 /// MARK: - /// Keyboard
-extension SIMChatViewController : SIMChatKeyboardDelegate {
+extension SIMChatViewController {
     
     /// 获取键盘.
     func keyboard(style: SIMChatTextFieldItemStyle) -> UIView? {
@@ -159,7 +159,7 @@ extension SIMChatViewController : SIMChatKeyboardDelegate {
         switch style {
         case .Emoji: kb = SIMChatKeyboardEmoji(delegate: self)
         case .Voice: kb = UIView()
-        case .Tool:  kb = UIView()
+        case .Tool:  kb = SIMChatKeyboardTool(delegate: self, dataSource: self)
         default:     kb = nil
         }
         // 并没有创建成功?
@@ -217,7 +217,7 @@ extension SIMChatViewController : SIMChatKeyboardDelegate {
     /// 工具栏显示 
     ///
     /// :param: frame 接下来键盘的大小
-    /// :param: delay 是否需要延迟加载(主要是键盘切换)
+    /// :param: delay 是否需要延迟加载(键盘切换需要延迟一下)
     ///
     func onKeyboardHidden(frame: CGRect, delay: Bool = false) {
         SIMLog.debug("\(frame) \(delay)")
@@ -244,8 +244,12 @@ extension SIMChatViewController : SIMChatKeyboardDelegate {
             block()
         }
     }
+}
+
+/// MARK: - /// Extension Keyboard Emoji
+extension SIMChatViewController : SIMChatKeyboardEmojiDelegate {
     /// 选择了表情
-    func chatKeyboard(chatKeyboard: AnyObject, didSelectEmoji emoji: String) {
+    func chatKeyboardEmoji(chatKeyboardEmoji: SIMChatKeyboardEmoji, didSelectEmoji emoji: String) {
         let src = textField.contentSize.height
         // = . =更新value
         textField.text = (textField.text ?? "") + emoji
@@ -255,7 +259,7 @@ extension SIMChatViewController : SIMChatKeyboardDelegate {
         }
     }
     /// 选择了后退
-    func chatKeyboardDidDelete(chatKeyboard: AnyObject) {
+    func chatKeyboardEmojiDidDelete(chatKeyboardEmoji: SIMChatKeyboardEmoji) {
         let src = textField.contentSize.height
         var str = textField.text
         // ..
@@ -269,6 +273,30 @@ extension SIMChatViewController : SIMChatKeyboardDelegate {
             textField.scrollViewToBottom()
         }
     }
+    /// 发送
+    func chatKeyboardEmojiDidReturn(chatKeyboardEmoji: SIMChatKeyboardEmoji) {
+        SIMLog.debug("发送文本")
+    }
+}
+
+/// MARK: - /// Extension Keyboard Tool
+extension SIMChatViewController : SIMChatKeyboardToolDataSource, SIMChatKeyboardToolDelegate {
+    /// 需要扩展工具栏的数量
+    func chatKeyboardTool(chatKeyboardTool: SIMChatKeyboardTool, numberOfItemsInSection section: Int) -> Int {
+        return 0
+    }
+    /// item
+    func chatKeyboardTool(chatKeyboardTool: SIMChatKeyboardTool, itemAtIndexPath indexPath: NSIndexPath) -> UIBarButtonItem? {
+        return nil
+    }
+    /// 选中
+    func chatKeyboardTool(chatKeyboardTool: SIMChatKeyboardTool, didSelectedItem item: UIBarButtonItem) {
+        SIMLog.debug((item.title ?? "") + "(\(item.tag))")
+    }
+}
+
+/// MARK: - /// Extension Keyboard Audio
+extension SIMChatViewController {
 }
 
 /// MARK: - /// Text Field
