@@ -350,10 +350,11 @@ class SIMChatKeyboardAudio: SIMView {
 //
 //    private var timer: NSTimer?
    
-    private lazy var pushTalkView: UIView = {
+    private lazy var pushTalkView: SIMChatKeyboardAudioPushToTalkView = {
         let view = SIMChatKeyboardAudioPushToTalkView()
         
         // config
+        view.delegate = self
         view.backgroundColor = UIColor.clearColor()
         view.translatesAutoresizingMaskIntoConstraints = false
         
@@ -439,20 +440,33 @@ extension SIMChatKeyboardAudio {
             recordButton.setBackgroundImage(UIImage(named: "simchat_keyboard_voice_button_press"), forState: .Highlighted)
             recordButton.translatesAutoresizingMaskIntoConstraints = false
             
+            tipsLabel.text = "按住说话"
             tipsLabel.textColor = UIColor(hex: 0x7B7B7B)
             tipsLabel.translatesAutoresizingMaskIntoConstraints = false
+            
+            activityView.translatesAutoresizingMaskIntoConstraints = false
+            activityView.hidesWhenStopped = true
+            activityView.hidden = true
             
             // add view
             addSubview(operatorView)
             addSubview(recordButton)
+            addSubview(tipsLabel)
+            addSubview(activityView)
             
             // add constraints
+            addConstraint(NSLayoutConstraintMake(tipsLabel, .CenterX, .Equal, self, .CenterX))
+            addConstraint(NSLayoutConstraintMake(tipsLabel, .Top,     .Equal, self, .Top, 20))
+            
             addConstraint(NSLayoutConstraintMake(recordButton, .Top,     .Equal, self, .Top, 51))
             addConstraint(NSLayoutConstraintMake(recordButton, .CenterX, .Equal, self, .CenterX))
             
-            addConstraint(NSLayoutConstraintMake(operatorView, .Left,    .Equal, self, .Left,   20))
-            addConstraint(NSLayoutConstraintMake(operatorView, .Right,   .Equal, self, .Right, -20))
-            addConstraint(NSLayoutConstraintMake(operatorView, .Top,     .Equal, self, .Top,    36))
+            addConstraint(NSLayoutConstraintMake(operatorView, .Left,    .Equal, self,      .Left,   20))
+            addConstraint(NSLayoutConstraintMake(operatorView, .Right,   .Equal, self,      .Right, -20))
+            addConstraint(NSLayoutConstraintMake(operatorView, .Top,     .Equal, tipsLabel, .Bottom, 16))
+            
+            addConstraint(NSLayoutConstraintMake(activityView, .CenterY, .Equal, tipsLabel, .CenterY))
+            addConstraint(NSLayoutConstraintMake(activityView, .Right,   .Equal, tipsLabel, .Left,  -4))
             
             // add events
             recordButton.addTarget(self, action: "onDrag:withEvent:", forControlEvents: .TouchDragInside)
@@ -463,7 +477,7 @@ extension SIMChatKeyboardAudio {
             recordButton.addTarget(self, action: "onEnd:", forControlEvents: .TouchUpOutside)
             recordButton.addTarget(self, action: "onInterrupt:", forControlEvents: .TouchCancel)
         }
-        /// 开始
+        /// 事件
         dynamic func onBegin(sender: AnyObject) {
             SIMLog.trace()
             
@@ -488,7 +502,6 @@ extension SIMChatKeyboardAudio {
             
             recordButton.layer.addAnimation(ani, forKey: "start")
         }
-        /// 结束
         dynamic func onEnd(sender: AnyObject) {
             SIMLog.trace()
             // 检查状态
@@ -509,7 +522,6 @@ extension SIMChatKeyboardAudio {
                 self.precancelView.layer.transform = CATransform3DIdentity
             }
         }
-        /// 中断
         dynamic func onInterrupt(sender: AnyObject) {
             SIMLog.trace()
             // 如果中断了, 认为他是选择了试听
@@ -522,7 +534,6 @@ extension SIMChatKeyboardAudio {
             // 走正常结束流程
             self.onEnd(sender)
         }
-        /// 拖动
         dynamic func onDrag(sender: UIButton, withEvent event: UIEvent?) {
             // 一直维持高亮
             sender.highlighted = true
@@ -564,6 +575,8 @@ extension SIMChatKeyboardAudio {
             // 更新
             UIView.animateWithDuration(0.25) {
                 
+                self.update()
+                
                 self.preplayView.layer.transform = CATransform3DMakeScale(sl, sl, 1)
                 self.precancelView.layer.transform = CATransform3DMakeScale(sr, sr, 1)
                 self.preplayView.highlighted = hl
@@ -573,28 +586,32 @@ extension SIMChatKeyboardAudio {
             }
         }
         
-        /// 试听
         dynamic func onListen(sender: AnyObject) {
-            SIMLog.trace()
+            delegate?.onListen(self)
         }
-        /// 播放
-        dynamic func onPlay(sender: AnyObject) {
-            SIMLog.trace()
-        }
-        /// 停止
-        dynamic func onStop(sender: AnyObject) {
-            SIMLog.trace()
-        }
-        /// 完成
         dynamic func onFinish(sender: AnyObject) {
-            SIMLog.trace()
+            delegate?.onFinish(self)
         }
-        /// 取消
         dynamic func onCancel(sender: AnyObject) {
-            SIMLog.trace()
+            delegate?.onCancel(self)
+        }
+      
+        private func update() {
+            if self.preplayView.highlighted {
+                tipsLabel.text = "松开播放"
+            } else if self.precancelView.highlighted {
+                tipsLabel.text = "松开取消"
+            } else {
+                tipsLabel.text = "录音中.."
+            }
         }
         
+        var started = false
+        
+        weak var delegate: SIMChatKeyboardAudio?
+        
         private lazy var tipsLabel = UILabel()
+        private lazy var activityView = UIActivityIndicatorView(activityIndicatorStyle: .Gray)
         
         private lazy var listenButton = UIButton()
         private lazy var recordButton = UIButton()
@@ -665,6 +682,20 @@ extension SIMChatKeyboardAudio {
     func onCancel() {
         SIMLog.trace()
     }
+    
+    /// 试听
+    dynamic func onListen(sender: AnyObject) {
+        SIMLog.trace()
+    }
+    /// 完成
+    dynamic func onFinish(sender: AnyObject) {
+        SIMLog.trace()
+    }
+    /// 取消
+    dynamic func onCancel(sender: AnyObject) {
+        SIMLog.trace()
+    }
+    
 }
 
 //extension SIMChatInputAudioView {

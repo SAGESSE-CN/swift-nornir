@@ -276,6 +276,8 @@ extension SIMChatTextField : UITextViewDelegate {
                 }
                 // 更新offset
                 textView.setContentOffset(CGPointZero, animated: true)
+                // 大小发生了改变, 通知
+                delegate?.chatTextFieldContentSizeDidChange?(self)
             }
         }
         
@@ -323,6 +325,8 @@ extension SIMChatTextField {
     
     optional func chatTextFieldDidChange(chatTextField: SIMChatTextField)
     optional func chatTextField(chatTextField: SIMChatTextField, shouldChangeCharactersInRange range: NSRange, replacementString string: String) -> Bool
+    
+    optional func chatTextFieldContentSizeDidChange(chatTextField: SIMChatTextField)
     
     optional func chatTextFieldShouldClear(chatTextField: SIMChatTextField) -> Bool
     optional func chatTextFieldShouldReturn(chatTextField: SIMChatTextField) -> Bool

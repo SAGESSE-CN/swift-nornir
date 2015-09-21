@@ -14,6 +14,11 @@ func |<T : OptionSetType>(lhs: T, rhs: T) -> T {
     return lhs.union(rhs)
 }
 
+/// 让时间支持 - 操作
+func -(lhs: NSDate, rhs: NSDate) -> NSTimeInterval {
+    return lhs.timeIntervalSince1970 - rhs.timeIntervalSince1970
+}
+
 /// 让枚举支持 allZeros
 extension OptionSetType where RawValue : BitwiseOperationsType {
     static var allZeros: Self {
@@ -49,6 +54,23 @@ class SIMView : UIView {
 }
 
 /// 添加build
+class SIMTableViewCell : UITableViewCell {
+    /// 序列化
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+        self.build()
+    }
+    /// 初始化
+    override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
+        super.init(style: style, reuseIdentifier: reuseIdentifier)
+        self.build()
+    }
+    /// 构建
+    func build() {
+    }
+}
+
+/// 添加build
 class SIMViewController : UIViewController {
     /// 序列化
     required init?(coder aDecoder: NSCoder) {
@@ -74,3 +96,24 @@ enum SIMChatTextFieldItemStyle : Int {
     case Tool       = 0x0103
 }
 
+
+
+extension NSDate {
+    /// 零
+    class var zero: NSDate {
+        return NSDate(timeIntervalSince1970: 0)
+    }
+    /// 现在
+    class var now: NSDate {
+        return NSDate()
+    }
+    /// 友好的显示
+    var visual: String {
+        let df = NSDateFormatter()
+        // format
+        df.dateStyle = .MediumStyle
+        df.timeStyle = .ShortStyle
+        // ok
+        return df.stringFromDate(self)
+    }
+}
