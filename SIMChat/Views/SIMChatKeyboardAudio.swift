@@ -28,6 +28,8 @@ class SIMChatKeyboardAudio: SIMView {
     /// 构建
     override func build() {
         super.build()
+        
+        pushTalkView.hidden = false
     }
     /// 固定大小
     override func intrinsicContentSize() -> CGSize {
@@ -347,9 +349,26 @@ class SIMChatKeyboardAudio: SIMView {
 //    }()
 //
 //    private var timer: NSTimer?
-    
-    
-    private(set) lazy var toolbar: UIView = {
+   
+    private lazy var pushTalkView: UIView = {
+        let view = SIMChatKeyboardAudioPushToTalkView()
+        
+        // config
+        view.backgroundColor = UIColor.clearColor()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        
+        // add view
+        self.addSubview(view)
+        
+        // add constraints
+        self.addConstraint(NSLayoutConstraintMake(view,   .Left,   .Equal, self, .Left))
+        self.addConstraint(NSLayoutConstraintMake(view,   .Right,  .Equal, self, .Right))
+        self.addConstraint(NSLayoutConstraintMake(view,   .Top,    .Equal, self, .Top))
+        self.addConstraint(NSLayoutConstraintMake(view,   .Bottom, .Equal, self, .Bottom))
+        
+        return view
+    }()
+    private lazy var toolbarView: UIView = {
         let view = UIView()
         let send = UIButton()
         let cancel = UIButton()
@@ -361,14 +380,14 @@ class SIMChatKeyboardAudio: SIMView {
         
         send.setTitle("发送", forState: .Normal)
         send.setTitleColor(UIColor(hex: 0x18B4ED), forState: .Normal)
-        send.setBackgroundImage(UIImage(named: "simchat_button_record_send"), forState: .Normal)
-        send.setBackgroundImage(UIImage(named: "simchat_button_record_send_press"), forState: .Highlighted)
+        send.setBackgroundImage(UIImage(named: "simchat_keyboard_voice_more_send_nor"), forState: .Normal)
+        send.setBackgroundImage(UIImage(named: "simchat_keyboard_voice_more_send_press"), forState: .Highlighted)
         send.translatesAutoresizingMaskIntoConstraints = false
         
         cancel.setTitle("取消", forState: .Normal)
         cancel.setTitleColor(UIColor(hex: 0x18B4ED), forState: .Normal)
-        cancel.setBackgroundImage(UIImage(named: "simchat_button_record_cancel"), forState: .Normal)
-        cancel.setBackgroundImage(UIImage(named: "simchat_button_record_cancel_press"), forState: .Highlighted)
+        cancel.setBackgroundImage(UIImage(named: "simchat_keyboard_voice_more_cancel_nor"), forState: .Normal)
+        cancel.setBackgroundImage(UIImage(named: "simchat_keyboard_voice_more_cancel_press"), forState: .Highlighted)
         cancel.translatesAutoresizingMaskIntoConstraints = false
         
         // add views
@@ -398,6 +417,242 @@ class SIMChatKeyboardAudio: SIMView {
         // ok
         return view
     }()
+}
+
+/// MARK: - /// Type 
+extension SIMChatKeyboardAudio {
+  
+    /// 按下说话
+    private class SIMChatKeyboardAudioPushToTalkView : SIMView {
+        // 构建
+        override func build() {
+            super.build()
+            
+            // config
+            operatorView.alpha = 0
+            operatorView.backgroundColor = UIColor.clearColor()
+            operatorView.translatesAutoresizingMaskIntoConstraints = false
+            
+            recordButton.setImage(UIImage(named: "simchat_keyboard_voice_icon_record"), forState: .Normal)
+            recordButton.setImage(UIImage(named: "simchat_keyboard_voice_icon_record"), forState: .Highlighted)
+            recordButton.setBackgroundImage(UIImage(named: "simchat_keyboard_voice_button_nor"), forState: .Normal)
+            recordButton.setBackgroundImage(UIImage(named: "simchat_keyboard_voice_button_press"), forState: .Highlighted)
+            recordButton.translatesAutoresizingMaskIntoConstraints = false
+            
+            tipsLabel.textColor = UIColor(hex: 0x7B7B7B)
+            tipsLabel.translatesAutoresizingMaskIntoConstraints = false
+            
+            // add view
+            addSubview(operatorView)
+            addSubview(recordButton)
+            
+            // add constraints
+            addConstraint(NSLayoutConstraintMake(recordButton, .Top,     .Equal, self, .Top, 51))
+            addConstraint(NSLayoutConstraintMake(recordButton, .CenterX, .Equal, self, .CenterX))
+            
+            addConstraint(NSLayoutConstraintMake(operatorView, .Left,    .Equal, self, .Left,   20))
+            addConstraint(NSLayoutConstraintMake(operatorView, .Right,   .Equal, self, .Right, -20))
+            addConstraint(NSLayoutConstraintMake(operatorView, .Top,     .Equal, self, .Top,    36))
+            
+            // add events
+            recordButton.addTarget(self, action: "onDrag:withEvent:", forControlEvents: .TouchDragInside)
+            recordButton.addTarget(self, action: "onDrag:withEvent:", forControlEvents: .TouchDragOutside)
+            
+            recordButton.addTarget(self, action: "onBegin:", forControlEvents: .TouchDown)
+            recordButton.addTarget(self, action: "onEnd:", forControlEvents: .TouchUpInside)
+            recordButton.addTarget(self, action: "onEnd:", forControlEvents: .TouchUpOutside)
+            recordButton.addTarget(self, action: "onInterrupt:", forControlEvents: .TouchCancel)
+        }
+        /// 开始
+        dynamic func onBegin(sender: AnyObject) {
+            SIMLog.trace()
+            
+            // 先重置状态
+            self.preplayView.highlighted = false
+            self.preplayView2.highlighted = false
+            self.precancelView.highlighted = false
+            self.precancelView2.highlighted = false
+            
+            UIView.animateWithDuration(0.25) {
+                self.operatorView.alpha = 1
+                self.preplayView.layer.transform = CATransform3DIdentity
+                self.precancelView.layer.transform = CATransform3DIdentity
+            }
+            
+            // duang
+            let ani = CAKeyframeAnimation(keyPath: "transform.scale")
+            
+            ani.duration = 0.25
+            ani.values = [1,0.8,1.2,1]
+            ani.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionLinear)
+            
+            recordButton.layer.addAnimation(ani, forKey: "start")
+        }
+        /// 结束
+        dynamic func onEnd(sender: AnyObject) {
+            SIMLog.trace()
+            // 检查状态
+            if preplayView.highlighted {
+                // 需要试听
+                self.onListen(sender)
+            } else if precancelView.highlighted {
+                // 取消
+                self.onCancel(sender)
+            } else {
+                // 完成
+                self.onFinish(sender)
+            }
+            // 隐藏就行了
+            UIView.animateWithDuration(0.25) {
+                self.operatorView.alpha = 0
+                self.preplayView.layer.transform = CATransform3DIdentity
+                self.precancelView.layer.transform = CATransform3DIdentity
+            }
+        }
+        /// 中断
+        dynamic func onInterrupt(sender: AnyObject) {
+            SIMLog.trace()
+            // 如果中断了, 认为他是选择了试听
+            self.preplayView.highlighted = true
+            self.preplayView2.highlighted = true
+            self.precancelView.highlighted = false
+            self.precancelView2.highlighted = false
+            self.preplayView.layer.transform = CATransform3DIdentity
+            self.precancelView.layer.transform = CATransform3DIdentity
+            // 走正常结束流程
+            self.onEnd(sender)
+        }
+        /// 拖动
+        dynamic func onDrag(sender: UIButton, withEvent event: UIEvent?) {
+            // 一直维持高亮
+            sender.highlighted = true
+            // 检查触摸位置
+            guard let touch = event?.allTouches()?.first else {
+                // 并没有..
+                return
+            }
+            
+            var hl: Bool = false
+            var hr: Bool = false
+            var sl: CGFloat = 1.0
+            var sr: CGFloat = 1.0
+            let pt = touch.locationInView(recordButton)
+            
+            if pt.x < 0 {
+                // 左边
+                var pt2 = touch.locationInView(preplayView)
+                pt2.x -= preplayView.bounds.width / 2
+                pt2.y -= preplayView.bounds.height / 2
+                let r = sqrt(pt2.x * pt2.x + pt2.y * pt2.y)
+                // 是否高亮
+                hl = r < preplayView.bounds.width / 2
+                // 计算出左边的缩放
+                sl = 1.0 + max((64 - r) / 64, 0) * 0.75
+            
+            } else if pt.x > recordButton.bounds.width {
+                // 右边
+                var pt2 = touch.locationInView(precancelView)
+                pt2.x -= precancelView.bounds.width / 2
+                pt2.y -= precancelView.bounds.height / 2
+                let r = sqrt(pt2.x * pt2.x + pt2.y * pt2.y)
+                // 是否高亮
+                hr = r < precancelView.bounds.width / 2
+                // 计算出右边的缩放
+                sr = 1.0 + max((64 - r) / 64, 0) * 0.75
+            }
+            
+            // 更新
+            UIView.animateWithDuration(0.25) {
+                
+                self.preplayView.layer.transform = CATransform3DMakeScale(sl, sl, 1)
+                self.precancelView.layer.transform = CATransform3DMakeScale(sr, sr, 1)
+                self.preplayView.highlighted = hl
+                self.preplayView2.highlighted = hl
+                self.precancelView.highlighted = hr
+                self.precancelView2.highlighted = hr
+            }
+        }
+        
+        /// 试听
+        dynamic func onListen(sender: AnyObject) {
+            SIMLog.trace()
+        }
+        /// 播放
+        dynamic func onPlay(sender: AnyObject) {
+            SIMLog.trace()
+        }
+        /// 停止
+        dynamic func onStop(sender: AnyObject) {
+            SIMLog.trace()
+        }
+        /// 完成
+        dynamic func onFinish(sender: AnyObject) {
+            SIMLog.trace()
+        }
+        /// 取消
+        dynamic func onCancel(sender: AnyObject) {
+            SIMLog.trace()
+        }
+        
+        private lazy var tipsLabel = UILabel()
+        
+        private lazy var listenButton = UIButton()
+        private lazy var recordButton = UIButton()
+        
+        private lazy var preplayView = UIImageView()
+        private lazy var preplayView2 = UIImageView()
+        private lazy var precancelView = UIImageView()
+        private lazy var precancelView2 = UIImageView()
+        private lazy var operatorView: UIView = {
+            let view = UIView()
+            let line = UIImageView()
+            
+            // config
+            line.image = UIImage(named: "simchat_keyboard_voice_line")
+            line.translatesAutoresizingMaskIntoConstraints = false
+            
+            self.preplayView2.image = UIImage(named: "simchat_keyboard_voice_operate_listen_nor")
+            self.preplayView2.highlightedImage = UIImage(named: "simchat_keyboard_voice_operate_listen_press")
+            self.preplayView2.translatesAutoresizingMaskIntoConstraints = false
+            
+            self.precancelView2.image = UIImage(named: "simchat_keyboard_voice_operate_delete_nor")
+            self.precancelView2.highlightedImage = UIImage(named: "simchat_keyboard_voice_operate_delete_press")
+            self.precancelView2.translatesAutoresizingMaskIntoConstraints = false
+            
+            self.preplayView.image = UIImage(named: "simchat_keyboard_voice_operate_nor")
+            self.preplayView.highlightedImage = UIImage(named: "simchat_keyboard_voice_operate_press")
+            self.preplayView.translatesAutoresizingMaskIntoConstraints = false
+            
+            self.precancelView.image = UIImage(named: "simchat_keyboard_voice_operate_nor")
+            self.precancelView.highlightedImage = UIImage(named: "simchat_keyboard_voice_operate_press")
+            self.precancelView.translatesAutoresizingMaskIntoConstraints = false
+            
+            // add view
+            view.addSubview(line)
+            view.addSubview(self.preplayView)
+            view.addSubview(self.precancelView)
+            view.addSubview(self.preplayView2)
+            view.addSubview(self.precancelView2)
+            
+            // add constraints
+            view.addConstraint(NSLayoutConstraintMake(self.preplayView,   .Left,   .Equal, view, .Left))
+            view.addConstraint(NSLayoutConstraintMake(self.preplayView,   .Top,    .Equal, view, .Top))
+            view.addConstraint(NSLayoutConstraintMake(self.precancelView, .Top,    .Equal, view, .Top))
+            view.addConstraint(NSLayoutConstraintMake(self.precancelView, .Right,  .Equal, view, .Right))
+            
+            view.addConstraint(NSLayoutConstraintMake(line, .Left,   .Equal, view, .Left,   3.5))
+            view.addConstraint(NSLayoutConstraintMake(line, .Right,  .Equal, view, .Right, -3.5))
+            view.addConstraint(NSLayoutConstraintMake(line, .Top,    .Equal, view, .Top,    14))
+            view.addConstraint(NSLayoutConstraintMake(line, .Bottom, .Equal, view, .Bottom))
+            
+            view.addConstraint(NSLayoutConstraintMake(self.preplayView2,   .CenterX, .Equal, self.preplayView,   .CenterX))
+            view.addConstraint(NSLayoutConstraintMake(self.preplayView2,   .CenterY, .Equal, self.preplayView,   .CenterY))
+            view.addConstraint(NSLayoutConstraintMake(self.precancelView2, .CenterX, .Equal, self.precancelView, .CenterX))
+            view.addConstraint(NSLayoutConstraintMake(self.precancelView2, .CenterY, .Equal, self.precancelView, .CenterY))
+            
+            return view
+        }()
+    }
 }
 
 /// MARK: - /// Event
