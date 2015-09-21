@@ -63,8 +63,6 @@ class SIMChatCellBubble: SIMChatCell {
         contentView.addSubview(portraitView)
         contentView.addSubview(visitCardView)
         
-        self.backgroundColor = UIColor.orangeColor()
-        
         // add constraints
         
         addConstraints(NSLayoutConstraintMake("H:[p]-mh1@ph0-[b]-mh1@ph1-[p]", views: vs, metrics: ms))
