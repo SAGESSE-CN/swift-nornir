@@ -35,6 +35,11 @@ class SIMChatKeyboardAudio: SIMView {
     override func intrinsicContentSize() -> CGSize {
         return CGSizeMake(0, 216)
     }
+   
+    
+    
+    private lazy var audioManager = SIMChatAudioManager()
+    
     
 //    func buildUI() {
 //        
@@ -350,6 +355,25 @@ class SIMChatKeyboardAudio: SIMView {
 //
 //    private var timer: NSTimer?
    
+    private lazy var playView: SIMChatKeyboardAudioPlayView = {
+        let view = SIMChatKeyboardAudioPlayView()
+        
+        // config
+        //view.delegate = self
+        view.backgroundColor = UIColor.clearColor()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        
+        // add view
+        self.addSubview(view)
+        
+        // add constraints
+        self.addConstraint(NSLayoutConstraintMake(view,   .Left,   .Equal, self, .Left))
+        self.addConstraint(NSLayoutConstraintMake(view,   .Right,  .Equal, self, .Right))
+        self.addConstraint(NSLayoutConstraintMake(view,   .Top,    .Equal, self, .Top))
+        self.addConstraint(NSLayoutConstraintMake(view,   .Bottom, .Equal, self, .Bottom))
+        
+        return view
+    }()
     private lazy var pushTalkView: SIMChatKeyboardAudioPushToTalkView = {
         let view = SIMChatKeyboardAudioPushToTalkView()
         
@@ -422,7 +446,13 @@ class SIMChatKeyboardAudio: SIMView {
 
 /// MARK: - /// Type 
 extension SIMChatKeyboardAudio {
-  
+    /// 播放
+    class SIMChatKeyboardAudioPlayView : SIMView {
+        /// 构建
+        override func build() {
+            super.build()
+        }
+    }
     /// 按下说话
     private class SIMChatKeyboardAudioPushToTalkView : SIMView {
         // 构建
@@ -611,6 +641,7 @@ extension SIMChatKeyboardAudio {
         weak var delegate: SIMChatKeyboardAudio?
         
         private lazy var tipsLabel = UILabel()
+        private lazy var spectrumView = SIMChatSpectrumView(frame: CGRectZero)
         private lazy var activityView = UIActivityIndicatorView(activityIndicatorStyle: .Gray)
         
         private lazy var listenButton = UIButton()
@@ -685,6 +716,9 @@ extension SIMChatKeyboardAudio {
     
     /// 试听
     dynamic func onListen(sender: AnyObject) {
+        
+        self.playView.hidden = false
+        
         SIMLog.trace()
     }
     /// 完成

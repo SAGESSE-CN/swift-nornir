@@ -240,7 +240,7 @@ extension SIMChatViewController : UITableViewDataSource {
 extension SIMChatViewController : UITableViewDelegate {
     /// 开始拖动
     func scrollViewWillBeginDragging(scrollView: UIScrollView) {
-        if scrollView === tableView && self.isFirstResponder() {
+        if scrollView === tableView && textField.selectedStyle != .None {
             self.resignFirstResponder()
         }
     }
@@ -279,6 +279,57 @@ extension SIMChatViewController : UITableViewDelegate {
     }
 }
 
+/// MAKR: - /// Select Image
+extension SIMChatViewController : UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+    /// 完成选择
+    func imagePickerController(picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : AnyObject]) {
+        // 修正方向.
+        let image = (info[UIImagePickerControllerOriginalImage] as? UIImage)?.fixOrientation()
+        // 关闭窗口
+        picker.dismissViewControllerAnimated(true) {
+            // 必须关闭完成才发送, = 。 =
+            if image != nil { 
+                self.send(image: image!)
+            }
+        }
+    }
+    /// 开始选择图片
+    func onImagePickerForPhoto() {
+        SIMLog.trace()
+        // 选择图片
+        let picker = UIImagePickerController()
+        
+        picker.sourceType = .PhotoLibrary
+        picker.delegate = self
+        picker.modalPresentationStyle = .CurrentContext
+        
+        self.presentViewController(picker, animated: true, completion: nil)
+    }
+    /// 从摄像头选择
+    func onImagePickerForCamera() {
+        SIMLog.trace()
+//        // 获取权限
+//        let status = AVCaptureDevice.authorizationStatusForMediaType(AVMediaTypeVideo)
+//        
+//        // 检查权限 
+//        if status == .Restricted || status == .Denied {
+//            // 没有权限 
+//            UIAlertView(title: "提示", message: "请在设备的\"设置-隐私-相机\"中允许访问相机。", delegate: nil, cancelButtonTitle: "确定").show()
+//            // end
+//            return
+//        }
+        // 拍摄图片
+        let picker = UIImagePickerController()
+        
+        // TODO: bug
+        picker.sourceType = .Camera
+        picker.delegate = self
+        picker.editing = true
+        
+        self.presentViewController(picker, animated: true, completion: nil)
+    }
+}
+
 /// MARK: - /// Message
 extension SIMChatViewController {
     ///
@@ -295,10 +346,9 @@ extension SIMChatViewController {
         self.relations[key] = cell
         // 注册到tabelView
         self.tableView.registerClass(cell, forCellReuseIdentifier: key)
-        //self.tableView.insertRows
     }
     ///
-    /// 批量插入消息
+    /// 批量插入消息, TODO: 需要优化
     ///
     /// :param: ms       消息
     /// :param: index    如果为index < 0, 插入点为count + index + 1
@@ -688,6 +738,12 @@ extension SIMChatViewController : SIMChatKeyboardToolDataSource, SIMChatKeyboard
     /// 选中
     func chatKeyboardTool(chatKeyboardTool: SIMChatKeyboardTool, didSelectedItem item: UIBarButtonItem) {
         SIMLog.debug((item.title ?? "") + "(\(item.tag))")
+        
+        if item.tag == -1 {
+            self.onImagePickerForPhoto()
+        } else if item.tag == -2 {
+            self.onImagePickerForCamera()
+        }
     }
 }
 
@@ -752,26 +808,17 @@ extension SIMChatViewController {
     func send(text data: String?) {
         SIMLog.trace()
         
+        // 不能为空
+        guard let text = data where !text.isEmpty else {
+            return
+        }
+        
         let m = SIMChatMessage()
         
         m.content = SIMChatContentText(text: data ?? "")
-        // 填写发送信息
-        m.sender = self.conversation?.sender
-        m.sentTime = .now
-        //m.sentStatus = .Sending
-        // 填写接收者信息
-        m.recver = self.conversation?.recver
-        m.recvTime = .now
-        //m.recvStatus = .Unknow
         
         // 发送
-        self.conversation?.send(m) { m, e in
-//            if let e = e {
-//                // 失败
-//            } else {
-//                // 成功
-//            }
-        }
+        self.conversation?.send(m)
     }
     ///
     /// 发送声音
@@ -782,22 +829,9 @@ extension SIMChatViewController {
         let m = SIMChatMessage()
         
         m.content = SIMChatContentAudio(data: data, duration: duration)
-        // 填写发送信息
-        m.sender = self.conversation?.sender
-        m.sentTime = .now
-        //m.sentStatus = .Sending
-        // 填写接收者信息
-        m.recver = self.conversation?.recver
-        m.recvTime = .now
-        //m.recvStatus = .Unknow
+        
         // 发送
-        self.conversation?.send(m) { m, e in
-//            if let e = e {
-//                // 失败
-//            } else {
-//                // 成功
-//            }
-        }
+        self.conversation?.send(m)
     }
     ///
     /// 发送图片
@@ -808,23 +842,9 @@ extension SIMChatViewController {
         let m = SIMChatMessage()
         
         m.content = SIMChatContentImage(origin: data, thumbnail: data)
-        // 填写发送信息
-        m.sender = self.conversation?.sender
-        m.sentTime = .now
-        //m.sentStatus = .Sending
-        // 填写接收者信息
-        m.recver = self.conversation?.recver
-        m.recvTime = .now
-        //m.recvStatus = .Unknow
         
         // 发送
-        self.conversation?.send(m) { m, e in
-//            if let e = e {
-//                // 失败
-//            } else {
-//                // 成功
-//            }
-        }
+        self.conversation?.send(m)
     }
     ///
     /// 发送自定义消息
@@ -834,22 +854,8 @@ extension SIMChatViewController {
         let m = SIMChatMessage()
         
         m.content = data
-        // 填写发送信息
-        m.sender = self.conversation?.sender
-        m.sentTime = .now
-        //m.sentStatus = .Sending
-        // 填写接收者信息
-        m.recver = self.conversation?.recver
-        m.recvTime = .now
-        //m.recvStatus = .Unknow
         
         // 发送
-        self.conversation?.send(m) { m, e in
-//            if let e = e {
-//                // 失败
-//            } else {
-//                // 成功
-//            }
-        }
+        self.conversation?.send(m)
     }
 }

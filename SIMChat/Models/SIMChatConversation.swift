@@ -37,7 +37,7 @@ extension SIMChatConversation {
     ///
     /// 发送一条消息
     ///
-    func send(m: SIMChatMessage, finish: ((SIMChatMessage?, NSError?) -> ())?) {
+    func send(m: SIMChatMessage, finish: ((SIMChatMessage?, NSError?) -> ())? = nil) {
         
         // 填写发送信息
         m.sender = self.sender
@@ -49,11 +49,10 @@ extension SIMChatConversation {
         //m.recvStatus = .now
         
         // 真的需要追加?
-        if !messages.contains(m) {
+        if !self.messages.contains(m) {
             // 真正的发送出去
             self.messages.insert(m, atIndex: 0)
         }
-        
         // 通知
         delegate?.chatConversation?(self, didSendMessage: m)
         

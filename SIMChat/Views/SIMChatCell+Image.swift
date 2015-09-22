@@ -20,8 +20,8 @@ class SIMChatCellImage: SIMChatCellBubble {
         contentView2.contentMode = .ScaleAspectFill
         contentView2.translatesAutoresizingMaskIntoConstraints = false
         
-        contentView2Width = NSLayoutConstraintMake(contentView2, .Width, .Equal, nil, .Height, 0, 751)
-        contentView2Height = NSLayoutConstraintMake(contentView2, .Width, .Equal, nil, .Height, 0, 751)
+        contentView2Width = NSLayoutConstraintMake(contentView2, .Width, .Equal, nil, .Width, 0, 751)
+        contentView2Height = NSLayoutConstraintMake(contentView2, .Height, .Equal, nil, .Height, 0, 751)
         
         // add views
         bubbleView.contentView.addSubview(contentView2)
@@ -50,6 +50,8 @@ class SIMChatCellImage: SIMChatCellBubble {
 
             contentView2Width.constant = width * scale
             contentView2Height.constant = height * scale
+            
+            setNeedsLayout()
 
             // 最大值是135
 

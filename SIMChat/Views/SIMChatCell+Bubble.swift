@@ -139,9 +139,6 @@ class SIMChatCellBubble: SIMChatCell {
         }
     }
     
-    private func addConstraint(constraint: NSLayoutConstraint, _ dir: SIMChatCellBoubbleConstraintDir) {
-    }
-    
     /// 自动调整
     private let hPriority = UILayoutPriority(700)
     private let vPriority = UILayoutPriority(800)
@@ -149,20 +146,8 @@ class SIMChatCellBubble: SIMChatCell {
     private lazy var topConstraints = [NSLayoutConstraint]()
     private lazy var leftConstraints = [NSLayoutConstraint]()
     
-    // 该死的bug
-    private(set) lazy var bubbleView: SIMChatBubbleView = SIMChatBubbleView()
-    private(set) lazy var portraitView: SIMChatPortraitView = SIMChatPortraitView()
-    private(set) lazy var visitCardView: SIMChatVisitCardView = SIMChatVisitCardView()
+    private(set) lazy var bubbleView = SIMChatBubbleView(frame: CGRectZero)
+    private(set) lazy var portraitView = SIMChatPortraitView(frame: CGRectZero)
+    private(set) lazy var visitCardView = SIMChatVisitCardView(frame: CGRectZero)
 }
 
-/// MARK: - /// Type
-extension SIMChatCell {
-    /// 类型
-    enum SIMChatCellBoubbleConstraintDir : Int {
-        case Left
-        case Right
-        case Top
-        case Bottom
-        case None
-    }
-}

@@ -72,20 +72,16 @@ class SIMLog : NSObject {
         _ file: String = __FILE__,
         _ line: Int = __LINE__)
     {
+        let fname = ((file as NSString).lastPathComponent as NSString).stringByDeletingPathExtension
         #if DEBUG
-            let fname = ((file as NSString).lastPathComponent as NSString).stringByDeletingPathExtension
-            
-            objc_sync_enter(Log.sharedInstace)
+            objc_sync_enter(self.queue)
             
             //[%-5p](%d{yyyy-MM-dd HH:mm:ss}) %M - %m%n
             print("[\(level)] \(fname).\(function): \(message)")
             
-            objc_sync_exit(Log.sharedInstace)
-            #else
-            dispatch_async(SIMLog.queue) {
-                
-                let fname = ((file as NSString).lastPathComponent as NSString).stringByDeletingPathExtension
-                
+            objc_sync_exit(self.queue)
+        #else
+            dispatch_async(self.queue) {
                 //[%-5p](%d{yyyy-MM-dd HH:mm:ss}) %M - %m%n
                 print("[\(level)] \(fname).\(function): \(message)")
             }
@@ -93,5 +89,4 @@ class SIMLog : NSObject {
     }
     
     private(set) static var queue = dispatch_queue_create("log.queue", nil)
-    private(set) static var sharedInstace = SIMLog()
 }

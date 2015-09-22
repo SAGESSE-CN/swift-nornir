@@ -9,6 +9,10 @@
 import UIKit
 
 class SIMChatCellAudio: SIMChatCellBubble {
+    /// 释放
+    deinit {
+        SIMNotificationCenter.removeObserver(self)
+    }
     /// 构建
     override func build() {
         super.build()
@@ -45,13 +49,13 @@ class SIMChatCellAudio: SIMChatCellBubble {
             }
         }
         
-//        // add kvo
-//        NSNotificationCenter.simInternalCenter().addObserver(self, selector: "onAudioStop:", name: SIMChatAudioWillStopNotification, object: nil)
-//        NSNotificationCenter.simInternalCenter().addObserver(self, selector: "onAudioStop:", name: SIMChatAudioWillRecordNotification, object: nil)
-//        NSNotificationCenter.simInternalCenter().addObserver(self, selector: "onAudioPlay:", name: SIMChatAudioWillPlayNotification, object: nil)
-//        
-//        NSNotificationCenter.simInternalCenter().addObserver(self, selector: "onAudioLoading:", name: SIMChatAudioWillLoadNotification, object: nil)
-//        NSNotificationCenter.simInternalCenter().addObserver(self, selector: "onAudioLoaded:", name: SIMChatAudioDidLoadNotification, object: nil)
+        // add kvo
+        SIMNotificationCenter.addObserver(self, selector: "onAudioDidStop:", name: SIMChatAudioManagerWillStopNotification)
+        SIMNotificationCenter.addObserver(self, selector: "onAudioDidStop:", name: SIMChatAudioManagerWillRecordNotification)
+        SIMNotificationCenter.addObserver(self, selector: "onAudioDidPlay:", name: SIMChatAudioManagerWillPlayNotification)
+        
+        SIMNotificationCenter.addObserver(self, selector: "onAudioWillLoad:", name: SIMChatAudioManagerWillLoadNotification)
+        SIMNotificationCenter.addObserver(self, selector: "onAudioDidLoad:", name: SIMChatAudioManagerDidLoadNotification)
     }
     //
     /// 重新加载数据.
@@ -106,6 +110,42 @@ class SIMChatCellAudio: SIMChatCellBubble {
     private lazy var animationView = UIImageView()
 }
 
+/// MARK: - /// Events
+extension SIMChatCellAudio {
+    /// 音频开始播放
+    func onAudioDidPlay(sender: NSNotification) {
+        // 只在是本消息的事件才处理
+        if let ctx = message?.content as? SIMChatContentAudio {
+            if ctx.data.storaged && *ctx.data === sender.object {
+                // TODO: 需要切到主线程?
+                animationView.startAnimating()
+            }
+        }
+    }
+    /// 音频停止播放
+    func onAudioDidStop(sender: NSNotification) {
+        // 不管是谁. 停了再说
+        if let ctx = message?.content as? SIMChatContentAudio {
+            ctx.playing = false
+        }
+        if animationView.isAnimating() {
+            // TODO: 需要切到主线程?
+            animationView.stopAnimating()
+        }
+    }
+    /// 音频加载开始
+    func onAudioWillLoad(sender: NSNotification) {
+        if sender.object === message {
+            SIMLog.debug()
+        }
+    }
+    /// 音频加载完成
+    func onAudioDidLoad(sender: NSNotification) {
+        if sender.object === message {
+            SIMLog.debug()
+        }
+    }
+}
 
 /// MARK: - /// Resources
 extension SIMChatCellAudio {
