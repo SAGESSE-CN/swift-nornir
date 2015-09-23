@@ -58,6 +58,19 @@ extension SIMChatConversation {
         
         // 完成
         finish?(m, nil)
+        
+        // TODO: 测试环境!
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(500 * NSEC_PER_MSEC)), dispatch_get_main_queue()) {
+            let rm = SIMChatMessage()
+            
+            rm.sender = m.recver
+            rm.recver = m.sender
+            rm.sentTime = m.sentTime
+            rm.recvTime = .now
+            rm.content = m.content
+            
+            self.recvice(rm)
+        }
     }
     ///
     /// 查询多条消息
