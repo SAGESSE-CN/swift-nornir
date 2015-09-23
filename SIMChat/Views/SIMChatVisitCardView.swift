@@ -27,7 +27,7 @@ class SIMChatVisitCardView: SIMView {
         
         // config
         titleLabel.font = UIFont.systemFontOfSize(14)
-        titleLabel.textColor = UIColor.whiteColor()
+        titleLabel.textColor = UIColor(hex: 0x7B7B7B)
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         
         // add views
