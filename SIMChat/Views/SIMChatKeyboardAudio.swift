@@ -40,7 +40,7 @@ class SIMChatKeyboardAudio: SIMView {
         let view = SIMChatKeyboardAudioPlayView()
         
         // config
-        //view.delegate = self
+        view.delegate = self
         view.backgroundColor = UIColor.clearColor()
         view.translatesAutoresizingMaskIntoConstraints = false
         
@@ -216,7 +216,12 @@ extension SIMChatKeyboardAudio {
         
         dynamic func onPlay() {
             // 如果正在播放, 跳过
-            if self.timer != nil {
+            guard self.timer == nil else {
+                return
+            }
+            // 准备好了
+            guard self.delegate?.chatKeyboardAudioViewWillBeginPlay?() ?? false else {
+                // 并没有准备好播放
                 return
             }
             // 重置
@@ -227,6 +232,7 @@ extension SIMChatKeyboardAudio {
             
             self.playing = true
             self.playProgress.hidden = false
+            self.delegate?.chatKeyboardAudioViewDidBeginPlay?()
             
             // 获取
             self.duration = delegate?.chatKeyboardAudioViewDuration?() ?? 0
@@ -244,6 +250,7 @@ extension SIMChatKeyboardAudio {
             // 重置
             self.playing = false
             self.playProgress.hidden = true
+            self.delegate?.chatKeyboardAudioViewDidStop?()
         }
         
         weak var delegate: SIMChatKeyboardAudioViewDelegate?
@@ -304,13 +311,13 @@ extension SIMChatKeyboardAudio {
             recordButton.addTarget(self, action: "onDrag:withEvent:", forControlEvents: .TouchDragInside)
             recordButton.addTarget(self, action: "onDrag:withEvent:", forControlEvents: .TouchDragOutside)
             
-            recordButton.addTarget(self, action: "onBegin:", forControlEvents: .TouchDown)
-            recordButton.addTarget(self, action: "onEnd:", forControlEvents: .TouchUpInside)
-            recordButton.addTarget(self, action: "onEnd:", forControlEvents: .TouchUpOutside)
+            recordButton.addTarget(self, action: "onStart:", forControlEvents: .TouchDown)
+            recordButton.addTarget(self, action: "onStop:", forControlEvents: .TouchUpInside)
+            recordButton.addTarget(self, action: "onStop:", forControlEvents: .TouchUpOutside)
             recordButton.addTarget(self, action: "onInterrupt:", forControlEvents: .TouchCancel)
         }
         /// 事件
-        dynamic func onBegin(sender: AnyObject) {
+        dynamic func onStart(sender: AnyObject) {
             /// 己经准备好了?
             guard self.delegate?.chatKeyboardAudioViewWillBeginRecord?() ?? false else {
                 // 并没有
@@ -342,7 +349,7 @@ extension SIMChatKeyboardAudio {
             self.recording = true
             self.delegate?.chatKeyboardAudioViewDidBeginPlay?()
         }
-        dynamic func onEnd(sender: AnyObject) {
+        dynamic func onStop(sender: AnyObject) {
             // 正在录音?
             guard self.recording else {
                 // 没有, 跳过
@@ -385,7 +392,7 @@ extension SIMChatKeyboardAudio {
             self.preplayView.layer.transform = CATransform3DIdentity
             self.precancelView.layer.transform = CATransform3DIdentity
             // 走正常结束流程
-            self.onEnd(sender)
+            self.onStop(sender)
         }
         dynamic func onDrag(sender: UIButton, withEvent event: UIEvent?) {
             // 正在录音?
@@ -552,6 +559,9 @@ extension SIMChatKeyboardAudio {
             self.playView.alpha = 0
         }, completion: { b in
             self.playView.hidden = false
+            if self.playView.playing {
+                self.playView.onStop()
+            }
         })
     }
     /// 显示工具栏
@@ -596,12 +606,22 @@ extension SIMChatKeyboardAudio : SIMChatKeyboardAudioViewDelegate {
     func chatKeyboardAudioViewDidFinish() {
         SIMLog.trace()
         
+        // 如果正在播放, 必须先停止音频, ui再慢慢更新
+        if self.playView.playing {
+            self.chatKeyboardAudioViewDidStop()
+        }
+        
         self.onShowRecord()
         self.onHideToolbar()
     }
     /// 取消
     func chatKeyboardAudioViewDidCancel() {
         SIMLog.trace()
+        
+        // 如果正在播放, 必须先停止音频, ui再慢慢更新
+        if self.playView.playing {
+            self.chatKeyboardAudioViewDidStop()
+        }
         
         self.onShowRecord()
         self.onHideToolbar()
@@ -615,7 +635,7 @@ extension SIMChatKeyboardAudio : SIMChatKeyboardAudioViewDelegate {
     }
     /// 当前时间
     func chatKeyboardAudioViewCurrentTime() -> NSTimeInterval {
-        return 0
+        return 20
     }
     /// 当前音波
     func chatKeyboardAudioViewMeter() -> Float {
