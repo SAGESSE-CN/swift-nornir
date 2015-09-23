@@ -123,12 +123,10 @@ class SIMChatCellBubble: SIMChatCell {
         willSet {
             switch newValue {
             case .Left:
-                self.bubbleView.backgroundImage = UIImage(named: "simchat_bubble_recive")
-                self.portraitView.defaultPortrait = SIMChatImageManager.defaultPortrait2
+                self.bubbleView.backgroundImage = SIMChatImageManager.defaultBubbleRecive
                 
             case .Right:    
-                self.bubbleView.backgroundImage = UIImage(named: "simchat_bubble_send")
-                self.portraitView.defaultPortrait = SIMChatImageManager.defaultPortrait1
+                self.bubbleView.backgroundImage = SIMChatImageManager.defaultBubbleSend
             }
             // 修改约束
             leftConstraints.forEach {

@@ -201,6 +201,7 @@ extension SIMChatTextField {
                 setImage(item.n, forState: .Normal)
                 setImage(item.h, forState: .Highlighted)
                 
+                // duang
                 let ani = CATransition()
                 
                 ani.duration = 0.25

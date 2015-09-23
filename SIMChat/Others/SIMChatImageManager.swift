@@ -20,6 +20,9 @@ class SIMChatImageManager: NSObject {
     static let defaultPortrait1 = UIImage(named: "simchat_portrait_default1")
     static let defaultPortrait2 = UIImage(named: "simchat_portrait_default2")
     
+    static let defaultBubbleRecive = UIImage(named: "simchat_bubble_recive")
+    static let defaultBubbleSend = UIImage(named: "simchat_bubble_send")
+    
     static let defautlInputBackground = UIImage(named: "chat_bottom_textfield")
     static let inputItemImages: [SIMChatTextFieldItemStyle : (n: UIImage?, h: UIImage?)] = [
         .Keyboard   : (n: UIImage(named: "chat_bottom_keyboard_nor"),   h: UIImage(named: "chat_bottom_keyboard_press")),

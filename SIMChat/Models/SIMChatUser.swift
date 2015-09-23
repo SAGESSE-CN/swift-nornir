@@ -15,9 +15,10 @@ import UIKit
 class SIMChatUser: NSObject {
     
     /// 初始化
-    init(identifier: String, name: String? = nil, portrait: NSURL? = nil) {
+    init(identifier: String, name: String? = nil, gender: Int = 0, portrait: NSURL? = nil) {
         self.identifier = identifier
         self.name = name
+        self.gender = gender
         self.portrait = portrait
         super.init()
     }
@@ -28,6 +29,9 @@ class SIMChatUser: NSObject {
     var name: String?
     /// 用户头像
     var portrait: NSURL?
+    
+    /// 0未知, 1男, 1女
+    var gender: Int = 0
     
     /// 附加数据
     var extra: AnyObject?

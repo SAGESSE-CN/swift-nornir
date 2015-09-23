@@ -22,9 +22,10 @@ class SIMChatViewController: SIMViewController {
         
         self.registerClass(SIMChatCellUnknow.self, SIMChatContentUnknow.self)
         
-        let s = SIMChatUser(identifier: "self", name: "sagesse", portrait: nil)
-        let o = SIMChatUser(identifier: "other")
+        let s = SIMChatUser(identifier: "self", name: "sagesse", gender: 1, portrait: nil)
+        let o = SIMChatUser(identifier: "other", name: "swift", gender: 2)
         let c = SIMChatConversation(recver: o, sender: s)
+        
         
         self.conversation = c
     }

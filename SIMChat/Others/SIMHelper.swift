@@ -119,3 +119,11 @@ extension NSDate {
         return df.stringFromDate(self)
     }
 }
+
+
+extension NSTimer {
+    class func scheduledTimerWithTimeInterval2(ti: NSTimeInterval, _ aTarget: AnyObject, _ aSelector: Selector, _ userInfo: AnyObject? = nil) -> NSTimer {
+        return self.scheduledTimerWithTimeInterval(ti, target: aTarget, selector: aSelector, userInfo: userInfo, repeats: true)
+    }
+}
+    

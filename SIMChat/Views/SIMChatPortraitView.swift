@@ -50,18 +50,18 @@ class SIMChatPortraitView: SIMView {
     }
     /// 关联的用户
     var user: SIMChatUser? {
-        willSet {
+        didSet {
             contentView.image = self.defaultPortrait
-            //imageView.sd_setImageWithURL(NSURL(string: newValue?.portrait ?? ""), placeholderImage: SIMPortraitView.defaultPortrait)
         }
     }
-    /// 默认头像
-    var defaultPortrait: UIImage? {
-        willSet {
-            // 更新
-            let u = self.user
-            self.user = u
+    /// 
+    private var defaultPortrait: UIImage? {
+        // 如果性别为女, 显示2号头像
+        if self.user?.gender == 2 {
+            return SIMChatImageManager.defaultPortrait2
         }
+        // 否则
+        return SIMChatImageManager.defaultPortrait1
     }
     
     private(set) lazy var contentView = UIImageView()
