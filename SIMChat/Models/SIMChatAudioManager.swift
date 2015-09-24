@@ -33,6 +33,7 @@ class SIMChatAudioManager: NSObject {
             // 加载
             player = try? AVAudioPlayer(data: data)
             player?.delegate = self
+            player?.meteringEnabled = true
             // 通知
             SIMNotificationCenter.postNotificationName(SIMChatAudioManagerWillPlayNotification, object: player)
             // 真正的准备
@@ -55,13 +56,14 @@ class SIMChatAudioManager: NSObject {
         // 允许录音?
         if delegate?.audioManagerWillRecord?(self, url: url) ?? true {
             // 配置..
-            let _ = try? AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayAndRecord)
-            let _ = try? AVAudioSession.sharedInstance().setActive(true)
+            let _ = try! AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayAndRecord)
+            let _ = try! AVAudioSession.sharedInstance().setActive(true)
             // 删除这个文件
-            let _ = try? NSFileManager.defaultManager().removeItemAtURL(url)
+            let _ = try! NSFileManager.defaultManager().removeItemAtURL(url)
             // 加载
-            recorder = try? AVAudioRecorder(URL: url, settings: self.recordSettings)
+            recorder = try! AVAudioRecorder(URL: url, settings: self.recordSettings)
             recorder?.delegate = self
+            recorder?.meteringEnabled = true
             // 通知
             SIMNotificationCenter.postNotificationName(SIMChatAudioManagerWillRecordNotification, object: recorder)
             // 真正的准备
@@ -102,13 +104,11 @@ class SIMChatAudioManager: NSObject {
     }
     /// 完成
     func finish() {
-        
         if player != nil {
             player?.stop()
             player?.delegate = nil
             player = nil
         }
-        
         if recorder != nil {
             recorder?.stop()
             // 等待完成
@@ -136,6 +136,22 @@ class SIMChatAudioManager: NSObject {
         // 通知
         SIMNotificationCenter.postNotificationName(SIMChatAudioManagerDidStopNotification, object: nil)
     }
+    /// 波形
+    func meter(channel: Int) -> Float {
+        if playing {
+            // 首先要更新一下才能获取到
+            player?.updateMeters()
+            // 去看看
+            return player?.averagePowerForChannel(channel) ?? 0
+        }
+        if recording {
+            // 首先要更新一下才能获取到
+            recorder?.updateMeters()
+            // 去看看
+            return recorder?.averagePowerForChannel(channel) ?? 0
+        }
+        return 0
+    }
     /// 正在播放
     var playing: Bool {
         return player?.playing ?? false
@@ -143,16 +159,6 @@ class SIMChatAudioManager: NSObject {
     /// 正在录音
     var recording: Bool {
         return recorder?.recording ?? false
-    }
-    /// 波形
-    var meter: Float {
-        if playing {
-            return player?.peakPowerForChannel(0) ?? 0
-        }
-        if recording {
-            return recorder?.peakPowerForChannel(0) ?? 0
-        }
-        return 0
     }
     /// 持续时间
     var duration: NSTimeInterval {

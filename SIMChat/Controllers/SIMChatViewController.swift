@@ -629,11 +629,13 @@ extension SIMChatViewController {
     func onKeyboardWillShow(sender: NSNotification) {
         // 获取高度
         if let r1 = sender.userInfo?[UIKeyboardFrameEndUserInfoKey]?.CGRectValue {
-            if self.keyboardHeight != r1.height {
+            // Note: 在iPad这可能会有键盘高度不变但y改变的情况
+            let h = self.view.bounds.height - r1.origin.y
+            if self.keyboardHeight != h {
                 SIMLog.trace()
                 // 取消隐藏动画
                 self.keyboardHiddenAnimation = false
-                self.onKeyboardShow(r1)
+                self.onKeyboardShow(CGRectMake(0, 0, r1.width, h))
             }
         }
     }
