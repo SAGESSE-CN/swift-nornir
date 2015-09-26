@@ -11,6 +11,11 @@ import UIKit
 /// 消息模型
 class SIMChatMessage: NSObject {
     
+    convenience init(_ content: AnyObject) {
+        self.init()
+        self.content = content
+    }
+    
     /// 消息
     var id = NSUUID().UUIDString
     var type = 0

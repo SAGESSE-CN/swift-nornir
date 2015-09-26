@@ -115,12 +115,12 @@ extension SIMChatCellAudio {
     /// 音频开始播放
     func onAudioDidPlay(sender: NSNotification) {
         // 只在是本消息的事件才处理
-        if let ctx = message?.content as? SIMChatContentAudio {
-            if ctx.data.storaged && *ctx.data === sender.object {
-                // TODO: 需要切到主线程?
-                animationView.startAnimating()
-            }
-        }
+//        if let ctx = message?.content as? SIMChatContentAudio {
+//            if ctx.data.storaged && *ctx.data === sender.object {
+//                // TODO: 需要切到主线程?
+//                animationView.startAnimating()
+//            }
+//        }
     }
     /// 音频停止播放
     func onAudioDidStop(sender: NSNotification) {

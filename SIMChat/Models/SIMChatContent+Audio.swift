@@ -11,16 +11,18 @@ import UIKit
 /// 音频消息
 class SIMChatContentAudio: SIMChatContent {
     /// 初始化
-    convenience init(data: NSData?, duration: NSTimeInterval) {
+    convenience init(url: NSURL, duration: NSTimeInterval) {
         self.init()
-        self.data ~> data
+        
+        self.url = url
         self.duration = duration
     }
-    // 音频
-    var data = SIMAsyncLazyAttr<NSData?>()
+    
     // 配置
     var played = false
     var playing = false
+    
+    var url: NSURL?
     var duration = NSTimeIntervalSince1970
 }
 

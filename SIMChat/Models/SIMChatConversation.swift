@@ -37,7 +37,9 @@ extension SIMChatConversation {
     ///
     /// 发送一条消息
     ///
-    func send(m: SIMChatMessage, finish: ((SIMChatMessage?, NSError?) -> ())? = nil) {
+    func send(content: AnyObject, finish: ((SIMChatMessage?, NSError?) -> ())? = nil) {
+        
+        let m = SIMChatMessage(content)
         
         // 填写发送信息
         m.sender = self.sender
@@ -75,7 +77,7 @@ extension SIMChatConversation {
     ///
     /// 查询多条消息
     ///
-    func query(count: Int, last: SIMChatMessage?, finish: ((NSArray?, NSError?) -> ())?) {
+    func query(count: Int, latest: SIMChatMessage?, finish: ((NSArray?, NSError?) -> ())?) {
         SIMLog.trace()
     }
     ///
@@ -110,22 +112,18 @@ extension SIMChatConversation {
 
 /// MARK: - /// Helper
 extension SIMChatConversation {
-    
     ///
     /// 第一条, 这是最新的
     ///
     var first: SIMChatMessage? { return messages.first }
-    
     ///
     /// 最后一条, 这是最旧的
     ///
     var last: SIMChatMessage? { return messages.last }
-    
     ///
     /// 总数
     ///
     var count: Int { return messages.count }
-    
     ///
     /// 未读总数
     ///
@@ -140,7 +138,6 @@ extension SIMChatConversation {
 /// 消息删除
 /// 消息更新
 ///
-
 @objc protocol SIMChatConversationDelegate : NSObjectProtocol {
    
     optional func chatConversation(conversation: SIMChatConversation, didSendMessage message: SIMChatMessage)
