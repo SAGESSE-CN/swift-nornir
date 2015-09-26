@@ -139,6 +139,21 @@ class SIMChatTextField : SIMView {
     /// 代理
     weak var delegate: SIMChatTextFieldDelegate?
     
+    var enabled: Bool = true {
+        willSet {
+            
+            // 关闭输入
+            self.backgroundView.highlighted = newValue
+            self.textView.userInteractionEnabled = newValue
+            
+            for view in self.subviews {
+                if let btn = view as? UIButton {
+                    btn.enabled = newValue
+                }
+            }
+        }
+    }
+    
     var contentSize: CGSize {
         return textView.contentSize
     }

@@ -10,21 +10,11 @@ import UIKit
 
 /// 自定义键盘-音频
 class SIMChatKeyboardAudio: SIMView {
-    
-    enum State : Int {
-        case Normal
-        case Ready
-        case Play
-        case Record
-        case Cancel
-        case Error
+    /// 初始化
+    convenience init(delegate: SIMChatKeyboardAudioDelegate?) {
+        self.init()
+        self.delegate = delegate
     }
-    
-//    convenience init(delegate: SIMChatInputAudioViewDelegate?) {
-//        self.init()
-//        self.delegate = delegate
-//    }
-    
     /// 构建
     override func build() {
         super.build()
@@ -36,7 +26,11 @@ class SIMChatKeyboardAudio: SIMView {
     override func intrinsicContentSize() -> CGSize {
         return CGSizeMake(0, 216)
     }
+    /// 代理
+    weak var delegate: SIMChatKeyboardAudioDelegate?
     
+    /// 录音了多久的
+    private lazy var recordDuration: NSTimeInterval = 0
     private lazy var playView: SIMChatKeyboardAudioPlayView = {
         let view = SIMChatKeyboardAudioPlayView()
         
@@ -125,13 +119,13 @@ class SIMChatKeyboardAudio: SIMView {
         return view
     }()
     
-    private lazy var audioManager = SIMChatAudioManager()
+    private lazy var am = SIMChatAudioManager.sharedManager
 }
 
 /// MARK: - /// Type 
 extension SIMChatKeyboardAudio {
     /// 播放
-    class SIMChatKeyboardAudioPlayView : SIMView {
+    private class SIMChatKeyboardAudioPlayView : SIMView, SIMChatSpectrumViewDelegate {
         /// 构建
         override func build() {
             super.build()
@@ -154,18 +148,46 @@ extension SIMChatKeyboardAudio {
             
             playButton.layer.addSublayer(playProgress)
             
+            tipsLabel.text = "点击播放"
+            tipsLabel.font = UIFont.systemFontOfSize(16)
+            tipsLabel.textColor = UIColor(hex: 0x7B7B7B)
+            tipsLabel.translatesAutoresizingMaskIntoConstraints = false
+            
+            spectrumView.color = UIColor(hex: 0xFB7A0D)
+            spectrumView.hidden = true
+            spectrumView.delegate = self
+            spectrumView.translatesAutoresizingMaskIntoConstraints = false
+            
+            activityView.translatesAutoresizingMaskIntoConstraints = false
+            activityView.hidesWhenStopped = true
+            activityView.hidden = true
+            
             // add views
             addSubview(playButton)
+            addSubview(spectrumView)
+            addSubview(tipsLabel)
+            addSubview(activityView)
             
             /// add constraints
             addConstraint(NSLayoutConstraintMake(playButton, .Top,     .Equal, self, .Top, 51))
             addConstraint(NSLayoutConstraintMake(playButton, .CenterX, .Equal, self, .CenterX))
             
+            addConstraint(NSLayoutConstraintMake(tipsLabel, .CenterX, .Equal, self, .CenterX))
+            addConstraint(NSLayoutConstraintMake(tipsLabel, .Top,     .Equal, self, .Top, 20))
+            
+            addConstraint(NSLayoutConstraintMake(spectrumView, .CenterX, .Equal, tipsLabel, .CenterX))
+            addConstraint(NSLayoutConstraintMake(spectrumView, .CenterY, .Equal, tipsLabel, .CenterY))
+            
+            addConstraint(NSLayoutConstraintMake(activityView, .CenterY, .Equal, tipsLabel, .CenterY))
+            addConstraint(NSLayoutConstraintMake(activityView, .Right,   .Equal, tipsLabel, .Left,  -4))
+            
             // add event
             playButton.addTarget(self, action: "onClicked:", forControlEvents: .TouchUpInside)
             
             // disable
-            playing = false
+            self.playing = false
+            // 更新为默认状态
+            self.update(0)
         }
         /// 正在播放
         private(set) var playing: Bool = true {
@@ -193,19 +215,27 @@ extension SIMChatKeyboardAudio {
                 ani.subtype = kCATransitionFromTop
                 
                 playButton.layer.addAnimation(ani, forKey: "s")
+                
+                // 更新频谱动画
+                if newValue {
+                    spectrumView.startAnimating()
+                } else {
+                    spectrumView.stopAnimating()
+                }
             }
         }
-        dynamic func onTimer(sender: AnyObject) {
+        private dynamic func onTimer(sender: AnyObject) {
             // 计算当前进度
             let cur = CACurrentMediaTime() - self.startAt
             // 更新进度
             self.playProgress.strokeEnd = CGFloat(cur / max(self.duration, 0.1))
             // 完成了?
             if cur > self.duration + 0.1 {
+                // ok 完成
                 self.onStop()
             }
         }
-        dynamic func onClicked(sender: AnyObject) {
+        private dynamic func onClicked(sender: AnyObject) {
             if self.playing {
                 // 正在播放, 那就停止
                 self.onStop()
@@ -215,14 +245,10 @@ extension SIMChatKeyboardAudio {
             }
         }
         
-        dynamic func onPlay() {
+        /// 播放
+        private dynamic func onPlay() {
             // 如果正在播放, 跳过
             guard self.timer == nil else {
-                return
-            }
-            // 准备好了
-            guard self.delegate?.chatKeyboardAudioViewWillBeginPlay?() ?? false else {
-                // 并没有准备好播放
                 return
             }
             // 重置
@@ -230,30 +256,99 @@ extension SIMChatKeyboardAudio {
             CATransaction.setDisableActions(true)
             self.playProgress.strokeEnd = 0
             CATransaction.commit()
+            // 进入准备状态
+            self.update(1)
+            // 申请启动:)
+            dispatch_async(dispatch_get_main_queue()) {
+                self.delegate?.chatKeyboardAudioViewDidStartPlay?()
+            }
+        }
+        /// 停止
+        private dynamic func onStop() {
+            self.delegate?.chatKeyboardAudioViewDidStop?()
+        }
+        ///
+        /// 更新状态
+        /// - 0 空
+        /// - 1 准备中(切换音频的时候会处于这个状态)
+        /// - 2 播放
+        /// - 3 错误
+        ///
+        private func update(flag: Int) {
+            switch flag {
+            case 0: // 无
+                self.tipsLabel.text = "点击播放"
+                self.spectrumView.hidden = true
+                self.activityView.stopAnimating()
+                self.activityView.hidden = true
+            case 1: // 准备
+                self.tipsLabel.text = "准备中"
+                self.spectrumView.hidden = true
+                self.activityView.hidden = false
+                self.activityView.startAnimating()
+            case 2: // 录音进行中
+                let t = self.delegate?.chatKeyboardAudioViewCurrentTime?() ?? 0
+                self.tipsLabel.text = String(format: "%0d:%02d", Int(t / 60), Int(t % 60))
+                self.spectrumView.hidden = false
+                self.activityView.stopAnimating()
+                self.activityView.hidden = true
+            case 3: // 错误
+                self.tipsLabel.text = "播放错误!!"
+                self.spectrumView.hidden = true
+                self.activityView.stopAnimating()
+                self.activityView.hidden = true
+            default:
+                break
+            }
             
+            self.tipsLabel.hidden = false
+        }
+        /// 开始播放
+        func playStart() {
+            // 己经在播放了
+            if self.playing {
+                return
+            }
+            // 重置状态
             self.playing = true
             self.playProgress.hidden = false
-            self.delegate?.chatKeyboardAudioViewDidBeginPlay?()
-            
             // 获取
             self.duration = delegate?.chatKeyboardAudioViewDuration?() ?? 0
-            
-            SIMLog.debug("play duration: \(self.duration)")
-            
-            // 开启线程, 注意必须在主线程开
+            // 检查
+            SIMLog.debug("play duration: \(self.duration)s")
+            // 开启定时器, 注意必须在主线程开
             dispatch_async(dispatch_get_main_queue()) {
                 self.timer = NSTimer.scheduledTimerWithTimeInterval2(0.1, self, "onTimer:")
                 self.startAt = CACurrentMediaTime()
+                // 进入播放状态
+                self.update(2)
             }
         }
-        dynamic func onStop() {
-            
+        /// 停止播放
+        func playStop() {
+            // 并没有播放
+            if !self.playing {
+                self.update(0)
+                return
+            }
             self.timer?.invalidate()
             self.timer = nil
             // 重置
+            self.update(0)
             self.playing = false
             self.playProgress.hidden = true
-            self.delegate?.chatKeyboardAudioViewDidStop?()
+        }
+        /// 播放错误
+        func playFail(error: NSError?){
+            self.update(3)
+        }
+        
+        @objc func chatSpectrumViewWaveOfLeft(chatSpectrumView: SIMChatSpectrumView) -> Float {
+            self.update(2)
+            return self.delegate?.chatSpectrumViewWaveOfLeft?(chatSpectrumView) ?? 0
+        }
+        @objc func chatSpectrumViewWaveOfRight(chatSpectrumView: SIMChatSpectrumView) -> Float {
+            return self.delegate?.chatSpectrumViewWaveOfRight?(chatSpectrumView) ?? 0
         }
         
         weak var delegate: SIMChatKeyboardAudioViewDelegate?
@@ -261,6 +356,10 @@ extension SIMChatKeyboardAudio {
         private var timer: NSTimer?
         private var startAt: CFTimeInterval = 0
         private var duration: NSTimeInterval = 0
+        
+        private(set) lazy var tipsLabel = UILabel()
+        private(set) lazy var spectrumView = SIMChatSpectrumView(frame: CGRectZero)
+        private(set) lazy var activityView = UIActivityIndicatorView(activityIndicatorStyle: .Gray)
         
         private var playButton = UIButton()
         private var playProgress = CAShapeLayer()
@@ -282,8 +381,7 @@ extension SIMChatKeyboardAudio {
             recordButton.setBackgroundImage(UIImage(named: "simchat_keyboard_voice_button_press"), forState: .Highlighted)
             recordButton.translatesAutoresizingMaskIntoConstraints = false
             
-            //tipsLabel.text = "按住说话"
-            tipsLabel.text = "0:00"
+            tipsLabel.text = "-:--"
             tipsLabel.font = UIFont.systemFontOfSize(16)
             tipsLabel.textColor = UIColor(hex: 0x7B7B7B)
             tipsLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -329,52 +427,40 @@ extension SIMChatKeyboardAudio {
             recordButton.addTarget(self, action: "onStop:", forControlEvents: .TouchUpInside)
             recordButton.addTarget(self, action: "onStop:", forControlEvents: .TouchUpOutside)
             recordButton.addTarget(self, action: "onInterrupt:", forControlEvents: .TouchCancel)
+            
+            self.update(0)
         }
         /// 事件
-        dynamic func onStart(sender: AnyObject) {
-            /// 己经准备好了?
-            guard self.delegate?.chatKeyboardAudioViewWillBeginRecord?() ?? false else {
-                // 并没有
+        private dynamic func onStart(sender: AnyObject) {
+            // 正在录音呢
+            if self.recording {
                 return
             }
-            SIMLog.trace()
             // 先重置状态
             self.preplayView.highlighted = false
             self.preplayView2.highlighted = false
             self.precancelView.highlighted = false
             self.precancelView2.highlighted = false
-            
-            UIView.animateWithDuration(0.25) {
-                self.operatorView.alpha = 1
-                self.preplayView.layer.transform = CATransform3DIdentity
-                self.precancelView.layer.transform = CATransform3DIdentity
+            // 进入准备状态
+            self.update(1)
+            // 启动.
+            // 完成了之后重新调用startRecord
+            dispatch_async(dispatch_get_main_queue()) {
+                self.delegate?.chatKeyboardAudioViewDidStartRecord?()
             }
-            
-            // duang
-            let ani = CAKeyframeAnimation(keyPath: "transform.scale")
-            
-            ani.duration = 0.25
-            ani.values = [1,0.8,1.2,1]
-            ani.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionLinear)
-            
-            recordButton.layer.addAnimation(ani, forKey: "start")
-            
-            // ok, 正式开工
-            self.recording = true
-            self.delegate?.chatKeyboardAudioViewDidBeginRecord?()
-            self.update()
         }
-        dynamic func onStop(sender: AnyObject) {
+        private dynamic func onStop(sender: AnyObject) {
             // 正在录音?
-            guard self.recording else {
-                // 没有, 跳过
+            if !self.recording {
+                self.recordStop()
+                self.delegate?.chatKeyboardAudioViewDidStop?()
                 return
             }
             SIMLog.trace()
             // 完工.
-            self.recording = false
+            self.recordStop()
+            // stop
             self.delegate?.chatKeyboardAudioViewDidStop?()
-            self.spectrumView.hidden = true
             // 检查状态
             if preplayView.highlighted {
                 // 需要试听
@@ -386,14 +472,8 @@ extension SIMChatKeyboardAudio {
                 // 完成
                 self.onFinish(sender)
             }
-            // 隐藏就行了
-            UIView.animateWithDuration(0.25) {
-                self.operatorView.alpha = 0
-                self.preplayView.layer.transform = CATransform3DIdentity
-                self.precancelView.layer.transform = CATransform3DIdentity
-            }
         }
-        dynamic func onInterrupt(sender: AnyObject) {
+        private dynamic func onInterrupt(sender: AnyObject) {
             // 正在录音?
             guard self.recording else {
                 // 没有, 跳过
@@ -410,7 +490,7 @@ extension SIMChatKeyboardAudio {
             // 走正常结束流程
             self.onStop(sender)
         }
-        dynamic func onDrag(sender: UIButton, withEvent event: UIEvent?) {
+        private dynamic func onDrag(sender: UIButton, withEvent event: UIEvent?) {
             // 正在录音?
             guard self.recording else {
                 // 没有, 跳过
@@ -455,9 +535,6 @@ extension SIMChatKeyboardAudio {
             
             // 更新
             UIView.animateWithDuration(0.25) {
-                
-                self.update()
-                
                 self.preplayView.layer.transform = CATransform3DMakeScale(sl, sl, 1)
                 self.precancelView.layer.transform = CATransform3DMakeScale(sr, sr, 1)
                 self.preplayView.highlighted = hl
@@ -467,43 +544,124 @@ extension SIMChatKeyboardAudio {
             }
         }
         
-        dynamic func onListen(sender: AnyObject) {
+        private dynamic func onListen(sender: AnyObject) {
             self.delegate?.chatKeyboardAudioViewDidListen?()
         }
-        dynamic func onFinish(sender: AnyObject) {
+        private dynamic func onFinish(sender: AnyObject) {
             self.delegate?.chatKeyboardAudioViewDidFinish?()
         }
-        dynamic func onCancel(sender: AnyObject) {
+        private dynamic func onCancel(sender: AnyObject) {
             self.delegate?.chatKeyboardAudioViewDidCancel?()
         }
       
-        private func update() {
-            if self.preplayView.highlighted {
-                tipsLabel.text = "松开试听"
-                spectrumView.hidden = true
-                activityView.hidden = true
-            } else if self.precancelView.highlighted {
-                tipsLabel.text = "松开取消"
-                spectrumView.hidden = true
-                activityView.hidden = true
-            } else if let t = self.delegate?.chatKeyboardAudioViewCurrentTime?() where self.recording {
-                tipsLabel.text = String(format: "%0d:%02d", Int(t / 60), Int(t % 60))
-                spectrumView.hidden = false
-                activityView.hidden = true
-            } else {
-                tipsLabel.text = "准备中"
-                spectrumView.hidden = true
-                activityView.startAnimating()
-                activityView.hidden = false
+        ///
+        /// 更新状态
+        /// - 0 空
+        /// - 1 准备中(切换音频的时候会处于这个状态)
+        /// - 2 录音
+        /// - 3 错误
+        ///
+        private func update(flag: Int) {
+            switch flag {
+            case 0: // 无
+                self.tipsLabel.text = "按住说话"
+                self.spectrumView.hidden = true
+                self.activityView.hidden = true
+                self.activityView.stopAnimating()
+            case 1: // 准备中
+                self.tipsLabel.text = "准备中"
+                self.spectrumView.hidden = true
+                self.activityView.hidden = false
+                self.activityView.startAnimating()
+            case 2: // 录音进行中
+                if self.preplayView.highlighted {
+                    self.tipsLabel.text = "松开试听"
+                    self.spectrumView.hidden = true
+                } else if self.precancelView.highlighted {
+                    self.tipsLabel.text = "松开取消"
+                    self.spectrumView.hidden = true
+                } else {
+                    let t = self.delegate?.chatKeyboardAudioViewCurrentTime?() ?? 0
+                    self.tipsLabel.text = String(format: "%0d:%02d", Int(t / 60), Int(t % 60))
+                    self.spectrumView.hidden = false
+                }
+                // 不允许显示的..
+                self.activityView.hidden = true
+                self.activityView.stopAnimating()
+            case 3: // 错误
+                self.tipsLabel.text = "录音错误"
+                self.spectrumView.hidden = true
+                self.activityView.hidden = true
+                self.activityView.stopAnimating()
+            default:
+                break
             }
+            
+            self.tipsLabel.hidden = false
         }
         
         @objc func chatSpectrumViewWaveOfLeft(chatSpectrumView: SIMChatSpectrumView) -> Float {
-            self.update()
+            self.update(2)
             return self.delegate?.chatSpectrumViewWaveOfLeft?(chatSpectrumView) ?? 0
         }
         @objc func chatSpectrumViewWaveOfRight(chatSpectrumView: SIMChatSpectrumView) -> Float {
             return self.delegate?.chatSpectrumViewWaveOfRight?(chatSpectrumView) ?? 0
+        }
+        
+        /// 开始录音
+        func recordStart() {
+            // 正在录音中, 重复调用了?
+            if self.recording {
+                return
+            }
+            
+            SIMLog.trace()
+            
+            UIView.animateWithDuration(0.25) {
+                self.operatorView.alpha = 1
+                self.preplayView.layer.transform = CATransform3DIdentity
+                self.precancelView.layer.transform = CATransform3DIdentity
+            }
+            
+            // duang
+            let ani = CAKeyframeAnimation(keyPath: "transform.scale")
+            
+            ani.duration = 0.25
+            ani.values = [1,0.8,1.2,1]
+            ani.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionLinear)
+            
+            self.recordButton.layer.addAnimation(ani, forKey: "start")
+            
+            // :)
+            self.recording = true
+            // 进入录音状态
+            self.update(2)
+        }
+        /// 停止录音
+        func recordStop() {
+            // 没有正在录音中, 调用顺序错误了?
+            if !self.recording {
+                self.update(0)
+                return
+            }
+            
+            SIMLog.trace()
+            
+            // :)
+            self.recording = false
+            // 恢复状态
+            self.update(0)
+            
+            // 隐藏就行了
+            UIView.animateWithDuration(0.25) {
+                self.operatorView.alpha = 0
+                self.preplayView.layer.transform = CATransform3DIdentity
+                self.precancelView.layer.transform = CATransform3DIdentity
+            }
+        }
+        /// 错误
+        func recordFail(error: NSError?) {
+            self.update(3)
         }
         
         private(set) var recording: Bool = false {
@@ -518,9 +676,9 @@ extension SIMChatKeyboardAudio {
        
         weak var delegate: SIMChatKeyboardAudioViewDelegate?
         
-        private lazy var tipsLabel = UILabel()
-        private lazy var spectrumView = SIMChatSpectrumView(frame: CGRectZero)
-        private lazy var activityView = UIActivityIndicatorView(activityIndicatorStyle: .Gray)
+        private(set) lazy var tipsLabel = UILabel()
+        private(set) lazy var spectrumView = SIMChatSpectrumView(frame: CGRectZero)
+        private(set) lazy var activityView = UIActivityIndicatorView(activityIndicatorStyle: .Gray)
         
         private lazy var listenButton = UIButton()
         private lazy var recordButton = UIButton()
@@ -589,17 +747,24 @@ extension SIMChatKeyboardAudio {
         
         self.playView.hidden = false
         self.playView.alpha = 0
+        self.playView.playStop()
         
-        UIView.animateWithDuration(0.25) {
+        //self.pushTalkView.tipsLabel.hidden = true
+        
+        UIView.animateWithDuration(0.25, animations: {
             self.playView.alpha = 1
-        }
+            self.pushTalkView.tipsLabel.alpha = 0
+        })
     }
     /// 显示录音
     func onShowRecord() {
         SIMLog.trace()
         
+        self.pushTalkView.recordStop()
+        
         UIView.animateWithDuration(0.25, animations: {
             self.playView.alpha = 0
+            self.pushTalkView.tipsLabel.alpha = 1
         }, completion: { b in
             self.playView.hidden = false
             if self.playView.playing {
@@ -636,6 +801,28 @@ extension SIMChatKeyboardAudio {
     }
 }
 
+/// MARK: - /// 管理器
+extension SIMChatKeyboardAudio : SIMChatAudioManagerDelegate {
+    /// 开始录音
+    func chatAudioManagerDidStartRecord(chatAudioManager: SIMChatAudioManager, param: AnyObject) {
+        self.delegate?.chatKeyboardAudioDidBegin?(self)
+        self.pushTalkView.recordStart()
+    }
+    /// 录音失败
+    func chatAudioManagerRecordFail(chatAudioManager: SIMChatAudioManager, error: NSError?) {
+        self.delegate?.chatKeyboardAudioDidEnd?(self)
+        self.pushTalkView.recordFail(error)
+    }
+    /// 开始播放
+    func chatAudioManagerDidStartPlay(chatAudioManager: SIMChatAudioManager, param: AnyObject) {
+        self.playView.playStart()
+    }
+    /// 播放错误
+    func chatAudioManagerPlayFail(chatAudioManager: SIMChatAudioManager, error: NSError?) {
+        self.playView.playFail(error)
+    }
+}
+
 /// MARK: - /// Event
 extension SIMChatKeyboardAudio : SIMChatKeyboardAudioViewDelegate {
     /// 试听
@@ -656,6 +843,9 @@ extension SIMChatKeyboardAudio : SIMChatKeyboardAudioViewDelegate {
         
         self.onShowRecord()
         self.onHideToolbar()
+        
+        self.delegate?.chatKeyboardAudioDidEnd?(self)
+        self.delegate?.chatKeyboardAudioDidFinish?(self, url: self.am.dynamicType.defaultRecordFile, duration: self.recordDuration)
     }
     /// 取消
     func chatKeyboardAudioViewDidCancel() {
@@ -668,234 +858,82 @@ extension SIMChatKeyboardAudio : SIMChatKeyboardAudioViewDelegate {
         
         self.onShowRecord()
         self.onHideToolbar()
+        
+        self.delegate?.chatKeyboardAudioDidEnd?(self)
+        self.delegate?.chatKeyboardAudioDidCancel?(self, url: self.am.dynamicType.defaultRecordFile)
     }
     
     /// Info
     
     /// 持续时间
     func chatKeyboardAudioViewDuration() -> NSTimeInterval {
-        return self.audioManager.duration
+        return self.am.duration
     }
     /// 当前时间
     func chatKeyboardAudioViewCurrentTime() -> NSTimeInterval {
-        return self.audioManager.currentTime
+        let currentTime = self.am.currentTime
+        // 如果是录音, 维持一个最大的录音时间
+        if self.am.recording {
+            self.recordDuration = currentTime
+        }
+        return currentTime
     }
     /// 当前音波(左)
     func chatSpectrumViewWaveOfLeft(chatSpectrumView: SIMChatSpectrumView) -> Float {
-        return self.audioManager.meter(0)
+        return self.am.meter(0)
     }
     /// 当前音波(右)
     func chatSpectrumViewWaveOfRight(chatSpectrumView: SIMChatSpectrumView) -> Float {
-        return self.audioManager.meter(0)
+        return self.am.meter(0)
     }
     
     /// Control
     
-    /// 将要开始播放
-    func chatKeyboardAudioViewWillBeginPlay() -> Bool {
+    /// 开始播放
+    func chatKeyboardAudioViewDidStartPlay() {
         SIMLog.trace()
-        
-        return self.audioManager.prepareToPlay(url: SIMChatAudioManager.defaultRecordFile)
+        self.am.delegate = self
+        self.am.play(self.am.dynamicType.defaultRecordFile)
     }
-    /// 己经开始播放
-    func chatKeyboardAudioViewDidBeginPlay() {
+    /// 开始录音
+    func chatKeyboardAudioViewDidStartRecord() {
         SIMLog.trace()
-        
-        self.audioManager.play()
+        self.am.delegate = self
+        self.am.record(self.am.dynamicType.defaultRecordFile)
     }
-    /// 将要开始录音
-    func chatKeyboardAudioViewWillBeginRecord() -> Bool {
-        SIMLog.trace()
-        
-        return self.audioManager.prepareToRecord()
-    }
-    /// 己经开始录音
-    func chatKeyboardAudioViewDidBeginRecord() {
-        SIMLog.trace()
-        
-        self.audioManager.record()
-    }
-    /// 己经停止
+    /// 停止
     func chatKeyboardAudioViewDidStop() {
         SIMLog.trace()
-        
-        self.audioManager.stop()
+        self.pushTalkView.recordStop()
+        self.playView.playStop()
+        self.am.stop()
     }
 }
 
-//extension SIMChatInputAudioView {
-//    
-//    /// 开始计时
-//    func startTimer() {
-//        if self.timer != nil {
-//            return
-//        }
-//        dispatch_async(dispatch_get_main_queue()) {
-//            if self.timer != nil {
-//                return
-//            }
-//            self.timer = NSTimer.scheduledTimerWithTimeInterval(0.25, target: self, selector: "interruptOfTimer", userInfo: nil, repeats: true)
-//        }
-//    }
-//    
-//    /// 停止计时
-//    func stopTimer() {
-//        self.timer?.invalidate()
-//        self.timer = nil
-//    }
-//    
-//    /// 开始试听.
-//    func startAudition() {
-//        // 允许播放?
-//        if !(delegate?.chatInputAudioViewShouldPlay?(self) ?? false) {
-//            return
-//        }
-//        // 动画代理
-//        class SFAnimationDelegateToBlock : NSObject {
-//            init(block: (Bool)->()) {
-//                self.block = block 
-//                super.init()
-//            }
-//            private var block: (Bool)->() 
-//            private override func animationDidStop(anim: CAAnimation!, finished flag: Bool) {
-//                block(flag)
-//            }
-//        }
-//        
-//        // 创建动画
-//        let ani = CABasicAnimation(keyPath: "strokeEnd")
-//        
-//        // 开始
-//        self.delegate?.chatInputAudioViewDidPlay?(self)
-//        
-//        ani.fromValue = 0
-//        ani.toValue = 1
-//        ani.duration = (delegate?.chatInputAudioViewDuration?(self) ?? 0) + 0.1
-//        ani.delegate = SFAnimationDelegateToBlock { [weak self] b in
-//            if b {
-//                // 完成.
-//                self?.stopAudition()
-//            }
-//        }
-//        
-//        // ..
-//        self.updateMeter()
-//        self.startTimer()
-//        self.progress.addAnimation(ani, forKey: "SE")
-//        self.playing = true
-//    }
-//    
-//    /// 停止试听
-//    func stopAudition() {
-//        if self.playing && delegate?.chatInputAudioViewShouldStop?(self) ?? true {
-//            
-//            // 清除动画
-//            self.stopTimer()
-//            self.progress.removeAllAnimations()
-//            self.playing = false
-//            
-//            delegate?.chatInputAudioViewDidStop?(self)
-//        }
-//    }
-//
-//    /// 开始录音
-//    func startRecord() {
-//        // 允许录音?
-//        if !(delegate?.chatInputAudioViewShouldRecord?(self) ?? false) {
-//            // 错误了。。
-//            self.tips.text = "未准备好"
-//            self.state = .Error
-//            return
-//        }
-//        // 启动录音
-//        self.delegate?.chatInputAudioViewDidRecord?(self)
-//        
-//        self.startTimer()
-//        self.state = .Record
-//        self.recording = true
-//    }
-//    
-//    /// 停止录音
-//    func stopRecord() {
-//        if self.recording && delegate?.chatInputAudioViewShouldStop?(self) ?? true {
-//            // 停止录音
-//            self.stopTimer()
-//            self.recording = false
-//            
-//            delegate?.chatInputAudioViewDidStop?(self)
-//        }
-//    }
-//    
-//    // 完成录音
-//    func finishRecord() {
-//        if delegate?.chatInputAudioViewShouldSend?(self) ?? true {
-//            // 更新状态
-//            self.state = .Normal
-//            //
-//            delegate?.chatInputAudioViewDidSend?(self)
-//        }
-//    }
-//    
-//    /// 取消录音.
-//    func cancelRecord() {
-//        if delegate?.chatInputAudioViewShouldCancel?(self) ?? true {
-//            // 更新状态
-//            self.state = .Normal
-//        
-//            delegate?.chatInputAudioViewDidCancel?(self)
-//        }
-//    }
-//
-//    /// 更新音频信息
-//    func updateMeter() {
-//        
-//        let time = delegate?.chatInputAudioViewCurrentTime?(self) ?? 0
-//        let meter = delegate?.chatInputAudioViewMeter?(self) ?? 0
-//        
-//        self.tips.text = String(format: "%d:%02d", Int(time / 60), Int(time % 60))
-//        self.activity.hidden = true
-//    }
-//}
-//
-//
-//@objc protocol SIMChatInputAudioViewDelegate : NSObjectProtocol {
-//    
-//    optional func chatInputAudioViewShouldRecord(chatInputAudioView: SIMChatInputAudioView) -> Bool
-//    optional func chatInputAudioViewDidRecord(chatInputAudioView: SIMChatInputAudioView)
-//    
-//    optional func chatInputAudioViewShouldPlay(chatInputAudioView: SIMChatInputAudioView) -> Bool
-//    optional func chatInputAudioViewDidPlay(chatInputAudioView: SIMChatInputAudioView)
-//    
-//    optional func chatInputAudioViewShouldStop(chatInputAudioView: SIMChatInputAudioView) -> Bool
-//    optional func chatInputAudioViewDidStop(chatInputAudioView: SIMChatInputAudioView)
-//    
-//    optional func chatInputAudioViewMeter(chatInputAudioView: SIMChatInputAudioView) -> Float
-//    optional func chatInputAudioViewDuration(chatInputAudioView: SIMChatInputAudioView) -> NSTimeInterval
-//    optional func chatInputAudioViewCurrentTime(chatInputAudioView: SIMChatInputAudioView) -> NSTimeInterval
-//    
-//    optional func chatInputAudioViewShouldSend(chatInputAudioView: SIMChatInputAudioView) -> Bool
-//    optional func chatInputAudioViewDidSend(chatInputAudioView: SIMChatInputAudioView)
-//    
-//    optional func chatInputAudioViewShouldCancel(chatInputAudioView: SIMChatInputAudioView) -> Bool
-//    optional func chatInputAudioViewDidCancel(chatInputAudioView: SIMChatInputAudioView)
-//}
-
-
 /// MARK: - /// protocol
-@objc protocol SIMChatKeyboardAudioViewDelegate : NSObjectProtocol, SIMChatSpectrumViewDelegate {
+
+/// 内部代理.
+@objc private protocol SIMChatKeyboardAudioViewDelegate : NSObjectProtocol, SIMChatSpectrumViewDelegate {
     
     optional func chatKeyboardAudioViewDuration() -> NSTimeInterval
     optional func chatKeyboardAudioViewCurrentTime() -> NSTimeInterval
     
-    optional func chatKeyboardAudioViewWillBeginPlay() -> Bool
-    optional func chatKeyboardAudioViewDidBeginPlay()
-    
-    optional func chatKeyboardAudioViewWillBeginRecord() -> Bool
-    optional func chatKeyboardAudioViewDidBeginRecord()
-    
+    optional func chatKeyboardAudioViewDidStartPlay()
+    optional func chatKeyboardAudioViewDidStartRecord()
     optional func chatKeyboardAudioViewDidStop()
     
     optional func chatKeyboardAudioViewDidCancel()
     optional func chatKeyboardAudioViewDidFinish()
     optional func chatKeyboardAudioViewDidListen()
 }
+
+/// 公开代理
+@objc protocol SIMChatKeyboardAudioDelegate : NSObjectProtocol {
+  
+    optional func chatKeyboardAudioDidBegin(chatKeyboardAudio: SIMChatKeyboardAudio)
+    optional func chatKeyboardAudioDidEnd(chatKeyboardAudio: SIMChatKeyboardAudio)
+    
+    optional func chatKeyboardAudioDidCancel(chatKeyboardAudio: SIMChatKeyboardAudio, url: NSURL)
+    optional func chatKeyboardAudioDidFinish(chatKeyboardAudio: SIMChatKeyboardAudio, url: NSURL, duration: NSTimeInterval)
+}
+

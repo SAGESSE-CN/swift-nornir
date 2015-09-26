@@ -20,105 +20,156 @@ class SIMChatAudioManager: NSObject {
     deinit {
         NSNotificationCenter.defaultCenter().removeObserver(self)
     }
-    /// 准备播放
-    func prepareToPlay(data: NSData) -> Bool {
+    ///
+    /// 播放(优先用文件吧, 低内存占用)
+    ///
+    func play(url: NSURL) {
         SIMLog.trace()
         // 一定要先停止.
-        stop()
+        self.stop()
         // 允许播放?
-        if delegate?.audioManagerWillPlay?(self, data: data) ?? true {
-            // 配置..
-            let _ = try? AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback)
-            let _ = try? AVAudioSession.sharedInstance().setActive(true)
-            // 加载
-            player = try? AVAudioPlayer(data: data)
-            player?.delegate = self
-            player?.meteringEnabled = true
+        if !(self.delegate?.chatAudioManagerWillStartPlay?(self, param: url) ?? true) {
+            // 不允许
+            return
+        }
+        // 通知:)
+        SIMNotificationCenter.postNotificationName(SIMChatAudioManagerWillPlayNotification, object: url)
+        
+        do {
+           
+            // create
+            self.player = try AVAudioPlayer(contentsOfURL: url)
+            self.player?.delegate = self
+            self.player?.meteringEnabled = true
+            // config
+            try AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback)
+            try AVAudioSession.sharedInstance().setActive(true)
+            // prepare 
+            if !(self.player?.prepareToPlay() ?? false) {
+                self.player = nil
+                throw NSError(domain: "requeset player prepare fail!", code: -2, userInfo: nil)
+            }
+            // start
+            self.player?.play()
+            // 己经启动
+            self.delegate?.chatAudioManagerDidStartPlay?(self, param: url)
             // 通知
-            SIMNotificationCenter.postNotificationName(SIMChatAudioManagerWillPlayNotification, object: player)
-            // 真正的准备
-            return player?.prepareToPlay() ?? false
+            SIMNotificationCenter.postNotificationName(SIMChatAudioManagerDidPlayNotification, object: url)
+            
+        } catch let error as NSError  {
+                
+            SIMLog.error(error)
+            // 回调
+            self.delegate?.chatAudioManagerPlayFail?(self, error: error)
+            
         }
-        return false
     }
-    /// 准备播放
-    func prepareToPlay(url url: NSURL) -> Bool {
-        if let data = NSData(contentsOfURL: url) {
-            return prepareToPlay(data)
-        }
-        return false
-    }
-    /// 准备录音
-    func prepareToRecord(url: NSURL = SIMChatAudioManager.defaultRecordFile) -> Bool {
+    ///
+    /// 播放
+    ///
+    func playWithData(data: NSData) {
         SIMLog.trace()
         // 一定要先停止.
-        stop()
-        // 允许录音?
-        if delegate?.audioManagerWillRecord?(self, url: url) ?? true {
-            // 配置..
-            let _ = try! AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayAndRecord)
-            let _ = try! AVAudioSession.sharedInstance().setActive(true)
-            // 删除这个文件
-            let _ = try! NSFileManager.defaultManager().removeItemAtURL(url)
-            // 加载
-            recorder = try! AVAudioRecorder(URL: url, settings: self.recordSettings)
-            recorder?.delegate = self
-            recorder?.meteringEnabled = true
+        self.stop()
+        // 允许播放?
+        if !(self.delegate?.chatAudioManagerWillStartPlay?(self, param: data) ?? true) {
+            // 不允许
+            return
+        }
+        // 通知:)
+        SIMNotificationCenter.postNotificationName(SIMChatAudioManagerWillPlayNotification, object: data)
+        
+        do {
+           
+            // create
+            self.player = try AVAudioPlayer(data: data)
+            self.player?.delegate = self
+            self.player?.meteringEnabled = true
+            // config
+            try AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback)
+            try AVAudioSession.sharedInstance().setActive(true)
+            // prepare 
+            if !(self.player?.prepareToPlay() ?? false) {
+                self.player = nil
+                throw NSError(domain: "requeset player prepare fail!", code: -2, userInfo: nil)
+            }
+            // start
+            self.player?.play()
+            // 己经启动
+            self.delegate?.chatAudioManagerDidStartPlay?(self, param: data)
             // 通知
-            SIMNotificationCenter.postNotificationName(SIMChatAudioManagerWillRecordNotification, object: recorder)
-            // 真正的准备
-            return recorder?.prepareToRecord() ?? false
+            SIMNotificationCenter.postNotificationName(SIMChatAudioManagerDidPlayNotification, object: data)
+            
+        } catch let error as NSError  {
+                
+            SIMLog.error(error)
+            // 回调
+            self.delegate?.chatAudioManagerPlayFail?(self, error: error)
+            
         }
-        // ..
-        return false
     }
-    /// 播放(需要准备)
-    func play() {
-        // 检查一下有没有准备好
-        if player == nil {
-            delegate?.audioManagerDidPlayFail?(self, error: NSError(domain: "没有准备好", code: 1, userInfo: nil))
+    ///
+    /// 录音
+    ///
+    func record(url: NSURL) {
+        SIMLog.trace()
+        // 一定要先停止.
+        self.stop()
+        // 允许录音? 问过之后才请求权限
+        if !(self.delegate?.chatAudioManagerWillStartRecord?(self, param: url) ?? true) {
+            // 不允许.
             return
         }
-        SIMLog.trace()
-        // 调用播放
-        player?.play()
-        // 通知.
-        delegate?.audioManagerDidPlay?(self, data: player!.data!)
-        // ..
-        SIMNotificationCenter.postNotificationName(SIMChatAudioManagerDidPlayNotification, object: player)
-    }
-    /// 录音(需要准备)
-    func record() {
-        // 检查一下有没有准备好
-        if recorder == nil {
-            delegate?.audioManagerDidRecordFail?(self, error: NSError(domain: "没有准备好", code: 1, userInfo: nil))
-            return
-        }
-        SIMLog.trace()
-        // 调用录音
-        recorder?.record()
-        // 通知
-        delegate?.audioManagerDidRecord?(self, url: recorder!.url)
-        // ..
-        SIMNotificationCenter.postNotificationName(SIMChatAudioManagerDidRecordNotification, object: recorder)
-    }
-    /// 完成
-    func finish() {
-        if player != nil {
-            player?.stop()
-            player?.delegate = nil
-            player = nil
-        }
-        if recorder != nil {
-            recorder?.stop()
-            // 等待完成
-            while recorder != nil {
-                NSRunLoop.currentRunLoop().runUntilDate(NSDate(timeIntervalSinceNow: 0.05))
+        // 通知:)
+        SIMNotificationCenter.postNotificationName(SIMChatAudioManagerWillRecordNotification, object: url)
+        // :)
+        self.recordStarted = true
+        // 请求录音权限
+        AVAudioSession.sharedInstance().requestRecordPermission { hasPermission in
+            do {
+                // 己经取消了该请求?
+                if !self.recordStarted {
+                    return
+                }
+                // 请求失败
+                if !hasPermission {
+                    throw NSError(domain: "requeset record permission fail!", code: -1, userInfo: nil)
+                }
+                // clean
+                let _ = try? NSFileManager.defaultManager().removeItemAtURL(url)
+                // config
+                try AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryRecord)
+                try AVAudioSession.sharedInstance().setActive(true)
+                // create
+                self.recorder = try AVAudioRecorder(URL: url, settings: self.recordSettings)
+                self.recorder?.delegate = self
+                self.recorder?.meteringEnabled = true
+                // prepare 
+                if !(self.recorder?.prepareToRecord() ?? false) {
+                    self.recorder = nil
+                    throw NSError(domain: "requeset record prepare fail!", code: -2, userInfo: nil)
+                }
+                // start
+                self.recorder?.record()
+                // 己经启动了录音.
+                self.delegate?.chatAudioManagerDidStartRecord?(self, param: url)
+                // 通知用户
+                SIMNotificationCenter.postNotificationName(SIMChatAudioManagerWillRecordNotification, object: url)
+                
+            } catch let error as NSError  {
+                
+                SIMLog.error(error)
+                // 回调
+                self.delegate?.chatAudioManagerRecordFail?(self, error: error)
+                
             }
         }
     }
-    /// 操作
+    ///
+    /// 停止
+    ///
     func stop() {
+        self.recordStarted = false
         // 需要停止?
         if player == nil && recorder == nil {
             return
@@ -135,6 +186,15 @@ class SIMChatAudioManager: NSObject {
         recorder = nil
         // 通知
         SIMNotificationCenter.postNotificationName(SIMChatAudioManagerDidStopNotification, object: nil)
+        // 延迟0.5s再恢复, 不然给人一种毛燥的感觉
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(500 * NSEC_PER_MSEC)), dispatch_get_main_queue()) {
+            // 如果正在使用就不要取消激活了
+            if self.playing || self.recording {
+                return
+            }
+            /// 取消激活
+            let _ = try? AVAudioSession.sharedInstance().setActive(false, withOptions: .NotifyOthersOnDeactivation)
+        }
     }
     /// 波形
     func meter(channel: Int) -> Float {
@@ -142,15 +202,15 @@ class SIMChatAudioManager: NSObject {
             // 首先要更新一下才能获取到
             player?.updateMeters()
             // 去看看
-            return player?.averagePowerForChannel(channel) ?? 0
+            return player?.averagePowerForChannel(channel) ?? -160
         }
         if recording {
             // 首先要更新一下才能获取到
             recorder?.updateMeters()
             // 去看看
-            return recorder?.averagePowerForChannel(channel) ?? 0
+            return recorder?.averagePowerForChannel(channel) ?? -160
         }
-        return 0
+        return -160
     }
     /// 正在播放
     var playing: Bool {
@@ -181,7 +241,9 @@ class SIMChatAudioManager: NSObject {
         return 0
     }
     /// 代理
-    weak var delegate: SIMAudioManagerDelegate?
+    weak var delegate: SIMChatAudioManagerDelegate?
+   
+    private var recordStarted = false
     
     private(set) lazy var player: AVAudioPlayer? = nil
     private(set) lazy var recorder: AVAudioRecorder? = nil
@@ -203,12 +265,14 @@ class SIMChatAudioManager: NSObject {
 extension SIMChatAudioManager : AVAudioPlayerDelegate {
     /// 完成播放
     func audioPlayerDidFinishPlaying(player: AVAudioPlayer, successfully flag: Bool) {
-        delegate?.audioManagerDidPlayFinish?(self)
+        SIMLog.trace()
+        delegate?.chatAudioManagerPlayFinish?(self)
         stop()
     }
     /// 未能完成
     func audioPlayerDecodeErrorDidOccur(player: AVAudioPlayer, error: NSError?) {
-        delegate?.audioManagerDidPlayFail?(self, error: error)
+        SIMLog.trace()
+        delegate?.chatAudioManagerPlayFail?(self, error: error)
         stop()
     }
 }
@@ -218,13 +282,13 @@ extension SIMChatAudioManager : AVAudioRecorderDelegate {
     /// 录音完成
     func audioRecorderDidFinishRecording(recorder: AVAudioRecorder, successfully flag: Bool) {
         SIMLog.trace()
-        delegate?.audioManagerDidRecordFinish?(self)
+        delegate?.chatAudioManagerRecordFinish?(self)
         stop()
     }
     /// 录音失败
     func audioRecorderEncodeErrorDidOccur(recorder: AVAudioRecorder, error: NSError?) {
         SIMLog.trace()
-        delegate?.audioManagerDidRecordFail?(self, error: error)
+        delegate?.chatAudioManagerRecordFail?(self, error: error)
         stop()
     }
     
@@ -238,25 +302,23 @@ extension SIMChatAudioManager {
     }
 }
 
-
 /// MARK: - /// Delegate
-@objc protocol SIMAudioManagerDelegate : NSObjectProtocol {
+@objc protocol SIMChatAudioManagerDelegate : NSObjectProtocol {
     
-    optional func audioManagerWillPlay(audioManager: SIMChatAudioManager, data: NSData) -> Bool
-    optional func audioManagerDidPlay(audioManager: SIMChatAudioManager, data: NSData)
+    optional func chatAudioManagerWillStartPlay(chatAudioManager: SIMChatAudioManager, param: AnyObject) -> Bool
+    optional func chatAudioManagerDidStartPlay(chatAudioManager: SIMChatAudioManager, param: AnyObject)
     
-    optional func audioManagerWillRecord(audioManager: SIMChatAudioManager, url: NSURL) -> Bool
-    optional func audioManagerDidRecord(audioManager: SIMChatAudioManager, url: NSURL)
+    optional func chatAudioManagerWillStartRecord(chatAudioManager: SIMChatAudioManager, param: AnyObject) -> Bool
+    optional func chatAudioManagerDidStartRecord(chatAudioManager: SIMChatAudioManager, param: AnyObject)
     
-    optional func audioManagerDidRecordFinish(audioManager: SIMChatAudioManager)
-    optional func audioManagerDidRecordFail(audioManager: SIMChatAudioManager, error: NSError?)
+    optional func chatAudioManagerWillStop(chatAudioManager: SIMChatAudioManager) -> Bool
+    optional func chatAudioManagerDidStop(chatAudioManager: SIMChatAudioManager)
     
-    optional func audioManagerDidPlayFinish(audioManager: SIMChatAudioManager)
-    optional func audioManagerDidPlayFail(audioManager: SIMChatAudioManager, error: NSError?)
+    optional func chatAudioManagerRecordFinish(chatAudioManager: SIMChatAudioManager)
+    optional func chatAudioManagerRecordFail(chatAudioManager: SIMChatAudioManager, error: NSError?)
     
-    optional func audioManagerWillStop(audioManager: SIMChatAudioManager) -> Bool
-    optional func audioManagerDidStop(audioManager: SIMChatAudioManager)
-    
+    optional func chatAudioManagerPlayFinish(chatAudioManager: SIMChatAudioManager)
+    optional func chatAudioManagerPlayFail(chatAudioManager: SIMChatAudioManager, error: NSError?)
 }
 
 /// 停止

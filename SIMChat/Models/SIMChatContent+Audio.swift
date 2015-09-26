@@ -23,3 +23,12 @@ class SIMChatContentAudio: SIMChatContent {
     var playing = false
     var duration = NSTimeIntervalSince1970
 }
+
+extension SIMChatContentAudio {
+    var durationText: String {
+        if self.duration < 60 {
+            return String(format: "%.0lf''", self.duration % 60)
+        }
+        return String(format: "%.0f'%02.0f''", self.duration / 60, self.duration % 60)
+    }
+}

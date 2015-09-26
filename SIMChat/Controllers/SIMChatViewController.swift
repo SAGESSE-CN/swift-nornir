@@ -600,7 +600,7 @@ extension SIMChatViewController {
         // 创建.
         switch style {
         case .Emoji: kb = SIMChatKeyboardEmoji(delegate: self)
-        case .Voice: kb = SIMChatKeyboardAudio()
+        case .Voice: kb = SIMChatKeyboardAudio(delegate: self)
         case .Tool:  kb = SIMChatKeyboardTool(delegate: self, dataSource: self)
         default:     kb = nil
         }
@@ -751,7 +751,23 @@ extension SIMChatViewController : SIMChatKeyboardToolDataSource, SIMChatKeyboard
 }
 
 /// MARK: - /// Extension Keyboard Audio
-extension SIMChatViewController {
+extension SIMChatViewController : SIMChatKeyboardAudioDelegate {
+    /// 开始音频输入
+    func chatKeyboardAudioDidBegin(chatKeyboardAudio: SIMChatKeyboardAudio) {
+        SIMLog.trace()
+        self.textField.enabled = false
+    }
+    /// 结束音频输入
+    func chatKeyboardAudioDidEnd(chatKeyboardAudio: SIMChatKeyboardAudio) {
+        SIMLog.trace()
+        self.textField.enabled = true
+    }
+    /// 得到结果
+    func chatKeyboardAudioDidFinish(chatKeyboardAudio: SIMChatKeyboardAudio, url: NSURL, duration: NSTimeInterval) {
+        if let data = NSData(contentsOfURL: url) {
+            self.send(audio: data, duration: duration)
+        }
+    }
 }
 
 /// MARK: - /// Text Field
@@ -765,7 +781,7 @@ extension SIMChatViewController : SIMChatTextFieldDelegate {
     }
     /// ...
     func chatTextFieldContentSizeDidChange(chatTextField: SIMChatTextField) {
-//        // 填充动画更新
+        // 填充动画更新
         UIView.animateWithDuration(0.25) {
             // 更新键盘高度
             self.view.layoutIfNeeded()

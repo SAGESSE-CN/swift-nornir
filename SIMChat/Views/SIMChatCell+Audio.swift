@@ -39,8 +39,8 @@ class SIMChatCellAudio: SIMChatCellBubble {
         addConstraints(NSLayoutConstraintMake("H:|-12@hp1-[c]-10@hp1-[i]-10@hp1-|", views: vs, options: .AlignAllCenterY, metrics: ms))
         addConstraints(NSLayoutConstraintMake("H:|-10@hp0-[i]-10@hp0-[c]-12@hp0-|", views: vs, options: .AlignAllCenterY, metrics: ms))
         addConstraints(NSLayoutConstraintMake("V:|->=8-[i]->=8-|", views: vs))
-        addConstraints(NSLayoutConstraintMake("H:[i(s0)]", views: vs))
-        addConstraints(NSLayoutConstraintMake("V:[i(s0)]", views: vs))
+        addConstraints(NSLayoutConstraintMake("H:[i(s0)]", views: vs, metrics: ms))
+        addConstraints(NSLayoutConstraintMake("V:[i(s0)]", views: vs, metrics: ms))
         
         // get constraints
         for c in bubbleView.contentView.constraints {
@@ -67,7 +67,7 @@ class SIMChatCellAudio: SIMChatCellBubble {
         super.reloadData(m, ofUser: u)
         // 更新内容
         if let ctx = m.content as? SIMChatContentAudio {
-            titleLabel.text = "\(ctx.duration)"
+            titleLabel.text = ctx.durationText
             // 播放中.
             if ctx.playing {
                 animationView.startAnimating()
@@ -153,10 +153,10 @@ extension SIMChatCellAudio {
     /// 左边
     static let leftImages: (UIImage?, [UIImage]?) = {
         let a = NSMutableArray()
-        for n in ["voice_receive_icon_nor",
-                  "voice_receive_icon_1",
-                  "voice_receive_icon_2",
-                  "voice_receive_icon_3"] {
+        for n in ["simchat_audio_receive_icon_nor",
+                  "simchat_audio_receive_icon_1",
+                  "simchat_audio_receive_icon_2",
+                  "simchat_audio_receive_icon_3"] {
             if let img = UIImage(named: n) {
                 a.addObject(img)
             }
@@ -167,10 +167,10 @@ extension SIMChatCellAudio {
     /// 右边
     static let rightImages: (UIImage?, [UIImage]?) = {
         let a = NSMutableArray()
-        for n in ["voice_send_icon_nor",
-                  "voice_send_icon_1",
-                  "voice_send_icon_2",
-                  "voice_send_icon_3"] {
+        for n in ["simchat_audio_send_icon_nor",
+                  "simchat_audio_send_icon_1",
+                  "simchat_audio_send_icon_2",
+                  "simchat_audio_send_icon_3"] {
             if let img = UIImage(named: n) {
                 a.addObject(img)
             }
