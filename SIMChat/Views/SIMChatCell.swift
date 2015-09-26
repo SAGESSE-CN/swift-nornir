@@ -12,8 +12,14 @@ import UIKit
 /// 消息单元格
 ///
 class SIMChatCell: SIMTableViewCell {
+    deinit {
+        // 追踪
+        SIMLog.trace()
+    }
     /// 构建
     override func build() {
+        // 追踪
+        SIMLog.trace()
         super.build()
         self.clipsToBounds = true
         self.backgroundColor = UIColor.clearColor()
@@ -70,36 +76,59 @@ class SIMChatCell: SIMTableViewCell {
     private(set) var message: SIMChatMessage?          // 关联的消息
 }
 
-/// MARK: - /// Type
-extension SIMChatCell {
-    /// 类型
-    enum SIMChatCellStyle : Int {
-        case Left
-        case Right
-    }
-}
-
-/// MARK: - /// Event 
+// MARK: - Event
 extension SIMChatCell {
     /// 删除.
-    dynamic func chatCellDelete(sender: AnyObject?) {
-        SIMLog.trace()
-        //delegate?.chatCellDidDelete?(self)
+    dynamic func chatCellDelete(sender: AnyObject) {
+        self.delegate?.chatCellDidDelete?(self)
+    }
+    /// 点击
+    dynamic func chatCellPress(sender: SIMChatCellEvent) {
+        self.delegate?.chatCellDidPress?(self, withEvent: sender)
+    }
+    /// 长按
+    dynamic func chatCellLongPress(sender: SIMChatCellEvent) {
+        self.delegate?.chatCellDidLongPress?(self, withEvent: sender)
     }
 }
 
-/// MARK: - /// 代理
+// MARK: - Delegate
 @objc protocol SIMChatCellDelegate : NSObjectProtocol {
     
-    ///
-    optional func chatCellDidDelete(chatCell: SIMChatCell)
     optional func chatCellDidCopy(chatCell: SIMChatCell)
+    optional func chatCellDidDelete(chatCell: SIMChatCell)
     
-//    /// 点击消息
-//    optional func chatCellWillPress(chatCell: SIMChatCell, withEvent event: SIMChatCellEvent) -> Bool
-//    optional func chatCellDidPress(chatCell: SIMChatCell, withEvent event: SIMChatCellEvent)
-//    
-//    /// 长按消息
-//    optional func chatCellWillLongPress(chatCell: SIMChatCell, withEvent event: SIMChatCellEvent) -> Bool
-//    optional func chatCellDidLongPress(chatCell: SIMChatCell, withEvent event: SIMChatCellEvent)
+    optional func chatCellDidReSend(chatCell: SIMChatCell)
+    
+    optional func chatCellDidPress(chatCell: SIMChatCell, withEvent event: SIMChatCellEvent)
+    optional func chatCellDidLongPress(chatCell: SIMChatCell, withEvent event: SIMChatCellEvent)
+    
+}
+
+/// 类型
+enum SIMChatCellStyle : Int {
+    case Left
+    case Right
+}
+
+/// 事件源
+enum SIMChatCellEventType : Int {
+    case Bubble         // 气泡
+    case VisitCard      // 名片
+    case Portrait       // 头像
+}
+
+/// 事件
+class SIMChatCellEvent : NSObject {
+    init(_ type: SIMChatCellEventType, _ sender: AnyObject? = nil, _ event: UIEvent? = nil, _ extra: AnyObject? = nil) {
+        self.type = type
+        self.event = event
+        self.sender = sender
+        self.extra = extra
+        super.init()
+    }
+    var type: SIMChatCellEventType
+    var event: UIEvent?
+    var sender: AnyObject?
+    var extra: AnyObject?
 }

@@ -177,7 +177,7 @@ class SIMChatTextField : SIMView {
     ]
 }
 
-/// MARK: - /// Type
+// MARK: - Type
 extension SIMChatTextField {
     ///
     /// 输入输的选项
@@ -231,7 +231,7 @@ extension SIMChatTextField {
     }
 }
 
-/// MARK: - /// Text View Delegate and Forward
+// MARK: - Text View Delegate and Forward
 extension SIMChatTextField : UITextViewDelegate {
     /// 将要编辑文本
     func textViewShouldBeginEditing(textView: UITextView) -> Bool {
@@ -312,7 +312,7 @@ extension SIMChatTextField : UITextViewDelegate {
     }
 }
 
-/// MARK: - /// Event
+// MARK: - Event
 extension SIMChatTextField {
     /// 选项
     func onItem(sender: SIMChatTextFieldItem) {

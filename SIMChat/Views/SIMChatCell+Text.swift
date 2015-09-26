@@ -58,24 +58,15 @@ class SIMChatCellText: SIMChatCellBubble {
         // 继续计算
         return super.systemLayoutSizeFittingSize(targetSize)
     }
-//    /// 检查是否使用.
-//    override func canPerformAction(action: Selector, withSender sender: AnyObject?) -> Bool {
-//        // 允许复制
-//        if action == "chatCellCopy:" {
-//            return true
-//        }
-//        return super.canPerformAction(action, withSender: sender)
-//    }
-//    
-//    /// 复制
-//    func chatCellCopy(sender: AnyObject?) {
-//        if let ctx = message?.content as? SIMChatContentText {
-//            UIPasteboard.generalPasteboard().string = ctx.text
-//            delegate?.chatCellDidCopy?(self)
-//        }
-//    }
-//    
-//    
+    /// 检查是否使用.
+    override func canPerformAction(action: Selector, withSender sender: AnyObject?) -> Bool {
+        // 允许复制
+        if action == "chatCellCopy:" {
+            return true
+        }
+        return super.canPerformAction(action, withSender: sender)
+    }
+    
     /// 显示类型
     override var style: SIMChatCellStyle  {
         willSet {
@@ -88,3 +79,19 @@ class SIMChatCellText: SIMChatCellBubble {
     
     private(set) lazy var contentLabel = UILabel()
 }
+
+
+// MARK: - Event
+extension SIMChatCellText {
+    /// 复制
+    dynamic func chatCellCopy(sender: AnyObject) {
+        SIMLog.trace()
+        if let ctx = message?.content as? SIMChatContentText {
+            // 复制进去:)
+            UIPasteboard.generalPasteboard().string = ctx.text
+            // 完成
+            self.delegate?.chatCellDidCopy?(self)
+        }
+    }
+}
+    

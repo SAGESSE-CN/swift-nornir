@@ -8,7 +8,7 @@
 
 import UIKit
 
-/// MARK: - /// Keyboard
+// MARK: - Keyboard
 extension SIMChatViewController {
     /// 更新键盘(类型)
     func updateKeyboard(style style: SIMChatTextFieldItemStyle) {
@@ -166,7 +166,7 @@ extension SIMChatViewController {
     }
 }
 
-/// MARK: - /// Extension Keyboard Emoji
+// MARK: - Extension Keyboard Emoji
 extension SIMChatViewController : SIMChatKeyboardEmojiDelegate {
     /// 选择了表情
     func chatKeyboardEmoji(chatKeyboardEmoji: SIMChatKeyboardEmoji, didSelectEmoji emoji: String) {
@@ -202,7 +202,7 @@ extension SIMChatViewController : SIMChatKeyboardEmojiDelegate {
     }
 }
 
-/// MARK: - /// Extension Keyboard Tool
+// MARK: - Extension Keyboard Tool
 extension SIMChatViewController : SIMChatKeyboardToolDataSource, SIMChatKeyboardToolDelegate {
     /// 需要扩展工具栏的数量
     func chatKeyboardTool(chatKeyboardTool: SIMChatKeyboardTool, numberOfItemsInSection section: Int) -> Int {
@@ -224,7 +224,7 @@ extension SIMChatViewController : SIMChatKeyboardToolDataSource, SIMChatKeyboard
     }
 }
 
-/// MARK: - /// Extension Keyboard Audio
+// MARK: - Extension Keyboard Audio
 extension SIMChatViewController : SIMChatKeyboardAudioDelegate {
     /// 开始音频输入
     func chatKeyboardAudioDidBegin(chatKeyboardAudio: SIMChatKeyboardAudio) {

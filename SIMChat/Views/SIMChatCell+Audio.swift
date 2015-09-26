@@ -11,7 +11,7 @@ import UIKit
 class SIMChatCellAudio: SIMChatCellBubble {
     /// 释放
     deinit {
-        SIMNotificationCenter.removeObserver(self)
+        SIMChatNotificationCenter.removeObserver(self)
     }
     /// 构建
     override func build() {
@@ -50,12 +50,12 @@ class SIMChatCellAudio: SIMChatCellBubble {
         }
         
         // add kvo
-        SIMNotificationCenter.addObserver(self, selector: "onAudioDidStop:", name: SIMChatAudioManagerWillStopNotification)
-        SIMNotificationCenter.addObserver(self, selector: "onAudioDidStop:", name: SIMChatAudioManagerWillRecordNotification)
-        SIMNotificationCenter.addObserver(self, selector: "onAudioDidPlay:", name: SIMChatAudioManagerWillPlayNotification)
+        SIMChatNotificationCenter.addObserver(self, selector: "onAudioDidStop:", name: SIMChatAudioManagerWillStopNotification)
+        SIMChatNotificationCenter.addObserver(self, selector: "onAudioDidStop:", name: SIMChatAudioManagerWillRecordNotification)
+        SIMChatNotificationCenter.addObserver(self, selector: "onAudioDidPlay:", name: SIMChatAudioManagerWillPlayNotification)
         
-        SIMNotificationCenter.addObserver(self, selector: "onAudioWillLoad:", name: SIMChatAudioManagerWillLoadNotification)
-        SIMNotificationCenter.addObserver(self, selector: "onAudioDidLoad:", name: SIMChatAudioManagerDidLoadNotification)
+        SIMChatNotificationCenter.addObserver(self, selector: "onAudioWillLoad:", name: SIMChatAudioManagerWillLoadNotification)
+        SIMChatNotificationCenter.addObserver(self, selector: "onAudioDidLoad:", name: SIMChatAudioManagerDidLoadNotification)
     }
     //
     /// 重新加载数据.
@@ -110,7 +110,7 @@ class SIMChatCellAudio: SIMChatCellBubble {
     private lazy var animationView = UIImageView()
 }
 
-/// MARK: - /// Events
+// MARK: - Events
 extension SIMChatCellAudio {
     /// 音频开始播放
     func onAudioDidPlay(sender: NSNotification) {
@@ -147,7 +147,7 @@ extension SIMChatCellAudio {
     }
 }
 
-/// MARK: - /// Resources
+// MARK: - Resources
 extension SIMChatCellAudio {
 
     /// 左边

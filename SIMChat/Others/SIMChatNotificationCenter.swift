@@ -1,5 +1,5 @@
 //
-//  SIMNotificationCenter.swift
+//  SIMChatNotificationCenter.swift
 //  SIMChat
 //
 //  Created by sagesse on 9/19/15.
@@ -8,17 +8,17 @@
 
 import UIKit
 
-class SIMNotificationCenter: NSNotificationCenter {
-    // 默认的, 但不是系统的那个
-    override class func defaultCenter() -> SIMNotificationCenter {
+class SIMChatNotificationCenter: NSNotificationCenter {
+    // 默认的, 但不是系统的那个(不能用系统的那个. 严重影响效率)
+    override class func defaultCenter() -> SIMChatNotificationCenter {
         return self.sharedInstance
     }
     // 应该是自动lazy的
-    private static let sharedInstance = SIMNotificationCenter()
+    private static let sharedInstance = SIMChatNotificationCenter()
 }
 
-/// MARK: - /// helper
-extension SIMNotificationCenter {
+// MARK: - helper
+extension SIMChatNotificationCenter {
     class func addObserver(observer: AnyObject, selector aSelector: Selector, name aName: String?, object anObject: AnyObject? = nil) {
         return self.defaultCenter().addObserver(observer, selector: aSelector, name: aName, object: anObject)
     }
@@ -44,6 +44,4 @@ extension SIMNotificationCenter {
     }
 }
 
-
-let SIMChatUserInfoChangedNotification = "SIMChatUserInfoChangedNotification"
 

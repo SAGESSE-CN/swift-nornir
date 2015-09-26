@@ -72,6 +72,9 @@ class SIMChatViewController: SIMViewController {
         
         // 加载聊天历史
         dispatch_async(dispatch_get_main_queue()) {
+            // 更新键盘
+            self.updateKeyboard(height: 0)
+            // 加载历史
             self.loadHistorys(40)
         }
     }
@@ -125,7 +128,7 @@ class SIMChatViewController: SIMViewController {
     internal lazy var keyboardHiddenAnimation = false
 }
 
-/// MARK: - /// Content
+// MARK: - Content
 extension SIMChatViewController : UITableViewDataSource {
     /// 行数
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -174,7 +177,6 @@ extension SIMChatViewController : UITableViewDataSource {
     /// 加载单元格
     ///
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        
         // 获取数据
         let message = source[indexPath.row]
         let key: String = {
@@ -189,14 +191,14 @@ extension SIMChatViewController : UITableViewDataSource {
         // 获取单元格, 如果不存在则创建
         let cell = tableView.dequeueReusableCellWithIdentifier(key, forIndexPath: indexPath) as! SIMChatCell
         // 重新加载数据
-        //cell.delegate = self
+        cell.delegate = self
         cell.reloadData(message, ofUser: self.conversation.sender)
         // 完成.
         return cell
     }
 }
 
-/// MARK: - /// Content Event
+// MARK: - Content Event
 extension SIMChatViewController : UITableViewDelegate {
     /// 开始拖动
     func scrollViewWillBeginDragging(scrollView: UIScrollView) {
@@ -209,37 +211,25 @@ extension SIMChatViewController : UITableViewDelegate {
     ///
     func scrollViewWillEndDragging(scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
         //Log.debug(targetContentOffset.memory)
-//        
-//        let pt = scrollView.contentOffset
-//        
-//        //Log.debug("\(pt.y) \(targetContentOffset.memory.y)")
-//        if pt.y < -scrollView.contentInset.top && targetContentOffset.memory.y <= -scrollView.contentInset.top {
-//            dispatch_async(dispatch_get_main_queue()) {
-//                //self.loadMore(nil)
-//            }
-//        }
+        // 
+        // let pt = scrollView.contentOffset
+        // 
+        // //Log.debug("\(pt.y) \(targetContentOffset.memory.y)")
+        // if pt.y < -scrollView.contentInset.top && targetContentOffset.memory.y <= -scrollView.contentInset.top {
+        //     dispatch_async(dispatch_get_main_queue()) {
+        //         //self.loadMore(nil)
+        //     }
+        // }
     }
     /// 结束减速
     func scrollViewDidEndDecelerating(scrollView: UIScrollView) {
         if scrollView === tableView && scrollView.contentOffset.y <= -scrollView.contentInset.top {
-//            // 查询.
-//            self.conversation.query(40, last: self.lastMessage) { [weak self]ms, e in
-//                // 查询成功?
-//                if let ms = ms as? [SIMChatMessage] {
-//                    // 没有更多了
-//                    if ms.count == 0 {
-//                        return
-//                    }
-//                    // 还有继续插入
-//                    self?.insertMessages(ms.reverse(), atIndex: 0, animated: true)
-//                    self?.latest = ms.last
-//                }
-//            }
+            // self.loadHistorys(40, latest: self.latest)
         }
     }
 }
 
-/// MARK: - /// Text Field
+// MARK: - Text Field
 extension SIMChatViewController : SIMChatTextFieldDelegate {
     /// 选中..
     func chatTextField(chatTextField: SIMChatTextField, didSelectItem item: Int) {

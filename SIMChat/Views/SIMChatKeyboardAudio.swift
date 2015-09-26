@@ -122,7 +122,7 @@ class SIMChatKeyboardAudio: SIMView {
     private lazy var am = SIMChatAudioManager.sharedManager
 }
 
-/// MARK: - /// Type 
+// MARK: - Type 
 extension SIMChatKeyboardAudio {
     /// 播放
     private class SIMChatKeyboardAudioPlayView : SIMView, SIMChatSpectrumViewDelegate {
@@ -801,7 +801,7 @@ extension SIMChatKeyboardAudio {
     }
 }
 
-/// MARK: - /// 管理器
+// MARK: - Manager
 extension SIMChatKeyboardAudio : SIMChatAudioManagerDelegate {
     /// 开始录音
     func chatAudioManagerDidStartRecord(chatAudioManager: SIMChatAudioManager, param: AnyObject) {
@@ -823,7 +823,7 @@ extension SIMChatKeyboardAudio : SIMChatAudioManagerDelegate {
     }
 }
 
-/// MARK: - /// Event
+// MARK: - Event
 extension SIMChatKeyboardAudio : SIMChatKeyboardAudioViewDelegate {
     /// 试听
     func chatKeyboardAudioViewDidListen() {
@@ -910,7 +910,7 @@ extension SIMChatKeyboardAudio : SIMChatKeyboardAudioViewDelegate {
     }
 }
 
-/// MARK: - /// protocol
+// MARK: - protocol
 
 /// 内部代理.
 @objc private protocol SIMChatKeyboardAudioViewDelegate : NSObjectProtocol, SIMChatSpectrumViewDelegate {

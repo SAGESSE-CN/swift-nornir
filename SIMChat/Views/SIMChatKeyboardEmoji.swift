@@ -110,7 +110,7 @@ class SIMChatKeyboardEmoji: SIMView {
     }()
 }
 
-/// MARK: - /// UICollectionViewDelegate or UICollectionViewDataSource
+// MARK: - UICollectionViewDelegate or UICollectionViewDataSource
 extension SIMChatKeyboardEmoji : UICollectionViewDelegate, UICollectionViewDataSource {
     /// 滑动
     func scrollViewDidEndDecelerating(scrollView: UIScrollView) {
@@ -244,7 +244,7 @@ extension SIMChatKeyboardEmoji {
     }
 }
 
-/// MARK: - /// Event 
+// MARK: - Event 
 extension SIMChatKeyboardEmoji {
     /// 发送
     func onSend(sender: AnyObject) {

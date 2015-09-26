@@ -9,12 +9,12 @@
 import UIKit
 
 
-/// 让枚举支持 | 操作
+/// 提供 | 操作支持
 func |<T : OptionSetType>(lhs: T, rhs: T) -> T {
     return lhs.union(rhs)
 }
 
-/// 让时间支持 - 操作
+/// 为时间提供 - 操作支持
 func -(lhs: NSDate, rhs: NSDate) -> NSTimeInterval {
     return lhs.timeIntervalSince1970 - rhs.timeIntervalSince1970
 }
@@ -40,6 +40,23 @@ func NSLayoutConstraintMake(format: String, views: [String : AnyObject], options
 
 /// 添加build
 class SIMView : UIView {
+    /// 序列化
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+        self.build()
+    }
+    /// 初始化
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        self.build()
+    }
+    /// 构建
+    func build() {
+    }
+}
+
+/// 添加build
+class SIMControl : UIControl {
     /// 序列化
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)

@@ -33,7 +33,7 @@ class SIMChatAudioManager: NSObject {
             return
         }
         // 通知:)
-        SIMNotificationCenter.postNotificationName(SIMChatAudioManagerWillPlayNotification, object: url)
+        SIMChatNotificationCenter.postNotificationName(SIMChatAudioManagerWillPlayNotification, object: url)
         
         do {
            
@@ -54,7 +54,7 @@ class SIMChatAudioManager: NSObject {
             // 己经启动
             self.delegate?.chatAudioManagerDidStartPlay?(self, param: url)
             // 通知
-            SIMNotificationCenter.postNotificationName(SIMChatAudioManagerDidPlayNotification, object: url)
+            SIMChatNotificationCenter.postNotificationName(SIMChatAudioManagerDidPlayNotification, object: url)
             
         } catch let error as NSError  {
                 
@@ -77,7 +77,7 @@ class SIMChatAudioManager: NSObject {
             return
         }
         // 通知:)
-        SIMNotificationCenter.postNotificationName(SIMChatAudioManagerWillPlayNotification, object: data)
+        SIMChatNotificationCenter.postNotificationName(SIMChatAudioManagerWillPlayNotification, object: data)
         
         do {
            
@@ -98,7 +98,7 @@ class SIMChatAudioManager: NSObject {
             // 己经启动
             self.delegate?.chatAudioManagerDidStartPlay?(self, param: data)
             // 通知
-            SIMNotificationCenter.postNotificationName(SIMChatAudioManagerDidPlayNotification, object: data)
+            SIMChatNotificationCenter.postNotificationName(SIMChatAudioManagerDidPlayNotification, object: data)
             
         } catch let error as NSError  {
                 
@@ -121,7 +121,7 @@ class SIMChatAudioManager: NSObject {
             return
         }
         // 通知:)
-        SIMNotificationCenter.postNotificationName(SIMChatAudioManagerWillRecordNotification, object: url)
+        SIMChatNotificationCenter.postNotificationName(SIMChatAudioManagerWillRecordNotification, object: url)
         // :)
         self.recordStarted = true
         // 请求录音权限
@@ -154,7 +154,7 @@ class SIMChatAudioManager: NSObject {
                 // 己经启动了录音.
                 self.delegate?.chatAudioManagerDidStartRecord?(self, param: url)
                 // 通知用户
-                SIMNotificationCenter.postNotificationName(SIMChatAudioManagerWillRecordNotification, object: url)
+                SIMChatNotificationCenter.postNotificationName(SIMChatAudioManagerWillRecordNotification, object: url)
                 
             } catch let error as NSError  {
                 
@@ -175,7 +175,7 @@ class SIMChatAudioManager: NSObject {
             return
         }
         SIMLog.trace()
-        SIMNotificationCenter.postNotificationName(SIMChatAudioManagerWillStopNotification, object: nil)
+        SIMChatNotificationCenter.postNotificationName(SIMChatAudioManagerWillStopNotification, object: nil)
         // 终止播放
         player?.stop()
         player?.delegate = nil
@@ -185,7 +185,7 @@ class SIMChatAudioManager: NSObject {
         recorder?.delegate = nil
         recorder = nil
         // 通知
-        SIMNotificationCenter.postNotificationName(SIMChatAudioManagerDidStopNotification, object: nil)
+        SIMChatNotificationCenter.postNotificationName(SIMChatAudioManagerDidStopNotification, object: nil)
         // 延迟0.5s再恢复, 不然给人一种毛燥的感觉
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(500 * NSEC_PER_MSEC)), dispatch_get_main_queue()) {
             // 如果正在使用就不要取消激活了
@@ -261,7 +261,7 @@ class SIMChatAudioManager: NSObject {
     static let defaultRecordFile = NSURL(fileURLWithPath: NSTemporaryDirectory() + "/record_tmp.acc")
 }
 
-/// MARK: - /// Player
+// MARK: - Player
 extension SIMChatAudioManager : AVAudioPlayerDelegate {
     /// 完成播放
     func audioPlayerDidFinishPlaying(player: AVAudioPlayer, successfully flag: Bool) {
@@ -277,7 +277,7 @@ extension SIMChatAudioManager : AVAudioPlayerDelegate {
     }
 }
 
-/// MARK: - /// Recorder
+// MARK: - Recorder
 extension SIMChatAudioManager : AVAudioRecorderDelegate {
     /// 录音完成
     func audioRecorderDidFinishRecording(recorder: AVAudioRecorder, successfully flag: Bool) {
@@ -294,7 +294,7 @@ extension SIMChatAudioManager : AVAudioRecorderDelegate {
     
 }
 
-/// MARK: - /// Interruption
+// MARK: - Interruption
 extension SIMChatAudioManager {
     /// 中断
     func interruption(sender: NSNotification) {
@@ -302,7 +302,7 @@ extension SIMChatAudioManager {
     }
 }
 
-/// MARK: - /// Delegate
+// MARK: - Delegate
 @objc protocol SIMChatAudioManagerDelegate : NSObjectProtocol {
     
     optional func chatAudioManagerWillStartPlay(chatAudioManager: SIMChatAudioManager, param: AnyObject) -> Bool

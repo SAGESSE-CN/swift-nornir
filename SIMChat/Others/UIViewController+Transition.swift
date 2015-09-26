@@ -9,9 +9,8 @@
 import UIKit
 
 
-/// MARK: - /// Snapshoot
+// MARK: - Snapshoot
 extension UIView {
-   
     ///
     /// make a snapshoot
     ///
@@ -30,19 +29,17 @@ extension UIView {
     }
 }
 
-/// MARK: - /// Custom Present
+// MARK: - Custom Present
 extension UIViewController {
-    
     ///
     /// 弹出的时候显示的视图
     ///
     var presentingView: UIView? {
         return nil
     }
-    
     ///
     /// 显示
-    /// TODO: 还有一个未处理的情况
+    // TODO: 还有一个未处理的情况
     ///
     func presentViewController(viewControllerToPresent: UIViewController, animated flag: Bool, fromView: UIView?, completion: (() -> Void)?) {
         SIMLog.trace()
@@ -113,14 +110,13 @@ extension UIViewController {
             }
         })
     }
-    
     ///
     /// 消失
     ///
     func dismissViewControllerAnimated(flag: Bool, fromView: UIView?, completion: (() -> Void)?) {
         SIMLog.trace()
         
-        /// TODO: 还有一个未处理的情况
+        // TODO: 还有一个未处理的情况
         
         // 准备啊
         let src = self
@@ -188,14 +184,13 @@ extension UIViewController {
             }
         })
     }
-    
     ///
     /// 转场的环境.
     ///
     var modalTransitionContext: TransitionContext! {
         set {
             self.willChangeValueForKey("modalTransitionContext")
-            objc_setAssociatedObject(self, modalTransitionContextKey, newValue, .OBJC_ASSOCIATION_ASSIGN)
+            objc_setAssociatedObject(self, modalTransitionContextKey, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
             self.didChangeValueForKey("modalTransitionContext")
         }
         get {
@@ -224,7 +219,6 @@ class TransitionContext : NSObject {
         // 打个快照.
         return fromView?.snapshoot()
     }
-    
     var toViewSnapshoot: UIImage! {
         // 如果他本来就是imageview了, 那就不需要生成了
         if let v = toView as? UIImageView {
@@ -244,7 +238,6 @@ class TransitionContext : NSObject {
         return w
     }()
 }
-
 
 ///
 let modalTransitionContextKey = unsafeAddressOf("modalTransitionContextKey")

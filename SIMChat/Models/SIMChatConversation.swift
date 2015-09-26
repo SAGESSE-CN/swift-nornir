@@ -32,7 +32,7 @@ class SIMChatConversation: NSObject {
     internal lazy var messages = [SIMChatMessage]()
 }
 
-/// MARK: - /// Public Method
+// MARK: - Public Method
 extension SIMChatConversation {
     ///
     /// 发送一条消息
@@ -44,31 +44,37 @@ extension SIMChatConversation {
         // 填写发送信息
         m.sender = self.sender
         m.sentTime = .now
-        //m.sentStatus = .Sending
+        m.sentStatus = .Sending
         // 填写接收者信息
         m.recver = self.recver
         m.sentTime = .now
-        //m.recvStatus = .now
+        m.recvStatus = .Unknow
         
         // 真的需要追加?
         if !self.messages.contains(m) {
             // 真正的发送出去
             self.messages.insert(m, atIndex: 0)
+            // TODO: 如果是重发需要删除了再发送 
+            delegate?.chatConversation?(self, didSendMessage: m)
         }
-        // 通知
-        delegate?.chatConversation?(self, didSendMessage: m)
         
         // 完成
         finish?(m, nil)
         
         // TODO: 测试环境!
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(500 * NSEC_PER_MSEC)), dispatch_get_main_queue()) {
+            
+            m.sentStatus = .Sent
+            m.statusChanged()
+            
             let rm = SIMChatMessage()
             
             rm.sender = m.recver
             rm.recver = m.sender
             rm.sentTime = m.sentTime
+            rm.sentStatus = .Sent
             rm.recvTime = .now
+            rm.recvStatus = .Unread
             rm.content = m.content
             
             self.recvice(rm)
@@ -110,7 +116,7 @@ extension SIMChatConversation {
 }
 
 
-/// MARK: - /// Helper
+// MARK: - Helper
 extension SIMChatConversation {
     ///
     /// 第一条, 这是最新的

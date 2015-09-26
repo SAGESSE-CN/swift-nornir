@@ -78,7 +78,7 @@ class SIMChatKeyboardTool: SIMView {
     private(set) lazy var builtInTools = [UIBarButtonItem]()
 }
 
-/// MARK: - /// UICollectionViewDelegate or UICollectionViewDataSource
+// MARK: - UICollectionViewDelegate or UICollectionViewDataSource
 extension SIMChatKeyboardTool : UICollectionViewDelegate, UICollectionViewDataSource {
     /// 滑动完成
     func scrollViewDidEndDecelerating(scrollView: UIScrollView) {
@@ -211,7 +211,7 @@ extension SIMChatKeyboardTool {
     }
 }
 
-/// MARK: 增强
+// MARK: 增强
 extension UIBarButtonItem {
     /// 初始化
     convenience init(tag: Int, title: String, image: UIImage?) {
@@ -222,7 +222,7 @@ extension UIBarButtonItem {
     }
 }
 
-/// MARK: - /// Events
+// MARK: - Events
 extension SIMChatKeyboardTool {
     /// 选择了
     func onItem(item: UIBarButtonItem) {

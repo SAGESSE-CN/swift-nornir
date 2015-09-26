@@ -9,7 +9,9 @@
 import UIKit
 
 class SIMChatImageManager: NSObject {
-
+    
+    static let messageFail = UIImage(named: "simchat_message_fail")
+    static let messageSurccess = UIImage(named: "simchat_message_succ")
 
     static let deleteImageNor = UIImage(named: "simchat_button_delete_nor")
     static let deleteImagePress = UIImage(named: "simchat_button_delete_press")

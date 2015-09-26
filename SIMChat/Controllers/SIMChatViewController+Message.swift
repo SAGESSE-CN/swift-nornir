@@ -8,7 +8,7 @@
 
 import UIKit
 
-/// MARK: - /// Message
+// MARK: - Message
 extension SIMChatViewController {
     ///
     /// 注册消息单元格
@@ -158,7 +158,7 @@ extension SIMChatViewController {
             UIView.performWithoutAnimation     {
                 self.tableView.scrollToRowAtIndexPath(idx, atScrollPosition: .Top, animated: false)
             }
-            // 获取TOP位置
+            // 获取top位置
             let t = self.tableView.contentOffset
             // 更新contentOffset
             self.tableView.setContentOffset(CGPointMake(t.x, t.y + offset.y), animated: false)
@@ -191,7 +191,7 @@ extension SIMChatViewController {
     }
     ///
     /// 删除消息
-    /// TODO: 需要优化!!!
+    // TODO: 需要优化!!!
     /// 
     /// :param: ms       消息
     /// :param: animated 动画
@@ -288,7 +288,7 @@ extension SIMChatViewController {
     }
 }
 
-/// MARK: - /// Message Conversation
+// MARK: - Message Conversation
 extension SIMChatViewController : SIMChatConversationDelegate {
     /// 发送消息通知
     func chatConversation(conversation: SIMChatConversation, didSendMessage message: SIMChatMessage) {
@@ -309,7 +309,7 @@ extension SIMChatViewController : SIMChatConversationDelegate {
     }
 }
 
-/// MARK: - /// Message Send
+// MARK: - Message Send
 extension SIMChatViewController {
     ///
     /// 发送文本
@@ -345,6 +345,113 @@ extension SIMChatViewController {
     }
 }
 
-/// MARK: - /// Message Cell Event 
-extension SIMChatViewController {
+// MARK: - Message Cell Event 
+extension SIMChatViewController : SIMChatCellDelegate {
+    
+    /// 选择了删除.
+    func chatCellDidDelete(chatCell: SIMChatCell) {
+        SIMLog.trace()
+        if let msg = chatCell.message {
+            self.deleteRows(msg)
+        }
+    }
+    /// 选择了复制
+    func chatCellDidCopy(chatCell: SIMChatCell) {
+        SIMLog.trace()
+    }
+    /// 点击
+    func chatCellDidPress(chatCell: SIMChatCell, withEvent event: SIMChatCellEvent) {
+        SIMLog.trace(event.type.rawValue)
+        // 只处理气泡消息, 目前 
+        guard event.type == .Bubble else {
+            return
+        }
+        
+//        // 音频
+//        if let ctx = chatCell.message?.content as? SIMChatContentAudio {
+//            return
+//        }
+        
+        // 图片
+        if let ctx = chatCell.message?.content as? SIMChatContentImage {
+            let f = (chatCell as? SIMChatCellImage)?.contentView2 ?? chatCell
+            let vc = SIMChatPhotoBrowserController()
+            
+            vc.content = ctx
+            
+            // 预览图片
+            self.presentViewController(vc, animated: true, fromView: f) { [weak vc] in
+                vc?.showDetailIfNeed()
+            }
+            // ok
+            return
+        }
+        
+//        // .
+//        let m = chatCell.message
+//        
+//        if let ctx = m?.content as? SIMChatContentAudio {
+//            // 这是音频?
+//            if !ctx.data.storaged {
+//                ctx.data.willSet({ [weak m] oldValue in
+//                    // 生成通知
+//                    NSNotificationCenter.simInternalCenter().postNotificationName(SIMChatAudioWillLoadNotification, object: m)
+//                }).didSet({ [weak m] newValue in
+//                    // 加载完成
+//                    NSNotificationCenter.simInternalCenter().postNotificationName(SIMChatAudioDidLoadNotification, object: m)
+//                })
+//            }
+//            
+//            if let data = ctx.data.get() {
+//                
+//                // 清除.
+//                ctx.data.clean()
+//                
+//                if data != nil && !ctx.playing {
+//                    
+//                    audioManager.prepareToPlay(data!)
+//                    audioManager.play()
+//                    
+//                    // :)
+//                    ctx.played = true
+//                    ctx.playing = true
+//                    
+//                } else {
+//                    
+//                    audioManager.stop()
+//                    
+//                    // :D
+//                    ctx.playing = false
+//                }
+//                
+//            } else {
+//                // 正在加载中
+//                // 如果正在播放其他。 停止他
+//                audioManager.stop()
+//            }
+//        }
+    }
+    /// 长按
+    func chatCellDidLongPress(chatCell: SIMChatCell, withEvent event: SIMChatCellEvent) {
+        // 只响应begin事件
+        guard let rec = event.sender as? UIGestureRecognizer where rec.state == .Began else {
+            return
+        }
+        SIMLog.trace(event.type.rawValue)
+        // 如果是气泡的按下事件
+        if event.type == .Bubble {
+            if let c = chatCell as? SIMChatCellBubble {
+                // 准备菜单
+                let mu = UIMenuController.sharedMenuController()
+                // 进入激活状态
+                c.becomeFirstResponder()
+                // 菜单项
+                mu.menuItems = [UIMenuItem(title: "复制", action: "chatCellCopy:"),
+                                UIMenuItem(title: "删除", action: "chatCellDelete:")]
+                // 设置弹出区域
+                mu.setTargetRect(c.bubbleView.frame, inView: c)
+                mu.setMenuVisible(true, animated: true)
+            }
+        }
+    }
 }

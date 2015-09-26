@@ -25,6 +25,9 @@ class SIMChatCellBubble: SIMChatCell {
     /// 销毁
     deinit {
         removeObserver(self, forKeyPath: "visitCardView.hidden")
+        // :)
+        SIMChatNotificationCenter.removeObserver(self, name: SIMChatUserInfoChangedNotification)
+        SIMChatNotificationCenter.removeObserver(self, name: SIMChatMessageStatusChangedNotification)
     }
     /// 构建
     override func build() {
@@ -32,6 +35,7 @@ class SIMChatCellBubble: SIMChatCell {
         
         let vs = ["p" : portraitView,
                   "c" : visitCardView,
+                  "s" : stateView,
                   "b" : bubbleView]
         
         let ms = ["s0" : 50,
@@ -54,14 +58,16 @@ class SIMChatCellBubble: SIMChatCell {
         let addConstraints = contentView.addConstraints
         
         /// config
+        stateView.translatesAutoresizingMaskIntoConstraints = false
         bubbleView.translatesAutoresizingMaskIntoConstraints = false
         portraitView.translatesAutoresizingMaskIntoConstraints = false
         visitCardView.translatesAutoresizingMaskIntoConstraints = false
        
         // add views
-        contentView.addSubview(bubbleView)
-        contentView.addSubview(portraitView)
         contentView.addSubview(visitCardView)
+        contentView.addSubview(portraitView)
+        contentView.addSubview(bubbleView)
+        contentView.addSubview(stateView)
         
         // add constraints
         
@@ -73,7 +79,10 @@ class SIMChatCellBubble: SIMChatCell {
         addConstraints(NSLayoutConstraintMake("V:|-(==mv0)-[p(s0)]-(>=0@850)-|", views: vs, metrics: ms))
         addConstraints(NSLayoutConstraintMake("V:|-(==mv1)-[c(s1)]-(==2@pv1)-[b]|", views: vs, metrics: ms))
         addConstraints(NSLayoutConstraintMake("V:|-(mv0@pv0)-[b(>=p)]", views: vs, metrics: ms))
-
+        addConstraints(NSLayoutConstraintMake("V:|-(mv0@pv0)-[b(>=p)]", views: vs, metrics: ms))
+        addConstraints(NSLayoutConstraintMake("H:[b]-(4@ph0)-[s]-(4@ph1)-[b]", views: vs, metrics: ms))
+        addConstraints(NSLayoutConstraintMake("V:[s]-(mv0)-|", views: vs, metrics: ms))
+        
         // get constraints
         contentView.constraints.forEach {
             if $0.priority == self.hPriority {
@@ -85,6 +94,19 @@ class SIMChatCellBubble: SIMChatCell {
         
         // add kvos
         addObserver(self, forKeyPath: "visitCardView.hidden", options: .New, context: nil)
+        // :)
+        SIMChatNotificationCenter.addObserver(self, selector: "onUserInfoChanged:", name: SIMChatUserInfoChangedNotification)
+        SIMChatNotificationCenter.addObserver(self, selector: "onMessageStateChanged:", name: SIMChatMessageStatusChangedNotification)
+        
+        // add events
+        bubbleView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: "onBubblePress:"))
+        bubbleView.addGestureRecognizer(UILongPressGestureRecognizer(target: self, action: "onBubbleLongPress:"))
+        portraitView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: "onPortraitPress:"))
+        portraitView.addGestureRecognizer(UILongPressGestureRecognizer(target: self, action: "onPortraitLongPress:"))
+        visitCardView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: "onVisitCardPress:"))
+        visitCardView.addGestureRecognizer(UILongPressGestureRecognizer(target: self, action: "onVisitCardLongPress:"))
+        
+        stateView.addTarget(self, action: "onRetryPress:", forControlEvents: .TouchUpInside)
     }
     ///
     /// 重新加载数据.
@@ -93,19 +115,22 @@ class SIMChatCellBubble: SIMChatCell {
     /// :param: m   需要显示的消息
     ///
     override func reloadData(m: SIMChatMessage, ofUser u: SIMChatUser?) {
+        // 更新数据
         super.reloadData(m, ofUser: u)
-        // 关于名片
+        // 关于名片显示
         if !m.hiddenName && m.sender != nil {
             // 显示名片
-            self.visitCardView.user = m.sender
             self.visitCardView.hidden = m.sender == u
         } else {
             // 隐藏名片
-            self.visitCardView.user = nil
             self.visitCardView.hidden = true
         }
         // 关于头像
         self.portraitView.user = m.sender
+        // 关于名片
+        self.visitCardView.user = m.sender
+        // 关于状态
+        self.onMessageStateChanged(nil)
     }
     /// kvo
     override func observeValueForKeyPath(keyPath: String?, ofObject object: AnyObject?, change: [String : AnyObject]?, context: UnsafeMutablePointer<Void>) {
@@ -125,7 +150,7 @@ class SIMChatCellBubble: SIMChatCell {
             case .Left:
                 self.bubbleView.backgroundImage = SIMChatImageManager.defaultBubbleRecive
                 
-            case .Right:    
+            case .Right:
                 self.bubbleView.backgroundImage = SIMChatImageManager.defaultBubbleSend
             }
             // 修改约束
@@ -144,8 +169,85 @@ class SIMChatCellBubble: SIMChatCell {
     private lazy var topConstraints = [NSLayoutConstraint]()
     private lazy var leftConstraints = [NSLayoutConstraint]()
     
+    private(set) lazy var stateView = SIMChatStatusView(frame: CGRectZero)
     private(set) lazy var bubbleView = SIMChatBubbleView(frame: CGRectZero)
     private(set) lazy var portraitView = SIMChatPortraitView(frame: CGRectZero)
     private(set) lazy var visitCardView = SIMChatVisitCardView(frame: CGRectZero)
 }
 
+// MARK: - Notifications
+extension SIMChatCellBubble {
+    /// 用户信息改变
+    private dynamic func onUserInfoChanged(sender: NSNotification) {
+        // 为空说明不需要做何处理
+        guard let message = self.message else {
+            return
+        }
+        // 改变的是他
+        if let u = sender.object as? SIMChatUser where u == message.sender {
+            // 更新sender, 防止同步错误
+            message.sender = u
+            // 关于头像
+            self.portraitView.user = u
+            // 关于名片
+            self.visitCardView.user = u
+        }
+    }
+    /// 消息状态改变
+    private dynamic func onMessageStateChanged(sender: NSNotification?) {
+        // 为空说明不需要做何处理
+        guard let message = self.message else {
+            return
+        }
+        // 检查是不是自己的消息.
+        if sender != nil && sender!.object !== message {
+            return
+        }
+        var status = SIMChatStatus.None
+        // 检查状态
+        if message.sender == self.user {
+            // 如果是自己, 取发送状态
+            if message.sentStatus == .Failed {
+                status = .Failed
+            } else if message.sentStatus == .Sending {
+                status = .Waiting
+            }
+        } else {
+            // 不是自己, 取接收状态
+            if message.recvStatus == .Failed {
+                status = .Failed
+            } else if message.recvStatus == .Downloading {
+                status = .Waiting
+            }
+        }
+        // 更新
+        self.stateView.status = status
+    }
+}
+
+// MARK: - Events
+extension SIMChatCellBubble {
+    
+    func onBubblePress(sender: AnyObject) {
+        self.chatCellPress(SIMChatCellEvent(.Bubble, sender, nil))
+    }
+    func onBubbleLongPress(sender: AnyObject) {
+        self.chatCellLongPress(SIMChatCellEvent(.Bubble, sender, nil))
+    }
+    func onPortraitPress(sender: AnyObject) {
+        self.chatCellPress(SIMChatCellEvent(.Portrait, sender, nil))
+    }
+    func onPortraitLongPress(sender: AnyObject) {
+        self.chatCellLongPress(SIMChatCellEvent(.Portrait, sender, nil))
+    }
+    func onVisitCardPress(sender: AnyObject) {
+        self.chatCellPress(SIMChatCellEvent(.VisitCard, sender, nil))
+    }
+    func onVisitCardLongPress(sender: AnyObject) {
+        self.chatCellLongPress(SIMChatCellEvent(.VisitCard, sender, nil))
+    }
+    func onRetryPress(sender: AnyObject) {
+        SIMLog.trace()
+        self.delegate?.chatCellDidReSend?(self)
+    }
+}

@@ -21,7 +21,7 @@ class SIMChatManager: NSObject {
     var conversations = [String : SIMChatConversation]()
 }
 
-/// MARK: - /// User
+// MARK: - User
 extension SIMChatManager {
     
     ///
@@ -117,7 +117,7 @@ extension SIMChatManager {
     }
 }
 
-/// MARK: - /// Conversation
+// MARK: - Conversation
 extension SIMChatManager {
     
     ///
@@ -152,3 +152,6 @@ extension SIMChatManager {
         return 0
     }
 }
+
+/// 用户信息改变通知 
+let SIMChatUserInfoChangedNotification = "SIMChatUserInfoChangedNotification"
