@@ -48,12 +48,6 @@ extension SIMChatManager {
         // 回调
         finish?(nil)
     }
-    ///
-    /// 查询用户信息
-    ///
-    func query(userInfo user: SIMChatUser, finish: ((SIMChatUser?, NSError?) -> Void)?) {
-        // nothing
-    }
 }
 
 // MARK: - Conversation
