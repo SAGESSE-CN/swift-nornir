@@ -14,7 +14,12 @@ class SIMChatContentAudio: SIMChatContent {
     convenience init(url: NSURL, duration: NSTimeInterval) {
         self.init()
         
-        self.url = url
+        self.url ~> { f in
+            // TODO: 模拟1s的加载时间
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(1000 * NSEC_PER_MSEC)), dispatch_get_main_queue()) {
+                f(url)
+            }
+        }
         self.duration = duration
     }
     
@@ -22,15 +27,15 @@ class SIMChatContentAudio: SIMChatContent {
     var played = false
     var playing = false
     
-    var url: NSURL?
+    var url = SIMAsyncLazyAttr<NSURL?>()
     var duration = NSTimeIntervalSince1970
 }
 
 extension SIMChatContentAudio {
     var durationText: String {
         if self.duration < 60 {
-            return String(format: "%.0lf''", self.duration % 60)
+            return String(format: "%d''", Int(self.duration % 60))
         }
-        return String(format: "%.0f'%02.0f''", self.duration / 60, self.duration % 60)
+        return String(format: "%d'%02d''", Int(self.duration / 60), Int(self.duration % 60))
     }
 }

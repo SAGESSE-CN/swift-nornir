@@ -8,18 +8,22 @@
 
 import UIKit
 
+var g_testCellCount = 0
+
 ///
 /// 消息单元格
 ///
 class SIMChatCell: SIMTableViewCell {
+    /// 释放
     deinit {
         // 追踪
-        SIMLog.trace()
+        SIMLog.trace("created \(--g_testCellCount)")
     }
     /// 构建
     override func build() {
         // 追踪
-        SIMLog.trace()
+        SIMLog.trace("created \(++g_testCellCount)")
+        
         super.build()
         self.clipsToBounds = true
         self.backgroundColor = UIColor.clearColor()

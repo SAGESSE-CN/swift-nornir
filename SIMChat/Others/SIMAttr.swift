@@ -144,12 +144,14 @@ class SIMAsyncLazyAttr <T> : SIMAttr <T> {
 func ~><T>(lhs: SIMAttr<T>, rhs: T) {
     lhs.set(rhs)
 }
+func ~><T>(lhs: SIMAttr<T?>, rhs: T) {
+    lhs.set(rhs)
+}
 func ~><T, B>(lhs: SIMAttr<T>?, rhs: B) {
     if let lhs = lhs {
         lhs ~> rhs
     }
 }
-
 func ~><T>(lhs: SIMLazyAttr<T>, rhs: Void -> T) {
     lhs.lazyer(rhs)
 }

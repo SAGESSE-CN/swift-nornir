@@ -29,8 +29,9 @@ class SIMChatKeyboardAudio: SIMView {
     /// 代理
     weak var delegate: SIMChatKeyboardAudioDelegate?
     
-    /// 录音了多久的
+    /// 录音的配置
     private lazy var recordDuration: NSTimeInterval = 0
+    
     private lazy var playView: SIMChatKeyboardAudioPlayView = {
         let view = SIMChatKeyboardAudioPlayView()
         

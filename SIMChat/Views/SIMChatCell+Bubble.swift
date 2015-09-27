@@ -178,9 +178,9 @@ class SIMChatCellBubble: SIMChatCell {
 // MARK: - Notifications
 extension SIMChatCellBubble {
     /// 用户信息改变
-    private dynamic func onUserInfoChanged(sender: NSNotification) {
+    internal dynamic func onUserInfoChanged(sender: NSNotification) {
         // 为空说明不需要做何处理
-        guard let message = self.message else {
+        guard let message = self.message where enabled else {
             return
         }
         // 改变的是他
@@ -194,9 +194,9 @@ extension SIMChatCellBubble {
         }
     }
     /// 消息状态改变
-    private dynamic func onMessageStateChanged(sender: NSNotification?) {
+    internal dynamic func onMessageStateChanged(sender: NSNotification?) {
         // 为空说明不需要做何处理
-        guard let message = self.message else {
+        guard let message = self.message where enabled else {
             return
         }
         // 检查是不是自己的消息.

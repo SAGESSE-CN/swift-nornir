@@ -102,8 +102,8 @@ class SIMChatSpectrumView: SIMView {
         CATransaction.begin()
         CATransaction.setDisableActions(true)
         
-        var pbl = CGRectMake(0, 0, 2, 2 + floor(sl * 10) * 2)
-        var pbr = CGRectMake(0, 0, 2, 2 + floor(sr * 10) * 2)
+        var pbl = CGRectMake(0, 0, 2, 2 + round(sl * 8) * 2)
+        var pbr = CGRectMake(0, 0, 2, 2 + round(sr * 8) * 2)
         
         leftLayers.forEach {
             swap(&$0.bounds, &pbl)

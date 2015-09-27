@@ -58,18 +58,16 @@ class SIMChatCellImage: SIMChatCellBubble {
             if let img = content.thumbnail.get() {
                 contentView2.image = img
                 content.thumbnail.clean()
-            } else if enabled {
-                contentView2.image = nil
-                content.thumbnail.setter { [weak self] newValue in
-                    // up..
-                    self?.contentView2.image = newValue
+            } else  {
+                contentView2.image = SIMChatImageManager.defaultImage
+                if enabled {
+                    content.thumbnail.setter { [weak self] newValue in
+                        // up..
+                        self?.contentView2.image = newValue
+                    }
                 }
             }
         }
-//        // 设置默认图片
-//        if self.content.image == nil {
-//            self.content.image = UIImage(named: "aio_image_default")
-//        }
     }
     /// 检查是否使用.
     override func canPerformAction(action: Selector, withSender sender: AnyObject?) -> Bool {
@@ -91,11 +89,10 @@ extension SIMChatCellImage {
     /// 复制
     dynamic func chatCellCopy(sender: AnyObject?) {
         SIMLog.trace()
-        // TODO: 图片还没确定好
-//        if let ctx = message?.content as? SIMChatContentImage {
-//            //UIPasteboard.generalPasteboard().image = ctx.image
-//            // 完成
-//            self.delegate?.chatCellDidCopy?(self)
-//        }
+        if let ctx = message?.content as? SIMChatContentImage where ctx.origin.storaged {
+            UIPasteboard.generalPasteboard().image = *(ctx.origin)
+            // 完成
+            self.delegate?.chatCellDidCopy?(self)
+        }
     }
 }

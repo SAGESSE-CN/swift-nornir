@@ -114,13 +114,15 @@ class SIMChatCellAudio: SIMChatCellBubble {
 extension SIMChatCellAudio {
     /// 音频开始播放
     func onAudioDidPlay(sender: NSNotification) {
+        // 为空说明不需要做何处理
+        guard let content = self.message?.content as? SIMChatContentAudio else {
+            return
+        }
         // 只在是本消息的事件才处理
-//        if let ctx = message?.content as? SIMChatContentAudio {
-//            if ctx.data.storaged && *ctx.data === sender.object {
-//                // TODO: 需要切到主线程?
-//                animationView.startAnimating()
-//            }
-//        }
+        if content.url.storaged && *content.url === sender.object {
+            // TODO: 需要切到主线程?
+            self.animationView.startAnimating()
+        }
     }
     /// 音频停止播放
     func onAudioDidStop(sender: NSNotification) {
@@ -135,14 +137,31 @@ extension SIMChatCellAudio {
     }
     /// 音频加载开始
     func onAudioWillLoad(sender: NSNotification) {
-        if sender.object === message {
-            SIMLog.debug()
+        if enabled && sender.object === self.message {
+            SIMLog.trace()
+            self.message?.recvStatus = .Downloading
+            self.onMessageStateChanged(nil)
         }
     }
     /// 音频加载完成
     func onAudioDidLoad(sender: NSNotification) {
-        if sender.object === message {
-            SIMLog.debug()
+        // 必须是音频
+        guard let ctx = self.message?.content as? SIMChatContentAudio else {
+            return
+        }
+        // :)
+        if enabled && sender.object === message && ctx.url.storaged {
+            SIMLog.trace()
+            // 有没有加载成功?
+            if *(ctx.url) != nil {
+                self.message?.recvStatus = .Downloaded
+            } else {
+                self.message?.recvStatus = .Failed
+            }
+            // 通知状态修改
+            self.onMessageStateChanged(nil)
+            // 模拟一次点击
+            self.onBubblePress(sender)
         }
     }
 }

@@ -62,7 +62,7 @@ extension SIMChatConversation {
         finish?(m, nil)
         
         // TODO: 测试环境!
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(500 * NSEC_PER_MSEC)), dispatch_get_main_queue()) {
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(1000 * NSEC_PER_MSEC)), dispatch_get_main_queue()) {
             
             m.sentStatus = .Sent
             m.statusChanged()

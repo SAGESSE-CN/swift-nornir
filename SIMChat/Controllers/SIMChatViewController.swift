@@ -57,6 +57,9 @@ class SIMChatViewController: SIMViewController {
         tableView.rowHeight = 32
         tableView.dataSource = self
         tableView.delegate = self
+        //
+        maskView.backgroundColor = UIColor(white: 0, alpha: 0.2)
+        maskView.autoresizingMask = .FlexibleWidth | .FlexibleHeight
         
         // add views
         // 第一个视图必须是tableView, addSubview(tableView)在ios7下有点bug?
@@ -96,6 +99,9 @@ class SIMChatViewController: SIMViewController {
         
         center.removeObserver(self, name: UIKeyboardWillShowNotification, object: nil)
         center.removeObserver(self, name: UIKeyboardWillHideNotification, object: nil)
+        
+        // 禁止播放
+        SIMChatAudioManager.sharedManager.stop()
     }
     /// 放弃编辑
     override func resignFirstResponder() -> Bool {
@@ -110,6 +116,7 @@ class SIMChatViewController: SIMViewController {
         didSet  { self.conversation?.delegate = self }
     }
     
+    private(set) lazy var maskView = UIView()
     private(set) lazy var tableView = UITableView()
     private(set) lazy var textField = SIMChatTextField(frame: CGRectZero)
   

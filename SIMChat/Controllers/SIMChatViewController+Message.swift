@@ -324,14 +324,29 @@ extension SIMChatViewController {
     ///
     func send(audio url: NSURL, duration: NSTimeInterval) {
         SIMLog.trace()
-        // 发送
-        self.conversation?.send(SIMChatContentAudio(url: url, duration: duration))
+        // 生成连接
+        let nurl = NSURL(fileURLWithPath: String(format: "%@/upload/audio/%@.wav", NSTemporaryDirectory(), NSUUID().UUIDString))
+        // 检查目录并发送
+        do {
+            // 创建目录
+            try NSFileManager.defaultManager().createDirectoryAtURL(nurl.URLByDeletingLastPathComponent!, withIntermediateDirectories: true, attributes: nil)
+            // 移动文件
+            try NSFileManager.defaultManager().moveItemAtURL(url, toURL: nurl)
+            // 发送
+            self.conversation?.send(SIMChatContentAudio(url: nurl, duration: duration))
+            
+        } catch let e as NSError {
+            // 发送失败
+            SIMLog.debug(e)
+        }
     }
     ///
     /// 发送图片
     ///
     func send(image data: UIImage) {
         SIMLog.trace()
+        // 生成连接(这可以降低内存使用)
+        // let nurl = NSURL(fileURLWithPath: String(format: "%@/upload/image/%@.jpg", NSTemporaryDirectory(), NSUUID().UUIDString))
         // 发送
         self.conversation?.send(SIMChatContentImage(origin: data, thumbnail: data))
     }
@@ -363,15 +378,47 @@ extension SIMChatViewController : SIMChatCellDelegate {
     func chatCellDidPress(chatCell: SIMChatCell, withEvent event: SIMChatCellEvent) {
         SIMLog.trace(event.type.rawValue)
         // 只处理气泡消息, 目前 
-        guard event.type == .Bubble else {
+        guard let message = chatCell.message where event.type == .Bubble else {
             return
         }
-        
-//        // 音频
-//        if let ctx = chatCell.message?.content as? SIMChatContentAudio {
-//            return
-//        }
-        
+        // 音频
+        if let ctx = chatCell.message?.content as? SIMChatContentAudio {
+            // 有没有加载? 没有的话添加监听
+            if !ctx.url.storaged {
+                ctx.url.willSet({ [weak message] oldValue in
+                    SIMChatNotificationCenter.postNotificationName(SIMChatAudioManagerWillLoadNotification, object: message)
+                }).didSet({  [weak message] newValue in
+                    SIMChatNotificationCenter.postNotificationName(SIMChatAudioManagerDidLoadNotification, object: message)
+                })
+            }
+            // 获取
+            if let url = ctx.url.get() {
+                // 清除监控.
+                ctx.url.clean()
+                // 加载成功, 并且是没有在播放中
+                if let url = url where !ctx.playing {
+                    // 播放
+                    SIMChatAudioManager.sharedManager.delegate = nil
+                    SIMChatAudioManager.sharedManager.play(url)
+                    // :)
+                    ctx.played = true
+                    ctx.playing = true
+                } else {
+                    // 停止
+                    SIMChatAudioManager.sharedManager.delegate = nil
+                    SIMChatAudioManager.sharedManager.stop()
+                    // :(
+                    ctx.playing = false
+                }
+            } else {
+                // 正在加载中
+                // 如果正在播放其他。 停止他
+                SIMChatAudioManager.sharedManager.delegate = nil
+                SIMChatAudioManager.sharedManager.stop()
+            }
+            
+            return
+        }
         // 图片
         if let ctx = chatCell.message?.content as? SIMChatContentImage {
             let f = (chatCell as? SIMChatCellImage)?.contentView2 ?? chatCell
@@ -386,50 +433,6 @@ extension SIMChatViewController : SIMChatCellDelegate {
             // ok
             return
         }
-        
-//        // .
-//        let m = chatCell.message
-//        
-//        if let ctx = m?.content as? SIMChatContentAudio {
-//            // 这是音频?
-//            if !ctx.data.storaged {
-//                ctx.data.willSet({ [weak m] oldValue in
-//                    // 生成通知
-//                    NSNotificationCenter.simInternalCenter().postNotificationName(SIMChatAudioWillLoadNotification, object: m)
-//                }).didSet({ [weak m] newValue in
-//                    // 加载完成
-//                    NSNotificationCenter.simInternalCenter().postNotificationName(SIMChatAudioDidLoadNotification, object: m)
-//                })
-//            }
-//            
-//            if let data = ctx.data.get() {
-//                
-//                // 清除.
-//                ctx.data.clean()
-//                
-//                if data != nil && !ctx.playing {
-//                    
-//                    audioManager.prepareToPlay(data!)
-//                    audioManager.play()
-//                    
-//                    // :)
-//                    ctx.played = true
-//                    ctx.playing = true
-//                    
-//                } else {
-//                    
-//                    audioManager.stop()
-//                    
-//                    // :D
-//                    ctx.playing = false
-//                }
-//                
-//            } else {
-//                // 正在加载中
-//                // 如果正在播放其他。 停止他
-//                audioManager.stop()
-//            }
-//        }
     }
     /// 长按
     func chatCellDidLongPress(chatCell: SIMChatCell, withEvent event: SIMChatCellEvent) {

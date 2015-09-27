@@ -15,6 +15,10 @@ class SIMChatImageManager: NSObject {
 
     static let deleteImageNor = UIImage(named: "simchat_button_delete_nor")
     static let deleteImagePress = UIImage(named: "simchat_button_delete_press")
+    
+    static let imageDownloadFail = UIImage(named: "simchat_images_fail")
+    static let defaultImage = UIImage(named: "simchat_images_fail")
+    
 
     /// 默认聊天背景
     static let defaultBackground = UIImage(named: "simchat_background_default")
