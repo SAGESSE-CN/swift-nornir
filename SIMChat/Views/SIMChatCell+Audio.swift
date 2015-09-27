@@ -120,7 +120,6 @@ extension SIMChatCellAudio {
         }
         // 只在是本消息的事件才处理
         if content.url.storaged && *content.url === sender.object {
-            // TODO: 需要切到主线程?
             self.animationView.startAnimating()
         }
     }
@@ -130,9 +129,8 @@ extension SIMChatCellAudio {
         if let ctx = message?.content as? SIMChatContentAudio {
             ctx.playing = false
         }
-        if animationView.isAnimating() {
-            // TODO: 需要切到主线程?
-            animationView.stopAnimating()
+        if self.animationView.isAnimating() {
+            self.animationView.stopAnimating()
         }
     }
     /// 音频加载开始

@@ -20,14 +20,17 @@ class SIMChatConversation: NSObject {
         
         super.init()
     }
-    /// 管理器
+    
+    /// 管理器(保留联系)
     weak var manager: SIMChatManager!
     /// 代理
     weak var delegate: SIMChatConversationDelegate?
+    
     /// 发送者
     private(set) var sender: SIMChatUser
     /// 接收者
     private(set) var recver: SIMChatUser
+    
     /// 消息
     internal lazy var messages = [SIMChatMessage]()
 }
@@ -47,7 +50,7 @@ extension SIMChatConversation {
         m.sentStatus = .Sending
         // 填写接收者信息
         m.recver = self.recver
-        m.sentTime = .now
+        m.recvTime = .now
         m.recvStatus = .Unknow
         
         // 真的需要追加?
@@ -71,7 +74,7 @@ extension SIMChatConversation {
             
             rm.sender = m.recver
             rm.recver = m.sender
-            rm.sentTime = m.sentTime
+            rm.sentTime = .now
             rm.sentStatus = .Sent
             rm.recvTime = .now
             rm.recvStatus = .Unread
@@ -81,16 +84,13 @@ extension SIMChatConversation {
         }
     }
     ///
-    /// 查询多条消息
+    /// 接收消息
     ///
-    func query(count: Int, latest: SIMChatMessage?, finish: ((NSArray?, NSError?) -> ())?) {
-        SIMLog.trace()
-    }
-    ///
-    /// 标记消息为己读
-    ///
-    func read(m: SIMChatMessage) {
-        SIMLog.trace()
+    func recvice(m: SIMChatMessage) {
+        // 需要避免重复添加?
+        self.messages.insert(m, atIndex: 0)
+        // 通知
+        self.delegate?.chatConversation?(self, didReceiveMessage: m)
     }
     ///
     /// 删除消息
@@ -104,15 +104,17 @@ extension SIMChatConversation {
         delegate?.chatConversation?(self, didRemoveMessage: m)
     }
     ///
-    /// 接收消息
+    /// 标记消息为己读
     ///
-    func recvice(m: SIMChatMessage) {
-        // 需要避免重复添加?
-        messages.insert(m, atIndex: 0)
-        // 通知
-        delegate?.chatConversation?(self, didReceiveMessage: m)
+    func read(m: SIMChatMessage) {
+        SIMLog.trace()
     }
-    
+    ///
+    /// 查询多条消息
+    ///
+    func query(count: Int, latest: SIMChatMessage?, finish: ((NSArray?, NSError?) -> ())?) {
+        SIMLog.trace()
+    }
 }
 
 
@@ -121,7 +123,7 @@ extension SIMChatConversation {
     ///
     /// 第一条, 这是最新的
     ///
-    var first: SIMChatMessage? { return messages.first }
+    var latest: SIMChatMessage? { return messages.first }
     ///
     /// 最后一条, 这是最旧的
     ///
@@ -134,10 +136,10 @@ extension SIMChatConversation {
     /// 未读总数
     ///
     var unread: Int {
+        // TODO: 未读记数
         return 0
     }
 }
-
 
 ///
 /// 消息插入

@@ -8,8 +8,6 @@
 
 import UIKit
 
-var g_testCellCount = 0
-
 ///
 /// 消息单元格
 ///
@@ -17,12 +15,12 @@ class SIMChatCell: SIMTableViewCell {
     /// 释放
     deinit {
         // 追踪
-        SIMLog.trace("created \(--g_testCellCount)")
+        SIMLog.trace("created count \(--self.dynamicType.createdCount)")
     }
     /// 构建
     override func build() {
         // 追踪
-        SIMLog.trace("created \(++g_testCellCount)")
+        SIMLog.trace("created count \(++self.dynamicType.createdCount)")
         
         super.build()
         self.clipsToBounds = true
@@ -78,6 +76,8 @@ class SIMChatCell: SIMTableViewCell {
     
     private(set) var user: SIMChatUser?                // 当前用户
     private(set) var message: SIMChatMessage?          // 关联的消息
+    
+    private(set) static var createdCount = 0
 }
 
 // MARK: - Event

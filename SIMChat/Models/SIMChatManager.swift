@@ -8,33 +8,35 @@
 
 import UIKit
 
+///
+/// 消息管理
+///
 class SIMChatManager: NSObject {
-    
-    /// 当前用户
+    /// 当前登录的用户
     var user: SIMChatUser?
     
     /// 所有的用户信息缓存
     var users = [String : SIMChatUser]()
     var groups = [String : SIMChatGroup]()
     
+    /// 用户管理
+    lazy var userManager = SIMChatUserManager.sharedManager
     /// 所有的会话缓存
-    var conversations = [String : SIMChatConversation]()
+    lazy var allConversations = Dictionary<String, SIMChatConversation>()
 }
 
 // MARK: - User
 extension SIMChatManager {
-    
     ///
     /// 登入
     ///
     func login(user: SIMChatUser, finish: (NSError? -> Void)?) {
         // 成功
         self.user = user
-        self.users[user.identifier] = user
+        self.userManager[user.identifier] = user
         // 回调
         finish?(nil)
     }
-    
     ///
     /// 登出
     ///
@@ -43,7 +45,9 @@ extension SIMChatManager {
         self.user = nil
         self.users.removeAll(keepCapacity: false)
         self.groups.removeAll(keepCapacity: false)
-        self.conversations.removeAll(keepCapacity: false)
+        
+        self.allConversations.removeAll()
+        
         // 回调
         finish?(nil)
     }
@@ -119,32 +123,23 @@ extension SIMChatManager {
 
 // MARK: - Conversation
 extension SIMChatManager {
-    
     ///
     /// 获取会话, 如果不存在创建
     ///
     /// :param: recver 接收者
     ///
     func conversationWithRecver(recver: SIMChatUser) -> SIMChatConversation? {
-        return self.conversations[recver.identifier]
-    }
-    
-    ///
-    /// 获取会话
-    ///
-    func conversationAtIndex(index: Int) -> SIMChatConversation? {
         return nil
+        //return self.conversations[recver.identifier]
     }
-    
     ///
     /// 删除会话
     ///
     /// :param: recver 删除和接收者相关的会话
     ///
     func conversationOfRemove(recver: SIMChatUser) {
-        self.conversations.removeValueForKey(recver.identifier)
+        self.allConversations.removeValueForKey(recver.identifier)
     }
-    
     ///
     /// 会放数量
     ///
@@ -152,6 +147,3 @@ extension SIMChatManager {
         return 0
     }
 }
-
-/// 用户信息改变通知 
-let SIMChatUserInfoChangedNotification = "SIMChatUserInfoChangedNotification"
