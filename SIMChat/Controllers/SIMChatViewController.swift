@@ -9,8 +9,24 @@
 import UIKit
 
 class SIMChatViewController: SIMViewController {
+    /// 初始化
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+    }
+    /// 初始化
+    init(conversation: SIMChatConversation) {
+        super.init(nibName: nil, bundle: nil)
+        self.conversation = conversation
+        self.conversation.delegate = self
+    }
+    /// 释放
+    deinit {
+        SIMLog.trace()
+    }
     /// 构建
     override func build() {
+        SIMLog.trace()
+        
         super.build()
         
         // 聊天内容
@@ -22,15 +38,6 @@ class SIMChatViewController: SIMViewController {
         self.registerClass(SIMChatCellDate.self,    SIMChatContentDate.self)
         // 默认
         self.registerClass(SIMChatCellUnknow.self,  SIMChatContentUnknow.self)
-        
-        // 测试会话
-        if true {
-            let s = SIMChatUser(identifier: "self", name: "self", gender: 1, portrait: nil)
-            let o = SIMChatUser(identifier: "other", name: "other", gender: 2)
-            let c = SIMChatConversation(recver: o, sender: s)
-            
-            self.conversation = c
-        }
     }
     /// 加载完成
     override func viewDidLoad() {

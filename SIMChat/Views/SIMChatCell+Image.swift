@@ -41,7 +41,6 @@ class SIMChatCellImage: SIMChatCellBubble {
     override func reloadData(m: SIMChatMessage, ofUser u: SIMChatUser?) {
         super.reloadData(m, ofUser: u)
         
-        // TODO: !!!!!!!!!!!
         if let content = m.content as? SIMChatContentImage {
             
             let width = max(content.thumbnailSize.width, 32)

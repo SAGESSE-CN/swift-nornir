@@ -9,25 +9,27 @@
 import UIKit
 
 
-class ViewController: UIViewController {
+class ViewController: UITableViewController {
 
-    var tv = UIImageView()
-    var tv2 = UIView()
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
         
     }
     
-    @IBAction func test() {
+    override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        tableView.deselectRowAtIndexPath(indexPath, animated: true)
+        
+        let s = SIMChatUser(identifier: "self", name: "self", gender: 1, portrait: nil)
+        let o = SIMChatUser(identifier: "other", name: "other", gender: 2)
+        let m = SIMChatManager.sharedManager
+        
+        //
+        m.login(s, finish: nil)
+        // ;
+        let cc = SIMChatViewController(conversation: m.conversationWithRecver(o))
+        // 显示
+        self.navigationController?.pushViewController(cc, animated: true)
     }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
-
-
 }
 

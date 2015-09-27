@@ -15,14 +15,13 @@ class SIMChatManager: NSObject {
     /// 当前登录的用户
     var user: SIMChatUser?
     
-    /// 所有的用户信息缓存
-    var users = [String : SIMChatUser]()
-    var groups = [String : SIMChatGroup]()
-    
     /// 用户管理
     lazy var userManager = SIMChatUserManager.sharedManager
     /// 所有的会话缓存
     lazy var allConversations = Dictionary<String, SIMChatConversation>()
+    
+    /// 单例
+    static let sharedManager = SIMChatManager()
 }
 
 // MARK: - User
@@ -43,81 +42,17 @@ extension SIMChatManager {
     func logout(finish: (NSError? -> Void)?) {
         // 成功
         self.user = nil
-        self.users.removeAll(keepCapacity: false)
-        self.groups.removeAll(keepCapacity: false)
         
         self.allConversations.removeAll()
         
         // 回调
         finish?(nil)
     }
-    
-    ///
-    /// 用户
-    ///
-    func user(userId identifier: String) -> SIMChatUser {
-        
-        if let u = self.users[identifier] {
-            return u
-        }
-        
-        let u = SIMChatUser(identifier: identifier)
-        
-        self.users[identifier] = u
-        
-        self.query(userInfo: u) { [weak self](nu, e) in
-            if let nu = nu {
-                // 更新。。
-                self?.updateUserInfo(nu)
-            } else {
-                // 失败删除 
-                self?.users.removeValueForKey(identifier)
-            }
-        }
-        
-        return u
-    }
-    
-    ///
-    /// 群组
-    ///
-    func group(groupId id: String) -> SIMChatGroup {
-        
-        if let u = self.groups[id] {
-            return u
-        }
-        
-        let u = SIMChatGroup(identifier: id)
-        
-        self.groups[id] = u
-        
-        return u
-    }
-    
     ///
     /// 查询用户信息
     ///
     func query(userInfo user: SIMChatUser, finish: ((SIMChatUser?, NSError?) -> Void)?) {
         // nothing
-    }
-    
-    ///
-    /// 更新用户信息
-    ///
-    func updateUserInfo(user: SIMChatUser) {
-        
-        let u = self.users[user.identifier]
-        
-        // 成功， 更新
-        u?.identifier = user.identifier
-        u?.name = user.name
-        u?.portrait = user.portrait
-        u?.extra = user.extra
-        
-        self.users[user.identifier] = user
-        
-//        // 生成全局通知
-//        NSNotificationCenter.simInternalCenter().postNotificationName(SIMChatUserInfoDidUpdateNotification, object: user)
     }
 }
 
@@ -128,9 +63,25 @@ extension SIMChatManager {
     ///
     /// :param: recver 接收者
     ///
-    func conversationWithRecver(recver: SIMChatUser) -> SIMChatConversation? {
-        return nil
-        //return self.conversations[recver.identifier]
+    func conversationWithRecver(recver: SIMChatUser) -> SIMChatConversation {
+        // 己经创建
+        if let cv = self.allConversations[recver.identifier] {
+            return cv
+        }
+        // 创建
+        let cv = SIMChatConversation(recver: recver, sender: user!)
+        // 缓存起来
+        self.allConversations[recver.identifier] = cv
+        // ok
+        return cv
+    }
+    ///
+    /// 获取会话, 如果不存在创建
+    ///
+    /// :param: recver 接收者
+    ///
+    func conversationWithRecverId(identifier: String) -> SIMChatConversation {
+        return self.conversationWithRecver(self.userManager[identifier])
     }
     ///
     /// 删除会话
@@ -144,6 +95,6 @@ extension SIMChatManager {
     /// 会放数量
     ///
     func conversationOfCount() -> Int {
-        return 0
+        return self.allConversations.count
     }
 }
