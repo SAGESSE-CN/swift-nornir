@@ -37,6 +37,18 @@ class SIMChatUser: NSObject {
     var extra: AnyObject?
 }
 
+/// assign
+extension SIMChatUser {
+    /// 覆盖
+    func assign(other: SIMChatUser) {
+        self.identifier = other.identifier
+        self.name = other.name
+        self.portrait = other.portrait
+        self.gender = other.gender
+        self.extra = other.extra
+    }
+}
+
 /// 比较两个用户
 func ==(lhs: SIMChatUser?, rhs: SIMChatUser?) -> Bool {
     return lhs === rhs || lhs?.identifier == rhs?.identifier

@@ -1,5 +1,5 @@
 //
-//  SIMChatContent+Image.swift
+//  SIMChatMessageContent+Image.swift
 //  SIMChat
 //
 //  Created by sagesse on 9/21/15.
@@ -9,14 +9,14 @@
 import UIKit
 
 /// 图片消息
-class SIMChatContentImage: SIMChatContent {
+class SIMChatMessageContentImage: SIMChatMessageContent {
     /// 初始化
     convenience init(origin: UIImage?, thumbnail: UIImage? = nil) {
         self.init()
         self.origin ~> origin
         self.originSize = origin?.size ?? CGSizeZero
-        self.thumbnail ~> thumbnail
-        self.thumbnailSize = thumbnail?.size ?? CGSizeZero
+        self.thumbnail ~> (thumbnail ?? origin)
+        self.thumbnailSize = (thumbnail ?? origin)?.size ?? CGSizeZero
     }
     // 图片(允许)
     var origin = SIMAsyncLazyAttr<UIImage?>()

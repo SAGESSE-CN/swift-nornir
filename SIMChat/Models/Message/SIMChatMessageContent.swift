@@ -1,5 +1,5 @@
 //
-//  SIMChatContent.swift
+//  SIMChatMessageContent.swift
 //  SIMChat
 //
 //  Created by sagesse on 9/21/15.
@@ -9,7 +9,7 @@
 import UIKit
 
 /// 消息的内容
-class SIMChatContent: NSObject {
+class SIMChatMessageContent: NSObject {
     /// 扩展数据
     var extra: AnyObject?
 }

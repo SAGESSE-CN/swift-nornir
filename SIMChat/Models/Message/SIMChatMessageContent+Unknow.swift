@@ -1,5 +1,5 @@
 //
-//  SIMChatContent+Unknow.swift
+//  SIMChatMessageContent+Unknow.swift
 //  SIMChat
 //
 //  Created by sagesse on 9/21/15.
@@ -9,5 +9,5 @@
 import UIKit
 
 /// 未知的消息
-class SIMChatContentUnknow: SIMChatContent {
+class SIMChatMessageContentUnknow: SIMChatMessageContent {
 }

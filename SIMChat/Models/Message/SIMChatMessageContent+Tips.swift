@@ -1,5 +1,5 @@
 //
-//  SIMChatContent+Tips.swift
+//  SIMChatMessageContent+Tips.swift
 //  SIMChat
 //
 //  Created by sagesse on 9/21/15.
@@ -9,7 +9,7 @@
 import UIKit
 
 /// 提示消息
-class SIMChatContentTips: SIMChatContent {
+class SIMChatMessageContentTips: SIMChatMessageContent {
     /// 初始化
     convenience init(tips: String) {
         self.init()

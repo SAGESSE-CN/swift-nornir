@@ -1,5 +1,5 @@
 //
-//  SIMChatContent+Time.swift
+//  SIMChatMessageContent+Time.swift
 //  SIMChat
 //
 //  Created by sagesse on 9/21/15.
@@ -9,7 +9,7 @@
 import UIKit
 
 /// 日期消息
-class SIMChatContentDate: SIMChatContent {
+class SIMChatMessageContentDate: SIMChatMessageContent {
     /// 初始化
     convenience init(date: NSDate) {
         self.init()

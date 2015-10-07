@@ -86,7 +86,7 @@ extension SIMChatMessage {
         self.recvStatus = .Unknow
         
         self.extra = nil
-        self.content = SIMChatContentDate(date: self.recvTime)
+        self.content = SIMChatMessageContentDate(date: self.recvTime)
         
         self.mute = true
         self.hidden = false

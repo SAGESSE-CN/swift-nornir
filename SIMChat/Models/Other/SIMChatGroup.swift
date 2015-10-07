@@ -12,5 +12,4 @@ import UIKit
 /// 群组是一个特殊的用户
 ///
 class SIMChatGroup: SIMChatUser {
-
 }

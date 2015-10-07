@@ -1,5 +1,5 @@
 //
-//  SIMChatContent+Audio.swift
+//  SIMChatMessageContent+Audio.swift
 //  SIMChat
 //
 //  Created by sagesse on 9/21/15.
@@ -9,17 +9,12 @@
 import UIKit
 
 /// 音频消息
-class SIMChatContentAudio: SIMChatContent {
+class SIMChatMessageContentAudio: SIMChatMessageContent {
     /// 初始化
     convenience init(url: NSURL, duration: NSTimeInterval) {
         self.init()
         
-        self.url ~> { f in
-            // TODO: 模拟1s的加载时间
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(1000 * NSEC_PER_MSEC)), dispatch_get_main_queue()) {
-                f(url)
-            }
-        }
+        self.url ~> url
         self.duration = duration
     }
     
@@ -31,7 +26,7 @@ class SIMChatContentAudio: SIMChatContent {
     var duration = NSTimeIntervalSince1970
 }
 
-extension SIMChatContentAudio {
+extension SIMChatMessageContentAudio {
     var durationText: String {
         if self.duration < 60 {
             return String(format: "%d''", Int(self.duration % 60))
