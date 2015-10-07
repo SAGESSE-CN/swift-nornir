@@ -52,11 +52,18 @@ class SIMChatKeyboardTool: SIMView {
         
         // add events
         pageControl.addTarget(self, action: "onPageChanged:", forControlEvents: .ValueChanged)
-        
-        pageControl.currentPage = 0
-        pageControl.numberOfPages = (contentView.numberOfItemsInSection(0) + 8 - 1) / 8
-        pageControl.hidesForSinglePage = true
     }
+    /// 将要显示的时候再重置
+    override func willMoveToWindow(newWindow: UIWindow?) {
+        super.willMoveToWindow(newWindow)
+        // ok
+        if newWindow != nil {
+            self.pageControl.currentPage = 0
+            self.pageControl.numberOfPages = (contentView.numberOfItemsInSection(0) + 8 - 1) / 8
+            self.pageControl.hidesForSinglePage = true
+        }
+    }
+    
     /// 固定大小
     override func intrinsicContentSize() -> CGSize {
         return CGSizeMake(0, 216)

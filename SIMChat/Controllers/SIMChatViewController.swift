@@ -30,14 +30,14 @@ class SIMChatViewController: SIMViewController {
         super.build()
         
         // 聊天内容
-        self.registerClass(SIMChatCellText.self,    SIMChatContentText.self)
-        self.registerClass(SIMChatCellAudio.self,   SIMChatContentAudio.self)
-        self.registerClass(SIMChatCellImage.self,   SIMChatContentImage.self)
+        self.registerClass(SIMChatCellText.self,    SIMChatMessageContentText.self)
+        self.registerClass(SIMChatCellAudio.self,   SIMChatMessageContentAudio.self)
+        self.registerClass(SIMChatCellImage.self,   SIMChatMessageContentImage.self)
         // 辅助
-        self.registerClass(SIMChatCellTips.self,    SIMChatContentTips.self)
-        self.registerClass(SIMChatCellDate.self,    SIMChatContentDate.self)
+        self.registerClass(SIMChatCellTips.self,    SIMChatMessageContentTips.self)
+        self.registerClass(SIMChatCellDate.self,    SIMChatMessageContentDate.self)
         // 默认
-        self.registerClass(SIMChatCellUnknow.self,  SIMChatContentUnknow.self)
+        self.registerClass(SIMChatCellUnknow.self,  SIMChatMessageContentUnknow.self)
     }
     /// 加载完成
     override func viewDidLoad() {
@@ -133,7 +133,7 @@ class SIMChatViewController: SIMViewController {
     /// 单元格
     internal lazy var testers = Dictionary<String, SIMChatCell>()
     internal lazy var relations = Dictionary<String, SIMChatCell.Type>()
-    internal lazy var relationDefault = NSStringFromClass(SIMChatCellUnknow.self)
+    internal lazy var relationDefault = NSStringFromClass(SIMChatMessageContentUnknow.self)
     
     /// 自定义键盘
     internal lazy var keyboard = UIView?()
@@ -242,34 +242,3 @@ extension SIMChatViewController : UITableViewDelegate {
         }
     }
 }
-
-// MARK: - Text Field
-extension SIMChatViewController : SIMChatTextFieldDelegate {
-    /// 选中..
-    func chatTextField(chatTextField: SIMChatTextField, didSelectItem item: Int) {
-        SIMLog.trace()
-        if let style = SIMChatTextFieldItemStyle(rawValue: item) {
-            self.updateKeyboard(style: style)
-        }
-    }
-    /// ...
-    func chatTextFieldContentSizeDidChange(chatTextField: SIMChatTextField) {
-        // 填充动画更新
-        UIView.animateWithDuration(0.25) {
-            // 更新键盘高度
-            self.view.layoutIfNeeded()
-            self.updateKeyboard(height: self.keyboardHeight)
-        }
-    }
-    /// ok
-    func chatTextFieldShouldReturn(chatTextField: SIMChatTextField) -> Bool {
-        // 发送.
-        if let text = textField.text where !text.isEmpty {
-            self.send(text: text)
-            self.textField.text = nil
-        }
-        // 不可能return
-        return false
-    }
-}
-

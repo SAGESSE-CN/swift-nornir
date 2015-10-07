@@ -12,13 +12,14 @@ import UIKit
 /// 消息管理
 ///
 class SIMChatManager: NSObject {
-    /// 当前登录的用户
-    var user: SIMChatUser?
     
     /// 用户管理
     lazy var userManager = SIMChatUserManager.sharedManager
     /// 所有的会话缓存
     lazy var allConversations = Dictionary<String, SIMChatConversation>()
+    
+    /// 当前登录的用户
+    var user: SIMChatUser!
     
     /// 单例
     static let sharedManager = SIMChatManager()
@@ -50,11 +51,24 @@ extension SIMChatManager {
     }
 }
 
+// MARK: - Message
+extension SIMChatManager {
+    /// 发送消息
+    func sendMessage(conversation: SIMChatConversation, message: SIMChatMessage) {
+        // 发送成功
+        // 发送失败
+    }
+    /// 查询消息
+    func queryMessages(conversation: SIMChatConversation, last: SIMChatMessage) {
+        // 查询成功
+        // 查询失败
+    }
+}
+
 // MARK: - Conversation
 extension SIMChatManager {
     ///
     /// 获取会话, 如果不存在创建
-    ///
     /// :param: recver 接收者
     ///
     func conversationWithRecver(recver: SIMChatUser) -> SIMChatConversation {
@@ -62,8 +76,10 @@ extension SIMChatManager {
         if let cv = self.allConversations[recver.identifier] {
             return cv
         }
-        // 创建
-        let cv = SIMChatConversation(recver: recver, sender: user!)
+        // 创建, 可能需要由子类创建
+        let cv = self.conversationOfMake(recver)
+        // 配置
+        cv.manager = self
         // 缓存起来
         self.allConversations[recver.identifier] = cv
         // ok
@@ -72,9 +88,9 @@ extension SIMChatManager {
     ///
     /// 获取会话, 如果不存在创建
     ///
-    /// :param: recver 接收者
+    /// :param: identifier 接收者标识符
     ///
-    func conversationWithRecverId(identifier: String) -> SIMChatConversation {
+    func conversationWithIdentifier(identifier: String) -> SIMChatConversation {
         return self.conversationWithRecver(self.userManager[identifier])
     }
     ///
@@ -90,5 +106,12 @@ extension SIMChatManager {
     ///
     func conversationOfCount() -> Int {
         return self.allConversations.count
+    }
+    ///
+    /// 创建会话
+    /// :param: recver 接收者
+    ///
+    func conversationOfMake(recver: SIMChatUser) -> SIMChatConversation {
+        return SIMChatConversation(recver: recver, sender: user)
     }
 }

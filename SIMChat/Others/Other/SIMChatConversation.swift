@@ -32,15 +32,27 @@ class SIMChatConversation: NSObject {
     private(set) var recver: SIMChatUser
     
     /// 消息
-    internal lazy var messages = [SIMChatMessage]()
+    internal lazy var messages = Array<SIMChatMessage>()
+}
+
+/// MAKR: - Message
+extension SIMChatConversation {
+    
+    ///
+    func sendMessage(message: SIMChatMessage) {
+    }
+    
+    func sendMessageWithContent(content: AnyObject) {
+    }
 }
 
 // MARK: - Public Method
 extension SIMChatConversation {
+    
     ///
-    /// 发送一条消息
+    /// 发送一条消息(禁止重写)
     ///
-    func send(content: AnyObject, finish: ((SIMChatMessage?, NSError?) -> ())? = nil) {
+    final func send(content: AnyObject) {
         
         let m = SIMChatMessage(content)
         
@@ -59,28 +71,6 @@ extension SIMChatConversation {
             self.messages.insert(m, atIndex: 0)
             // TODO: 如果是重发需要删除了再发送 
             delegate?.chatConversation?(self, didSendMessage: m)
-        }
-        
-        // 完成
-        finish?(m, nil)
-        
-        // TODO: 测试环境!
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(1000 * NSEC_PER_MSEC)), dispatch_get_main_queue()) {
-            
-            m.sentStatus = .Sent
-            m.statusChanged()
-            
-            let rm = SIMChatMessage()
-            
-            rm.sender = m.recver
-            rm.recver = m.sender
-            rm.sentTime = .now
-            rm.sentStatus = .Sent
-            rm.recvTime = .now
-            rm.recvStatus = .Unread
-            rm.content = m.content
-            
-            self.recvice(rm)
         }
     }
     ///
@@ -112,7 +102,7 @@ extension SIMChatConversation {
     ///
     /// 查询多条消息
     ///
-    func query(count: Int, latest: SIMChatMessage?, finish: ((NSArray?, NSError?) -> ())?) {
+    func query(count: Int, latest: SIMChatMessage?) {
         SIMLog.trace()
     }
 }
@@ -149,7 +139,13 @@ extension SIMChatConversation {
 @objc protocol SIMChatConversationDelegate : NSObjectProtocol {
    
     optional func chatConversation(conversation: SIMChatConversation, didSendMessage message: SIMChatMessage)
+    
     optional func chatConversation(conversation: SIMChatConversation, didReceiveMessage message: SIMChatMessage)
     optional func chatConversation(conversation: SIMChatConversation, didRemoveMessage message: SIMChatMessage)
     optional func chatConversation(conversation: SIMChatConversation, didUpdateMessage message: SIMChatMessage)
+    
+    optional func chatConversation(conversation: SIMChatConversation, didQueryMessages messages: [SIMChatMessage])
+    
+    optional func chatConversation(conversation: SIMChatConversation, didSendFailWithError error: NSError?)
+    optional func chatConversation(conversation: SIMChatConversation, didQueryFailWithError error: NSError?)
 }

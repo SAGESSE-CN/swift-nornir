@@ -103,7 +103,7 @@ extension SIMChatViewController {
         // 获取高度
         if let r1 = sender.userInfo?[UIKeyboardFrameEndUserInfoKey]?.CGRectValue {
             // Note: 在iPad这可能会有键盘高度不变但y改变的情况
-            let h = self.view.bounds.height - r1.origin.y
+            let h = r1.height//self.view.bounds.height - r1.origin.y
             if self.keyboardHeight != h {
                 SIMLog.trace()
                 // 取消隐藏动画
@@ -196,10 +196,7 @@ extension SIMChatViewController : SIMChatKeyboardEmojiDelegate {
     }
     /// 发送
     func chatKeyboardEmojiDidReturn(chatKeyboardEmoji: SIMChatKeyboardEmoji) {
-        if let text = self.textField.text where !text.isEmpty {
-            self.send(text: text)
-            self.textField.text = nil
-        }
+        self.chatTextFieldShouldReturn(self.textField)
     }
 }
 
@@ -232,9 +229,10 @@ extension SIMChatViewController : SIMChatKeyboardAudioDelegate {
         SIMLog.trace()
         self.textField.enabled = false
         // 计算高度
-        let height = self.view.bounds.height - self.keyboardHeight - self.textField.bounds.height
+        let size = self.view.window?.bounds.size ?? CGSizeZero
+        let height = size.height - self.keyboardHeight - self.textField.bounds.height
         
-        self.maskView.frame = CGRectMake(0, 0, self.view.bounds.width, height)
+        self.maskView.frame = CGRectMake(0, 0, size.width, height)
         self.maskView.alpha = 0
         self.view.window?.addSubview(self.maskView)
         // duang
@@ -258,6 +256,34 @@ extension SIMChatViewController : SIMChatKeyboardAudioDelegate {
     /// 得到结果
     func chatKeyboardAudioDidFinish(chatKeyboardAudio: SIMChatKeyboardAudio, url: NSURL, duration: NSTimeInterval) {
         self.send(audio: url, duration: duration)
+    }
+}
+
+// MARK: - Text Field
+extension SIMChatViewController : SIMChatTextFieldDelegate {
+    /// 选中..
+    func chatTextField(chatTextField: SIMChatTextField, didSelectItem item: Int) {
+        SIMLog.trace()
+        if let style = SIMChatTextFieldItemStyle(rawValue: item) {
+            self.updateKeyboard(style: style)
+        }
+    }
+    /// ...
+    func chatTextFieldContentSizeDidChange(chatTextField: SIMChatTextField) {
+        // 填充动画更新
+        UIView.animateWithDuration(0.25) {
+            // 更新键盘高度
+            self.view.layoutIfNeeded()
+            self.updateKeyboard(height: self.keyboardHeight)
+        }
+    }
+    /// ok
+    func chatTextFieldShouldReturn(chatTextField: SIMChatTextField) -> Bool {
+        // 发送.
+        self.send(text: self.textField.text ?? "")
+        self.textField.text = nil
+        // 不可能return
+        return false
     }
 }
 

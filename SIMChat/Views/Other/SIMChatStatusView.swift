@@ -12,34 +12,6 @@ import UIKit
 /// 消息状态显示
 ///
 class SIMChatStatusView: SIMControl {
-    /// 构建
-    override func build() {
-        super.build()
-        
-        // config
-        retryButton.translatesAutoresizingMaskIntoConstraints = false
-        retryButton.setImage(SIMChatImageManager.messageFail, forState: .Normal)
-        
-        activityIndicatorView.translatesAutoresizingMaskIntoConstraints = false
-        activityIndicatorView.hidesWhenStopped = true
-        
-        // add views
-        addSubview(retryButton)
-        addSubview(activityIndicatorView)
-        
-        // add constraints
-        addConstraint(NSLayoutConstraintMake(activityIndicatorView, .CenterX, .Equal, self, .CenterX))
-        addConstraint(NSLayoutConstraintMake(activityIndicatorView, .CenterY, .Equal, self, .CenterY))
-        
-        addConstraint(NSLayoutConstraintMake(retryButton, .CenterX, .Equal, self, .CenterX))
-        addConstraint(NSLayoutConstraintMake(retryButton, .CenterY, .Equal, self, .CenterY))
-        
-        // add event
-        retryButton.addTarget(self, action: "onRetry:", forControlEvents: .TouchUpInside)
-        
-        // :)
-        self.status = .Failed
-    }
     /// 最小
     override func intrinsicContentSize() -> CGSize {
         return CGSizeMake(20, 20)
@@ -47,25 +19,40 @@ class SIMChatStatusView: SIMControl {
     /// 当前状态
     var status = SIMChatStatus.None {
         willSet {
-            switch newValue {
-            case .None:
-                self.retryButton.hidden = true
-                self.activityIndicatorView.hidden = true
-                self.activityIndicatorView.stopAnimating()
-            case .Waiting:
-                self.retryButton.hidden = true
-                self.activityIndicatorView.hidden = false
-                self.activityIndicatorView.startAnimating()
-            case .Failed:
-                self.retryButton.hidden = false
-                self.activityIndicatorView.hidden = true
-                self.activityIndicatorView.stopAnimating()
+            if newValue != status {
+                var nv: UIView?
+                // 每重情况都有不同的视图
+                switch newValue {
+                case .Waiting:
+                    let av = showView as? UIActivityIndicatorView ?? UIActivityIndicatorView(activityIndicatorStyle: .Gray)
+                    av.hidesWhenStopped = true
+                    nv = av
+                case .Failed:
+                    let btn = showView as? UIButton ?? UIButton()
+                    btn.setImage(SIMChatImageManager.messageFail, forState: .Normal)
+                    btn.addTarget(self, action: "onRetry:", forControlEvents: .TouchUpInside)
+                    nv = btn
+                default:
+                    break
+                }
+                if nv != showView {
+                    showView?.removeFromSuperview()
+                    if let nv = nv {
+                        nv.frame = bounds
+                        nv.autoresizingMask = .FlexibleWidth | .FlexibleHeight
+                        addSubview(nv)
+                    }
+                    showView = nv
+                }
+            }
+            // 如果是停止状态, 恢复状态
+            if let av = showView as? UIActivityIndicatorView where !av.isAnimating() {
+                av.startAnimating()
             }
         }
     }
-   
-    private lazy var retryButton = UIButton()
-    private lazy var activityIndicatorView = UIActivityIndicatorView(activityIndicatorStyle: .Gray)
+    
+    private var showView: UIView?
 }
 
 // MARK: - Event

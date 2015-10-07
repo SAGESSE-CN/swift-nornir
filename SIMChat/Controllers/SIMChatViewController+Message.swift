@@ -78,7 +78,7 @@ extension SIMChatViewController {
             if first == nil || fabs(first!.recvTime - m.recvTime) > st {
                 var time: SIMChatMessage!
                 // 如果前面的本来就是时间了.
-                if first?.content is SIMChatContentDate {
+                if first?.content is SIMChatMessageContentDate {
                     
                     time = first
                     upds.append(NSIndexPath(forRow: position + fms.count - 1, inSection: 0))
@@ -204,7 +204,7 @@ extension SIMChatViewController {
         
         if let idx = source.indexOf(m) {
             // 如果前一个是时间, 同时删除他
-            if idx != 0 && idx - 1 < source.count && source[idx - 1].content is SIMChatContentDate {
+            if idx != 0 && idx - 1 < source.count && source[idx - 1].content is SIMChatMessageContentDate {
                 idxs.append(idx - 1) // 删除他
             }
             // 删除 。
@@ -257,34 +257,35 @@ extension SIMChatViewController {
     ///
     func loadHistorys(count: Int, latest: SIMChatMessage? = nil) {
         SIMLog.trace()
-        // 查询: )
-        self.conversation.query(count, latest: latest) { [weak self] ms, e in
-            // 查询成功了? 
-            if let ms = ms as? [SIMChatMessage] where self != nil {
-                // 插入
-                self?.insertRows(ms.reverse(), atIndex: 0, animated: latest != nil)
-                self?.latest = ms.last
-                // 这是第一次
-                if latest == nil {
+        self.insertRows(self.conversation.messages, atIndex: 0)
+//        // 查询: )
+//        self.conversation.query(count, latest: latest) { [weak self] ms, e in
+//            // 查询成功了? 
+//            if let ms = ms as? [SIMChatMessage] where self != nil {
+//                // 插入
+//                self?.insertRows(ms.reverse(), atIndex: 0, animated: latest != nil)
+//                self?.latest = ms.last
+//                // 这是第一次
+//                if latest == nil {
                     // 有多行
-                    let cnt = self?.tableView.numberOfRowsInSection(0) ?? 0
+                    let cnt = self.tableView.numberOfRowsInSection(0) ?? 0
                     if cnt != 0 {
                         // 有多行?
                         let idx = NSIndexPath(forRow: cnt - 1, inSection: 0)
-                        self?.tableView.scrollToRowAtIndexPath(idx, atScrollPosition: .Bottom, animated: false)
+                        self.tableView.scrollToRowAtIndexPath(idx, atScrollPosition: .Bottom, animated: false)
                     }
                     // 淡入
-                    self?.tableView.alpha = 0
+                    self.tableView.alpha = 0
                     UIView.animateWithDuration(0.25) {
-                        self?.tableView.alpha = 1
+                        self.tableView.alpha = 1
                     }
-                    // 标记为己读
-                    if let m = ms.first {
-                        self?.conversation.read(m)
-                    }
-                }
-            }
-        }
+//                    // 标记为己读
+//                    if let m = ms.first {
+//                        self?.conversation.read(m)
+//                    }
+//                }
+//            }
+//        }
     }
 }
 
@@ -316,14 +317,23 @@ extension SIMChatViewController {
     ///
     func send(text data: String) {
         SIMLog.trace()
+        // 不能为空
+        if data.isEmpty {
+            let av = UIAlertView(title: "提示", message: "不能发送空内容", delegate: nil, cancelButtonTitle: "好")
+            return av.show()
+        }
         // 发送
-        self.conversation?.send(SIMChatContentText(text: data ?? ""))
+        self.conversation?.send(SIMChatMessageContentText(text: data))
     }
     ///
     /// 发送声音
     ///
     func send(audio url: NSURL, duration: NSTimeInterval) {
         SIMLog.trace()
+        if duration < 1 {
+            let av = UIAlertView(title: "提示", message: "录音时间太短", delegate: nil, cancelButtonTitle: "好")
+            return av.show()
+        }
         // 生成连接
         let nurl = NSURL(fileURLWithPath: String(format: "%@/upload/audio/%@.wav", NSTemporaryDirectory(), NSUUID().UUIDString))
         // 检查目录并发送
@@ -333,7 +343,7 @@ extension SIMChatViewController {
             // 移动文件
             try NSFileManager.defaultManager().moveItemAtURL(url, toURL: nurl)
             // 发送
-            self.conversation?.send(SIMChatContentAudio(url: nurl, duration: duration))
+            self.conversation?.send(SIMChatMessageContentAudio(url: nurl, duration: duration))
             
         } catch let e as NSError {
             // 发送失败
@@ -348,7 +358,7 @@ extension SIMChatViewController {
         // 生成连接(这可以降低内存使用)
         // let nurl = NSURL(fileURLWithPath: String(format: "%@/upload/image/%@.jpg", NSTemporaryDirectory(), NSUUID().UUIDString))
         // 发送
-        self.conversation?.send(SIMChatContentImage(origin: data, thumbnail: data))
+        self.conversation?.send(SIMChatMessageContentImage(origin: data, thumbnail: data))
     }
     ///
     /// 发送自定义消息
@@ -382,7 +392,7 @@ extension SIMChatViewController : SIMChatCellDelegate {
             return
         }
         // 音频
-        if let ctx = chatCell.message?.content as? SIMChatContentAudio {
+        if let ctx = chatCell.message?.content as? SIMChatMessageContentAudio {
             // 有没有加载? 没有的话添加监听
             if !ctx.url.storaged {
                 ctx.url.willSet({ [weak message] oldValue in
@@ -420,7 +430,7 @@ extension SIMChatViewController : SIMChatCellDelegate {
             return
         }
         // 图片
-        if let ctx = chatCell.message?.content as? SIMChatContentImage {
+        if let ctx = chatCell.message?.content as? SIMChatMessageContentImage {
             let f = (chatCell as? SIMChatCellImage)?.contentView2 ?? chatCell
             let vc = SIMChatPhotoBrowserController()
             

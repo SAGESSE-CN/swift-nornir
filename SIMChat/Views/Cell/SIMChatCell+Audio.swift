@@ -66,7 +66,7 @@ class SIMChatCellAudio: SIMChatCellBubble {
     override func reloadData(m: SIMChatMessage, ofUser u: SIMChatUser?) {
         super.reloadData(m, ofUser: u)
         // 更新内容
-        if let ctx = m.content as? SIMChatContentAudio {
+        if let ctx = m.content as? SIMChatMessageContentAudio {
             titleLabel.text = ctx.durationText
             // 播放中.
             if ctx.playing {
@@ -115,7 +115,7 @@ extension SIMChatCellAudio {
     /// 音频开始播放
     func onAudioDidPlay(sender: NSNotification) {
         // 为空说明不需要做何处理
-        guard let content = self.message?.content as? SIMChatContentAudio else {
+        guard let content = self.message?.content as? SIMChatMessageContentAudio else {
             return
         }
         // 只在是本消息的事件才处理
@@ -126,7 +126,7 @@ extension SIMChatCellAudio {
     /// 音频停止播放
     func onAudioDidStop(sender: NSNotification) {
         // 不管是谁. 停了再说
-        if let ctx = message?.content as? SIMChatContentAudio {
+        if let ctx = message?.content as? SIMChatMessageContentAudio {
             ctx.playing = false
         }
         if self.animationView.isAnimating() {
@@ -144,7 +144,7 @@ extension SIMChatCellAudio {
     /// 音频加载完成
     func onAudioDidLoad(sender: NSNotification) {
         // 必须是音频
-        guard let ctx = self.message?.content as? SIMChatContentAudio else {
+        guard let ctx = self.message?.content as? SIMChatMessageContentAudio else {
             return
         }
         // :)

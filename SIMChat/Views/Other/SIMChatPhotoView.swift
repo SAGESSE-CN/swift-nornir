@@ -72,8 +72,6 @@ class SIMChatPhotoView: SIMView {
         let from = imageView.bounds.size
         var to = imageView.image?.size ?? CGSizeZero
         
-        SIMLog.trace("from: \(from), to: \(to)")
-        
         to.width = max(to.width, 1)
         to.height = max(to.height, 1)
         
@@ -87,6 +85,9 @@ class SIMChatPhotoView: SIMView {
         scrollView.zoomScale = 1
         scrollView.minimumZoomScale = 1
         scrollView.maximumZoomScale = max(max(to.width / fit.width, to.height / fit.height), 2)
+        
+        
+        SIMLog.trace("from: \(from), to: \(to), scale: \(scrollView.maximumZoomScale)")
         
         if flag {
             UIView.animateWithDuration(0.25) {
@@ -109,7 +110,7 @@ class SIMChatPhotoView: SIMView {
     }
     
     /// 需要显示的图片:)
-    var image: SIMChatContentImage!
+    var image: SIMChatMessageContentImage!
     /// 代理
     weak var delegate: SIMChatPhotoViewDelegate?
     
@@ -135,13 +136,16 @@ extension SIMChatPhotoView : UIScrollViewDelegate {
 // MARK: - Events
 extension SIMChatPhotoView {
     /// 单击退出
-    func onTap(sender: AnyObject) {
-        SIMLog.trace()
+    private dynamic func onTap(sender: AnyObject) {
         self.delegate?.chatPhotoView?(self, didTap: sender)
     }
     /// 双击
-    func onDoubleTap(sender: AnyObject) {
-        SIMLog.trace()
+    private dynamic func onDoubleTap(sender: AnyObject) {
+        if scrollView.zoomScale > scrollView.minimumZoomScale {
+            scrollView.setZoomScale(scrollView.minimumZoomScale, animated: true)
+        } else {
+            scrollView.setZoomScale(scrollView.maximumZoomScale, animated: true)
+        }
     }
 }
 

@@ -73,6 +73,33 @@ class SIMControl : UIControl {
 }
 
 /// 添加build
+class SIMImageView : UIImageView {
+    /// 序列化
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+        self.build()
+    }
+    /// 初始化
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        self.build()
+    }
+    /// 初始化
+    override init(image: UIImage?) {
+        super.init(image: image)
+        self.build()
+    }
+    /// 初始化
+    override init(image: UIImage?, highlightedImage: UIImage?) {
+        super.init(image: image, highlightedImage: highlightedImage)
+        self.build()
+    }
+    /// 构建
+    func build() {
+    }
+}
+
+/// 添加build
 class SIMTableViewCell : UITableViewCell {
     /// 序列化
     required init?(coder aDecoder: NSCoder) {
@@ -115,8 +142,6 @@ enum SIMChatTextFieldItemStyle : Int {
     case Tool       = 0x0103
 }
 
-
-
 extension NSDate {
     /// 零
     class var zero: NSDate {
@@ -136,7 +161,6 @@ extension NSDate {
         return df.stringFromDate(self)
     }
 }
-
 
 extension NSTimer {
     class func scheduledTimerWithTimeInterval2(ti: NSTimeInterval, _ aTarget: AnyObject, _ aSelector: Selector, _ userInfo: AnyObject? = nil) -> NSTimer {

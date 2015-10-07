@@ -15,8 +15,11 @@ class SIMChatUserManager: NSObject {
     /// 获取用户
     subscript (identifier: String) -> SIMChatUser {
         set {
-            // 直接更新
-            self.caches[identifier] = newValue
+            // 更新
+            if let oldValue = self.caches.updateValue(newValue, forKey: identifier) {
+                // 覆盖更新
+                oldValue.assign(newValue)
+            }
             // 改变了, 发出通知
             SIMChatNotificationCenter.postNotificationName(SIMChatUserInfoChangedNotification, object: newValue)
         }

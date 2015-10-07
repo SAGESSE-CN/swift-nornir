@@ -38,12 +38,12 @@ extension UIViewController {
         return nil
     }
     ///
-    /// 显示
-    // TODO: 还有一个未处理的情况
+    /// 显示(ios7未测试)
     ///
     func presentViewController(viewControllerToPresent: UIViewController, animated flag: Bool, fromView: UIView?, completion: (() -> Void)?) {
         SIMLog.trace()
         
+        // TODO: 还有一个未处理的情况
         // 准备呗
         let src = self
         let dest = viewControllerToPresent
@@ -69,8 +69,7 @@ extension UIViewController {
         tp.image = context.fromViewSnapshoot
         tp.backgroundColor = UIColor.clearColor()
         
-        // 这里的rootViewController要指向旧的, 否则会产生抖动之类的
-        window.rootViewController = src.view.window?.rootViewController
+        window.rootViewController = nil
         window.addSubview(mask)
         window.addSubview(tp)
         window.makeKeyAndVisible()
@@ -79,7 +78,7 @@ extension UIViewController {
         let from = context.fromView!.convertRect(context.fromView!.bounds, toView: context.fromView?.window)
         let to = context.toView!.convertRect(context.toView!.bounds, toView: dest.view)
         
-        //Log.debug("will present view controller, from: \(from) to: \(to)")
+        //SIMLog.debug("will present view controller, from: \(from) to: \(to)")
         
         // 先不要显示遮罩层, 通过动画慢慢的显示
         tp.frame = from
@@ -87,7 +86,6 @@ extension UIViewController {
         
         //
         UIView.animateWithDuration(context.duration, delay: 0, options: UIViewAnimationOptions.CurveLinear, animations: {
-        //UIView.animateWithDuration(context.duration, animations: {
             
             tp.frame = to
             mask.alpha = 1
@@ -111,23 +109,20 @@ extension UIViewController {
         })
     }
     ///
-    /// 消失
+    /// 消失(ios7未测试)
     ///
     func dismissViewControllerAnimated(flag: Bool, fromView: UIView?, completion: (() -> Void)?) {
         SIMLog.trace()
         
         // TODO: 还有一个未处理的情况
-        
         // 准备啊
         let src = self
         let window = TransitionContext.window
         let context = src.modalTransitionContext
         let mask = UIView()
         let tp = UIImageView()
-        
         // config
         //window.frame = UIScreen.mainScreen().bounds
-        
         mask.frame = window.bounds
         mask.backgroundColor = src.view.backgroundColor
         mask.autoresizingMask = UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleHeight
@@ -135,49 +130,33 @@ extension UIViewController {
         tp.image = context.toViewSnapshoot
         tp.backgroundColor = UIColor.clearColor()
         
-        // 这里的rootViewController要指向旧的, 否则会产生抖动之类的
-        window.rootViewController = src
         window.addSubview(mask)
         window.addSubview(tp)
         window.makeKeyAndVisible()
-        
         // 计算位置
         let to = context.toView!.convertRect(context.toView!.bounds, toView: context.toView?.window)
-        
         // 直接显示遮罩层
         tp.frame = to
         mask.alpha = 1
-        
         // 直接关闭他
         self.dismissViewControllerAnimated(false, completion: {
-            
-            // 更改rootViewController为上一层的vc, 否则发生抖动
-            window.rootViewController = context.fromView?.window?.rootViewController
-            
             // 理由同上
             dispatch_async(dispatch_get_main_queue()) {
-                
                 // next
                 let from = context.fromView!.convertRect(context.fromView!.bounds, toView: context.fromView?.window)
-                
-                //Log.debug("will dismiss view controller, from: \(to), to: \(from)")
-                
+                //SIMLog.debug("will dismiss view controller, from: \(to), to: \(from)")
                 // 动画淡出
                 UIView.animateWithDuration(context.duration, delay: 0, options: UIViewAnimationOptions.CurveLinear, animations: {
-                //UIView.animateWithDuration(context.duration, animations: {
                     
                     tp.frame = from
                     mask.alpha = 0
                     
                 }, completion: { s in
-                    
                     // finsh, clean
                     //Log.debug("did dismiss view controller")
-                    
                     tp.removeFromSuperview()
                     mask.removeFromSuperview()
                     window.hidden = true
-                    
                     // end
                     completion?()
                 })

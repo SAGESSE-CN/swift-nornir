@@ -39,7 +39,7 @@ class SIMChatPhotoBrowserController: SIMViewController {
     ///
     /// 内容1
     ///
-    var content: SIMChatContentImage! {
+    var content: SIMChatMessageContentImage! {
         set { return imageView.image = newValue }
         get { return imageView.image }
     }

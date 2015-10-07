@@ -41,7 +41,7 @@ class SIMChatCellImage: SIMChatCellBubble {
     override func reloadData(m: SIMChatMessage, ofUser u: SIMChatUser?) {
         super.reloadData(m, ofUser: u)
         
-        if let content = m.content as? SIMChatContentImage {
+        if let content = m.content as? SIMChatMessageContentImage {
             
             let width = max(content.thumbnailSize.width, 32)
             let height = max(content.thumbnailSize.height, 1)
@@ -88,7 +88,7 @@ extension SIMChatCellImage {
     /// 复制
     dynamic func chatCellCopy(sender: AnyObject?) {
         SIMLog.trace()
-        if let ctx = message?.content as? SIMChatContentImage where ctx.origin.storaged {
+        if let ctx = message?.content as? SIMChatMessageContentImage where ctx.origin.storaged {
             UIPasteboard.generalPasteboard().image = *(ctx.origin)
             // 完成
             self.delegate?.chatCellDidCopy?(self)

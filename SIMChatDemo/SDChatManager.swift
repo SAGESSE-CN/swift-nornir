@@ -8,6 +8,34 @@
 
 import UIKit
 
+/// SIM Demo Chat Manager
 class SDChatManager: SIMChatManager {
+    
+}
 
+// MARK: - Conversation
+extension SDChatManager {
+    ///
+    /// 获取会话, 如果不存在创建
+    ///
+    /// :param: recver 接收者
+    ///
+    override func conversationWithRecver(recver: SIMChatUser) -> SDChatConversation {
+        return super.conversationWithRecver(recver) as! SDChatConversation
+    }
+    ///
+    /// 获取会话, 如果不存在创建
+    ///
+    /// :param: recver 接收者
+    ///
+    override func conversationWithIdentifier(identifier: String) -> SDChatConversation {
+        return super.conversationWithIdentifier(identifier) as! SDChatConversation
+    }
+    ///
+    /// 创建会话
+    /// :param: recver 接收者
+    ///
+    override func conversationOfMake(recver: SIMChatUser) -> SDChatConversation {
+        return SDChatConversation(recver: recver, sender: user)
+    }
 }
