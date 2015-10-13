@@ -23,8 +23,6 @@ class SIMChatConversation: NSObject {
     
     /// 管理器(保留联系)
     weak var manager: SIMChatManager!
-    /// 代理
-    weak var delegate: SIMChatConversationDelegate?
     
     /// 发送者
     private(set) var sender: SIMChatUser
@@ -48,56 +46,74 @@ extension SIMChatConversation {
 
 // MARK: - Public Method
 extension SIMChatConversation {
-    
     ///
-    /// 发送一条消息(禁止重写)
+    /// 发送一条消息
     ///
-    final func send(content: AnyObject) {
-        
+    func send(content: AnyObject) {
+        SIMLog.trace()
+        // 生成
         let m = SIMChatMessage(content)
-        
         // 填写发送信息
-        m.sender = self.sender
+        m.sender = sender
         m.sentTime = .now
         m.sentStatus = .Sending
         // 填写接收者信息
-        m.recver = self.recver
+        m.recver = recver
         m.recvTime = .now
         m.recvStatus = .Unknow
-        
-        // 真的需要追加?
-        if !self.messages.contains(m) {
-            // 真正的发送出去
-            self.messages.insert(m, atIndex: 0)
-            // TODO: 如果是重发需要删除了再发送 
-            delegate?.chatConversation?(self, didSendMessage: m)
-        }
+        // 保存
+        messages.insert(m, atIndex: 0)
+        // 发出通知
+        SIMChatNotificationCenter.postNotificationName(SIMChatConversationMessageDidRecive, object: m)
+        // 真正的发送
     }
     ///
-    /// 接收消息
+    /// 重新发送
     ///
-    func recvice(m: SIMChatMessage) {
-        // 需要避免重复添加?
-        self.messages.insert(m, atIndex: 0)
-        // 通知
-        self.delegate?.chatConversation?(self, didReceiveMessage: m)
+    func resend(m: SIMChatMessage) {
+        // 必须要存在的才能重新发送
+        guard let idx = messages.indexOf(m) else {
+            
+            return
+        }
+        SIMLog.trace()
+        // 填写发送信息
+        m.sender = sender
+        m.sentTime = .now
+        m.sentStatus = .Sending
+        // 填写接收者信息
+        m.recver = recver
+        m.recvTime = .now
+        m.recvStatus = .Unknow
+        // 调整结构
+        messages.removeAtIndex(idx)
+        messages.insert(m, atIndex: 0)
+        // 发出通知
+        SIMChatNotificationCenter.postNotificationName(SIMChatConversationMessageDidUpdate, object: m)
+        // 真正的发送
     }
     ///
     /// 删除消息
     ///
     func remove(m: SIMChatMessage) {
-        // 真的需要删除?
-        if let idx = messages.indexOf(m) {
-            messages.removeAtIndex(idx)
+        // 必须要存在的才能删除
+        guard let idx = messages.indexOf(m) else {
+            return
         }
+        SIMLog.trace()
+        // 真的需要删除?
+        messages.removeAtIndex(idx)
         // 通知
-        delegate?.chatConversation?(self, didRemoveMessage: m)
+        SIMChatNotificationCenter.postNotificationName(SIMChatConversationMessageDidRemove, object: m)
     }
     ///
     /// 标记消息为己读
     ///
     func read(m: SIMChatMessage) {
         SIMLog.trace()
+        
+        // 通知
+        SIMChatNotificationCenter.postNotificationName(SIMChatConversationMessageDidUpdate, object: m)
     }
     ///
     /// 查询多条消息
@@ -106,7 +122,6 @@ extension SIMChatConversation {
         SIMLog.trace()
     }
 }
-
 
 // MARK: - Helper
 extension SIMChatConversation {
@@ -131,21 +146,18 @@ extension SIMChatConversation {
     }
 }
 
-///
-/// 消息插入
-/// 消息删除
-/// 消息更新
-///
-@objc protocol SIMChatConversationDelegate : NSObjectProtocol {
-   
-    optional func chatConversation(conversation: SIMChatConversation, didSendMessage message: SIMChatMessage)
+
+/// 接口1
+@objc protocol SIMChatConversationInterface : NSObjectProtocol {
     
-    optional func chatConversation(conversation: SIMChatConversation, didReceiveMessage message: SIMChatMessage)
-    optional func chatConversation(conversation: SIMChatConversation, didRemoveMessage message: SIMChatMessage)
-    optional func chatConversation(conversation: SIMChatConversation, didUpdateMessage message: SIMChatMessage)
+    // send
+    // remove
+    // update
+    // query + block
     
-    optional func chatConversation(conversation: SIMChatConversation, didQueryMessages messages: [SIMChatMessage])
-    
-    optional func chatConversation(conversation: SIMChatConversation, didSendFailWithError error: NSError?)
-    optional func chatConversation(conversation: SIMChatConversation, didQueryFailWithError error: NSError?)
 }
+
+let SIMChatConversationMessageDidRecive = "SIMChatConversationMessageDidRecive"
+let SIMChatConversationMessageDidRemove = "SIMChatConversationMessageDidRemove"
+let SIMChatConversationMessageDidUpdate = "SIMChatConversationMessageDidUpdate"
+

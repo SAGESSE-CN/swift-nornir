@@ -287,26 +287,54 @@ extension SIMChatViewController {
 //            }
 //        }
     }
+
+    /// 构建
+    func buildOfMessage() {
+        SIMLog.trace()
+        
+        // 聊天内容
+        self.registerClass(SIMChatCellText.self,    SIMChatMessageContentText.self)
+        self.registerClass(SIMChatCellAudio.self,   SIMChatMessageContentAudio.self)
+        self.registerClass(SIMChatCellImage.self,   SIMChatMessageContentImage.self)
+        // 辅助
+        self.registerClass(SIMChatCellTips.self,    SIMChatMessageContentTips.self)
+        self.registerClass(SIMChatCellDate.self,    SIMChatMessageContentDate.self)
+        // 默认
+        self.registerClass(SIMChatCellUnknow.self,  SIMChatMessageContentUnknow.self)
+        
+        let center = SIMChatNotificationCenter.self
+        // add kvo
+        center.addObserver(self, selector: "onMessageOfRecive:", name: SIMChatConversationMessageDidRecive)
+        center.addObserver(self, selector: "onMessageOfRemove:", name: SIMChatConversationMessageDidRemove)
+        center.addObserver(self, selector: "onMessageOfUpdate:", name: SIMChatConversationMessageDidUpdate)
+    }
 }
 
 // MARK: - Message Conversation
-extension SIMChatViewController : SIMChatConversationDelegate {
-    /// 发送消息通知
-    func chatConversation(conversation: SIMChatConversation, didSendMessage message: SIMChatMessage) {
-        dispatch_async(dispatch_get_main_queue()) {
-            self.appendMessage(message)
-        }
-    }
+extension SIMChatViewController {
     /// 新消息通知
-    func chatConversation(conversation: SIMChatConversation, didReceiveMessage message: SIMChatMessage) {
-        dispatch_async(dispatch_get_main_queue()) {
-            self.appendMessage(message)
+    func onMessageOfRecive(sender: NSNotification) {
+        // 真的是他的?
+        guard let m = sender.object as? SIMChatMessage where m.recver == conversation.recver else {
+            return
         }
+        self.appendMessage(m)
     }
-    /// 删除通知
-    func chatConversation(conversation: SIMChatConversation, didRemoveMessage message: SIMChatMessage) {
-        // 己删除  
-        self.deleteRows(message)
+    /// 删除消息通知
+    func onMessageOfRemove(sender: NSNotification) {
+        // 真的是他的?
+        guard let m = sender.object as? SIMChatMessage where m.recver == conversation.recver else {
+            return
+        }
+        self.deleteRows(m)
+    }
+    /// 更新消息通知
+    func onMessageOfUpdate(sender: NSNotification) {
+        // 真的是他的?
+        guard let m = sender.object as? SIMChatMessage where m.recver == conversation.recver else {
+            return
+        }
+        self.reloadRows(m)
     }
 }
 

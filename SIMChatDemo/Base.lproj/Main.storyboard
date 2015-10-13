@@ -121,7 +121,6 @@
         <!--T!-->
         <scene sceneID="0XF-cG-TzQ">
             <objects>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="dvL-fD-J2k" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <tableViewController id="8Tu-L7-ErK" customClass="SDChatConversationViewController" customModule="SIMChat" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="static" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" id="qq9-Ig-SDj">
                         <rect key="frame" x="0.0" y="64" width="320" height="504"/>
@@ -165,6 +164,7 @@
                         <outlet property="t1" destination="hp5-dJ-b0B" id="q5j-3U-amC"/>
                     </connections>
                 </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="dvL-fD-J2k" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="643" y="318"/>
         </scene>

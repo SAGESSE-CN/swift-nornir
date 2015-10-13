@@ -17,9 +17,7 @@ class SIMChatMessage: NSObject {
     }
     
     /// 消息
-    var id = NSUUID().UUIDString
-    var type = 0
-    var target: String?
+    lazy var identifier = NSUUID().UUIDString
     
     /// 发送者, 如果发送者为空, 视为系统消息
     var sender: SIMChatUser?                              // 为nil, 自动隐藏名字
@@ -74,9 +72,6 @@ extension SIMChatMessage {
     /// 生成时间
     func makeDateWithMessage(m: SIMChatMessage) {
         
-        self.type = m.type
-        self.target = m.target
-        
         self.sender = nil
         self.sentTime = m.sentTime
         self.sentStatus = .Unknow
@@ -107,7 +102,7 @@ extension SIMChatMessage {
 /// 操作符重载
 ///
 func ==(lhs: SIMChatMessage?, rhs: SIMChatMessage?) -> Bool {
-    return lhs === rhs || lhs?.id == rhs?.id
+    return lhs === rhs || lhs?.identifier == rhs?.identifier
 }
 
 /// 消息状态改变通告

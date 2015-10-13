@@ -17,11 +17,12 @@ class SIMChatViewController: SIMViewController {
     init(conversation: SIMChatConversation) {
         super.init(nibName: nil, bundle: nil)
         self.conversation = conversation
-        self.conversation.delegate = self
     }
     /// 释放
     deinit {
         SIMLog.trace()
+        // 确保必须为空
+        SIMChatNotificationCenter.removeObserver(self)
     }
     /// 构建
     override func build() {
@@ -29,15 +30,7 @@ class SIMChatViewController: SIMViewController {
         
         super.build()
         
-        // 聊天内容
-        self.registerClass(SIMChatCellText.self,    SIMChatMessageContentText.self)
-        self.registerClass(SIMChatCellAudio.self,   SIMChatMessageContentAudio.self)
-        self.registerClass(SIMChatCellImage.self,   SIMChatMessageContentImage.self)
-        // 辅助
-        self.registerClass(SIMChatCellTips.self,    SIMChatMessageContentTips.self)
-        self.registerClass(SIMChatCellDate.self,    SIMChatMessageContentDate.self)
-        // 默认
-        self.registerClass(SIMChatCellUnknow.self,  SIMChatMessageContentUnknow.self)
+        self.buildOfMessage()
     }
     /// 加载完成
     override func viewDidLoad() {
@@ -118,10 +111,7 @@ class SIMChatViewController: SIMViewController {
     /// 最新的消息
     var latest: SIMChatMessage?
     /// 会话
-    var conversation: SIMChatConversation! {
-        willSet { self.conversation?.delegate = nil }
-        didSet  { self.conversation?.delegate = self }
-    }
+    var conversation: SIMChatConversation!
     
     private(set) lazy var maskView = UIView()
     private(set) lazy var tableView = UITableView()
