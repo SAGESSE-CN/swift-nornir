@@ -63,7 +63,7 @@ class SIMChatCellAudio: SIMChatCellBubble {
     /// :param: u   当前用户
     /// :param: m   需要显示的消息
     ///
-    override func reloadData(m: SIMChatMessage, ofUser u: SIMChatUser?) {
+    override func reloadData(m: SIMChatMessage, ofUser u: SIMChatUser2?) {
         super.reloadData(m, ofUser: u)
         // 更新内容
         if let ctx = m.content as? SIMChatMessageContentAudio {

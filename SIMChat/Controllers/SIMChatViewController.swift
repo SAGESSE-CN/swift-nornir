@@ -17,6 +17,7 @@ class SIMChatViewController: SIMViewController {
     init(conversation: SIMChatConversation) {
         super.init(nibName: nil, bundle: nil)
         self.conversation = conversation
+        self.conversation.delegate = self
     }
     /// 释放
     deinit {
@@ -111,7 +112,10 @@ class SIMChatViewController: SIMViewController {
     /// 最新的消息
     var latest: SIMChatMessage?
     /// 会话
-    var conversation: SIMChatConversation!
+    var conversation: SIMChatConversation! {
+        willSet { conversation.delegate = nil  }
+        didSet  { conversation.delegate = self }
+    }
     
     private(set) lazy var maskView = UIView()
     private(set) lazy var tableView = UITableView()

@@ -252,42 +252,6 @@ extension SIMChatViewController {
             // 更新未读数量
         }
     }
-    ///
-    /// 加载聊天历史
-    ///
-    func loadHistorys(count: Int, latest: SIMChatMessage? = nil) {
-        SIMLog.trace()
-        self.insertRows(self.conversation.messages, atIndex: 0)
-//        // 查询: )
-//        self.conversation.query(count, latest: latest) { [weak self] ms, e in
-//            // 查询成功了? 
-//            if let ms = ms as? [SIMChatMessage] where self != nil {
-//                // 插入
-//                self?.insertRows(ms.reverse(), atIndex: 0, animated: latest != nil)
-//                self?.latest = ms.last
-//                // 这是第一次
-//                if latest == nil {
-                    // 有多行
-                    let cnt = self.tableView.numberOfRowsInSection(0) ?? 0
-                    if cnt != 0 {
-                        // 有多行?
-                        let idx = NSIndexPath(forRow: cnt - 1, inSection: 0)
-                        self.tableView.scrollToRowAtIndexPath(idx, atScrollPosition: .Bottom, animated: false)
-                    }
-                    // 淡入
-                    self.tableView.alpha = 0
-                    UIView.animateWithDuration(0.25) {
-                        self.tableView.alpha = 1
-                    }
-//                    // 标记为己读
-//                    if let m = ms.first {
-//                        self?.conversation.read(m)
-//                    }
-//                }
-//            }
-//        }
-    }
-
     /// 构建
     func buildOfMessage() {
         SIMLog.trace()
@@ -301,40 +265,22 @@ extension SIMChatViewController {
         self.registerClass(SIMChatCellDate.self,    SIMChatMessageContentDate.self)
         // 默认
         self.registerClass(SIMChatCellUnknow.self,  SIMChatMessageContentUnknow.self)
-        
-        let center = SIMChatNotificationCenter.self
-        // add kvo
-        center.addObserver(self, selector: "onMessageOfRecive:", name: SIMChatConversationMessageDidRecive)
-        center.addObserver(self, selector: "onMessageOfRemove:", name: SIMChatConversationMessageDidRemove)
-        center.addObserver(self, selector: "onMessageOfUpdate:", name: SIMChatConversationMessageDidUpdate)
     }
 }
 
 // MARK: - Message Conversation
-extension SIMChatViewController {
+extension SIMChatViewController : SIMChatConversationDelegate {
     /// 新消息通知
-    func onMessageOfRecive(sender: NSNotification) {
-        // 真的是他的?
-        guard let m = sender.object as? SIMChatMessage where m.recver == conversation.recver else {
-            return
-        }
-        self.appendMessage(m)
+    func chatConversation(conversation: SIMChatConversation, didReciveMessage message: SIMChatMessage) {
+        self.appendMessage(message)
     }
     /// 删除消息通知
-    func onMessageOfRemove(sender: NSNotification) {
-        // 真的是他的?
-        guard let m = sender.object as? SIMChatMessage where m.recver == conversation.recver else {
-            return
-        }
-        self.deleteRows(m)
+    func chatConversation(conversation: SIMChatConversation, didRemoveMessage message: SIMChatMessage) {
+        self.deleteRows(message)
     }
     /// 更新消息通知
-    func onMessageOfUpdate(sender: NSNotification) {
-        // 真的是他的?
-        guard let m = sender.object as? SIMChatMessage where m.recver == conversation.recver else {
-            return
-        }
-        self.reloadRows(m)
+    func chatConversation(conversation: SIMChatConversation, didUpdateMessage message: SIMChatMessage) {
+        self.reloadRows(message)
     }
 }
 
@@ -396,6 +342,41 @@ extension SIMChatViewController {
         // 发送
         self.conversation?.send(data)
     }
+    ///
+    /// 加载聊天历史
+    ///
+    func loadHistorys(count: Int, last: SIMChatMessage? = nil) {
+        SIMLog.trace()
+        self.conversation.query(count, last: last, finish: { [weak self] ms in
+            // 插入
+            self?.insertRows(ms.reverse(), atIndex: 0, animated: last != nil)
+            self?.latest = ms.last
+            // 这是第一次
+            if last == nil {
+                // 有多行
+                let cnt = self?.tableView.numberOfRowsInSection(0) ?? 0
+                if cnt != 0 {
+                    // 有多行?
+                    let idx = NSIndexPath(forRow: cnt - 1, inSection: 0)
+                    self?.tableView.scrollToRowAtIndexPath(idx, atScrollPosition: .Bottom, animated: false)
+                }
+                // 淡入
+                self?.tableView.alpha = 0
+                UIView.animateWithDuration(0.25) {
+                    self?.tableView.alpha = 1
+                }
+                // 标记为己读
+                if let m = ms.first {
+                    self?.conversation.read(m)
+                }
+            }
+        }, fail: nil)
+//        self.insertRows(self.conversation.messages, atIndex: 0)
+//        // 查询: )
+//        self.conversation.query(count, latest: latest) { [weak self] ms, e in
+//        }
+    }
+
 }
 
 // MARK: - Message Cell Event 

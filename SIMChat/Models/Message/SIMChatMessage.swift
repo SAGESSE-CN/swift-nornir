@@ -20,13 +20,13 @@ class SIMChatMessage: NSObject {
     lazy var identifier = NSUUID().UUIDString
     
     /// 发送者, 如果发送者为空, 视为系统消息
-    var sender: SIMChatUser?                              // 为nil, 自动隐藏名字
+    var sender: SIMChatUser2?                              // 为nil, 自动隐藏名字
     var sentTime: NSDate = .zero                          // 为0
     /// 消息发送状态. Warning: 尽量不要去修改他
     var sentStatus: SIMChatMessageSentStatus = .Unknow
     
     /// 接收者, 如果接收者为空, 视为广播信息
-    var recver: SIMChatUser?
+    var recver: SIMChatUser2?
     var recvTime: NSDate = .zero
     /// 消息接收状态. Warning: 尽量不要去修改他
     var recvStatus: SIMChatMessageRecvStatus = .Unknow

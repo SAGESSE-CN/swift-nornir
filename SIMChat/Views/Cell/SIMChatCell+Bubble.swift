@@ -26,7 +26,7 @@ class SIMChatCellBubble: SIMChatCell {
     deinit {
         removeObserver(self, forKeyPath: "visitCardView.hidden")
         // :)
-        SIMChatNotificationCenter.removeObserver(self, name: SIMChatUserInfoChangedNotification)
+        SIMChatNotificationCenter.removeObserver(self, name: SIMChatUser2InfoChangedNotification)
         SIMChatNotificationCenter.removeObserver(self, name: SIMChatMessageStatusChangedNotification)
     }
     /// 构建
@@ -95,7 +95,7 @@ class SIMChatCellBubble: SIMChatCell {
         // add kvos
         addObserver(self, forKeyPath: "visitCardView.hidden", options: .New, context: nil)
         // :)
-        SIMChatNotificationCenter.addObserver(self, selector: "onUserInfoChanged:", name: SIMChatUserInfoChangedNotification)
+        SIMChatNotificationCenter.addObserver(self, selector: "onUserInfoChanged:", name: SIMChatUser2InfoChangedNotification)
         SIMChatNotificationCenter.addObserver(self, selector: "onMessageStateChanged:", name: SIMChatMessageStatusChangedNotification)
         
         // add events
@@ -114,7 +114,7 @@ class SIMChatCellBubble: SIMChatCell {
     /// :param: u   当前用户
     /// :param: m   需要显示的消息
     ///
-    override func reloadData(m: SIMChatMessage, ofUser u: SIMChatUser?) {
+    override func reloadData(m: SIMChatMessage, ofUser u: SIMChatUser2?) {
         // 更新数据
         super.reloadData(m, ofUser: u)
         // 关于名片显示
@@ -184,7 +184,7 @@ extension SIMChatCellBubble {
             return
         }
         // 改变的是他
-        if let u = sender.object as? SIMChatUser where u == message.sender {
+        if let u = sender.object as? SIMChatUser2 where u == message.sender {
             // 更新sender, 防止同步错误
             message.sender = u
             // 关于头像

@@ -20,7 +20,7 @@ extension SDChatManager {
     ///
     /// :param: recver 接收者
     ///
-    override func conversationWithRecver(recver: SIMChatUser) -> SDChatConversation {
+    override func conversationWithRecver(recver: SIMChatUser2) -> SDChatConversation {
         return super.conversationWithRecver(recver) as! SDChatConversation
     }
     ///
@@ -35,7 +35,7 @@ extension SDChatManager {
     /// 创建会话
     /// :param: recver 接收者
     ///
-    override func conversationOfMake(recver: SIMChatUser) -> SDChatConversation {
-        return SDChatConversation(recver: recver, sender: user)
+    override func conversationOfMake(recver: SIMChatUser2) -> SDChatConversation {
+        return SDChatConversation(recver: recver, manager: self)
     }
 }

@@ -1,5 +1,5 @@
 //
-//  SIMChatUser.swift
+//  SIMChatUser2.swift
 //  SIMChat
 //
 //  Created by sagesse on 9/19/15.
@@ -12,7 +12,7 @@ import UIKit
 /// ### 用户模型
 /// - TODO: 其他属性以后再扩展
 ///
-class SIMChatUser: NSObject {
+class SIMChatUser2: NSObject {
     
     /// 初始化
     init(identifier: String, name: String? = nil, gender: Int = 0, portrait: NSURL? = nil) {
@@ -38,9 +38,9 @@ class SIMChatUser: NSObject {
 }
 
 /// assign
-extension SIMChatUser {
+extension SIMChatUser2 {
     /// 覆盖
-    func assign(other: SIMChatUser) {
+    func assign(other: SIMChatUser2) {
         self.identifier = other.identifier
         self.name = other.name
         self.portrait = other.portrait
@@ -50,6 +50,6 @@ extension SIMChatUser {
 }
 
 /// 比较两个用户
-func ==(lhs: SIMChatUser?, rhs: SIMChatUser?) -> Bool {
+func ==(lhs: SIMChatUser2?, rhs: SIMChatUser2?) -> Bool {
     return lhs === rhs || lhs?.identifier == rhs?.identifier
 }

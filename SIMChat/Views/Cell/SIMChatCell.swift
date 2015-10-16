@@ -33,7 +33,7 @@ class SIMChatCell: SIMTableViewCell {
     /// :param: u   当前用户
     /// :param: m   需要显示的消息
     ///
-    func reloadData(m: SIMChatMessage, ofUser u: SIMChatUser?) {
+    func reloadData(m: SIMChatMessage, ofUser u: SIMChatUser2?) {
         // 更新用户数据 
         self.user = u
         self.message = m
@@ -74,7 +74,7 @@ class SIMChatCell: SIMTableViewCell {
     /// 代理.
     weak var delegate: SIMChatCellDelegate?
     
-    private(set) var user: SIMChatUser?                // 当前用户
+    private(set) var user: SIMChatUser2?                // 当前用户
     private(set) var message: SIMChatMessage?          // 关联的消息
     
     private(set) static var createdCount = 0

@@ -27,8 +27,8 @@ class SDChatConversationViewController: UITableViewController {
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         tableView.deselectRowAtIndexPath(indexPath, animated: true)
         
-        let s = SIMChatUser(identifier: "self", name: "self", gender: 1, portrait: nil)
-        let o = SIMChatUser(identifier: "other", name: "other", gender: 2)
+        let s = SIMChatUser2(identifier: "self", name: "self", gender: 1, portrait: nil)
+        let o = SIMChatUser2(identifier: "other", name: "other", gender: 2)
         let m = SDChatManager.sharedManager
         
         //
@@ -37,10 +37,10 @@ class SDChatConversationViewController: UITableViewController {
         let cv = m.conversationWithRecver(o)
         let cc = SDChatViewController(conversation: cv)
         
-        for _ in 0 ..< 20 {
-            let m = SIMChatMessage(SIMChatMessageContentImage(origin: UIImage(named: "t1.jpg")))
-            cv.messages.append(m)
-        }
+//        for _ in 0 ..< 20 {
+//            let m = SIMChatMessage(SIMChatMessageContentImage(origin: UIImage(named: "t1.jpg")))
+//            cv.messages.append(m)
+//        }
         
         // 显示
         self.navigationController?.pushViewController(cc, animated: true)

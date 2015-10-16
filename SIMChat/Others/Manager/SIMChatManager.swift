@@ -14,12 +14,12 @@ import UIKit
 class SIMChatManager: NSObject {
     
     /// 用户管理
-    lazy var userManager = SIMChatUserManager.sharedManager
+    lazy var userManager = SIMChatUser2Manager.sharedManager
     /// 所有的会话缓存
     lazy var allConversations = Dictionary<String, SIMChatConversation>()
     
     /// 当前登录的用户
-    var user: SIMChatUser!
+    var user: SIMChatUser2!
     
     /// 单例
     static let sharedManager = SIMChatManager()
@@ -30,7 +30,7 @@ extension SIMChatManager {
     ///
     /// 登入
     ///
-    func login(user: SIMChatUser, finish: (NSError? -> Void)?) {
+    func login(user: SIMChatUser2, finish: (NSError? -> Void)?) {
         // 成功
         self.user = user
         self.userManager[user.identifier] = user
@@ -54,14 +54,22 @@ extension SIMChatManager {
 // MARK: - Message
 extension SIMChatManager {
     /// 发送消息
-    func sendMessage(conversation: SIMChatConversation, message: SIMChatMessage) {
+    func sendMessage(message: SIMChatMessage, finish: (Void -> Void)?, fail: (NSError -> Void)?) {
         // 发送成功
         // 发送失败
+        SIMLog.debug()
+    }
+    /// 删除消息
+    func removeMessage(message: SIMChatMessage,  finish: (Void -> Void)?, fail: (NSError -> Void)?) {
+        SIMLog.debug()
+    }
+    /// 更新消息
+    func updateMessage(message: SIMChatMessage,  finish: (Void -> Void)?, fail: (NSError -> Void)?) {
+        SIMLog.debug()
     }
     /// 查询消息
-    func queryMessages(conversation: SIMChatConversation, last: SIMChatMessage) {
-        // 查询成功
-        // 查询失败
+    func queryMessages(count: Int, last: SIMChatMessage?, finish: ([SIMChatMessage] -> Void)?, fail: (NSError -> Void)?) {
+        SIMLog.debug()
     }
 }
 
@@ -71,7 +79,7 @@ extension SIMChatManager {
     /// 获取会话, 如果不存在创建
     /// :param: recver 接收者
     ///
-    func conversationWithRecver(recver: SIMChatUser) -> SIMChatConversation {
+    func conversationWithRecver(recver: SIMChatUser2) -> SIMChatConversation {
         // 己经创建
         if let cv = self.allConversations[recver.identifier] {
             return cv
@@ -98,7 +106,7 @@ extension SIMChatManager {
     ///
     /// :param: recver 删除和接收者相关的会话
     ///
-    func conversationOfRemove(recver: SIMChatUser) {
+    func conversationOfRemove(recver: SIMChatUser2) {
         self.allConversations.removeValueForKey(recver.identifier)
     }
     ///
@@ -111,7 +119,7 @@ extension SIMChatManager {
     /// 创建会话
     /// :param: recver 接收者
     ///
-    func conversationOfMake(recver: SIMChatUser) -> SIMChatConversation {
-        return SIMChatConversation(recver: recver, sender: user)
+    func conversationOfMake(recver: SIMChatUser2) -> SIMChatConversation {
+        return SIMChatConversation(recver: recver, manager: self)
     }
 }

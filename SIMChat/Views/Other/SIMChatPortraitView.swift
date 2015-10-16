@@ -49,7 +49,7 @@ class SIMChatPortraitView: SIMView {
         contentView.layer.cornerRadius = contentView.bounds.width / 2
     }
     /// 关联的用户
-    var user: SIMChatUser? {
+    var user: SIMChatUser2? {
         didSet {
             contentView.image = self.defaultPortrait
         }
