@@ -13,160 +13,124 @@ import UIKit
 ///
 class SIMChatConversation: NSObject {
     /// 初始化
-    init(recver: SIMChatUser2, manager: SIMChatManager) {
-        
-        self.manager = manager
-        self.recver = recver
-        
+    init(receiver: SIMChatUserProtocol, sender: SIMChatUserProtocol) {
+        self.receiver = receiver
+        self.sender = sender
         super.init()
     }
-    
-    /// 管理器(保留联系)
-    weak var manager: SIMChatManager!
+    /// 代理
     weak var delegate: SIMChatConversationDelegate?
     
-    /// 发送者
-    var sender: SIMChatUser2 { return manager.user }
-    /// 接收者
-    private(set) var recver: SIMChatUser2
+    private(set) var sender: SIMChatUserProtocol
+    private(set) var receiver: SIMChatUserProtocol
     
     /// 消息
     private(set) lazy var messages = Array<SIMChatMessage>()
 }
 
-// MARK: - Initiative
-extension SIMChatConversation {
+// MARK: - Protocol
+extension SIMChatConversation : SIMChatConversationProtocol {
     ///
-    /// 发送一条消息
+    /// 查询消息
     ///
-    func send(content: AnyObject) {
-        SIMLog.trace()
-        // 生成
-        let m = SIMChatMessage(content)
-        // 填写发送信息
-        m.sender = self.sender
-        m.sentTime = .now
-        m.sentStatus = .Sending
-        // 填写接收者信息
-        m.recver = self.recver
-        m.recvTime = .now
-        m.recvStatus = .Unknow
-        
-        self.recived(m)
-        self.manager.sendMessage(m, finish: {
-            // 发送成功
-            m.sentStatus = .Sent
-            self.updated(m)
-        }, fail: { e in
-            // 发送失败
-            m.sentStatus = .Failed
-            self.updated(m)
-        })
-    }
-    ///
-    /// 重新发送
-    ///
-    func resend(m: SIMChatMessage) {
-        // 必须要存在的才能重新发送
-        guard let idx = messages.indexOf(m) else {
-            
+    func queryMessages(total: Int, last: SIMChatMessage?, _ finish: ([SIMChatMessage] -> Void)?, _ fail: SIMChatFailBlock?) {
+        SIMLog.trace("last: \(last)")
+        // 如果last为nil, 从0开始
+        // 如果last不为nil, 从last的下一个开始
+        // 如果last不能找到, 从最后开始
+        // 起点
+        let sp = (last != nil) ? ((messages.indexOf(last!) ?? messages.count - 1) + 1) : 0
+        let ts = messages[sp ..<  min(sp + min(messages.count - sp, count), messages.count)]
+        // 缓存了?
+        if ts.count >= total {
+            finish?(Array<SIMChatMessage>(ts))
             return
         }
-        SIMLog.trace()
+        // 加载更多
+        finish?(Array<SIMChatMessage>(ts))
+    }
+    ///
+    /// 发送消息
+    ///
+    func sendMessage(m: SIMChatMessage, isResend: Bool, _ finish: SIMChatFinishBlock?, _ fail: SIMChatFailBlock?) {
+        SIMLog.trace("resend: \(isResend)")
         // 填写发送信息
         m.sender = self.sender
         m.sentTime = .now
-        m.sentStatus = .Sending
-        // 填写接收者信息
-        m.recver = self.recver
-        m.recvTime = .now
-        m.recvStatus = .Unknow
+        // 填写接收信息
+        m.receiver = self.receiver
+        m.receiveTime = .now
+        // 填写当前状态
+        m.owns = true
+        m.status = .Sending
         // 调整结构
-        self.messages.removeAtIndex(idx)
-        self.messages.insert(m, atIndex: 0)
-        
-        self.updated(m)
-        self.manager.sendMessage(m, finish: {
-            // 发送成功
-            m.sentStatus = .Sent
-            self.updated(m)
-        }, fail: { e in
-            // 发送失败
-            m.sentStatus = .Failed
-            self.updated(m)
-        })
+        if isResend {
+            // 如果真的存在
+            if let idx = self.messages.indexOf(m) {
+                // 调整他的位置
+                self.messages.removeAtIndex(idx)
+                self.messages.insert(m, atIndex: 0)
+                // 请求更新
+                self.updateMessageForRemote(m)
+            }
+        } else {
+            // 不需要insert, 因为由reciveMessage来insert
+            // 收到了一条新消息
+            self.reciveMessageForRemote(m)
+        }
+        // 直接完成
+        finish?()
     }
     ///
     /// 删除消息
+    /// 只是调用removeMessageForRemote然后完成
     ///
-    func remove(m: SIMChatMessage) {
-        SIMLog.trace()
-        // 删除
-        self.manager.removeMessage(m, finish: {
-            self.removed(m)
-        }, fail: { e in
-            // 出错了
-            self.removed(m)
-        })
+    func removeMessage(m: SIMChatMessage, _ finish: SIMChatFinishBlock?, _ fail: SIMChatFailBlock?) {
+        // 要求删除
+        self.removeMessageForRemote(m)
+        // 直接完成
+        finish?()
     }
     ///
-    /// 更新消息
+    /// 标记消息为己读
     ///
-    func read(m: SIMChatMessage) {
-        SIMLog.trace()
-        // 更新为己读
-        m.recvStatus = .Read
-        // 更新
-        self.manager.updateMessage(m, finish: {
-            self.updated(m)
-        }, fail: { e in
-            // 出错了
-            self.updated(m)
-        })
+    func readMessage(m: SIMChatMessage, _ finish: SIMChatFinishBlock?, _ fail: SIMChatFailBlock?) {
+        // :)
+        m.status = .Read
+        m.statusChanged()
+        // 要求删除
+        self.updateMessageForRemote(m)
+        // 直接完成
+        finish?()
     }
-    /// 查询消息
-    func query(count: Int, last: SIMChatMessage?, finish: ([SIMChatMessage] -> Void)?, fail: (NSError -> Void)?) {
-        SIMLog.trace()
-        // 真的需要查询?
-        self.manager.queryMessages(count, last: last, finish: { ms in
-            // 更新
-            self.messages.insertContentsOf(ms, at: self.messages.endIndex)
-            // 完成
-            finish?(ms)
-        }, fail: fail)
-    }
-}
-
-// MARK: - Passive
-extension SIMChatConversation {
     ///
-    /// 新消息
+    /// 远端获取到了一条消息
     ///
-    func recived(m: SIMChatMessage) {
+    func reciveMessageForRemote(m: SIMChatMessage) {
         // 保存
-        messages.insert(m, atIndex: 0)
+        self.messages.insert(m, atIndex: 0)
         // 发出通知
-        delegate?.chatConversation?(self, didReciveMessage: m)
+        self.delegate?.chatConversation?(self, didReciveMessage: m)
     }
     ///
-    /// 删除
+    /// 远端要求删除一条消息
     ///
-    func removed(m: SIMChatMessage) {
+    func removeMessageForRemote(m: SIMChatMessage) {
         // 必须要存在的才能删除
-        guard let idx = messages.indexOf(m) else {
+        guard let idx = self.messages.indexOf(m) else {
             return
         }
         // 删除
         self.messages.removeAtIndex(idx)
         // 发出通知
-        delegate?.chatConversation?(self, didUpdateMessage: m)
+        self.delegate?.chatConversation?(self, didRemoveMessage: m)
     }
     ///
-    /// 更新
+    /// 远端要求更新一条消息
     ///
-    func updated(m: SIMChatMessage) {
+    func updateMessageForRemote(m: SIMChatMessage) {
         // 发出通知
-        delegate?.chatConversation?(self, didUpdateMessage: m)
+        self.delegate?.chatConversation?(self, didUpdateMessage: m)
     }
 }
 
@@ -191,14 +155,5 @@ extension SIMChatConversation {
         // TODO: 未读记数
         return 0
     }
-}
-
-
-/// 代理
-@objc protocol SIMChatConversationDelegate : NSObjectProtocol {
-   
-    optional func chatConversation(conversation: SIMChatConversation, didReciveMessage message: SIMChatMessage)
-    optional func chatConversation(conversation: SIMChatConversation, didRemoveMessage message: SIMChatMessage)
-    optional func chatConversation(conversation: SIMChatConversation, didUpdateMessage message: SIMChatMessage)
 }
 

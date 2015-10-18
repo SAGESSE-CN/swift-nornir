@@ -40,16 +40,18 @@ class SIMChatCellText: SIMChatCellBubble {
     /// :param: u   当前用户
     /// :param: m   需要显示的消息
     ///
-    override func reloadData(m: SIMChatMessage, ofUser u: SIMChatUser2?) {
-        super.reloadData(m, ofUser: u)
+    override func reloadData(m: SIMChatMessage) {
+        super.reloadData(m)
         // 更新文本
         if let content = m.content as? SIMChatMessageContentText {
             // 发生了改变?
-            if self.contentLabel.attributedText?.hashValue != content.attributedText?.hashValue {
-                self.contentLabel.attributedText = content.attributedText
-                self.contentLabel.preferredMaxLayoutWidth = 0
-                self.makeEmojiViews()
-            }
+            self.contentLabel.text = content.text
+            self.contentLabel.preferredMaxLayoutWidth = 0
+//            if self.contentLabel.attributedText?.hashValue != content.attributedText?.hashValue {
+//                self.contentLabel.attributedText = content.attributedText
+//                self.contentLabel.preferredMaxLayoutWidth = 0
+//                //self.makeEmojiViews()
+//            }
         }
     }
     ///

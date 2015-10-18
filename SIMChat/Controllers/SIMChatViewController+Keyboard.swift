@@ -255,7 +255,7 @@ extension SIMChatViewController : SIMChatKeyboardAudioDelegate {
     }
     /// 得到结果
     func chatKeyboardAudioDidFinish(chatKeyboardAudio: SIMChatKeyboardAudio, url: NSURL, duration: NSTimeInterval) {
-        self.send(audio: url, duration: duration)
+        self.sendMessageForAudio(url, duration: duration)
     }
 }
 
@@ -280,7 +280,7 @@ extension SIMChatViewController : SIMChatTextFieldDelegate {
     /// ok
     func chatTextFieldShouldReturn(chatTextField: SIMChatTextField) -> Bool {
         // 发送.
-        self.send(text: self.textField.text ?? "")
+        self.sendMessageForText(self.textField.text ?? "")
         self.textField.text = nil
         // 不可能return
         return false
@@ -296,8 +296,8 @@ extension SIMChatViewController : UIImagePickerControllerDelegate, UINavigationC
         // 关闭窗口
         picker.dismissViewControllerAnimated(true) {
             // 必须关闭完成才发送, = 。 =
-            if image != nil { 
-                self.send(image: image!)
+            if image != nil {
+                self.sendMessageForImage(image!)
             }
         }
     }

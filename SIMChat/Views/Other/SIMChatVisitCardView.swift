@@ -38,7 +38,7 @@ class SIMChatVisitCardView: SIMView {
         addConstraints(NSLayoutConstraintMake("V:|-(0)-[t]-(0)-|", views: vs))
     }
     /// 关联的用户
-    var user: SIMChatUser2? {
+    var user: SIMChatUserProtocol? {
         willSet {
             titleLabel.text = newValue?.name ?? newValue?.identifier ?? "<Unknow>"
         }

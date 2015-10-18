@@ -114,20 +114,18 @@ class SIMChatCellBubble: SIMChatCell {
     /// :param: u   当前用户
     /// :param: m   需要显示的消息
     ///
-    override func reloadData(m: SIMChatMessage, ofUser u: SIMChatUser2?) {
+    override func reloadData(m: SIMChatMessage) {
         // 更新数据
-        super.reloadData(m, ofUser: u)
+        super.reloadData(m)
         // 关于名片显示
-        if !m.hiddenName && m.sender != nil {
-            // 显示名片
-            self.visitCardView.hidden = m.sender == u
-        } else {
+        if let h = m.hiddenContact {
             // 隐藏名片
-            self.visitCardView.hidden = true
+            self.visitCardView.hidden = h
+        } else {
+            self.visitCardView.hidden = m.owns
         }
         // 关于头像
         self.portraitView.user = m.sender
-        // 关于名片
         self.visitCardView.user = m.sender
         // 关于状态
         self.onMessageStateChanged(nil)
@@ -184,7 +182,7 @@ extension SIMChatCellBubble {
             return
         }
         // 改变的是他
-        if let u = sender.object as? SIMChatUser2 where u == message.sender {
+        if let u = sender.object as? SIMChatUserProtocol where u == message.sender {
             // 更新sender, 防止同步错误
             message.sender = u
             // 关于头像
@@ -203,25 +201,16 @@ extension SIMChatCellBubble {
         if sender != nil && sender!.object !== message {
             return
         }
-        var status = SIMChatStatus.None
         // 检查状态
-        if message.sender == self.user {
-            // 如果是自己, 取发送状态
-            if message.sentStatus == .Failed {
-                status = .Failed
-            } else if message.sentStatus == .Sending {
-                status = .Waiting
-            }
-        } else {
-            // 不是自己, 取接收状态
-            if message.recvStatus == .Failed {
-                status = .Failed
-            } else if message.recvStatus == .Downloading {
-                status = .Waiting
-            }
+        switch message.status {
+        case .Error:
+            self.stateView.status = .Failed
+        case .Sending:      fallthrough
+        case .Receiving:
+            self.stateView.status = .Waiting
+        default:
+            self.stateView.status = .None
         }
-        // 更新
-        self.stateView.status = status
     }
 }
 

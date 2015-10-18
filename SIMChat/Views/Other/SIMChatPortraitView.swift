@@ -49,7 +49,7 @@ class SIMChatPortraitView: SIMView {
         contentView.layer.cornerRadius = contentView.bounds.width / 2
     }
     /// 关联的用户
-    var user: SIMChatUser2? {
+    var user: SIMChatUserProtocol? {
         didSet {
             contentView.image = self.defaultPortrait
         }
@@ -57,7 +57,7 @@ class SIMChatPortraitView: SIMView {
     /// 
     private var defaultPortrait: UIImage? {
         // 如果性别为女, 显示2号头像
-        if self.user?.gender == 2 {
+        if let u = self.user as? SIMChatUser where u.gender == .Female {
             return SIMChatImageManager.defaultPortrait2
         }
         // 否则

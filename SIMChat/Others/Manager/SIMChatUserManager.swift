@@ -13,13 +13,14 @@ import UIKit
 ///
 class SIMChatUser2Manager: NSObject {
     /// 获取用户
-    subscript (identifier: String) -> SIMChatUser2 {
+    subscript (identifier: String) -> SIMChatUserProtocol {
         set {
             // 更新
-            if let oldValue = self.caches.updateValue(newValue, forKey: identifier) {
-                // 覆盖更新
-                oldValue.assign(newValue)
-            }
+//            if let oldValue = self.caches.updateValue(newValue, forKey: identifier) {
+//                // 覆盖更新
+//                // TODO: update
+//                //oldValue.assign(newValue)
+//            }
             // 改变了, 发出通知
             SIMChatNotificationCenter.postNotificationName(SIMChatUser2InfoChangedNotification, object: newValue)
         }
@@ -29,7 +30,7 @@ class SIMChatUser2Manager: NSObject {
                 return user
             }
             // 没有缓存
-            let user = SIMChatUser2(identifier: identifier)
+            let user = SIMChatUser(identifier: identifier, name: nil, portrait: nil, gender: .Unknow)
             // 请求详情
             self.delegate?.chatUserManager?(self, willRequestDetailInfo: user)
             // 先认为是请求完成的避免重复请求
@@ -39,7 +40,7 @@ class SIMChatUser2Manager: NSObject {
         }
     }
     /// 用户信息缓存
-    var caches = Dictionary<String, SIMChatUser2>()
+    var caches = Dictionary<String, SIMChatUserProtocol>()
     /// 缓存的用户数量
     var count: Int {
         return caches.count
@@ -54,7 +55,7 @@ class SIMChatUser2Manager: NSObject {
 
 // Delegate
 @objc protocol SIMChatUser2ManagerDelegate : NSObjectProtocol {
-    optional func chatUserManager(chatUserManager: SIMChatUser2Manager, willRequestDetailInfo user: SIMChatUser2)
+    optional func chatUserManager(chatUserManager: SIMChatUser2Manager, willRequestDetailInfo user: SIMChatUserProtocol)
 }
 
 /// 用户信息改变通知 

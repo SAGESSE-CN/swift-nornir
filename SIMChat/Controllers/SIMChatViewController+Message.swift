@@ -19,7 +19,7 @@ extension SIMChatViewController {
     func registerClass(cell: SIMChatCell.Type, _ model: AnyClass) {
         let key = NSStringFromClass(model)
         
-        SIMLog.debug("\(key) => \(cell)")
+        SIMLog.debug("\(key) => \(NSStringFromClass(cell))")
         // 保存起来
         self.relations[key] = cell
         // 注册到tabelView
@@ -75,7 +75,7 @@ extension SIMChatViewController {
         for m in ms {
             // 两条消息时差为st
             // 那么添加一个时间分隔线
-            if first == nil || fabs(first!.recvTime - m.recvTime) > st {
+            if first == nil || fabs(first!.receiveTime - m.receiveTime) > st {
                 var time: SIMChatMessage!
                 // 如果前面的本来就是时间了.
                 if first?.content is SIMChatMessageContentDate {
@@ -97,7 +97,7 @@ extension SIMChatViewController {
         }
         
         // 检查最后一条数据的时间
-        if first != nil && last != nil && !(fabs(first!.recvTime - last!.recvTime) > st) {
+        if first != nil && last != nil && !(fabs(first!.receiveTime - last!.receiveTime) > st) {
             // 删除 position + fms.count
             source.removeAtIndex(position)
             // 
@@ -229,7 +229,7 @@ extension SIMChatViewController {
     ///
     func appendMessage(m: SIMChatMessage) {
         
-        let isSelf = m.sender == self.conversation.sender
+        let isSelf = m.owns
         let isLasted = (tableView.indexPathsForVisibleRows?.last?.row ?? 0) + 1 == tableView.numberOfRowsInSection(0)
         
         self.insertRows([m], atIndex: -1)
@@ -239,8 +239,10 @@ extension SIMChatViewController {
         // 如果发送者是自己, 转到最后一行
         // 如果发送者是其他人, 并且当前行在最后一行, 转到最后一行
         if isSelf || isLasted {
-            // 更新为己读
-            self.conversation.read(m)
+            // 如果不是正在发送更新为己读
+            if m.status != .Sending {
+                self.conversation.readMessage(m, nil, nil)
+            }
             // ok, 更新
             dispatch_async(dispatch_get_main_queue()) {
                 let cnt = self.tableView.numberOfRowsInSection(0)
@@ -270,17 +272,28 @@ extension SIMChatViewController {
 
 // MARK: - Message Conversation
 extension SIMChatViewController : SIMChatConversationDelegate {
+    
     /// 新消息通知
-    func chatConversation(conversation: SIMChatConversation, didReciveMessage message: SIMChatMessage) {
-        self.appendMessage(message)
+    func chatConversation(conversation: SIMChatConversationProtocol, didReciveMessage message: SIMChatMessage) {
+        dispatch_async(dispatch_get_main_queue()) {
+            self.appendMessage(message)
+        }
     }
+    
     /// 删除消息通知
-    func chatConversation(conversation: SIMChatConversation, didRemoveMessage message: SIMChatMessage) {
-        self.deleteRows(message)
+    func chatConversation(conversation: SIMChatConversationProtocol, didRemoveMessage message: SIMChatMessage) {
+        dispatch_async(dispatch_get_main_queue()) {
+            self.deleteRows(message)
+        }
     }
+    
     /// 更新消息通知
-    func chatConversation(conversation: SIMChatConversation, didUpdateMessage message: SIMChatMessage) {
-        self.reloadRows(message)
+    func chatConversation(conversation: SIMChatConversationProtocol, didUpdateMessage message: SIMChatMessage) {
+        dispatch_async(dispatch_get_main_queue()) {
+            // 需要检查时间
+            // 可能发生了改变
+            self.reloadRows(message)
+        }
     }
 }
 
@@ -289,20 +302,20 @@ extension SIMChatViewController {
     ///
     /// 发送文本
     ///
-    func send(text data: String) {
+    func sendMessageForText(text: String) {
         SIMLog.trace()
         // 不能为空
-        if data.isEmpty {
+        if text.isEmpty {
             let av = UIAlertView(title: "提示", message: "不能发送空内容", delegate: nil, cancelButtonTitle: "好")
             return av.show()
         }
         // 发送
-        self.conversation?.send(SIMChatMessageContentText(text: data))
+        self.sendMessage(SIMChatMessageContentText(text: text))
     }
     ///
     /// 发送声音
     ///
-    func send(audio url: NSURL, duration: NSTimeInterval) {
+    func sendMessageForAudio(url: NSURL, duration: NSTimeInterval) {
         SIMLog.trace()
         if duration < 1 {
             let av = UIAlertView(title: "提示", message: "录音时间太短", delegate: nil, cancelButtonTitle: "好")
@@ -317,7 +330,7 @@ extension SIMChatViewController {
             // 移动文件
             try NSFileManager.defaultManager().moveItemAtURL(url, toURL: nurl)
             // 发送
-            self.conversation?.send(SIMChatMessageContentAudio(url: nurl, duration: duration))
+            self.sendMessage(SIMChatMessageContentAudio(url: nurl, duration: duration))
             
         } catch let e as NSError {
             // 发送失败
@@ -327,27 +340,43 @@ extension SIMChatViewController {
     ///
     /// 发送图片
     ///
-    func send(image data: UIImage) {
+    func sendMessageForImage(image: UIImage) {
         SIMLog.trace()
         // 生成连接(这可以降低内存使用)
         // let nurl = NSURL(fileURLWithPath: String(format: "%@/upload/image/%@.jpg", NSTemporaryDirectory(), NSUUID().UUIDString))
         // 发送
-        self.conversation?.send(SIMChatMessageContentImage(origin: data, thumbnail: data))
+        self.sendMessage(SIMChatMessageContentImage(origin: image, thumbnail: image))
     }
     ///
     /// 发送自定义消息
     ///
-    func send(custom data: AnyObject) {
+    func sendMessageForCustom(data: AnyObject) {
         SIMLog.trace()
-        // 发送
-        self.conversation?.send(data)
+        // :)
+        self.sendMessage(data)
     }
+    ///
+    /// 发送内容(禁止外部访问)
+    ///
+    private func sendMessage(content: AnyObject) {
+        // 真正的发送
+        self.conversation.sendMessage(SIMChatMessage(content), isResend: false, nil, nil)
+    }
+    ///
+    /// 重新发送消息(禁止外部访问)
+    ///
+    private func resendMessage(m: SIMChatMessage) {
+        // 真正的发送
+        self.conversation.sendMessage(m, isResend: true, nil, nil)
+    }
+    
     ///
     /// 加载聊天历史
     ///
-    func loadHistorys(count: Int, last: SIMChatMessage? = nil) {
+    func loadHistorys(total: Int, last: SIMChatMessage? = nil) {
         SIMLog.trace()
-        self.conversation.query(count, last: last, finish: { [weak self] ms in
+        // 查询消息
+        self.conversation.queryMessages(total, last: last, { [weak self] ms in
             // 插入
             self?.insertRows(ms.reverse(), atIndex: 0, animated: last != nil)
             self?.latest = ms.last
@@ -367,14 +396,10 @@ extension SIMChatViewController {
                 }
                 // 标记为己读
                 if let m = ms.first {
-                    self?.conversation.read(m)
+                    self?.conversation.readMessage(m, nil, nil)
                 }
             }
-        }, fail: nil)
-//        self.insertRows(self.conversation.messages, atIndex: 0)
-//        // 查询: )
-//        self.conversation.query(count, latest: latest) { [weak self] ms, e in
-//        }
+        }, nil)
     }
 
 }
@@ -385,8 +410,8 @@ extension SIMChatViewController : SIMChatCellDelegate {
     /// 选择了删除.
     func chatCellDidDelete(chatCell: SIMChatCell) {
         SIMLog.trace()
-        if let msg = chatCell.message {
-            self.deleteRows(msg)
+        if let m = chatCell.message {
+            self.conversation.removeMessage(m, nil, nil)
         }
     }
     /// 选择了复制

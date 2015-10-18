@@ -63,8 +63,8 @@ class SIMChatCellAudio: SIMChatCellBubble {
     /// :param: u   当前用户
     /// :param: m   需要显示的消息
     ///
-    override func reloadData(m: SIMChatMessage, ofUser u: SIMChatUser2?) {
-        super.reloadData(m, ofUser: u)
+    override func reloadData(m: SIMChatMessage) {
+        super.reloadData(m)
         // 更新内容
         if let ctx = m.content as? SIMChatMessageContentAudio {
             titleLabel.text = ctx.durationText
@@ -137,7 +137,7 @@ extension SIMChatCellAudio {
     func onAudioWillLoad(sender: NSNotification) {
         if enabled && sender.object === self.message {
             SIMLog.trace()
-            self.message?.recvStatus = .Downloading
+            self.message?.status = .Receiving
             self.onMessageStateChanged(nil)
         }
     }
@@ -152,9 +152,9 @@ extension SIMChatCellAudio {
             SIMLog.trace()
             // 有没有加载成功?
             if *(ctx.url) != nil {
-                self.message?.recvStatus = .Downloaded
+                self.message?.status = .Received
             } else {
-                self.message?.recvStatus = .Failed
+                self.message?.status = .Error
             }
             // 通知状态修改
             self.onMessageStateChanged(nil)

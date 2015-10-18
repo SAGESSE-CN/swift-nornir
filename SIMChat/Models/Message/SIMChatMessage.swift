@@ -8,62 +8,76 @@
 
 import UIKit
 
-/// 消息模型
+/// Message Module
 class SIMChatMessage: NSObject {
-    
+    /// 初始化
     convenience init(_ content: AnyObject) {
         self.init()
         self.content = content
     }
-    
     /// 消息
     lazy var identifier = NSUUID().UUIDString
     
-    /// 发送者, 如果发送者为空, 视为系统消息
-    var sender: SIMChatUser2?                              // 为nil, 自动隐藏名字
-    var sentTime: NSDate = .zero                          // 为0
-    /// 消息发送状态. Warning: 尽量不要去修改他
-    var sentStatus: SIMChatMessageSentStatus = .Unknow
+    /// 发送者, 如果发送者为空, 视为广播信息 \
+    /// 为nil自动隐藏名字
+    var sender: SIMChatUserProtocol?
+    var sentTime: NSDate = .zero
     
     /// 接收者, 如果接收者为空, 视为广播信息
-    var recver: SIMChatUser2?
-    var recvTime: NSDate = .zero
-    /// 消息接收状态. Warning: 尽量不要去修改他
-    var recvStatus: SIMChatMessageRecvStatus = .Unknow
+    var receiver: SIMChatUserProtocol?
+    var receiveTime: NSDate = .zero
     
     /// 内容
     var extra: AnyObject?
+    var status: SIMChatMessageStatus = .Unknow
     var content: AnyObject?
     
     /// 其他配置
     var mute = false            // 静音
     var hidden = false          // 透明消息
-    var hiddenName = false      // 隐藏名字
     
-    /// 辅助信息
-    var height = CGFloat(0)     // 为0表示需要计算
+    /// 这是自己发送的消息?
+    var owns: Bool = false
+    /// 是否需要隐藏名片服务? \
+    /// 为nil则自动根据环境选择
+    var hiddenContact: Bool?
+    
+    /// 消息的高度 \
+    /// 为0表示需要计算
+    var height = CGFloat(0)
 }
 
-// MARK: - Sent Status
-enum SIMChatMessageSentStatus {
-    case Unknow     /// 未知
-    case Sending    /// 发送中
-    case Failed     /// 发送失败
-    case Sent       /// 己发送
-    case Received   /// 对方己接收
-    case Read       /// 对方己读
-    case Destroyed  /// 对方己销毁
-}
-
-// MARK: - Reveice Status
-enum SIMChatMessageRecvStatus {
-    case Unknow      /// 未知
-    case Unread      /// 未读
-    case Downloading /// 接收中
-    case Downloaded  /// 己下载
-    case Failed      /// 接收失败
-    case Read        /// 己读
-    case Listened    /// 未读
+/// Message Status
+enum SIMChatMessageStatus {
+    /// SR: 未知
+    case Unknow
+    /// S: 正在发送中 \
+    /// R: 对方正在发送中(错误)
+    case Sending
+    /// S: 己发送 \
+    /// R: 错误
+    case Sent
+    /// S: 对方未读 \
+    /// R: 消息未读
+    case Unread
+    /// S: 对方正在接收中, 包含未读, (图片/音频/视频) \
+    /// R: 消息接收中, 包含未读, (图片/音频/视频)
+    case Receiving
+    /// S: 对方己接收, 包含未读 \
+    /// R: 消息己接收, 包含未读
+    case Received
+    /// S: 对方己读 \
+    /// R: 消息己读
+    case Read
+    /// S: 对方己播放(音频消息), 包含己读 \
+    /// R: 消息己播放(音频消息), 包含己读
+    case Played
+    /// S: 对方己销毁, 包含己读/己播放 \
+    /// R: 消息己销毁, 包含己读/己播放
+    case Destroyed
+    /// S: 发送错误(图片/音频/视频) \
+    /// R: 接收错误(图片/音频/视频)
+    case Error
 }
 
 // MARK: - Time
@@ -74,18 +88,18 @@ extension SIMChatMessage {
         
         self.sender = nil
         self.sentTime = m.sentTime
-        self.sentStatus = .Unknow
         
-        self.recver = nil
-        self.recvTime = m.recvTime
-        self.recvStatus = .Unknow
+        self.receiver = nil
+        self.receiveTime = m.receiveTime
+        
+        self.status = .Read
         
         self.extra = nil
-        self.content = SIMChatMessageContentDate(date: self.recvTime)
+        self.content = SIMChatMessageContentDate(date: self.receiveTime)
         
         self.mute = true
         self.hidden = false
-        self.hiddenName = true
+        self.hiddenContact = nil
         self.height = 0
     }
 }

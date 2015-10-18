@@ -33,12 +33,11 @@ class SIMChatCell: SIMTableViewCell {
     /// :param: u   当前用户
     /// :param: m   需要显示的消息
     ///
-    func reloadData(m: SIMChatMessage, ofUser u: SIMChatUser2?) {
+    func reloadData(m: SIMChatMessage) {
         // 更新用户数据 
-        self.user = u
         self.message = m
         // 更新显示类型
-        self.style = (m.sender == u ? .Right : .Left)
+        self.style = m.owns ? .Right : .Left
     }
     ///
     /// 计算高度, 在计算之前需要设置好约束和数据
@@ -73,10 +72,10 @@ class SIMChatCell: SIMTableViewCell {
     
     /// 代理.
     weak var delegate: SIMChatCellDelegate?
+    /// 关联的消息(不持有)
+    private(set) weak var message: SIMChatMessage?
     
-    private(set) var user: SIMChatUser2?                // 当前用户
-    private(set) var message: SIMChatMessage?          // 关联的消息
-    
+    /// 测试计数
     private(set) static var createdCount = 0
 }
 

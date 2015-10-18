@@ -8,9 +8,8 @@
 
 import UIKit
 
+typealias SIMChatFailBlock = NSError -> Void
+typealias SIMChatFinishBlock = Void -> Void
 
-enum SIMChatUserGender {
-    case Unknow     /// 未知
-    case Male       /// 男
-    case Female     /// 女
-}
+
+

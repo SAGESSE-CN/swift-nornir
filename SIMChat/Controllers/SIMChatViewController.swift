@@ -112,7 +112,7 @@ class SIMChatViewController: SIMViewController {
     /// 最新的消息
     var latest: SIMChatMessage?
     /// 会话
-    var conversation: SIMChatConversation! {
+    var conversation: SIMChatConversationProtocol! {
         willSet { conversation.delegate = nil  }
         didSet  { conversation.delegate = self }
     }
@@ -173,7 +173,7 @@ extension SIMChatViewController : UITableViewDataSource {
         // 预更新大小
         cell.frame = CGRectMake(0, 0, tableView.bounds.width, tableView.rowHeight)
         // 加载数据
-        cell.reloadData(message, ofUser: self.conversation.sender)
+        cell.reloadData(message)
         // 计算高度
         message.height = cell.systemLayoutSizeFittingSize(UILayoutFittingCompressedSize).height
         // 检查结果
@@ -200,7 +200,7 @@ extension SIMChatViewController : UITableViewDataSource {
         let cell = tableView.dequeueReusableCellWithIdentifier(key, forIndexPath: indexPath) as! SIMChatCell
         // 重新加载数据
         cell.delegate = self
-        cell.reloadData(message, ofUser: self.conversation.sender)
+        cell.reloadData(message)
         // 完成.
         return cell
     }

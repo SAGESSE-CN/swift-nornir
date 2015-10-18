@@ -38,8 +38,8 @@ class SIMChatCellDate: SIMChatCell {
     /// :param: u   当前用户
     /// :param: m   需要显示的消息
     ///
-    override func reloadData(m: SIMChatMessage, ofUser u: SIMChatUser2?) {
-        super.reloadData(m, ofUser: u)
+    override func reloadData(m: SIMChatMessage) {
+        super.reloadData(m)
         // 更新数据
         self.titleLabel.text = m.sentTime.visual
     }

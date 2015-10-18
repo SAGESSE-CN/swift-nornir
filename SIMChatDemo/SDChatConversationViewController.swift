@@ -24,12 +24,13 @@ class SDChatConversationViewController: UITableViewController {
         // Dispose of any resources that can be recreated.
     }
     
+    let m = SDChatManager()
+    
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         tableView.deselectRowAtIndexPath(indexPath, animated: true)
         
-        let s = SIMChatUser2(identifier: "self", name: "self", gender: 1, portrait: nil)
-        let o = SIMChatUser2(identifier: "other", name: "other", gender: 2)
-        let m = SDChatManager.sharedManager
+        let s = SIMChatUser(identifier: "self", name: "self", portrait: nil, gender: .Male)
+        let o = SIMChatUser(identifier: "other", name: "other", portrait: nil, gender: .Female)
         
         //
         m.login(s, finish: nil)
