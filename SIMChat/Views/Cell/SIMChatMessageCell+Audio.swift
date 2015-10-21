@@ -48,7 +48,10 @@ class SIMChatMessageCellAudio: SIMChatMessageCellBubble {
                 leftConstraints.append(c)
             }
         }
-        
+    }
+    /// 安装事件
+    override func install() {
+        super.install()
         // add kvo
         SIMChatNotificationCenter.addObserver(self, selector: "onAudioDidStop:", name: SIMChatAudioManagerWillStopNotification)
         SIMChatNotificationCenter.addObserver(self, selector: "onAudioDidStop:", name: SIMChatAudioManagerWillRecordNotification)
@@ -57,32 +60,19 @@ class SIMChatMessageCellAudio: SIMChatMessageCellBubble {
         SIMChatNotificationCenter.addObserver(self, selector: "onAudioWillLoad:", name: SIMChatAudioManagerWillLoadNotification)
         SIMChatNotificationCenter.addObserver(self, selector: "onAudioDidLoad:", name: SIMChatAudioManagerDidLoadNotification)
     }
-    //
-    /// 重新加载数据.
-    ///
-    /// :param: u   当前用户
-    /// :param: m   需要显示的消息
-    ///
-    override func reloadData(m: SIMChatMessage) {
-        super.reloadData(m)
-        // 更新内容
-        if let ctx = m.content as? SIMChatMessageContentAudio {
-            titleLabel.text = ctx.durationText
-            // 播放中.
-            if ctx.playing {
-                animationView.startAnimating()
-            }
-        }
-    }
     ///
     /// 显示类型
     ///
     override var style: SIMChatMessageCellStyle {
         willSet {
+            // 没有改变
+            guard newValue != style else {
+                return
+            }
+            // 检查
             switch newValue {
             case .Left:
                 
-                animationView.stopAnimating()
                 animationView.animationDuration = 1
                 titleLabel.textColor = UIColor.blackColor()
                 (animationView.image, animationView.animationImages) = self.dynamicType.leftImages
@@ -93,6 +83,9 @@ class SIMChatMessageCellAudio: SIMChatMessageCellBubble {
                 animationView.stopAnimating()
                 animationView.animationDuration = 1
                 (animationView.image, animationView.animationImages) = self.dynamicType.rightImages
+                
+            case .Unknow:
+                break
             }
             
             for c in leftConstraints {
@@ -100,6 +93,20 @@ class SIMChatMessageCellAudio: SIMChatMessageCellBubble {
             }
             
             setNeedsLayout()
+        }
+    }
+    /// 消息内容
+    override var message: SIMChatMessageProtocol? {
+        didSet {
+            // 检查
+            guard let content = message?.content as? SIMChatMessageContentAudio else {
+                return
+            }
+            titleLabel.text = content.durationText
+            // 播放中.
+            if content.playing {
+                animationView.startAnimating()
+            }
         }
     }
     
@@ -137,7 +144,8 @@ extension SIMChatMessageCellAudio {
     func onAudioWillLoad(sender: NSNotification) {
         if enabled && sender.object === self.message {
             SIMLog.trace()
-            self.message?.status = .Receiving
+            // TODO: no changed
+//            self.message?.status = .Receiving
             self.onMessageStateChanged(nil)
         }
     }
@@ -151,11 +159,12 @@ extension SIMChatMessageCellAudio {
         if enabled && sender.object === message && ctx.url.storaged {
             SIMLog.trace()
             // 有没有加载成功?
-            if *(ctx.url) != nil {
-                self.message?.status = .Received
-            } else {
-                self.message?.status = .Error
-            }
+            // TODO: no changed
+//            if *(ctx.url) != nil {
+//                self.message?.status = .Received
+//            } else {
+//                self.message?.status = .Error
+//            }
             // 通知状态修改
             self.onMessageStateChanged(nil)
             // 模拟一次点击

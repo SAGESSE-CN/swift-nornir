@@ -32,7 +32,7 @@ extension SDChatConversation {
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(1 * NSEC_PER_SEC)), dispatch_get_main_queue()) {
                 SIMLog.trace("finish")
                 
-                m.status = rand() % 2 == 0 ? .Sent : .Error
+                m.status = rand() % 20 == 0 ? .Error : .Sent
                 m.statusChanged()
                 
                 finish?()
@@ -40,11 +40,11 @@ extension SDChatConversation {
             }
             // 2秒后收到一条新消息
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(2 * NSEC_PER_SEC)), dispatch_get_main_queue()) {
-                let nm = SIMChatMessage(m.content!)
+                let nm = SIMChatMessage(m.content)
                 
                 nm.sender = self.receiver
                 nm.sentTime = m.sentTime
-                nm.receiver = self.sender
+                nm.receiver = self.receiver
                 nm.receiveTime = .now
                 nm.status = .Unread
                 

@@ -32,16 +32,17 @@ class SIMChatMessageCellTips: SIMChatMessageCell {
         contentView.addConstraints(NSLayoutConstraintMake("H:|-(8)-[t]-(8)-|", views: vs))
         contentView.addConstraints(NSLayoutConstraintMake("V:|-(16)-[t]-(8)-|", views: vs))
     }
-    ///
-    /// 重新加载数据.
-    ///
-    /// :param: u   当前用户
-    /// :param: m   需要显示的消息
-    ///
-    override func reloadData(m: SIMChatMessage) {
-        super.reloadData(m)
-        // 更新数据
-        self.titleLabel.text = m.sentTime.visual
+    /// 消息内容
+    override var message: SIMChatMessageProtocol? {
+        didSet {
+            // 检查
+            guard let m = message else {
+                // 空, 没有什么好说的
+                return
+            }
+            // 更新数据
+            self.titleLabel.text = m.sentTime.visual
+        }
     }
     
     private(set) lazy var titleLabel = UILabel()

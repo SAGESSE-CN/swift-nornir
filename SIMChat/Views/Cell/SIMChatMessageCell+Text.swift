@@ -35,26 +35,6 @@ class SIMChatMessageCellText: SIMChatMessageCellBubble {
         SIMChatNotificationCenter.addObserver(self, selector: "onTextAttachmentChanged:", name: SIMChatTextAttachmentChangedNotification)
     }
     ///
-    /// 重新加载数据.
-    ///
-    /// :param: u   当前用户
-    /// :param: m   需要显示的消息
-    ///
-    override func reloadData(m: SIMChatMessage) {
-        super.reloadData(m)
-        // 更新文本
-        if let content = m.content as? SIMChatMessageContentText {
-            // 发生了改变?
-            self.contentLabel.text = content.text
-            self.contentLabel.preferredMaxLayoutWidth = 0
-//            if self.contentLabel.attributedText?.hashValue != content.attributedText?.hashValue {
-//                self.contentLabel.attributedText = content.attributedText
-//                self.contentLabel.preferredMaxLayoutWidth = 0
-//                //self.makeEmojiViews()
-//            }
-        }
-    }
-    ///
     /// 计算高度, 在计算之前需要设置好约束
     ///
     /// :returns: 合适的大小
@@ -79,10 +59,33 @@ class SIMChatMessageCellText: SIMChatMessageCellBubble {
     /// 显示类型
     override var style: SIMChatMessageCellStyle  {
         willSet {
+            // 没有改变
+            guard newValue != style else {
+                return
+            }
             switch newValue {
             case .Left:  contentLabel.textColor = UIColor.blackColor()
             case .Right: contentLabel.textColor = UIColor.whiteColor()
+            case .Unknow:
+                break
             }
+        }
+    }
+    /// 消息内容
+    override var message: SIMChatMessageProtocol? {
+        didSet {
+            // 检查
+            guard let content = message?.content as? SIMChatMessageContentText else {
+                return
+            }
+            // 更新文本
+            self.contentLabel.text = content.text
+            self.contentLabel.preferredMaxLayoutWidth = 0
+//            if self.contentLabel.attributedText?.hashValue != content.attributedText?.hashValue {
+//                self.contentLabel.attributedText = content.attributedText
+//                self.contentLabel.preferredMaxLayoutWidth = 0
+//                //self.makeEmojiViews()
+//            }
         }
     }
     

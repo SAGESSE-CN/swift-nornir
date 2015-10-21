@@ -18,6 +18,18 @@ class SDChatConversationViewController: UITableViewController {
     }
     
     @IBOutlet weak var t1: UILabel!
+    
+    override func shouldAutorotate() -> Bool {
+        return true
+    }
+    
+    override func supportedInterfaceOrientations() -> UIInterfaceOrientationMask {
+        return UIInterfaceOrientationMask.Landscape
+    }
+    
+    override func prefersStatusBarHidden() -> Bool {
+        return false
+    }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
@@ -28,6 +40,8 @@ class SDChatConversationViewController: UITableViewController {
     
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         tableView.deselectRowAtIndexPath(indexPath, animated: true)
+        
+        srand(UInt32(time(nil)))
         
         let s = SIMChatUser(identifier: "self", name: "self", portrait: nil, gender: .Male)
         let o = SIMChatUser(identifier: "other", name: "other", portrait: nil, gender: .Female)

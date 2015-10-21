@@ -1,5 +1,5 @@
 //
-//  SIMChatCell.swift
+//  SIMChatMessageCell.swift
 //  SIMChat
 //
 //  Created by sagesse on 9/21/15.
@@ -9,9 +9,9 @@
 import UIKit
 
 ///
-/// 消息单元格
+/// 消息单元格(基类!!)
 ///
-class SIMChatCell: SIMTableViewCell {
+class SIMChatMessageCell: SIMTableViewCell, SIMChatMessageCellProtocol {
     /// 释放
     deinit {
         // 追踪
@@ -27,22 +27,14 @@ class SIMChatCell: SIMTableViewCell {
         self.backgroundColor = UIColor.clearColor()
         self.selectionStyle = UITableViewCellSelectionStyle.None
     }
-    ///
-    /// 重新加载数据.
-    ///
-    /// :param: u   当前用户
-    /// :param: m   需要显示的消息
-    ///
-    func reloadData(m: SIMChatMessage) {
-        // 更新用户数据 
-        self.message = m
-        // 更新显示类型
-        self.style = m.owns ? .Right : .Left
+    /// 安装(事件)
+    func install() {
+    }
+    /// 卸载(事件)
+    func uninstall() {
     }
     ///
     /// 计算高度, 在计算之前需要设置好约束和数据
-    ///
-    /// :returns: 合适的大小
     ///
     override func systemLayoutSizeFittingSize(targetSize: CGSize) -> CGSize {
         // 更新
@@ -65,72 +57,84 @@ class SIMChatCell: SIMTableViewCell {
         return false
     }
     
-    /// 显示类型
-    var style = SIMChatCellStyle.Left
-    /// 是否可用
-    var enabled = true
-    
+    /// 类型
+    var style: SIMChatMessageCellStyle = .Unknow
+    /// 消息内容
+    var message: SIMChatMessageProtocol? {
+        willSet {
+            // o(n _ n)o
+            if newValue?.ownership ?? false {
+                style = .Right
+            } else {
+                style = .Left
+            }
+        }
+    }
+    /// 是否启用
+    var enabled: Bool = false {
+        didSet {
+            // 检查有没有改变
+            guard oldValue != enabled else {
+                return
+            }
+            // 检查结果
+            if enabled {
+                // 安装
+                install()
+            } else {
+                // 卸载
+                uninstall()
+            }
+        }
+    }
     /// 代理.
-    weak var delegate: SIMChatCellDelegate?
-    /// 关联的消息(不持有)
-    private(set) weak var message: SIMChatMessage?
+    weak var delegate: SIMChatMessageCellDelegate?
     
     /// 测试计数
     private(set) static var createdCount = 0
 }
 
 // MARK: - Event
-extension SIMChatCell {
+extension SIMChatMessageCell {
     /// 删除.
     dynamic func chatCellDelete(sender: AnyObject) {
         self.delegate?.chatCellDidDelete?(self)
     }
     /// 点击
-    dynamic func chatCellPress(sender: SIMChatCellEvent) {
+    dynamic func chatCellPress(sender: SIMChatMessageCellEvent) {
         self.delegate?.chatCellDidPress?(self, withEvent: sender)
     }
     /// 长按
-    dynamic func chatCellLongPress(sender: SIMChatCellEvent) {
+    dynamic func chatCellLongPress(sender: SIMChatMessageCellEvent) {
         self.delegate?.chatCellDidLongPress?(self, withEvent: sender)
     }
 }
 
-// MARK: - Delegate
-@objc protocol SIMChatCellDelegate : NSObjectProtocol {
-    
-    optional func chatCellDidCopy(chatCell: SIMChatCell)
-    optional func chatCellDidDelete(chatCell: SIMChatCell)
-    
-    optional func chatCellDidReSend(chatCell: SIMChatCell)
-    
-    optional func chatCellDidPress(chatCell: SIMChatCell, withEvent event: SIMChatCellEvent)
-    optional func chatCellDidLongPress(chatCell: SIMChatCell, withEvent event: SIMChatCellEvent)
-    
-}
 
 /// 类型
-enum SIMChatCellStyle : Int {
+@objc enum SIMChatMessageCellStyle : Int {
+    case Unknow
     case Left
     case Right
 }
 
 /// 事件源
-enum SIMChatCellEventType : Int {
+enum SIMChatMessageCellEventType : Int {
     case Bubble         // 气泡
     case VisitCard      // 名片
     case Portrait       // 头像
 }
 
 /// 事件
-class SIMChatCellEvent : NSObject {
-    init(_ type: SIMChatCellEventType, _ sender: AnyObject? = nil, _ event: UIEvent? = nil, _ extra: AnyObject? = nil) {
+class SIMChatMessageCellEvent : NSObject {
+    init(_ type: SIMChatMessageCellEventType, _ sender: AnyObject? = nil, _ event: UIEvent? = nil, _ extra: AnyObject? = nil) {
         self.type = type
         self.event = event
         self.sender = sender
         self.extra = extra
         super.init()
     }
-    var type: SIMChatCellEventType
+    var type: SIMChatMessageCellEventType
     var event: UIEvent?
     var sender: AnyObject?
     var extra: AnyObject?

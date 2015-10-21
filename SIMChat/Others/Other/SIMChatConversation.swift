@@ -61,7 +61,7 @@ extension SIMChatConversation : SIMChatConversationProtocol {
         m.receiver = self.receiver
         m.receiveTime = .now
         // 填写当前状态
-        m.owns = true
+        m.ownership = true
         m.status = .Sending
         // 调整结构
         if isResend {

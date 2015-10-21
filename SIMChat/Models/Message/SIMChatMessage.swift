@@ -9,75 +9,80 @@
 import UIKit
 
 /// Message Module
-class SIMChatMessage: NSObject {
+class SIMChatMessage: NSObject, SIMChatMessageProtocol {
     /// 初始化
-    convenience init(_ content: AnyObject) {
-        self.init()
-        self.content = content
+    override init() {
+        self.content = SIMChatMessageContentUnknow()
+        super.init()
     }
-    /// 消息
-    lazy var identifier = NSUUID().UUIDString
+    /// 初始化
+    init(_ content: SIMChatMessageContentProtocol) {
+        self.content = content
+        super.init()
+    }
+//    convenience init(_ content: AnyObject) {
+//        self.init()
+//        self.content = content
+//    }
+//    /// 消息
+//    lazy var identifier = NSUUID().UUIDString
+//    
+//    /// 发送者, 如果发送者为空, 视为广播信息 \
+//    /// 为nil自动隐藏名字
+//    var sender: SIMChatUserProtocol?
+//    var sentTime: NSDate = .zero
+//    
+//    /// 接收者, 如果接收者为空, 视为广播信息
+//    var receiver: SIMChatUserProtocol?
+//    var receiveTime: NSDate = .zero
+//    
+//    /// 内容
+//    var extra: AnyObject?
+//    var status: SIMChatMessageStatus = .Unknow
+//    var content: AnyObject?
+//    
+//    /// 其他配置
+//    var mute = false            // 静音
+//    var hidden = false          // 透明消息
+//    
+//    /// 这是自己发送的消息?
+//    var owns: Bool = false
+//    /// 是否需要隐藏名片服务? \
+//    /// 为nil则自动根据环境选择
+//    var hiddenContact: Bool?
+//    
+//    /// 消息的高度 \
+//    /// 为0表示需要计算
+//    var height = CGFloat(0)
+//    
+    /// 标识符
+    var identifier: String = NSUUID().UUIDString
     
-    /// 发送者, 如果发送者为空, 视为广播信息 \
-    /// 为nil自动隐藏名字
+    /// 发送者 \
+    /// 为nil, 视为广播信息, 自动隐藏名字
     var sender: SIMChatUserProtocol?
-    var sentTime: NSDate = .zero
-    
-    /// 接收者, 如果接收者为空, 视为广播信息
+    /// 接收者 \
+    /// 为nil, 视为广播信息, 自动隐藏名字
     var receiver: SIMChatUserProtocol?
+    
+    /// 发送时间
+    var sentTime: NSDate = .zero
+    /// 接收时间
     var receiveTime: NSDate = .zero
     
-    /// 内容
-    var extra: AnyObject?
+    /// 状态
     var status: SIMChatMessageStatus = .Unknow
-    var content: AnyObject?
+    /// 内容
+    var content: SIMChatMessageContentProtocol
     
-    /// 其他配置
-    var mute = false            // 静音
-    var hidden = false          // 透明消息
-    
-    /// 这是自己发送的消息?
-    var owns: Bool = false
-    /// 是否需要隐藏名片服务? \
-    /// 为nil则自动根据环境选择
-    var hiddenContact: Bool?
+    /// 名片选项
+    var option: Int = 0
+    /// 是否是所有者
+    var ownership: Bool = false
     
     /// 消息的高度 \
     /// 为0表示需要计算
-    var height = CGFloat(0)
-}
-
-/// Message Status
-enum SIMChatMessageStatus {
-    /// SR: 未知
-    case Unknow
-    /// S: 正在发送中 \
-    /// R: 对方正在发送中(错误)
-    case Sending
-    /// S: 己发送 \
-    /// R: 错误
-    case Sent
-    /// S: 对方未读 \
-    /// R: 消息未读
-    case Unread
-    /// S: 对方正在接收中, 包含未读, (图片/音频/视频) \
-    /// R: 消息接收中, 包含未读, (图片/音频/视频)
-    case Receiving
-    /// S: 对方己接收, 包含未读 \
-    /// R: 消息己接收, 包含未读
-    case Received
-    /// S: 对方己读 \
-    /// R: 消息己读
-    case Read
-    /// S: 对方己播放(音频消息), 包含己读 \
-    /// R: 消息己播放(音频消息), 包含己读
-    case Played
-    /// S: 对方己销毁, 包含己读/己播放 \
-    /// R: 消息己销毁, 包含己读/己播放
-    case Destroyed
-    /// S: 发送错误(图片/音频/视频) \
-    /// R: 接收错误(图片/音频/视频)
-    case Error
+    var height: CGFloat = 0
 }
 
 // MARK: - Time
@@ -86,21 +91,22 @@ extension SIMChatMessage {
     /// 生成时间
     func makeDateWithMessage(m: SIMChatMessage) {
         
-        self.sender = nil
-        self.sentTime = m.sentTime
-        
-        self.receiver = nil
-        self.receiveTime = m.receiveTime
-        
-        self.status = .Read
-        
-        self.extra = nil
-        self.content = SIMChatMessageContentDate(date: self.receiveTime)
-        
-        self.mute = true
-        self.hidden = false
-        self.hiddenContact = nil
-        self.height = 0
+        // TODO: no imp
+//        self.sender = nil
+//        self.sentTime = m.sentTime
+//        
+//        self.receiver = nil
+//        self.receiveTime = m.receiveTime
+//        
+//        self.status = .Read
+//        
+//        self.extra = nil
+//        self.content = SIMChatMessageContentDate(date: self.receiveTime)
+//        
+//        self.mute = true
+//        self.hidden = false
+//        self.hiddenContact = nil
+//        self.height = 0
     }
 }
 

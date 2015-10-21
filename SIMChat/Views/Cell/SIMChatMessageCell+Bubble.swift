@@ -94,6 +94,11 @@ class SIMChatMessageCellBubble: SIMChatMessageCell {
         
         // add kvos
         addObserver(self, forKeyPath: "visitCardView.hidden", options: .New, context: nil)
+    }
+    /// 安装事件
+    override func install() {
+        super.install()
+        
         // :)
         SIMChatNotificationCenter.addObserver(self, selector: "onUserInfoChanged:", name: SIMChatUser2InfoChangedNotification)
         SIMChatNotificationCenter.addObserver(self, selector: "onMessageStateChanged:", name: SIMChatMessageStatusChangedNotification)
@@ -107,28 +112,6 @@ class SIMChatMessageCellBubble: SIMChatMessageCell {
         visitCardView.addGestureRecognizer(UILongPressGestureRecognizer(target: self, action: "onVisitCardLongPress:"))
         
         stateView.addTarget(self, action: "onRetryPress:", forControlEvents: .TouchUpInside)
-    }
-    ///
-    /// 重新加载数据.
-    ///
-    /// :param: u   当前用户
-    /// :param: m   需要显示的消息
-    ///
-    override func reloadData(m: SIMChatMessage) {
-        // 更新数据
-        super.reloadData(m)
-        // 关于名片显示
-        if let h = m.hiddenContact {
-            // 隐藏名片
-            self.visitCardView.hidden = h
-        } else {
-            self.visitCardView.hidden = m.owns
-        }
-        // 关于头像
-        self.portraitView.user = m.sender
-        self.visitCardView.user = m.sender
-        // 关于状态
-        self.onMessageStateChanged(nil)
     }
     /// kvo
     override func observeValueForKeyPath(keyPath: String?, ofObject object: AnyObject?, change: [String : AnyObject]?, context: UnsafeMutablePointer<Void>) {
@@ -144,12 +127,20 @@ class SIMChatMessageCellBubble: SIMChatMessageCell {
     /// 显示类型
     override var style: SIMChatMessageCellStyle  {
         willSet {
+            // 没有改变
+            guard newValue != style else {
+                return
+            }
+            // 检查
             switch newValue {
             case .Left:
                 self.bubbleView.backgroundImage = SIMChatImageManager.defaultBubbleRecive
                 
             case .Right:
                 self.bubbleView.backgroundImage = SIMChatImageManager.defaultBubbleSend
+                
+            case .Unknow:
+                break
             }
             // 修改约束
             leftConstraints.forEach {
@@ -157,6 +148,44 @@ class SIMChatMessageCellBubble: SIMChatMessageCell {
             }
             // 需要更新布局
             setNeedsLayout()
+        }
+    }
+    /// 消息内容
+    override var message: SIMChatMessageProtocol? {
+        didSet {
+            // 检查
+            guard let m = message else {
+                // 空, 没有什么好说的
+                return
+            }
+            // 关于名片显示
+            if m.option & SIMChatMessageOption.ContactShow != 0 {
+                // 强制显示
+                self.visitCardView.hidden = false
+            } else if m.option & SIMChatMessageOption.ContactHidden != 0 {
+                // 强制隐藏
+                self.visitCardView.hidden = true
+            } else if m.sender === nil {
+                // 并没有发送者
+                // 强制隐藏
+                self.visitCardView.hidden = true
+            } else {
+                // 如果是自己, 隐藏
+                // 如果是C2C,  隐藏
+                // 如果是Robot, 隐藏
+                if let r = m.receiver where m.ownership || r.type == .C2C || r.type == .Robot {
+                    // 隐藏
+                    self.visitCardView.hidden = true
+                } else {
+                    // 显示
+                    self.visitCardView.hidden = false
+                }
+            }
+            // 关于头像
+            self.portraitView.user = m.sender
+            self.visitCardView.user = m.sender
+            // 关于状态
+            self.onMessageStateChanged(nil)
         }
     }
     
@@ -183,8 +212,8 @@ extension SIMChatMessageCellBubble {
         }
         // 改变的是他
         if let u = sender.object as? SIMChatUserProtocol where u == message.sender {
-            // 更新sender, 防止同步错误
-            message.sender = u
+            // TODO: 更新sender, 防止同步错误
+            // message.sender = u
             // 关于头像
             self.portraitView.user = u
             // 关于名片

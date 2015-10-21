@@ -125,8 +125,8 @@ class SIMChatViewController: SIMViewController {
     internal lazy var source = Array<SIMChatMessage>()
     
     /// 单元格
-    internal lazy var testers = Dictionary<String, SIMChatCell>()
-    internal lazy var relations = Dictionary<String, SIMChatCell.Type>()
+    internal lazy var testers = Dictionary<String, SIMChatMessageCellProtocol>()
+    internal lazy var relations = Dictionary<String, SIMChatMessageCellProtocol.Type>()
     internal lazy var relationDefault = NSStringFromClass(SIMChatMessageContentUnknow.self)
     
     /// 自定义键盘
@@ -147,11 +147,9 @@ extension SIMChatViewController : UITableViewDataSource {
         // 获取数据
         let message = source[indexPath.row]
         let key: String = {
-            if message.content != nil {
-                let type = NSStringFromClass(message.content!.dynamicType)
-                if self.relations[type] != nil {
-                    return type
-                }
+            let type = NSStringFromClass(message.content.dynamicType)
+            if self.relations[type] != nil {
+                return type
             }
             return self.relationDefault
         }()
@@ -161,19 +159,19 @@ extension SIMChatViewController : UITableViewDataSource {
         }
         // 获取测试单元格
         let cell = testers[key] ?? {
-            let tmp = tableView.dequeueReusableCellWithIdentifier(key) as! SIMChatCell
+            let tmp = tableView.dequeueReusableCellWithIdentifier(key) as! SIMChatMessageCell
             // 隐藏
-            tmp.hidden = true
             tmp.enabled = false
             // 缓存
             self.testers[key] = tmp
             // 创建完成
             return tmp
         }()
-        // 预更新大小
-        cell.frame = CGRectMake(0, 0, tableView.bounds.width, tableView.rowHeight)
-        // 加载数据
-        cell.reloadData(message)
+        // 更新环境
+        if let cell = cell as? UIView {
+            cell.frame = CGRectMake(0, 0, tableView.bounds.width, tableView.rowHeight)
+        }
+        cell.message = message
         // 计算高度
         message.height = cell.systemLayoutSizeFittingSize(UILayoutFittingCompressedSize).height
         // 检查结果
@@ -188,19 +186,18 @@ extension SIMChatViewController : UITableViewDataSource {
         // 获取数据
         let message = source[indexPath.row]
         let key: String = {
-            if message.content != nil {
-                let type = NSStringFromClass(message.content!.dynamicType)
-                if self.relations[type] != nil {
-                    return type
-                }
+            let type = NSStringFromClass(message.content.dynamicType)
+            if self.relations[type] != nil {
+                return type
             }
             return self.relationDefault
         }()
         // 获取单元格, 如果不存在则创建
-        let cell = tableView.dequeueReusableCellWithIdentifier(key, forIndexPath: indexPath) as! SIMChatCell
-        // 重新加载数据
+        let cell = tableView.dequeueReusableCellWithIdentifier(key, forIndexPath: indexPath) as! SIMChatMessageCell
+        // 更新环境
+        cell.enabled = true
+        cell.message = message
         cell.delegate = self
-        cell.reloadData(message)
         // 完成.
         return cell
     }

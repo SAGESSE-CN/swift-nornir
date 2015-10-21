@@ -32,17 +32,22 @@ class SIMChatMessageCellImage: SIMChatMessageCellBubble {
         contentView.addConstraints(NSLayoutConstraintMake("H:|-(0)-[c]-(0)-|", views: vs))
         contentView.addConstraints(NSLayoutConstraintMake("V:|-(0)-[c]-(0)-|", views: vs))
     }
-    ///
-    /// 重新加载数据.
-    ///
-    /// :param: u   当前用户
-    /// :param: m   需要显示的消息
-    ///
-    override func reloadData(m: SIMChatMessage) {
-        super.reloadData(m)
-        
-        if let content = m.content as? SIMChatMessageContentImage {
-            
+    /// 检查是否使用.
+    override func canPerformAction(action: Selector, withSender sender: AnyObject?) -> Bool {
+        // 允许复制
+        if action == "chatCellCopy:" {
+            return true
+        }
+        return super.canPerformAction(action, withSender: sender)
+    }
+    
+    /// 消息内容
+    override var message: SIMChatMessageProtocol? {
+        didSet {
+            // 检查
+            guard let content = message?.content as? SIMChatMessageContentImage else {
+                return
+            }
             let width = max(content.thumbnailSize.width, 32)
             let height = max(content.thumbnailSize.height, 1)
             let scale = min(min(135, width) / width, min(135, height) / height)
@@ -67,14 +72,6 @@ class SIMChatMessageCellImage: SIMChatMessageCellBubble {
                 }
             }
         }
-    }
-    /// 检查是否使用.
-    override func canPerformAction(action: Selector, withSender sender: AnyObject?) -> Bool {
-        // 允许复制
-        if action == "chatCellCopy:" {
-            return true
-        }
-        return super.canPerformAction(action, withSender: sender)
     }
     
     private(set) var contentView2Width: NSLayoutConstraint!

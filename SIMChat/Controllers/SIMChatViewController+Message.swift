@@ -16,7 +16,7 @@ extension SIMChatViewController {
     /// :param: model   消息数据类
     /// :param: cell    消息显示的单元格
     ///
-    func registerClass(cell: SIMChatCell.Type, _ model: AnyClass) {
+    func registerClass(cell: SIMChatMessageCellProtocol.Type, _ model: SIMChatMessageContentProtocol.Type) {
         let key = NSStringFromClass(model)
         
         SIMLog.debug("\(key) => \(NSStringFromClass(cell))")
@@ -89,7 +89,9 @@ extension SIMChatViewController {
                     fms.append(time)
                 }
                 // 更新.
-                time.makeDateWithMessage(m)
+                time.receiveTime = m.receiveTime
+                time.content = SIMChatMessageContentDate()
+                //time.makeDateWithMessage(m)
             }
             
             fms.append(m)
@@ -229,7 +231,7 @@ extension SIMChatViewController {
     ///
     func appendMessage(m: SIMChatMessage) {
         
-        let isSelf = m.owns
+        let isSelf = m.ownership
         let isLasted = (tableView.indexPathsForVisibleRows?.last?.row ?? 0) + 1 == tableView.numberOfRowsInSection(0)
         
         self.insertRows([m], atIndex: -1)
@@ -259,14 +261,14 @@ extension SIMChatViewController {
         SIMLog.trace()
         
         // 聊天内容
-        self.registerClass(SIMChatCellText.self,    SIMChatMessageContentText.self)
-        self.registerClass(SIMChatCellAudio.self,   SIMChatMessageContentAudio.self)
-        self.registerClass(SIMChatCellImage.self,   SIMChatMessageContentImage.self)
+        self.registerClass(SIMChatMessageCellText.self,    SIMChatMessageContentText.self)
+        self.registerClass(SIMChatMessageCellAudio.self,   SIMChatMessageContentAudio.self)
+        self.registerClass(SIMChatMessageCellImage.self,   SIMChatMessageContentImage.self)
         // 辅助
-        self.registerClass(SIMChatCellTips.self,    SIMChatMessageContentTips.self)
-        self.registerClass(SIMChatCellDate.self,    SIMChatMessageContentDate.self)
+        self.registerClass(SIMChatMessageCellTips.self,    SIMChatMessageContentTips.self)
+        self.registerClass(SIMChatMessageCellDate.self,    SIMChatMessageContentDate.self)
         // 默认
-        self.registerClass(SIMChatCellUnknow.self,  SIMChatMessageContentUnknow.self)
+        self.registerClass(SIMChatMessageCellUnknow.self,  SIMChatMessageContentUnknow.self)
     }
 }
 
@@ -350,7 +352,7 @@ extension SIMChatViewController {
     ///
     /// 发送自定义消息
     ///
-    func sendMessageForCustom(data: AnyObject) {
+    func sendMessageForCustom(data: SIMChatMessageContentProtocol) {
         SIMLog.trace()
         // :)
         self.sendMessage(data)
@@ -358,7 +360,7 @@ extension SIMChatViewController {
     ///
     /// 发送内容(禁止外部访问)
     ///
-    private func sendMessage(content: AnyObject) {
+    private func sendMessage(content: SIMChatMessageContentProtocol) {
         // 真正的发送
         self.conversation.sendMessage(SIMChatMessage(content), isResend: false, nil, nil)
     }
@@ -405,21 +407,21 @@ extension SIMChatViewController {
 }
 
 // MARK: - Message Cell Event 
-extension SIMChatViewController : SIMChatCellDelegate {
+extension SIMChatViewController : SIMChatMessageCellDelegate {
     
     /// 选择了删除.
-    func chatCellDidDelete(chatCell: SIMChatCell) {
-        SIMLog.trace()
-        if let m = chatCell.message {
-            self.conversation.removeMessage(m, nil, nil)
-        }
+    func chatCellDidDelete(chatCell: SIMChatMessageCell) {
+//        SIMLog.trace()
+//        if let m = chatCell.message {
+//            self.conversation.removeMessage(m, nil, nil)
+//        }
     }
     /// 选择了复制
-    func chatCellDidCopy(chatCell: SIMChatCell) {
+    func chatCellDidCopy(chatCell: SIMChatMessageCell) {
         SIMLog.trace()
     }
     /// 点击
-    func chatCellDidPress(chatCell: SIMChatCell, withEvent event: SIMChatCellEvent) {
+    func chatCellDidPress(chatCell: SIMChatMessageCell, withEvent event: SIMChatMessageCellEvent) {
         SIMLog.trace(event.type.rawValue)
         // 只处理气泡消息, 目前 
         guard let message = chatCell.message where event.type == .Bubble else {
@@ -465,7 +467,7 @@ extension SIMChatViewController : SIMChatCellDelegate {
         }
         // 图片
         if let ctx = chatCell.message?.content as? SIMChatMessageContentImage {
-            let f = (chatCell as? SIMChatCellImage)?.contentView2 ?? chatCell
+            let f = (chatCell as? SIMChatMessageCellImage)?.contentView2 ?? chatCell
             let vc = SIMChatPhotoBrowserController()
             
             vc.content = ctx
@@ -479,7 +481,7 @@ extension SIMChatViewController : SIMChatCellDelegate {
         }
     }
     /// 长按
-    func chatCellDidLongPress(chatCell: SIMChatCell, withEvent event: SIMChatCellEvent) {
+    func chatCellDidLongPress(chatCell: SIMChatMessageCell, withEvent event: SIMChatMessageCellEvent) {
         // 只响应begin事件
         guard let rec = event.sender as? UIGestureRecognizer where rec.state == .Began else {
             return
@@ -487,7 +489,7 @@ extension SIMChatViewController : SIMChatCellDelegate {
         SIMLog.trace(event.type.rawValue)
         // 如果是气泡的按下事件
         if event.type == .Bubble {
-            if let c = chatCell as? SIMChatCellBubble {
+            if let c = chatCell as? SIMChatMessageCellBubble {
                 // 准备菜单
                 let mu = UIMenuController.sharedMenuController()
                 // 进入激活状态

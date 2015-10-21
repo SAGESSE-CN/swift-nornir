@@ -9,5 +9,5 @@
 import Foundation
 
 /// 消息内容的接口
-@objc protocol SIMChatMessageContentProtocol {
+@objc protocol SIMChatMessageContentProtocol : NSObjectProtocol {
 }

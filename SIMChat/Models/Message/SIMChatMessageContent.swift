@@ -9,7 +9,7 @@
 import UIKit
 
 /// 消息的内容
-class SIMChatMessageContent: NSObject {
+class SIMChatMessageContent: NSObject, SIMChatMessageContentProtocol {
     /// 扩展数据
     var extra: AnyObject?
 }
