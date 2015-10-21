@@ -1,5 +1,5 @@
 //
-//  SIMChatCell+Text.swift
+//  SIMChatMessageCell+Text.swift
 //  SIMChat
 //
 //  Created by sagesse on 9/21/15.
@@ -11,7 +11,7 @@ import UIKit
 ///
 /// 消息单元格-纯文本
 ///
-class SIMChatCellText: SIMChatCellBubble {
+class SIMChatMessageCellText: SIMChatMessageCellBubble {
     /// 构建ui
     override func build() {
         super.build()
@@ -77,7 +77,7 @@ class SIMChatCellText: SIMChatCellBubble {
     }
     
     /// 显示类型
-    override var style: SIMChatCellStyle  {
+    override var style: SIMChatMessageCellStyle  {
         willSet {
             switch newValue {
             case .Left:  contentLabel.textColor = UIColor.blackColor()
@@ -91,7 +91,7 @@ class SIMChatCellText: SIMChatCellBubble {
 }
 
 // MARK: - Emoji 
-extension SIMChatCellText {
+extension SIMChatMessageCellText {
     /// 生成表情视图
     private func makeEmojiViews() {
         // 检查参数
@@ -141,7 +141,7 @@ extension SIMChatCellText {
 
 
 // MARK: - Event
-extension SIMChatCellText {
+extension SIMChatMessageCellText {
     /// 文本附加信息改变.
     private dynamic func onTextAttachmentChanged(sender: NSNotification) {
         // 检查参数

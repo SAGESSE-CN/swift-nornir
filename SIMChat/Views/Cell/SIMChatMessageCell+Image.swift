@@ -1,5 +1,5 @@
 //
-//  SIMChatCell+Image.swift
+//  SIMChatMessageCell+Image.swift
 //  SIMChat
 //
 //  Created by sagesse on 9/21/15.
@@ -8,7 +8,7 @@
 
 import UIKit
 
-class SIMChatCellImage: SIMChatCellBubble {
+class SIMChatMessageCellImage: SIMChatMessageCellBubble {
     /// 构建
     override func build() {
         super.build()
@@ -84,7 +84,7 @@ class SIMChatCellImage: SIMChatCellBubble {
 }
 
 // MARK: - Event
-extension SIMChatCellImage {
+extension SIMChatMessageCellImage {
     /// 复制
     dynamic func chatCellCopy(sender: AnyObject?) {
         SIMLog.trace()

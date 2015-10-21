@@ -1,5 +1,5 @@
 //
-//  SIMChatCell+Date.swift
+//  SIMChatMessageCell+Tips.swift
 //  SIMChat
 //
 //  Created by sagesse on 9/21/15.
@@ -9,9 +9,9 @@
 import UIKit
 
 ///
-/// 消息单元格-日期
+/// 消息单元格-提示
 ///
-class SIMChatCellDate: SIMChatCell {
+class SIMChatMessageCellTips: SIMChatMessageCell {
     /// 构建
     override func build() {
         super.build()

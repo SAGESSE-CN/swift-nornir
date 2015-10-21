@@ -1,5 +1,5 @@
 //
-//  SIMChatCell+Audio.swift
+//  SIMChatMessageCell+Audio.swift
 //  SIMChat
 //
 //  Created by sagesse on 9/21/15.
@@ -8,7 +8,7 @@
 
 import UIKit
 
-class SIMChatCellAudio: SIMChatCellBubble {
+class SIMChatMessageCellAudio: SIMChatMessageCellBubble {
     /// 释放
     deinit {
         SIMChatNotificationCenter.removeObserver(self)
@@ -77,7 +77,7 @@ class SIMChatCellAudio: SIMChatCellBubble {
     ///
     /// 显示类型
     ///
-    override var style: SIMChatCellStyle {
+    override var style: SIMChatMessageCellStyle {
         willSet {
             switch newValue {
             case .Left:
@@ -111,7 +111,7 @@ class SIMChatCellAudio: SIMChatCellBubble {
 }
 
 // MARK: - Events
-extension SIMChatCellAudio {
+extension SIMChatMessageCellAudio {
     /// 音频开始播放
     func onAudioDidPlay(sender: NSNotification) {
         // 为空说明不需要做何处理
@@ -165,7 +165,7 @@ extension SIMChatCellAudio {
 }
 
 // MARK: - Resources
-extension SIMChatCellAudio {
+extension SIMChatMessageCellAudio {
 
     /// 左边
     static let leftImages: (UIImage?, [UIImage]?) = {

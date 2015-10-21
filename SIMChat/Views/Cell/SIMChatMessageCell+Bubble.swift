@@ -1,5 +1,5 @@
 //
-//  SIMChatCell+Bubble.swift
+//  SIMChatMessageCell+Bubble.swift
 //  SIMChat
 //
 //  Created by sagesse on 9/21/15.
@@ -21,7 +21,7 @@ import UIKit
 ///
 /// 消息单元格-气泡
 ///
-class SIMChatCellBubble: SIMChatCell {
+class SIMChatMessageCellBubble: SIMChatMessageCell {
     /// 销毁
     deinit {
         removeObserver(self, forKeyPath: "visitCardView.hidden")
@@ -142,7 +142,7 @@ class SIMChatCellBubble: SIMChatCell {
         }
     }
     /// 显示类型
-    override var style: SIMChatCellStyle  {
+    override var style: SIMChatMessageCellStyle  {
         willSet {
             switch newValue {
             case .Left:
@@ -174,7 +174,7 @@ class SIMChatCellBubble: SIMChatCell {
 }
 
 // MARK: - Notifications
-extension SIMChatCellBubble {
+extension SIMChatMessageCellBubble {
     /// 用户信息改变
     internal dynamic func onUserInfoChanged(sender: NSNotification) {
         // 为空说明不需要做何处理
@@ -215,25 +215,25 @@ extension SIMChatCellBubble {
 }
 
 // MARK: - Events
-extension SIMChatCellBubble {
+extension SIMChatMessageCellBubble {
     
     func onBubblePress(sender: AnyObject) {
-        self.chatCellPress(SIMChatCellEvent(.Bubble, sender, nil))
+        self.chatCellPress(SIMChatMessageCellEvent(.Bubble, sender, nil))
     }
     func onBubbleLongPress(sender: AnyObject) {
-        self.chatCellLongPress(SIMChatCellEvent(.Bubble, sender, nil))
+        self.chatCellLongPress(SIMChatMessageCellEvent(.Bubble, sender, nil))
     }
     func onPortraitPress(sender: AnyObject) {
-        self.chatCellPress(SIMChatCellEvent(.Portrait, sender, nil))
+        self.chatCellPress(SIMChatMessageCellEvent(.Portrait, sender, nil))
     }
     func onPortraitLongPress(sender: AnyObject) {
-        self.chatCellLongPress(SIMChatCellEvent(.Portrait, sender, nil))
+        self.chatCellLongPress(SIMChatMessageCellEvent(.Portrait, sender, nil))
     }
     func onVisitCardPress(sender: AnyObject) {
-        self.chatCellPress(SIMChatCellEvent(.VisitCard, sender, nil))
+        self.chatCellPress(SIMChatMessageCellEvent(.VisitCard, sender, nil))
     }
     func onVisitCardLongPress(sender: AnyObject) {
-        self.chatCellLongPress(SIMChatCellEvent(.VisitCard, sender, nil))
+        self.chatCellLongPress(SIMChatMessageCellEvent(.VisitCard, sender, nil))
     }
     func onRetryPress(sender: AnyObject) {
         SIMLog.trace()
