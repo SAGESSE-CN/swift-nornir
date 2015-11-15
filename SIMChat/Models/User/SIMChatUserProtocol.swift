@@ -10,31 +10,23 @@ import UIKit
 
 /// 用户
 @objc protocol SIMChatUserProtocol {
-    /// 用户类型
-    var type: SIMChatUserType { get }
-    /// 用户唯一标识符
-    var identifier: String { get }
+    
     /// 用户名
     var name: String? { get }
     /// 用户头像
     var portrait: String? { get }
+    /// 用户唯一标识符
+    var identifier: String { get }
 }
 
-/// 用户类型
-@objc enum SIMChatUserType : Int {
-    /// 单聊
-    case C2C
-    /// 群聊
-    case Group
-    /// 讨论组
-    case Discussion
-    /// 公众号
-    case Robot
-    /// 系统消息
-    case System
+/// 用户性别
+@objc enum SIMChatUserGender : Int {
+    case Unknow     /// 未知
+    case Male       /// 男
+    case Female     /// 女
 }
 
 /// 比较两个用户
-func ==(lhs: SIMChatUserProtocol?, rhs: SIMChatUserProtocol?) -> Bool {
-    return lhs === rhs || (lhs?.type == rhs?.type && lhs?.identifier == rhs?.identifier)
+func ==(lhs: SIMChatUserProtocol, rhs: SIMChatUserProtocol?) -> Bool {
+    return lhs.identifier == rhs?.identifier
 }

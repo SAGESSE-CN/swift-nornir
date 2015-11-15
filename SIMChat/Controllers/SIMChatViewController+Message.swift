@@ -220,7 +220,7 @@ extension SIMChatViewController {
         
         // 重新加载...
         let ani = !animated ? UIView.performWithoutAnimation : { b in b() }
-        let style: UITableViewRowAnimation = (m.sender == self.conversation.sender) ? .Right : .Left
+        let style: UITableViewRowAnimation = (m.sender! == self.conversation.sender) ? .Right : .Left
         
         ani { 
             self.tableView.deleteRowsAtIndexPaths(idxs.map({NSIndexPath(forRow: $0, inSection: 0)}), withRowAnimation: style)

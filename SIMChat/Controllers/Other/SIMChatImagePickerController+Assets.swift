@@ -1,5 +1,5 @@
 //
-//  SIMChatAssetsViewController.swift
+//  SIMChatImagePickerController+Assets.swift
 //  SIMChat
 //
 //  Created by sagesse on 11/15/15.
@@ -8,11 +8,42 @@
 
 import UIKit
 
+import Photos
+import AssetsLibrary
+
+extension SIMChatImagePickerController {
+    /// 图片模型
+    class Asset : NSObject {
+        /// 初始化
+        init(_ asset: AnyObject) {
+            self.data = asset
+            super.init()
+        }
+        
+        func s(handler: (UIImage? -> Void)?) {
+            if #available(iOS 8.0, *) {
+                
+                
+//                PHImageManager.defaultManager().requestImageForAsset(<#T##asset: PHAsset##PHAsset#>, targetSize: <#T##CGSize#>, contentMode: <#T##PHImageContentMode#>, options: <#T##PHImageRequestOptions?#>, resultHandler: <#T##(UIImage?, [NSObject : AnyObject]?) -> Void#>)
+                if let v = self.data as? PHAsset {
+                    PHImageManager.defaultManager().requestImageForAsset(v, targetSize: CGSizeMake(70, 70), contentMode: .AspectFill, options: nil) { img, info in
+                        handler?(img)
+                    }
+                        //, resultHandler: <#T##(UIImage?, [NSObject : AnyObject]?) -> Void#>)
+                }
+            }
+        }
+        
+        
+        private var data: AnyObject
+    }
+}
+
 extension SIMChatImagePickerController {
     /// 图片控制器
     class AssetsViewController: UICollectionViewController {
         
-        init(album: SIMChatImagePickerAlbum) {
+        init(album: SIMChatImagePickerController.Album) {
             self.album = album
             super.init(collectionViewLayout: UICollectionViewFlowLayout())
         }
@@ -49,7 +80,7 @@ extension SIMChatImagePickerController {
         }
         
         // ..
-        private var album: SIMChatImagePickerAlbum?
+        private var album: SIMChatImagePickerController.Album?
     }
 }
 

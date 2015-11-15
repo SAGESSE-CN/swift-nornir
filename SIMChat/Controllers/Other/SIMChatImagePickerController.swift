@@ -8,28 +8,38 @@
 
 import UIKit
 
+import Photos
+import AssetsLibrary
+
 class SIMChatImagePickerController: UINavigationController {
+    
+    /// 初始化
+    convenience init(){
+        self.init(nibName: nil, bundle: nil)
+    }
+    /// 初始化
+    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: NSBundle?) {
+        self.rootViewController = AlbumsViewController()
+        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+        
+        // 可能需要直接转到指定页面
+        self.viewControllers = [self.rootViewController]
+    }
+    /// 反序列化
+    required init?(coder aDecoder: NSCoder) {
+        self.rootViewController = AlbumsViewController()
+        super.init(coder: aDecoder)
+        
+        // 可能需要直接转到指定页面
+        self.viewControllers = [self.rootViewController]
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        // Do any additional setup after loading the view.
-    }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
+        
+        assert(rootViewController != nil, "root must created!")
     }
     
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
-    }
-    */
-
+    private var rootViewController: AlbumsViewController!
 }
+

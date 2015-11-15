@@ -33,7 +33,7 @@ extension SIMChatManager {
     func login(user: SIMChatUserProtocol, finish: (NSError? -> Void)?) {
         // 成功
         self.currentUser = user
-        self.userManager[user.identifier] = user
+//        self.userManager[user.identifier] = user
         // 回调
         finish?(nil)
     }

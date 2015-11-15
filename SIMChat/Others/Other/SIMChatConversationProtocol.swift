@@ -63,3 +63,7 @@ import UIKit
     ///
     optional func chatConversation(conversation: SIMChatConversationProtocol, didUpdateMessage message: SIMChatMessage)
 }
+
+@objc enum SIMChatConversationType : Int {
+    case C2C
+}

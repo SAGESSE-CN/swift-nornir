@@ -170,16 +170,16 @@ class SIMChatMessageCellBubble: SIMChatMessageCell {
                 // 强制隐藏
                 self.visitCardView.hidden = true
             } else {
-                // 如果是自己, 隐藏
-                // 如果是C2C,  隐藏
-                // 如果是Robot, 隐藏
-                if let r = m.receiver where m.ownership || r.type == .C2C || r.type == .Robot {
-                    // 隐藏
-                    self.visitCardView.hidden = true
-                } else {
-                    // 显示
-                    self.visitCardView.hidden = false
-                }
+//                // 如果是自己, 隐藏
+//                // 如果是C2C,  隐藏
+//                // 如果是Robot, 隐藏
+//                if let r = m.receiver where m.ownership || r.type == .C2C || r.type == .Robot {
+//                    // 隐藏
+//                    self.visitCardView.hidden = true
+//                } else {
+//                    // 显示
+//                    self.visitCardView.hidden = false
+//                }
             }
             // 关于头像
             self.portraitView.user = m.sender
