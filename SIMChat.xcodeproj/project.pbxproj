@@ -101,7 +101,7 @@
 		0C0C8E531BAD4CD400573160 /* Reveal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Reveal.framework; sourceTree = "<group>"; };
 		0C0C8E551BAD4CFB00573160 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 		0C0C8E671BAD8E5F00573160 /* SIMChatViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SIMChatViewController.swift; sourceTree = "<group>"; wrapsLines = 0; };
-		0C1ABF821BF8E104007B5D0A /* SIMChatImagePickerController+Assets.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SIMChatImagePickerController+Assets.swift"; sourceTree = "<group>"; };
+		0C1ABF821BF8E104007B5D0A /* SIMChatImagePickerController+Assets.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SIMChatImagePickerController+Assets.swift"; sourceTree = "<group>"; wrapsLines = 0; };
 		0C3CA79A1BC144B100C26CA0 /* SDChatManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SDChatManager.swift; sourceTree = "<group>"; };
 		0C3CA79C1BC144C900C26CA0 /* SDChatViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SDChatViewController.swift; sourceTree = "<group>"; };
 		0C3CA79E1BC144F500C26CA0 /* SDChatConversationViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SDChatConversationViewController.swift; sourceTree = "<group>"; };

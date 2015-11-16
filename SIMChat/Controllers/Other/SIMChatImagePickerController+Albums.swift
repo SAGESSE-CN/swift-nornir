@@ -178,7 +178,7 @@ extension SIMChatImagePickerController.AlbumsViewController {
                         // 存在
                         layer.hidden = false
                         
-                        album?.assets[i].s { img in
+                        album?.assets[(album?.count ?? 0) - i - 1].s { img in
                             layer.contents = img?.CGImage
                         }
                         
