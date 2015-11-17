@@ -11,29 +11,6 @@ import UIKit
 import Photos
 import AssetsLibrary
 
-extension SIMChatImagePickerController {
-    /// 图片模型
-    class Asset : NSObject {
-        /// 初始化
-        init(_ asset: AnyObject) {
-            self.data = asset
-            super.init()
-        }
-        
-        func s(handler: (UIImage? -> Void)?) {
-            if #available(iOS 8.0, *) {
-                
-                if let v = self.data as? PHAsset {
-                    PHImageManager.defaultManager().requestImageForAsset(v, targetSize: CGSizeMake(70, 70), contentMode: .AspectFill, options: nil) { img, info in
-                        handler?(img)
-                    }
-                }
-            }
-        }
-        
-        private var data: AnyObject
-    }
-}
 
 extension SIMChatImagePickerController {
     /// 图片控制器
@@ -62,7 +39,7 @@ extension SIMChatImagePickerController {
             
             // Register cell classes
             self.collectionView?.backgroundColor = UIColor.whiteColor()
-            self.collectionView?.registerClass(UICollectionViewCell.self, forCellWithReuseIdentifier: "Asset")
+            self.collectionView?.registerClass(AssetCell.self, forCellWithReuseIdentifier: "Asset")
         }
         
         /// 视图将要显示
@@ -85,11 +62,10 @@ extension SIMChatImagePickerController {
             return album?.count ?? 0
         }
         
+        /// 创建单元格
         override func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
-            let cell = collectionView.dequeueReusableCellWithReuseIdentifier("Asset", forIndexPath: indexPath)
-            
-            cell.backgroundColor = UIColor.orangeColor()
-            
+            let cell = collectionView.dequeueReusableCellWithReuseIdentifier("Asset", forIndexPath: indexPath) as! AssetCell
+            cell.asset = album?.assets[indexPath.row]
             return cell
         }
         
@@ -131,6 +107,60 @@ extension SIMChatImagePickerController {
     }
 }
 
+// MARK: - Type
+extension SIMChatImagePickerController.AssetsViewController {
+    /// 图片单元格
+    private class AssetCell : UICollectionViewCell {
+        required init?(coder aDecoder: NSCoder) {
+            super.init(coder: aDecoder)
+            self.build()
+        }
+        override init(frame: CGRect) {
+            super.init(frame: frame)
+            self.build()
+        }
+        private func build() {
+            
+            backgroundView = UIView()
+            backgroundView?.backgroundColor = UIColor(white: 0, alpha: 0.4)
+            backgroundView?.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
+            
+            photo.frame = bounds
+            photo.clipsToBounds = true
+            photo.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
+            
+            contentView.addSubview(photo)
+        }
+        
+        override var highlighted: Bool {
+            willSet {
+                // 必须有要所改变
+                guard newValue != highlighted else {
+                    return
+                }
+                // 有?
+                if newValue {
+                    self.backgroundView?.frame = self.contentView.bounds
+                    if self.backgroundView?.superview != self.contentView && self.backgroundView != nil {
+                        self.contentView.addSubview(self.backgroundView!)
+                    }
+                } else {
+                    if self.backgroundView?.superview != nil {
+                        self.backgroundView?.removeFromSuperview()
+                    }
+                }
+            }
+        }
+        
+        var asset: SIMChatImagePickerController.Asset? {
+            didSet {
+                photo.asset = asset
+            }
+        }
+        
+        private lazy var photo = SIMChatImagePickerController.PhotoView(frame: CGRectZero)
+    }
+}
 
 // MARK: - Event
 extension SIMChatImagePickerController.AssetsViewController {
