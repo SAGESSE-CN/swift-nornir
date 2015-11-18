@@ -11,6 +11,8 @@ import UIKit
 import Photos
 import AssetsLibrary
 
+let lib = ALAssetsLibrary()
+
 extension SIMChatImagePickerController {
     /// 图集模型
     class Album : NSObject {
@@ -25,17 +27,20 @@ extension SIMChatImagePickerController {
             if #available(iOS 8.0, *) {
                 return self.collection.localizedTitle
             } else {
-                //return self.group.valueForProperty(ALAssetsGroupPropertyName) as? String
-                return "<Unknow>"
+                return self.group.valueForProperty(ALAssetsGroupPropertyName) as? String
             }
         }
         /// 图片数量
         var count: Int {
             if #available(iOS 8.0, *) {
+                // 如果没有加载, 请求第一张.
+                if !self.isLoading {
+                    self.asset(0, complete: nil)
+                }
+                // 然后就ok了
                 return self.assets.count
             } else {
-                //return self.group.numberOfAssets() ?? 0
-                return 0
+                return self.group.numberOfAssets()
             }
         }
         
@@ -47,25 +52,141 @@ extension SIMChatImagePickerController {
         @available(iOS, introduced=4.0, deprecated=9.0) var group: ALAssetsGroup {
             return self.data as! ALAssetsGroup
         }
+       
+        private lazy var assets = Array<SIMChatImagePickerController.Asset>()
+        private lazy var isLoading = false
+        private lazy var waitQueues = Dictionary<Int, [Asset? -> Void]>()
         
-        lazy var assets: [SIMChatImagePickerController.Asset] = {
-            var rs: [SIMChatImagePickerController.Asset] = []
+        func asset(index: Int, complete: (Asset? -> Void)?) {
+            // 加锁， 防止修改assets
+            objc_sync_enter(self)
+            // 如果己经存在，直接回调
+            if index < self.assets.count {
+                let asset = self.assets[index]
+                
+                // 必须要先取出来再解锁
+                objc_sync_exit(self)
+                
+                return complete?(asset) ?? Void()
+            }
+            // 添加到等待队列
+            if let complete = complete {
+                if self.waitQueues[index] == nil {
+                    self.waitQueues[index] = [complete]
+                } else {
+                    self.waitQueues[index]?.append(complete)
+                }
+            }
+            // 解锁必须的。。
+            objc_sync_exit(self)
+            
+            // 正在加载中?
+            guard !self.isLoading else {
+                return
+            }
+            // 如果没有加载, 请求加载
+            self.isLoading = true
+            
+            // iOS 8.x是同步的, iOS 7.x是异步的
             if #available(iOS 8.0, *) {
+                // 查询图片
                 let op = PHFetchOptions()
-                
                 op.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: true)]
+                let assets = PHAsset.fetchAssetsInAssetCollection(self.collection, options: op)
                 
-                let a = PHAsset.fetchAssetsInAssetCollection(self.collection, options: op)
-                for i in 0 ..< a.count {
-                    if let v = a[i] as? PHAsset {
-                        rs.append(SIMChatImagePickerController.Asset(v))
+                // 加锁assets
+                objc_sync_enter(self)
+                
+                // 处理
+                for index in 0 ..< assets.count {
+                    // 创建
+                    let sa = assets[index] as! PHAsset
+                    let asset = SIMChatImagePickerController.Asset(sa)
+                    
+                    // 更新
+                    self.assets.append(asset)
+                    // 取出并清除正在等待的
+                    let queue = self.waitQueues[index]
+                    self.waitQueues.removeValueForKey(index)
+                    
+                    // 通知
+                    queue?.forEach { $0(asset) }
+                }
+                
+                self.waitQueues.removeAll()
+                
+                objc_sync_exit(self)
+            } else {
+                // 这是异步的
+                self.group.enumerateAssetsUsingBlock { sa, index, stop in
+                    // 创建
+                    guard let sa = sa else {
+                        // 清空
+                        objc_sync_enter(self)
+                        self.waitQueues.removeAll()
+                        objc_sync_exit(self)
+                        return
+                    }
+                    let asset = SIMChatImagePickerController.Asset(sa)
+                    
+                    // 加锁assets
+                    objc_sync_enter(self)
+                    
+                    // 更新
+                    self.assets.append(asset)
+                    // 取出并清除正在等待的
+                    let queue = self.waitQueues[index]
+                    self.waitQueues.removeValueForKey(index)
+                    
+                    // 解锁必须的。。
+                    objc_sync_exit(self)
+                    
+                    // 通知
+                    queue?.forEach { $0(asset) }
+                }
+            }
+        }
+        
+        class func fetchAlbums(finish: ([Album] -> Void)?, fail: (NSError? -> Void)?) {
+            var rs: [Album] = []
+            if #available(iOS 8.0, *) {
+                
+                let r1 = PHAssetCollection.fetchAssetCollectionsWithType(.SmartAlbum, subtype: .Any, options: nil)
+                let r2 = PHAssetCollection.fetchAssetCollectionsWithType(.Album, subtype: .Any, options: nil)
+                
+                for i in 0 ..< r1.count {
+                    if let v = r1[i] as? PHAssetCollection {
+                        rs.append(SIMChatImagePickerController.Album(v))
                     }
                 }
+                for i in 0 ..< r2.count {
+                    if let v = r2[i] as? PHAssetCollection {
+                        rs.append(SIMChatImagePickerController.Album(v))
+                    }
+                }
+                
+                finish?(rs)
+                
             } else {
-                // ..
+                
+                // 遍历， 这是异步的
+                lib.enumerateGroupsWithTypes(ALAssetsGroupAll, usingBlock: { group, stop in
+                    // ok
+                    guard let group = group else {
+                        // 完成?
+                        finish?(rs)
+                        return
+                    }
+                    
+                    group.setAssetsFilter(ALAssetsFilter.allAssets())
+                    
+                    rs.append(SIMChatImagePickerController.Album(group))
+                    // 完成?
+                }, failureBlock: { error in
+                    fail?(error)
+                })
             }
-            return rs
-        }()
+        }
         
         /// 内部数据
         private var data: AnyObject
@@ -93,6 +214,12 @@ extension SIMChatImagePickerController {
                         self?.cacheImage = img
                         handler?(img)
                     }
+                }
+            } else {
+                if let v = self.data as? ALAsset {
+                    let img = UIImage(CGImage: v.thumbnail().takeUnretainedValue())
+                    self.cacheImage = img
+                    handler?(img)
                 }
             }
         }
@@ -127,10 +254,11 @@ extension SIMChatImagePickerController {
                     let photo = photos[i]
                     if i < album?.count ?? 0 {
                         // 更新
-                        photo.asset = album?.assets[(album?.count ?? 0) - i - 1]
-                        // 检查集合的类型
-                        photo.badgeStyle = .None //(i == 0) ? .Simple : .None
-                        
+                        album?.asset((album?.count ?? 0) - i - 1) { asset in
+                            photo.asset = asset
+                            // 检查集合的类型
+                            photo.badgeStyle = .None //(i == 0) ? .Simple : .None
+                        }
                         // 显示
                         if photo.superview != self {
                             self.insertSubview(photo, atIndex: 0)
@@ -285,6 +413,15 @@ extension SIMChatImagePickerController {
             self.tableView.registerClass(AlbumCell.self, forCellReuseIdentifier: "Album")
             self.tableView.separatorStyle = .None
             
+            // 监听
+//            // Register observer
+//            [[NSNotificationCenter defaultCenter] addObserver:self
+//                selector:@selector(assetsLibraryChanged:)
+//            name:ALAssetsLibraryChangedNotification
+//            object:nil];
+//        
+//        [[PHPhotoLibrary sharedPhotoLibrary] registerChangeObserver:self];
+            
             self.onRefresh(self)
         }
         
@@ -412,32 +549,12 @@ extension SIMChatImagePickerController.AlbumsViewController {
     private dynamic func onRefresh(sender: AnyObject) {
         SIMLog.trace()
         
-        // 加锁
-        objc_sync_enter(self.albums)
-        
-        if #available(iOS 8.0, *) {
-            
-            let r1 = PHAssetCollection.fetchAssetCollectionsWithType(.SmartAlbum, subtype: .Any, options: nil)
-            let r2 = PHAssetCollection.fetchAssetCollectionsWithType(.Album, subtype: .Any, options: nil)
-            
+        SIMChatImagePickerController.Album.fetchAlbums({ a in
+            self.albums = a
+            self.tableView.reloadData()
+        }, fail: { e in
             self.albums.removeAll()
-            
-            for i in 0 ..< r1.count {
-                if let v = r1[i] as? PHAssetCollection {
-                    self.albums.append(SIMChatImagePickerController.Album(v))
-                }
-            }
-            for i in 0 ..< r2.count {
-                if let v = r2[i] as? PHAssetCollection {
-                    self.albums.append(SIMChatImagePickerController.Album(v))
-                }
-            }
-            
-        }
-        
-        // 解锁
-        objc_sync_exit(self.albums)
-        // 重新加载
-        self.tableView.reloadData()
+            self.tableView.reloadData()
+        })
     }
 }
