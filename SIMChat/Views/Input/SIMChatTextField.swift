@@ -93,7 +93,7 @@ class SIMChatTextField : SIMView {
     }
     /// 当前焦点
     override func isFirstResponder() -> Bool {
-        return super.isFirstResponder() || self.textView.isFirstResponder()
+        return self.textView.isFirstResponder() || super.isFirstResponder()
     }
     /// 放弃焦点
     override func resignFirstResponder() -> Bool {
@@ -114,7 +114,7 @@ class SIMChatTextField : SIMView {
     override func intrinsicContentSize() -> CGSize {
         if textView.contentSize.height > maxHeight {
             // 不要改变
-            return CGSizeMake(bounds.width, bounds.height)
+            return CGSizeMake(bounds.width, maxHeight)
         }
         return CGSizeMake(bounds.width, max(textView.contentSize.height, 36) + 10)
     }
@@ -283,10 +283,12 @@ extension SIMChatTextField : UITextViewDelegate {
         let dst = textView.contentSize.height
         // 只有不同才会调整
         if src != dst {
-            if textView.contentSize.height < maxHeight {
+            if src + 36 < maxHeight /* 粘贴支持 */ || textView.contentSize.height < maxHeight {
                 SIMLog.trace("src: \(src), dst: \(dst)")
                 UIView.animateWithDuration(0.25) {
                     self.invalidateIntrinsicContentSize()
+                    // ios7
+                    textView.layoutIfNeeded()
                     self.layoutIfNeeded()
                     self.superview?.layoutIfNeeded()
                 }

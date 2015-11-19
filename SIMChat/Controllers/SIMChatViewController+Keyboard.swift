@@ -55,6 +55,8 @@ extension SIMChatViewController {
         //       只能使用layer.transform
         self.textField.layer.transform = CATransform3DMakeTranslation(0, -h1, 0)
         self.tableView.layer.transform = CATransform3DMakeTranslation(0, -h2, 0)
+        //self.textField.transform = CGAffineTransformMakeTranslation(0, -h1)
+        //self.tableView.transform = CGAffineTransformMakeTranslation(0, -h2)
         self.tableView.contentInset = UIEdgeInsetsMake(h2 + fix.top, fix.left, fix.bottom, fix.right)
         self.tableView.scrollIndicatorInsets = UIEdgeInsetsMake(h2 + fix.top, fix.left, fix.bottom, fix.right)
         // :)
@@ -106,10 +108,10 @@ extension SIMChatViewController {
             let h = r1.height//self.view.bounds.height - r1.origin.y
             if self.keyboardHeight != h {
                 SIMLog.trace()
-                // 取消隐藏动画
-                self.keyboardHiddenAnimation = false
                 self.onKeyboardShow(CGRectMake(0, 0, r1.width, h))
             }
+            // 取消隐藏动画
+            self.keyboardHiddenAnimation = false
         }
     }
     /// 键盘隐藏

@@ -67,6 +67,8 @@ class SIMChatViewController: SIMViewController {
         view.insertSubview(tableView, atIndex: 0)
         view.insertSubview(textField, aboveSubview: tableView)
         
+        //self.inputView = textField
+        //self.inputAccessoryView = textField
         // add constraints
         view.addConstraints(NSLayoutConstraintMake("H:|-(0)-[tf]-(0)-|", views: vs))
         view.addConstraints(NSLayoutConstraintMake("V:[tf]|", views: vs))
@@ -82,6 +84,7 @@ class SIMChatViewController: SIMViewController {
             self.loadHistorys(40)
         }
     }
+    
     /// 视图将要出现
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)

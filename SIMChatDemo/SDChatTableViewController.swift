@@ -27,10 +27,8 @@ class SDChatTableViewController: UITableViewController {
     
     
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        if #available(iOS 8.0, *) {
-            let picker = SIMChatImagePickerController()
-            
-            self.presentViewController(picker, animated: true, completion: nil)
-        }
+        let picker = SIMChatImagePickerController()
+        
+        self.presentViewController(picker, animated: true, completion: nil)
     }
 }
