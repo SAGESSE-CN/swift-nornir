@@ -191,14 +191,9 @@ class SIMChatImageAlbumsViewController : UITableViewController {
         self.tableView.separatorStyle = .None
         
         // 监听
-        //            // Register observer
-        //            [[NSNotificationCenter defaultCenter] addObserver:self
-        //                selector:@selector(assetsLibraryChanged:)
-        //            name:ALAssetsLibraryChangedNotification
-        //            object:nil];
-        //        
-        //        [[PHPhotoLibrary sharedPhotoLibrary] registerChangeObserver:self];
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "onLibraryDidChanged:", name: SIMChatImageLibraryDidChangedNotification, object: nil)
         
+        // .
         self.onRefresh(self)
     }
     
@@ -333,5 +328,9 @@ extension SIMChatImageAlbumsViewController {
             self.albums = a ?? []
             self.tableView.reloadData()
         }
+    }
+    /// 图库发生改变
+    private dynamic func onLibraryDidChanged(sender: NSNotification) {
+        self.onRefresh(sender)
     }
 }

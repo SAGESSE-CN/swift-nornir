@@ -31,8 +31,8 @@ class SIMChatImageAssetsViewController: UICollectionViewController, UICollection
         
         assert(album != nil, "Album can't empty!")
         
-        self.title = album?.title
-        self.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .Cancel, target: self, action: "onCancel:")
+        title = album?.title
+        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .Cancel, target: self, action: "onCancel:")
         
         let s1 = UIBarButtonItem(barButtonSystemItem: .FlexibleSpace, target: nil, action: "")
 //        let s2 = UIBarButtonItem(barButtonSystemItem: .FlexibleSpace, target: nil, action: "")
@@ -45,30 +45,38 @@ class SIMChatImageAssetsViewController: UICollectionViewController, UICollection
         i2.width = 48
         i4.width = 48
         
-        
-        //self.setToolbarHidden(false)
-        self.toolbarItems = [i1, i2, i3, s1, i4]
+        //setToolbarHidden(false)
+        toolbarItems = [i1, i2, i3, s1, i4]
         
         // Register cell classes
-        self.collectionView?.backgroundColor = UIColor.whiteColor()
-        self.collectionView?.registerClass(AssetCell.self, forCellWithReuseIdentifier: "Asset")
+        collectionView?.backgroundColor = UIColor.whiteColor()
+        collectionView?.registerClass(AssetCell.self, forCellWithReuseIdentifier: "Asset")
+//        collectionView?.canCancelContentTouches = true
         
+        if let collectionView = collectionView {
+            // 添加手势
+            let pan = UIPanGestureRecognizer(target: self, action: "onSelectItems:")
+            pan.delegate = self
+            collectionView.panGestureRecognizer.requireGestureRecognizerToFail(pan)
+//            pan.requireGestureRecognizerToFail()
+            collectionView.addGestureRecognizer(pan)
+        }
     }
     
     /// 视图将要显示
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         // 临时关闭侧滑手势
-        self.navigationController?.interactivePopGestureRecognizer?.enabled = false
-        self.navigationController?.setToolbarHidden(false, animated: true)
+        navigationController?.interactivePopGestureRecognizer?.enabled = false
+        navigationController?.setToolbarHidden(false, animated: true)
     }
     
     /// 视图将要消失
     override func viewWillDisappear(animated: Bool) {
         super.viewWillDisappear(animated)
         // 恢复侧滑手势
-        self.navigationController?.interactivePopGestureRecognizer?.enabled = true
-        self.navigationController?.setToolbarHidden(true, animated: true)
+        navigationController?.interactivePopGestureRecognizer?.enabled = true
+        navigationController?.setToolbarHidden(true, animated: true)
     }
     
     // MARK: UICollectionViewDataSource
@@ -80,11 +88,44 @@ class SIMChatImageAssetsViewController: UICollectionViewController, UICollection
     /// 创建单元格
     override func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier("Asset", forIndexPath: indexPath) as! AssetCell
-        album?.asset(indexPath.row) { asset in
+        // 标记和默认值
+        cell.tag = indexPath.row
+        cell.mark = false
+        // 更新内容
+        album?.asset(indexPath.row) { [weak self]asset in
+            // 检查标记
+            guard cell.tag == indexPath.row else {
+                return
+            }
+            // 更新数据
             cell.asset = asset
+            // 更新状态
+            if let asset = asset {
+                cell.mark = self?.selectedItems.contains(asset) ?? false
+            } else {
+                cell.mark = false
+            }
+        }
+        // 设置回调事件
+        cell.selectHandler = { [weak self] cell in
+            // 检查数据, 如果没有数据说明还在加载, 不能点击
+            guard let asset = cell.asset else {
+                return
+            }
+            // 检查是否己经存在
+            if let index = self?.selectedItems.indexOf(asset) {
+                // 取消
+                self?.selectedItems.removeAtIndex(index)
+                cell.setMark(false, animated: true)
+            } else {
+                // 选中
+                self?.selectedItems.insert(asset)
+                cell.setMark(true, animated: true)
+            }
         }
         return cell
     }
+    
     
     // MARK: UICollectionViewDelegateFlowLayout
     
@@ -99,22 +140,34 @@ class SIMChatImageAssetsViewController: UICollectionViewController, UICollection
         return CGSizeMake(width / CGFloat(column), width / CGFloat(column))
     }
     
+    // MARK: UICollectionViewDelegate
+    override func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
+        SIMLog.trace(indexPath)
+    }
+    
     // MARK: Rotate
     
     /// 转屏事件, iOS 6.x, iOS 7.x
     @available(iOS, introduced=2.0, deprecated=8.0)
     override func willRotateToInterfaceOrientation(toInterfaceOrientation: UIInterfaceOrientation, duration: NSTimeInterval) {
         super.willRotateToInterfaceOrientation(toInterfaceOrientation, duration: duration)
-        self.collectionView?.collectionViewLayout.invalidateLayout()
+        collectionView?.collectionViewLayout.invalidateLayout()
     }
     
     /// 转屏事件, iOS 8.x
     @available(iOS, introduced=8.0)
     override func viewWillTransitionToSize(size: CGSize, withTransitionCoordinator coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransitionToSize(size, withTransitionCoordinator: coordinator)
-        self.collectionView?.collectionViewLayout.invalidateLayout()
+        collectionView?.collectionViewLayout.invalidateLayout()
     }
     
+    
+    private var selectedItems: Set<SIMChatImageAsset> = []
+    
+    // 批量选中
+    private var selectedBegin: Int?
+    private var selectedEnd: Int?
+    private var selectedType: Bool?
     
     // ..
     private var album: SIMChatImageAlbum?
@@ -138,20 +191,16 @@ extension SIMChatImageAssetsViewController {
         }
     }
     /// 图片单元格
-    private class AssetCell : UICollectionViewCell {
+    private class AssetCell : UICollectionViewCell, UIGestureRecognizerDelegate {
         required init?(coder aDecoder: NSCoder) {
             super.init(coder: aDecoder)
-            self.build()
+            build()
         }
         override init(frame: CGRect) {
             super.init(frame: frame)
-            self.build()
+            build()
         }
         private func build() {
-            
-            backgroundView = UIView()
-            backgroundView?.backgroundColor = UIColor(white: 0, alpha: 0.4)
-            backgroundView?.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
             
             photoView.frame = bounds
             photoView.clipsToBounds = true
@@ -159,39 +208,72 @@ extension SIMChatImageAssetsViewController {
             
             markView.frame = CGRectMake(bounds.width - 23 - 4.5, 4.5, 23, 23)
             markView.autoresizingMask = [.FlexibleLeftMargin, .FlexibleBottomMargin]
-            markView.image = UIImage(named: "image_deselect")
-            markView.highlightedImage = UIImage(named: "image_select")
             markView.userInteractionEnabled = true
+            // 默认图片
+            markView.image = SIMChatImageLibrary.sharedLibrary().deselectImage
             
             contentView.addSubview(photoView)
             contentView.addSubview(markView)
+            
+            // 添加点击手势
+            let tap = UITapGestureRecognizer(target: self, action: "onSelectItem:")
+            tap.delegate = self
+            contentView.addGestureRecognizer(tap)
         }
         
-        override var highlighted: Bool {
-            willSet {
-                // 必须有要所改变
-                guard newValue != highlighted else {
-                    return
-                }
-                // 有?
-                if newValue {
-                    self.backgroundView?.frame = self.contentView.bounds
-                    if self.backgroundView?.superview != self.contentView && self.backgroundView != nil {
-                        self.contentView.addSubview(self.backgroundView!)
-                    }
-                } else {
-                    if self.backgroundView?.superview != nil {
-                        self.backgroundView?.removeFromSuperview()
-                    }
-                }
+        /// 重新调整可点击范围
+        @objc func gestureRecognizer(gestureRecognizer: UIGestureRecognizer, shouldReceiveTouch touch: UITouch) -> Bool {
+            let size = markView.bounds.size
+            let origin = touch.locationInView(markView)
+            // 如果在这个范围内
+            if fabs(hypot(origin.x - size.width / 2, origin.y - size.height / 2)) < size.width {
+                return true
+            }
+            return false
+        }
+        
+        /// 选择事件
+        private dynamic func onSelectItem(sender: AnyObject) {
+            selectHandler?(self)
+        }
+        
+        /// 设置
+        func setMark(mark: Bool, animated: Bool) {
+            self.mark = mark
+            if animated && mark {
+                // 选中时, 加点特效
+                let a = CAKeyframeAnimation(keyPath: "transform.scale")
+                
+                a.values = [0.8, 1.2, 1]
+                a.duration = 0.25
+                a.calculationMode = kCAAnimationCubic
+                
+                markView.layer.addAnimation(a, forKey: "v")
             }
         }
         
+        /// 图片
         var asset: SIMChatImageAsset? {
             didSet {
                 photoView.asset = asset
             }
         }
+        
+        /// 标记
+        var mark: Bool = false {
+            didSet {
+                // 必须有所改变
+                guard mark != oldValue else {
+                    return
+                }
+                let lib = SIMChatImageLibrary.sharedLibrary()
+                markView.image = mark ? lib.selectImage : lib.deselectImage
+            }
+        }
+        
+        /// 选择事件回调
+        /// 因为这个是一个不公开的类, 所以简单点直接用闭包
+        var selectHandler: (AssetCell -> Void)?
         
         private lazy var photoView = SIMChatImagePhotoView(frame: CGRectZero)
         private lazy var markView = UIImageView(frame: CGRectZero)
@@ -199,10 +281,104 @@ extension SIMChatImageAssetsViewController {
 }
 
 // MARK: - Event
-extension SIMChatImageAssetsViewController {
+extension SIMChatImageAssetsViewController : UIGestureRecognizerDelegate {
+    
+    /// 手势将要开始的时候检查一下是否需要使用
+    func gestureRecognizerShouldBegin(gestureRecognizer: UIGestureRecognizer) -> Bool {
+        if let pan = gestureRecognizer as? UIPanGestureRecognizer {
+            let pt = pan.velocityInView(collectionView)
+            // 检测手势的方向
+            // 如果超出阀值视为放弃该手势
+            if fabs(pt.y) > 240 || fabs(pt.y / pt.x) > 1.5 {
+                return false
+            }
+        }
+        return true
+    }
+    
     /// 取消
     private dynamic func onCancel(sender: AnyObject) {
         SIMLog.trace()
-        self.navigationController?.dismissViewControllerAnimated(true, completion: nil)
+        navigationController?.dismissViewControllerAnimated(true, completion: nil)
+    }
+    /// 批量选中
+    private dynamic func onSelectItems(sender: UIPanGestureRecognizer) {
+        let pt = sender.locationInView(collectionView)
+        // 结束的时候检查状态
+        defer {
+            // 结束的时候重置他
+            if sender.state == .Failed || sender.state == .Cancelled || sender.state == .Ended  {
+                selectedBegin = nil
+                selectedEnd = nil
+                selectedType = nil
+            }
+        }
+        // 先转为indexPath, 必须成功
+        guard let indexPath = collectionView?.indexPathForItemAtPoint(pt) else {
+            return
+        }
+        
+        // 把上一次的结束做为取消
+        let deselectedEnd = selectedEnd
+        
+        // 开始的时候必须重置选中区域
+        if selectedBegin == nil {
+            selectedBegin = indexPath.row
+            selectedEnd = indexPath.row
+        } else {
+            selectedEnd = indexPath.row
+        }
+        
+        // 如果为空就跳过事件处理
+        guard let sb = selectedBegin, let se = selectedEnd else {
+            return
+        }
+        
+        let begin = min(sb, se)
+        let end = max(sb, se)
+        
+        // 选中区域
+        for i in begin ... end {
+            guard let cell = collectionView?.cellForItemAtIndexPath(NSIndexPath(forItem: i, inSection: 0)) as? AssetCell else {
+                continue
+            }
+            // 取出
+            if selectedType == nil {
+                selectedType = !cell.mark
+            }
+            // 临时标记
+            cell.mark = selectedType ?? true
+            // 如果是结束, 那就提交
+            // 对于手势取消/中断都认为是成功
+            if sender.state == .Ended || sender.state == .Failed || sender.state == .Cancelled {
+                if let asset = cell.asset, let mark = selectedType {
+                    // 检查状态
+                    if mark {
+                        selectedItems.insert(asset)
+                    } else {
+                        selectedItems.remove(asset)
+                    }
+                }
+            }
+        }
+        
+        // 计算需要取消的
+        if let ce = deselectedEnd {
+            for i in min(sb, ce) ... max(sb, ce) {
+                // 如果这个区域在sb-se之内, 跳过
+                if begin <= i && i <= end {
+                    continue
+                }
+                guard let cell = collectionView?.cellForItemAtIndexPath(NSIndexPath(forItem: i, inSection: 0)) as? AssetCell else {
+                    continue
+                }
+                // 重新恢复标记
+                if let asset = cell.asset {
+                    cell.mark = self.selectedItems.contains(asset)
+                } else {
+                    cell.mark = false
+                }
+            }
+        }
     }
 }

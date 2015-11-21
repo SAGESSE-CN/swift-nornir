@@ -186,6 +186,27 @@ class SIMChatImageAlbum : NSObject {
 /// 图片库
 class SIMChatImageLibrary : NSObject {
     
+    /// 初始化
+    override init() {
+        super.init()
+        
+        // 添加监听
+        if #available(iOS 9.0, *) {
+            PHPhotoLibrary.sharedPhotoLibrary().registerChangeObserver(self)
+        } else {
+            NSNotificationCenter.defaultCenter().addObserver(self, selector: "assetsLibraryDidChange:", name: ALAssetsLibraryChangedNotification, object: nil)
+        //PHPhotoLibraryChangeObserver
+        //            // Register observer
+        //            [[NSNotificationCenter defaultCenter] addObserver:self
+        //                selector:@selector(assetsLibraryChanged:)
+        //            name:ALAssetsLibraryChangedNotification
+        //            object:nil];
+        //        
+        //        [[PHPhotoLibrary sharedPhotoLibrary] registerChangeObserver:self];
+        
+        }
+    }
+    
     ///
     /// 获取图集
     ///
@@ -241,7 +262,9 @@ class SIMChatImageLibrary : NSObject {
     }
     
     lazy var caches = NSCache()
-    //lazy var
+    
+    let selectImage =  UIImage(named: "image_select")
+    let deselectImage =  UIImage(named: "image_deselect")
     
     @available(iOS, introduced=8.0) lazy var manager = PHImageManager()
     @available(iOS, introduced=4.0, deprecated=9.0) lazy var library = ALAssetsLibrary()
@@ -249,6 +272,24 @@ class SIMChatImageLibrary : NSObject {
     private static var sharedInstance = SIMChatImageLibrary()
 }
 
+/// 图集改变事件
+extension SIMChatImageLibrary : PHPhotoLibraryChangeObserver {
+    
+    /// 图片改变
+    func assetsLibraryDidChange(sender: NSNotification) {
+        SIMLog.trace(sender)
+        NSNotificationCenter.defaultCenter().postNotificationName(SIMChatImageLibraryDidChangedNotification, object: self)
+    }
+    
+    /// 图片改变
+    @available(iOS 8.0, *)
+    func photoLibraryDidChange(changeInstance: PHChange) {
+        SIMLog.trace(changeInstance)
+        NSNotificationCenter.defaultCenter().postNotificationName(SIMChatImageLibraryDidChangedNotification, object: self)
+    }
+}
+
+let SIMChatImageLibraryDidChangedNotification = "SIMChatImageLibraryDidChangedNotification"
 
 ///
 /// 图片选择(多选)
