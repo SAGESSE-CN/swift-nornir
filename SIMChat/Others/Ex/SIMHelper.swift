@@ -39,9 +39,9 @@ func NSLayoutConstraintMake(format: String, views: [String : AnyObject], options
 }
 
 /// 添加build
-class SIMView : UIView {
+public class SIMView : UIView {
     /// 序列化
-    required init?(coder aDecoder: NSCoder) {
+    required public init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         self.build()
     }

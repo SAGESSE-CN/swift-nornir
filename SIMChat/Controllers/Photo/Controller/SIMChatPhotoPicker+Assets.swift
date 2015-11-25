@@ -1,17 +1,17 @@
 //
-//  SIMChatImagePickerController+Assets.swift
+//  SIMChatPhotoPicker+Assets.swift
 //  SIMChat
 //
-//  Created by sagesse on 11/15/15.
+//  Created by sagesse on 11/22/15.
 //  Copyright © 2015 Sagesse. All rights reserved.
 //
 
 import UIKit
 
 /// 图片控制器
-class SIMChatImageAssetsViewController: UICollectionViewController, UICollectionViewDelegateFlowLayout {
+internal class SIMChatPhotoPickerAssets: UICollectionViewController, UICollectionViewDelegateFlowLayout {
     
-    init(album: SIMChatImageAlbum) {
+    init(_ album: SIMChatPhotoAlbum, _ picker: SIMChatPhotoPicker?) {
         let layout = AssetLayout()
         layout.itemSize = CGSizeMake(78, 78)
         layout.minimumLineSpacing = 2
@@ -19,10 +19,12 @@ class SIMChatImageAssetsViewController: UICollectionViewController, UICollection
         layout.headerReferenceSize = CGSizeMake(0, 10)
         layout.footerReferenceSize = CGSizeZero
         self.album = album
+        self.picker = picker
         super.init(collectionViewLayout: layout)
     }
     required init?(coder aDecoder: NSCoder) {
         self.album = nil
+        self.picker = nil
         super.init(coder: aDecoder)
     }
     
@@ -33,20 +35,19 @@ class SIMChatImageAssetsViewController: UICollectionViewController, UICollection
         
         title = album?.title
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .Cancel, target: self, action: "onCancel:")
+        navigationItem.backBarButtonItem = UIBarButtonItem(title: "Back", style: .Done, target: nil, action: "")
         
         let s1 = UIBarButtonItem(barButtonSystemItem: .FlexibleSpace, target: nil, action: "")
 //        let s2 = UIBarButtonItem(barButtonSystemItem: .FlexibleSpace, target: nil, action: "")
         let i1 = UIBarButtonItem(title: "预览", style: .Bordered, target: nil, action: "")
-        let i2 = UIBarButtonItem(title: "编辑", style: .Bordered, target: nil, action: "")
         let i3 = UIBarButtonItem(title: "原图", style: .Bordered, target: nil, action: "")
         let i4 = UIBarButtonItem(title: "发送(99)", style: .Done, target: nil, action: "")
         
         i1.width = 32
-        i2.width = 48
         i4.width = 48
         
         //setToolbarHidden(false)
-        toolbarItems = [i1, i2, i3, s1, i4]
+        toolbarItems = [i1, i3, s1, i4]
         
         // Register cell classes
         collectionView?.backgroundColor = UIColor.whiteColor()
@@ -66,17 +67,29 @@ class SIMChatImageAssetsViewController: UICollectionViewController, UICollection
     /// 视图将要显示
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
-        // 临时关闭侧滑手势
-        navigationController?.interactivePopGestureRecognizer?.enabled = false
-        navigationController?.setToolbarHidden(false, animated: true)
+        SIMLog.trace()
+        // 开启工具栏
+        navigationController?.setToolbarHidden(false, animated: animated)
     }
     
     /// 视图将要消失
     override func viewWillDisappear(animated: Bool) {
         super.viewWillDisappear(animated)
+        SIMLog.trace()
         // 恢复侧滑手势
         navigationController?.interactivePopGestureRecognizer?.enabled = true
-        navigationController?.setToolbarHidden(true, animated: true)
+    }
+    
+    override func viewDidAppear(animated: Bool) {
+        super.viewDidAppear(animated)
+        SIMLog.trace()
+        // 临时关闭侧滑手势
+        navigationController?.interactivePopGestureRecognizer?.enabled = false
+    }
+    
+    override func viewDidDisappear(animated: Bool) {
+        super.viewDidDisappear(animated)
+        SIMLog.trace()
     }
     
     // MARK: UICollectionViewDataSource
@@ -100,26 +113,22 @@ class SIMChatImageAssetsViewController: UICollectionViewController, UICollection
             // 更新数据
             cell.asset = asset
             // 更新状态
-            if let asset = asset {
-                cell.mark = self?.selectedItems.contains(asset) ?? false
-            } else {
-                cell.mark = false
-            }
+            cell.mark = self?.picker?.checkItem(asset) ?? false
         }
         // 设置回调事件
         cell.selectHandler = { [weak self] cell in
             // 检查数据, 如果没有数据说明还在加载, 不能点击
-            guard let asset = cell.asset else {
+            guard let asset = cell.asset, let ss = self else {
                 return
             }
             // 检查是否己经存在
-            if let index = self?.selectedItems.indexOf(asset) {
+            if ss.picker?.checkItem(asset) ?? false {
                 // 取消
-                self?.selectedItems.removeAtIndex(index)
+                ss.picker?.deselectItem(asset)
                 cell.setMark(false, animated: true)
             } else {
                 // 选中
-                self?.selectedItems.insert(asset)
+                ss.picker?.selectItem(asset)
                 cell.setMark(true, animated: true)
             }
         }
@@ -142,7 +151,11 @@ class SIMChatImageAssetsViewController: UICollectionViewController, UICollection
     
     // MARK: UICollectionViewDelegate
     override func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
-        SIMLog.trace(indexPath)
+        SIMLog.trace(indexPath.row)
+        let vc = SIMChatPhotoPickerPreviews(album, picker, def: indexPath.row)
+        
+        //navigationController?.delegate = self
+        navigationController?.pushViewController(vc, animated: true)
     }
     
     // MARK: Rotate
@@ -152,6 +165,7 @@ class SIMChatImageAssetsViewController: UICollectionViewController, UICollection
     override func willRotateToInterfaceOrientation(toInterfaceOrientation: UIInterfaceOrientation, duration: NSTimeInterval) {
         super.willRotateToInterfaceOrientation(toInterfaceOrientation, duration: duration)
         collectionView?.collectionViewLayout.invalidateLayout()
+        SIMLog.trace()
     }
     
     /// 转屏事件, iOS 8.x
@@ -159,10 +173,8 @@ class SIMChatImageAssetsViewController: UICollectionViewController, UICollection
     override func viewWillTransitionToSize(size: CGSize, withTransitionCoordinator coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransitionToSize(size, withTransitionCoordinator: coordinator)
         collectionView?.collectionViewLayout.invalidateLayout()
+        SIMLog.trace()
     }
-    
-    
-    private var selectedItems: Set<SIMChatImageAsset> = []
     
     // 批量选中
     private var selectedBegin: Int?
@@ -170,14 +182,66 @@ class SIMChatImageAssetsViewController: UICollectionViewController, UICollection
     private var selectedType: Bool?
     
     // ..
-    private var album: SIMChatImageAlbum?
+    private var album: SIMChatPhotoAlbum?
     
     private let portraitColumn = 4
     private let landscapeColumn = 7
+    
+    /// 选择器
+    weak var picker: SIMChatPhotoPicker?
 }
 
+//// MARK: - Transitions
+//extension SIMChatPhotoPickerAssets : UINavigationControllerDelegate, UIViewControllerAnimatedTransitioning {
+//    
+//    /// 转场时间
+//    func transitionDuration(transitionContext: UIViewControllerContextTransitioning?) -> NSTimeInterval {
+//        return 0.25
+//    }
+//    /// 动画效果
+//    func animateTransition(transitionContext: UIViewControllerContextTransitioning) {
+//        // ok
+//        guard let toVC = transitionContext.viewControllerForKey(UITransitionContextToViewControllerKey) else {
+//            return
+//        }
+//        
+//        let containerView = transitionContext.containerView()
+//        
+//        toVC.view.frame = transitionContext.finalFrameForViewController(toVC)
+//        toVC.view.alpha = 0
+//        
+//        containerView?.addSubview(toVC.view)
+//        
+//        
+//        UIView.animateWithDuration(0.25, animations: {
+//            toVC.view.alpha = 1
+//        }, completion: { f in
+//            transitionContext.completeTransition(true)
+//        })
+//        
+////        // 初始化一开始的状态
+////        toViewController.view.frame = [transitionContext finalFrameForViewController:toViewController];
+////        toViewController.view.alpha = 0;
+////        toViewController.imageView.hidden = YES;
+////        
+////        [containerView addSubview:toViewController.view];
+//    }
+//    /// 动画结束
+//    func animationEnded(transitionCompleted: Bool) {
+//        SIMLog.trace()
+//    }
+//    
+//    /// 切换
+//    func navigationController(navigationController: UINavigationController, animationControllerForOperation operation: UINavigationControllerOperation, fromViewController fromVC: UIViewController, toViewController toVC: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+////        if fromVC is SIMChatImagePreviewsViewController || toVC is SIMChatImagePreviewsViewController {
+////            return self
+////        }
+//        return nil
+//    }
+//}
+
 // MARK: - Type
-extension SIMChatImageAssetsViewController {
+extension SIMChatPhotoPickerAssets {
     /// 图片布局
     private class AssetLayout : UICollectionViewFlowLayout {
         override func collectionViewContentSize() -> CGSize {
@@ -202,17 +266,17 @@ extension SIMChatImageAssetsViewController {
         }
         private func build() {
             
-            photoView.frame = bounds
-            photoView.clipsToBounds = true
-            photoView.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
+            assetView.frame = bounds
+            assetView.clipsToBounds = true
+            assetView.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
             
             markView.frame = CGRectMake(bounds.width - 23 - 4.5, 4.5, 23, 23)
             markView.autoresizingMask = [.FlexibleLeftMargin, .FlexibleBottomMargin]
             markView.userInteractionEnabled = true
             // 默认图片
-            markView.image = SIMChatImageLibrary.sharedLibrary().deselectImage
+            markView.image = SIMChatPhotoLibrary.sharedLibrary().deselectImage
             
-            contentView.addSubview(photoView)
+            contentView.addSubview(assetView)
             contentView.addSubview(markView)
             
             // 添加点击手势
@@ -225,7 +289,7 @@ extension SIMChatImageAssetsViewController {
         @objc func gestureRecognizer(gestureRecognizer: UIGestureRecognizer, shouldReceiveTouch touch: UITouch) -> Bool {
             let size = markView.bounds.size
             let origin = touch.locationInView(markView)
-            // 如果在这个范围内
+            // 如果在这个半径范围内
             if fabs(hypot(origin.x - size.width / 2, origin.y - size.height / 2)) < size.width {
                 return true
             }
@@ -253,9 +317,19 @@ extension SIMChatImageAssetsViewController {
         }
         
         /// 图片
-        var asset: SIMChatImageAsset? {
+        var asset: SIMChatPhotoAsset? {
             didSet {
-                photoView.asset = asset
+                assetView.asset = asset
+                // 检查类型
+                switch asset?.mediaType ?? .Unknown  {
+                case .Unknown:  assetView.badgeStyle = .None
+                case .Image:    assetView.badgeStyle = .None
+                case .Video:    assetView.badgeStyle = .Video
+                case .Audio:    assetView.badgeStyle = .Audio
+                }
+                let duration = asset?.mediaDuration ?? 0
+                // 总是更新value
+                assetView.badgeValue = String(format: "%d:%02d", Int(duration / 60), Int(duration % 60))
             }
         }
         
@@ -266,7 +340,7 @@ extension SIMChatImageAssetsViewController {
                 guard mark != oldValue else {
                     return
                 }
-                let lib = SIMChatImageLibrary.sharedLibrary()
+                let lib = SIMChatPhotoLibrary.sharedLibrary()
                 markView.image = mark ? lib.selectImage : lib.deselectImage
             }
         }
@@ -275,13 +349,13 @@ extension SIMChatImageAssetsViewController {
         /// 因为这个是一个不公开的类, 所以简单点直接用闭包
         var selectHandler: (AssetCell -> Void)?
         
-        private lazy var photoView = SIMChatImagePhotoView(frame: CGRectZero)
         private lazy var markView = UIImageView(frame: CGRectZero)
+        private lazy var assetView = SIMChatPhotoAssetView(frame: CGRectZero)
     }
 }
 
 // MARK: - Event
-extension SIMChatImageAssetsViewController : UIGestureRecognizerDelegate {
+extension SIMChatPhotoPickerAssets : UIGestureRecognizerDelegate {
     
     /// 手势将要开始的时候检查一下是否需要使用
     func gestureRecognizerShouldBegin(gestureRecognizer: UIGestureRecognizer) -> Bool {
@@ -289,7 +363,7 @@ extension SIMChatImageAssetsViewController : UIGestureRecognizerDelegate {
             let pt = pan.velocityInView(collectionView)
             // 检测手势的方向
             // 如果超出阀值视为放弃该手势
-            if fabs(pt.y) > 240 || fabs(pt.y / pt.x) > 1.5 {
+            if fabs(pt.y) > 80 || fabs(pt.y / pt.x) > 2.5 {
                 return false
             }
         }
@@ -301,13 +375,35 @@ extension SIMChatImageAssetsViewController : UIGestureRecognizerDelegate {
         SIMLog.trace()
         navigationController?.dismissViewControllerAnimated(true, completion: nil)
     }
+    /// 返回
+    private dynamic func onBack(sender: AnyObject) {
+        SIMLog.trace()
+        navigationController?.popViewControllerAnimated(true)
+    }
     /// 批量选中
     private dynamic func onSelectItems(sender: UIPanGestureRecognizer) {
         let pt = sender.locationInView(collectionView)
-        // 结束的时候检查状态
+        // 离开作用哉的时候检查状态
         defer {
-            // 结束的时候重置他
-            if sender.state == .Failed || sender.state == .Cancelled || sender.state == .Ended  {
+            if sender.state == .Ended || sender.state == .Failed || sender.state == .Cancelled {
+                // 如果为空就跳过事件处理
+                if let sb = selectedBegin, let se = selectedEnd {
+                    // 如果是结束, 那就提交选中区域
+                    for i in min(sb, se) ... max(sb, se) {
+                        guard let cell = collectionView?.cellForItemAtIndexPath(NSIndexPath(forItem: i, inSection: 0)) as? AssetCell else {
+                            continue
+                        }
+                        if let asset = cell.asset, let mark = selectedType {
+                            // 检查状态
+                            if mark {
+                                picker?.selectItem(asset)
+                            } else {
+                                picker?.deselectItem(asset)
+                            }
+                        }
+                    }
+                }
+                
                 selectedBegin = nil
                 selectedEnd = nil
                 selectedType = nil
@@ -348,18 +444,6 @@ extension SIMChatImageAssetsViewController : UIGestureRecognizerDelegate {
             }
             // 临时标记
             cell.mark = selectedType ?? true
-            // 如果是结束, 那就提交
-            // 对于手势取消/中断都认为是成功
-            if sender.state == .Ended || sender.state == .Failed || sender.state == .Cancelled {
-                if let asset = cell.asset, let mark = selectedType {
-                    // 检查状态
-                    if mark {
-                        selectedItems.insert(asset)
-                    } else {
-                        selectedItems.remove(asset)
-                    }
-                }
-            }
         }
         
         // 计算需要取消的
@@ -373,11 +457,7 @@ extension SIMChatImageAssetsViewController : UIGestureRecognizerDelegate {
                     continue
                 }
                 // 重新恢复标记
-                if let asset = cell.asset {
-                    cell.mark = self.selectedItems.contains(asset)
-                } else {
-                    cell.mark = false
-                }
+                cell.mark = picker?.checkItem(cell.asset) ?? false
             }
         }
     }

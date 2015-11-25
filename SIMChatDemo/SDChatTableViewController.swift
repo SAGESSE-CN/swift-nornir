@@ -27,7 +27,7 @@ class SDChatTableViewController: UITableViewController {
     
     
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        let picker = SIMChatImagePickerController()
+        let picker = SIMChatPhotoPicker()
         
         self.presentViewController(picker, animated: true, completion: nil)
     }
