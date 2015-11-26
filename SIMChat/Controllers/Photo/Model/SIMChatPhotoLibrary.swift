@@ -33,6 +33,8 @@ public class SIMChatPhotoLibrary: NSObject {
         //        [[PHPhotoLibrary sharedPhotoLibrary] registerChangeObserver:self];
         
         }
+        
+        caches.evictsObjectsWithDiscardedContent = true
     }
     
     ///
@@ -89,8 +91,8 @@ public class SIMChatPhotoLibrary: NSObject {
         return self.sharedInstance
     }
     
-    lazy var caches = NSCache()
-    lazy var assetCahces = NSMutableDictionary()
+    private(set) lazy var caches = NSCache()
+    private(set) lazy var assetCahces = NSMutableDictionary()
     
     let selectImage =  UIImage(named: "image_select")
     let deselectImage =  UIImage(named: "image_deselect")

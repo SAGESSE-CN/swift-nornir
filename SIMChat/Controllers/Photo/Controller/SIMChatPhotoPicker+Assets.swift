@@ -27,6 +27,10 @@ internal class SIMChatPhotoPickerAssets: UICollectionViewController, UICollectio
         self.picker = nil
         super.init(coder: aDecoder)
     }
+    deinit {
+        // 完成。清除他
+        NSNotificationCenter.defaultCenter().removeObserver(self)
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -41,7 +45,7 @@ internal class SIMChatPhotoPickerAssets: UICollectionViewController, UICollectio
 //        let s2 = UIBarButtonItem(barButtonSystemItem: .FlexibleSpace, target: nil, action: "")
         let i1 = UIBarButtonItem(title: "预览", style: .Bordered, target: nil, action: "")
         let i3 = UIBarButtonItem(title: "原图", style: .Bordered, target: nil, action: "")
-        let i4 = UIBarButtonItem(title: "发送(99)", style: .Done, target: nil, action: "")
+        let i4 = UIBarButtonItem(title: "发送(0)", style: .Done, target: nil, action: "")
         
         i1.width = 32
         i4.width = 48
@@ -62,6 +66,12 @@ internal class SIMChatPhotoPickerAssets: UICollectionViewController, UICollectio
 //            pan.requireGestureRecognizerToFail()
             collectionView.addGestureRecognizer(pan)
         }
+        
+        // 更新选中数量
+        onSelectedCountChanged(picker?.selectedItems.count ?? 0)
+        
+        // 监听
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "onSelectedCountChangedNTF:", name: SIMChatPhotoPickerCountDidChangedNotification, object: nil)
     }
     
     /// 视图将要显示
@@ -70,6 +80,27 @@ internal class SIMChatPhotoPickerAssets: UICollectionViewController, UICollectio
         SIMLog.trace()
         // 开启工具栏
         navigationController?.setToolbarHidden(false, animated: animated)
+        
+        // 回来的时候重置当前显示的
+        if let indexs = collectionView?.indexPathsForVisibleItems() where album?.count ?? 0 != 0 {
+            let cur = NSIndexPath(forItem: self.currentSelectedIndex, inSection: 0)
+            // 重置可见的单元格
+            if let cells = collectionView?.visibleCells() {
+                for cell in cells {
+                    if let cell = cell as? AssetCell {
+                        cell.mark = self.picker?.checkItem(cell.asset) ?? false
+                    }
+                }
+            }
+            // 如果需要显示, 那就滚动
+            if !indexs.contains(cur) {
+                dispatch_async(dispatch_get_main_queue()) {
+                    self.collectionView?.scrollToItemAtIndexPath(cur, atScrollPosition: .CenteredVertically, animated: false)
+                }
+            }
+        }
+        
+        SIMChatPhotoLibrary.sharedLibrary().caches
     }
     
     /// 视图将要消失
@@ -152,7 +183,13 @@ internal class SIMChatPhotoPickerAssets: UICollectionViewController, UICollectio
     // MARK: UICollectionViewDelegate
     override func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
         SIMLog.trace(indexPath.row)
-        let vc = SIMChatPhotoPickerPreviews(album, picker, def: indexPath.row)
+        
+        currentSelectedIndex = indexPath.row
+        
+        // 创建.
+        let vc = SIMChatPhotoPickerPreviews(album, picker, def: currentSelectedIndex)
+        
+        vc.previousViewController = self
         
         //navigationController?.delegate = self
         navigationController?.pushViewController(vc, animated: true)
@@ -186,6 +223,9 @@ internal class SIMChatPhotoPickerAssets: UICollectionViewController, UICollectio
     
     private let portraitColumn = 4
     private let landscapeColumn = 7
+    
+    // 当前选中的
+    var currentSelectedIndex: Int = 0
     
     /// 选择器
     weak var picker: SIMChatPhotoPicker?
@@ -304,7 +344,7 @@ extension SIMChatPhotoPickerAssets {
         /// 设置
         func setMark(mark: Bool, animated: Bool) {
             self.mark = mark
-            if animated && mark {
+            if animated {
                 // 选中时, 加点特效
                 let a = CAKeyframeAnimation(keyPath: "transform.scale")
                 
@@ -370,6 +410,17 @@ extension SIMChatPhotoPickerAssets : UIGestureRecognizerDelegate {
         return true
     }
     
+    /// 数量改变
+    @inline(__always) private func onSelectedCountChanged(count: Int) {
+        if let it = toolbarItems?.last as UIBarButtonItem? {
+            it.enabled = (count != 0)
+            it.title = "发送(\(count))"
+        }
+    }
+    private dynamic func onSelectedCountChangedNTF(sender: NSNotification) {
+        onSelectedCountChanged((sender.object as? Int) ?? 0)
+    }
+    
     /// 取消
     private dynamic func onCancel(sender: AnyObject) {
         SIMLog.trace()
@@ -432,18 +483,29 @@ extension SIMChatPhotoPickerAssets : UIGestureRecognizerDelegate {
         
         let begin = min(sb, se)
         let end = max(sb, se)
+        var count = picker?.selectedItems.count ?? 0
         
         // 选中区域
         for i in begin ... end {
             guard let cell = collectionView?.cellForItemAtIndexPath(NSIndexPath(forItem: i, inSection: 0)) as? AssetCell else {
                 continue
             }
+            // 真实的状态
+            let rmark = picker?.checkItem(cell.asset) ?? false
             // 取出
             if selectedType == nil {
                 selectedType = !cell.mark
             }
             // 临时标记
             cell.mark = selectedType ?? true
+            // 需要修改
+            if let type = selectedType where cell.mark != rmark {
+                if type {
+                    count++
+                } else {
+                    count--
+                }
+            }
         }
         
         // 计算需要取消的
@@ -460,5 +522,8 @@ extension SIMChatPhotoPickerAssets : UIGestureRecognizerDelegate {
                 cell.mark = picker?.checkItem(cell.asset) ?? false
             }
         }
+        
+        // 数量改变
+        onSelectedCountChanged(count)
     }
 }

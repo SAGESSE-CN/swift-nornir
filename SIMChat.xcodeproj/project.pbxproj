@@ -109,8 +109,8 @@
 /* Begin PBXFileReference section */
 		0C0345F31C0185930040DAD2 /* SIMChatPhotoPicker+Albums.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SIMChatPhotoPicker+Albums.swift"; sourceTree = "<group>"; };
 		0C0345F41C0185930040DAD2 /* SIMChatPhotoPicker+Assets.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SIMChatPhotoPicker+Assets.swift"; sourceTree = "<group>"; wrapsLines = 0; };
-		0C0345F51C0185930040DAD2 /* SIMChatPhotoPicker+Previews.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SIMChatPhotoPicker+Previews.swift"; sourceTree = "<group>"; };
-		0C0345F61C0185930040DAD2 /* SIMChatPhotoPicker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SIMChatPhotoPicker.swift; sourceTree = "<group>"; };
+		0C0345F51C0185930040DAD2 /* SIMChatPhotoPicker+Previews.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SIMChatPhotoPicker+Previews.swift"; sourceTree = "<group>"; wrapsLines = 0; };
+		0C0345F61C0185930040DAD2 /* SIMChatPhotoPicker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SIMChatPhotoPicker.swift; sourceTree = "<group>"; wrapsLines = 0; };
 		0C0345F81C0185930040DAD2 /* SIMChatPhotoAlbum.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SIMChatPhotoAlbum.swift; sourceTree = "<group>"; };
 		0C0345F91C0185930040DAD2 /* SIMChatPhotoAsset.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SIMChatPhotoAsset.swift; sourceTree = "<group>"; wrapsLines = 0; };
 		0C0345FA1C0185930040DAD2 /* SIMChatPhotoLibrary.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SIMChatPhotoLibrary.swift; sourceTree = "<group>"; };

@@ -12,18 +12,22 @@ class SIMChatPhotoPickerPreviews: UIViewController {
     
     init(_ dataSource: SIMChatPhotoBrowseDataSource?, _ picker: SIMChatPhotoPicker?, def: Int = 0) {
         self.picker = picker
-        self.defaultIndex = def
+        self.currentShowIndex = def
         super.init(nibName: nil, bundle: nil)
         self.dataSource = dataSource
     }
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
     }
+    deinit {
+        // 完成。清除他
+        NSNotificationCenter.defaultCenter().removeObserver(self)
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        title = "Title"
+        title = "\(currentShowIndex + 1)/\(dataSource?.count ?? 0)"
         navigationItem.rightBarButtonItem = UIBarButtonItem(customView: selectedButton)
         
         let s1 = UIBarButtonItem(barButtonSystemItem: .FlexibleSpace, target: nil, action: "")
@@ -46,9 +50,23 @@ class SIMChatPhotoPickerPreviews: UIViewController {
         view.backgroundColor = UIColor.blackColor()
         view.addSubview(browseView)
         
-        dispatch_async(dispatch_get_main_queue()) {
-            self.browseView.setCurrentIndex(self.defaultIndex, animated: false)
+        if currentShowIndex == 0 {
+            // 如果是0， 手动调一下
+            dataSource?.fetch(0) { [weak self] ele in
+                guard let s = self, let ele = ele where s.browseView.currentShowIndex == 0 else {
+                    return
+                }
+                s.browseView(s.browseView, willDisplayElement: ele)
+            }
+        } else {
+            self.browseView.setCurrentIndex(self.currentShowIndex, animated: false)
         }
+        
+        // 更新选中数量
+        onSelectedCountChanged(picker?.selectedItems.count ?? 0)
+        
+        // 监听
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "onSelectedCountChangedNTF:", name: SIMChatPhotoPickerCountDidChangedNotification, object: nil)
     }
     
     /// 视图将要显示
@@ -84,7 +102,25 @@ class SIMChatPhotoPickerPreviews: UIViewController {
     }
     
     override func prefersStatusBarHidden() -> Bool {
-        return navigationController?.toolbarHidden ??  super.prefersStatusBarHidden()
+        if let hidden = navigationController?.toolbarHidden where hidden {
+            return hidden
+        }
+        return super.prefersStatusBarHidden()
+    }
+    
+    func setSelected(selected: Bool, animated: Bool) {
+        self.selected = selected
+        
+        if animated {
+            // 选中时, 加点特效
+            let a = CAKeyframeAnimation(keyPath: "transform.scale")
+            
+            a.values = [0.8, 1.2, 1]
+            a.duration = 0.25
+            a.calculationMode = kCAAnimationCubic
+            
+            selectedButton.layer.addAnimation(a, forKey: "v")
+        }
     }
     
     /// 选中的按钮
@@ -118,11 +154,13 @@ class SIMChatPhotoPickerPreviews: UIViewController {
                 selectedButton.setImage(deselect, forState:  .Normal)
                 selectedButton.setImage(select, forState:  .Highlighted)
             }
+            
         }
     }
     
     /// 选择器
     weak var picker: SIMChatPhotoPicker?
+    weak var previousViewController: SIMChatPhotoPickerAssets?
     
     /// 数据源
     weak var dataSource: SIMChatPhotoBrowseDataSource? {
@@ -131,7 +169,11 @@ class SIMChatPhotoPickerPreviews: UIViewController {
     }
     
     /// 默认值
-    var defaultIndex: Int = 0
+    var currentShowIndex: Int = 0 {
+        didSet {
+            previousViewController?.currentSelectedIndex = currentShowIndex
+        }
+    }
     
     /// 浏览控件
     let browseView = SIMChatPhotoBrowseView(frame: CGRectZero)
@@ -152,14 +194,55 @@ extension SIMChatPhotoPickerPreviews : SIMChatPhotoBrowseDelegate {
         }
     }
     /// 将要显示
+    func browseView(browseView: SIMChatPhotoBrowseView, willDisplayElement element: SIMChatPhotoBrowseElement) {
+        SIMLog.trace("index: \(browseView.currentShowIndex) view: \(element)")
+        
+        // 更新标题
+        title = "\(browseView.currentShowIndex + 1)/\(dataSource?.count ?? 0)"
+        // 更新选中状态
+        selected = self.picker?.checkItem(element as? SIMChatPhotoAsset) ?? false
+        currentShowIndex = browseView.currentShowIndex
+    }
 }
 
 // MARK: - Event
 extension SIMChatPhotoPickerPreviews {
+    
+    /// 数量改变
+    @inline(__always) private func onSelectedCountChanged(count: Int) {
+        if let it = toolbarItems?.last as UIBarButtonItem? {
+            it.enabled = (count != 0)
+            it.title = "发送(\(count))"
+        }
+    }
+    private dynamic func onSelectedCountChangedNTF(sender: NSNotification) {
+        onSelectedCountChanged((sender.object as? Int) ?? 0)
+    }
     /// 标记
     private dynamic func onSelectItem(sender: AnyObject) {
         SIMLog.trace()
-        selected = !selected
+        
+        let index = browseView.currentShowIndex
+        // :)
+        if selected {
+            dataSource?.fetch(index) { [weak self] ele in
+                guard index == self?.browseView.currentShowIndex else {
+                    return
+                }
+                // 取消
+                self?.setSelected(false, animated: true)
+                self?.picker?.deselectItem(ele as? SIMChatPhotoAsset)
+            }
+        } else {
+            dataSource?.fetch(index) { [weak self] ele in
+                guard index == self?.browseView.currentShowIndex else {
+                    return
+                }
+                // 选中
+                self?.setSelected(true, animated: true)
+                self?.picker?.selectItem(ele as? SIMChatPhotoAsset)
+            }
+        }
     }
 }
 

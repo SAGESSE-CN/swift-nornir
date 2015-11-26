@@ -72,7 +72,15 @@ extension SIMChatPhotoPicker {
             return
         }
         SIMLog.trace(asset.identifier)
+        
+        let count = selectedItems.count
         selectedItems.addObject(asset)
+        // 检查数量是否有改变
+        if count != selectedItems.count {
+            // 减少调用数量
+            self.dynamicType.cancelPreviousPerformRequestsWithTarget(self, selector: "countDidChanged:", object: self)
+            self.performSelector("countDidChanged:", withObject: self, afterDelay: 0.1)
+        }
     }
     
     /// 取消选择
@@ -81,7 +89,14 @@ extension SIMChatPhotoPicker {
             return
         }
         SIMLog.trace(asset.identifier)
+        let count = selectedItems.count
         selectedItems.removeObject(asset)
+        // 检查数量是否有改变
+        if count != selectedItems.count {
+            // 减少调用数量
+            self.dynamicType.cancelPreviousPerformRequestsWithTarget(self, selector: "countDidChanged:", object: self)
+            self.performSelector("countDidChanged:", withObject: self, afterDelay: 0.01)
+        }
     }
     
     /// 检查是否是选择
@@ -91,5 +106,14 @@ extension SIMChatPhotoPicker {
         }
         return selectedItems.containsObject(asset)
     }
+    
+    /// 数量改变
+    private dynamic func countDidChanged(sender: AnyObject) {
+        let count = selectedItems.count
+        SIMLog.trace("\(count)")
+        NSNotificationCenter.defaultCenter().postNotificationName(SIMChatPhotoPickerCountDidChangedNotification, object: count)
+    }
 }
 
+// 通知
+public let SIMChatPhotoPickerCountDidChangedNotification = "SIMChatPhotoPickerCountDidChangedNotification"

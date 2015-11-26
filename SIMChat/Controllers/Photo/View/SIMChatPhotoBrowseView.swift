@@ -55,6 +55,8 @@ public protocol SIMChatPhotoBrowseDataSource : class {
     
     /// 将要显示
     optional func browseView(browseView: SIMChatPhotoBrowseView, willDisplayElement element: SIMChatPhotoBrowseElement)
+    /// 完成显示
+    optional func browseView(browseView: SIMChatPhotoBrowseView, didDisplayElement element: SIMChatPhotoBrowseElement)
 }
 
 ///
@@ -79,6 +81,10 @@ public class SIMChatPhotoBrowseView: SIMView {
         collectionView.collectionViewLayout.invalidateLayout()
     }
     
+    func setCurrentIndex(index: Int, animated: Bool) {
+        collectionView.scrollToItemAtIndexPath(NSIndexPath(forItem: index, inSection: 0), atScrollPosition: .None, animated: false)
+    }
+    
     private lazy var collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         let collection = UICollectionView(frame: CGRectZero, collectionViewLayout: layout)
@@ -86,6 +92,7 @@ public class SIMChatPhotoBrowseView: SIMView {
         layout.scrollDirection = .Horizontal
         layout.minimumLineSpacing = 0
         layout.minimumInteritemSpacing = 0
+        layout.sectionInset = UIEdgeInsetsZero
         
         collection.delegate = self
         collection.dataSource = self
@@ -98,11 +105,7 @@ public class SIMChatPhotoBrowseView: SIMView {
         return collection
     }()
     
-    func setCurrentIndex(index: Int, animated: Bool) {
-        collectionView.scrollToItemAtIndexPath(NSIndexPath(forItem: index, inSection: 0), atScrollPosition: .None, animated: false)
-    }
-    
-    var currentIndex: Int = 0
+    var currentShowIndex: Int = 0
     
     weak var dataSource: SIMChatPhotoBrowseDataSource?
     weak var delegate: SIMChatPhotoBrowseDelegate?
@@ -154,13 +157,36 @@ extension SIMChatPhotoBrowseView : UICollectionViewDataSource, UICollectionViewD
         // 减掉被自动缩进的值
         let width = collectionView.bounds.width - collectionView.contentInset.left - collectionView.contentInset.right
         let height = collectionView.bounds.height - collectionView.contentInset.top - collectionView.contentInset.bottom
+        SIMLog.trace("\(width) => \(height)")
         return CGSizeMake(width, height)
     }
     
-    /// 将要显示
-    public func collectionView(collectionView: UICollectionView, willDisplayCell cell: UICollectionViewCell, forItemAtIndexPath indexPath: NSIndexPath) {
-        dataSource?.fetch(indexPath.row) { [weak self] ele in
-            guard let view = self, let ele = ele else {
+    public func collectionView(collectionView: UICollectionView, didEndDisplayingCell cell: UICollectionViewCell, forItemAtIndexPath indexPath: NSIndexPath) {
+        // 最新的位置
+        let index = Int(round(collectionView.contentOffset.x / collectionView.bounds.width) + 0.1)
+        
+        // 通知.
+        dataSource?.fetch(index) { [weak self] ele in
+            guard let view = self, let ele = ele where index == view.currentShowIndex else {
+                return
+            }
+            self?.delegate?.browseView?(view, didDisplayElement: ele)
+        }
+    }
+    
+    /// 滚动
+    public func scrollViewDidScroll(scrollView: UIScrollView) {
+        // 最新的位置
+        let index = Int(round(scrollView.contentOffset.x / scrollView.bounds.width) + 0.1)
+
+        // 改变了?
+        guard index != currentShowIndex else {
+            return
+        }
+        currentShowIndex = index
+        // 通知.
+        dataSource?.fetch(index) { [weak self] ele in
+            guard let view = self, let ele = ele where index == view.currentShowIndex else {
                 return
             }
             self?.delegate?.browseView?(view, willDisplayElement: ele)
