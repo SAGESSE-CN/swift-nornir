@@ -2,4 +2,67 @@
 <Bucket
    type = "1"
    version = "2.0">
+   <Breakpoints>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "SIMChat/Controllers/Photo/View/SIMChatPhotoBrowseView.swift"
+            timestampString = "470498768.647315"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "23"
+            endingLineNumber = "23">
+            <Locations>
+               <Location
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "SIMChat.SIMChatPhotoBrowseView.__deallocating_deinit"
+                  moduleName = "SIMChat"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/sagesse/Projects/swift-chat/SIMChat/Controllers/Photo/View/SIMChatPhotoBrowseView.swift"
+                  timestampString = "470498768.700249"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "0"
+                  endingLineNumber = "0"
+                  offsetFromSymbolStart = "16">
+               </Location>
+               <Location
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "SIMChat.SIMChatPhotoBrowseView.init (SIMChat.SIMChatPhotoBrowseView.Type)(coder : __ObjC.NSCoder) -&gt; Swift.Optional&lt;SIMChat.SIMChatPhotoBrowseView&gt;"
+                  moduleName = "SIMChat"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/sagesse/Projects/swift-chat/SIMChat/Controllers/Photo/View/SIMChatPhotoBrowseView.swift"
+                  timestampString = "470498768.701385"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "108"
+                  endingLineNumber = "108"
+                  offsetFromSymbolStart = "36">
+               </Location>
+               <Location
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "SIMChat.SIMChatPhotoBrowseView.init (SIMChat.SIMChatPhotoBrowseView.Type)(frame : __C.CGRect) -&gt; SIMChat.SIMChatPhotoBrowseView"
+                  moduleName = "SIMChat"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/sagesse/Projects/swift-chat/SIMChat/Controllers/Photo/View/SIMChatPhotoBrowseView.swift"
+                  timestampString = "470498768.703971"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "108"
+                  endingLineNumber = "108"
+                  offsetFromSymbolStart = "64">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+   </Breakpoints>
 </Bucket>

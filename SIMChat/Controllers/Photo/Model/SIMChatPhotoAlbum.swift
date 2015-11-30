@@ -31,15 +31,21 @@ public class SIMChatPhotoAlbum: NSObject {
     /// 图片数量
     public var count: Int {
         if #available(iOS 9.0, *) {
-            // 如果没有加载, 请求第一张.
-            if !self.isLoading {
-                self.asset(0, complete: nil)
+            // 如果没有加载
+            if !isLoaded && !isLoading {
+                loadIfNeed(nil)
             }
             // 然后就ok了
             return self.assets.count
         } else {
             return self.group.numberOfAssets()
         }
+    }
+    
+    ///
+    /// 准备(预加载)
+    ///
+    public func prepare() {
     }
     
     // iOS 8.x and later
@@ -73,14 +79,24 @@ public class SIMChatPhotoAlbum: NSObject {
         }
         // 解锁必须的。。
         objc_sync_exit(self)
-        
+        // 加载
+        loadIfNeed(nil)
+    }
+    
+    /// 加载
+    public func loadIfNeed(complete: (Void -> Void)?) {
+        objc_sync_enter(self)
         // 正在加载中?
-        guard !self.isLoading else {
+        guard !isLoading && !isLoaded else {
+            objc_sync_exit(self)
+            // 直接完成
+            complete?()
             return
         }
         // 如果没有加载, 请求加载
         self.isLoading = true
-        
+        self.isLoaded = false
+        objc_sync_exit(self)
         // iOS 8.x是同步的, iOS 7.x是异步的
         if #available(iOS 9.0, *) {
             // 查询图片
@@ -95,7 +111,7 @@ public class SIMChatPhotoAlbum: NSObject {
             for index in 0 ..< assets.count {
                 // 创建
                 let sa = assets[index] as! PHAsset
-                let asset = assetMakeOrCache(sa)
+                let asset = self.assetMakeOrCache(sa)
                 
                 // 更新
                 self.assets.append(asset)
@@ -108,8 +124,13 @@ public class SIMChatPhotoAlbum: NSObject {
             }
             
             self.waitQueues.removeAll()
+            self.isLoading = false
+            self.isLoaded = true
             
             objc_sync_exit(self)
+            
+            // 完成
+            complete?()
         } else {
             // 这是异步的
             self.group.enumerateAssetsUsingBlock { sa, index, stop in
@@ -119,6 +140,8 @@ public class SIMChatPhotoAlbum: NSObject {
                     objc_sync_enter(self)
                     self.waitQueues.removeAll()
                     objc_sync_exit(self)
+                    // 完成
+                    complete?()
                     return
                 }
                 let asset = self.assetMakeOrCache(sa)
@@ -131,6 +154,9 @@ public class SIMChatPhotoAlbum: NSObject {
                 // 取出并清除正在等待的
                 let queue = self.waitQueues[index]
                 self.waitQueues.removeValueForKey(index)
+                
+                self.isLoading = false
+                self.isLoaded = true
                 
                 // 解锁必须的。。
                 objc_sync_exit(self)
@@ -159,8 +185,8 @@ public class SIMChatPhotoAlbum: NSObject {
     private var data: AnyObject
     
     private lazy var assets = Array<SIMChatPhotoAsset>()
-    private lazy var isLoading = false
     private lazy var waitQueues = Dictionary<Int, [SIMChatPhotoAsset? -> Void]>()
-    
+    private dynamic var isLoaded = false
+    private dynamic var isLoading = false
 }
 

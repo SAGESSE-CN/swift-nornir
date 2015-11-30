@@ -41,34 +41,32 @@ internal class SIMChatPhotoPickerAssets: UICollectionViewController, UICollectio
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .Cancel, target: self, action: "onCancel:")
         navigationItem.backBarButtonItem = UIBarButtonItem(title: "Back", style: .Done, target: nil, action: "")
         
-        let s1 = UIBarButtonItem(barButtonSystemItem: .FlexibleSpace, target: nil, action: "")
-//        let s2 = UIBarButtonItem(barButtonSystemItem: .FlexibleSpace, target: nil, action: "")
-        let i1 = UIBarButtonItem(title: "预览", style: .Bordered, target: nil, action: "")
-        let i3 = UIBarButtonItem(title: "原图", style: .Bordered, target: nil, action: "")
-        let i4 = UIBarButtonItem(title: "发送(0)", style: .Done, target: nil, action: "")
-        
-        i1.width = 32
-        i4.width = 48
-        
-        //setToolbarHidden(false)
-        toolbarItems = [i1, i3, s1, i4]
+        if picker?.allowsMultipleSelection ?? false {
+            let s1 = UIBarButtonItem(barButtonSystemItem: .FlexibleSpace, target: nil, action: "")
+            let i1 = UIBarButtonItem(title: "预览", style: .Plain, target: self, action: "onPreview:")
+            let i3 = UIBarButtonItem(customView: originButton)
+            let i4 = UIBarButtonItem(title: "发送(0)", style: .Done, target: self, action: "onSend:")
+            
+            i1.width = 32
+            i4.width = 48
+            
+            toolbarItems = [i1, i3, s1, i4]
+        }
         
         // Register cell classes
         collectionView?.backgroundColor = UIColor.whiteColor()
         collectionView?.registerClass(AssetCell.self, forCellWithReuseIdentifier: "Asset")
 //        collectionView?.canCancelContentTouches = true
         
-        if let collectionView = collectionView {
-            // 添加手势
-            let pan = UIPanGestureRecognizer(target: self, action: "onSelectItems:")
-            pan.delegate = self
-            collectionView.panGestureRecognizer.requireGestureRecognizerToFail(pan)
-//            pan.requireGestureRecognizerToFail()
-            collectionView.addGestureRecognizer(pan)
-        }
+        // 添加手势
+        let pan = UIPanGestureRecognizer(target: self, action: "onSelectItems:")
+        pan.delegate = self
+        pan.enabled = picker?.allowsMultipleSelection ?? false
+        collectionView?.panGestureRecognizer.requireGestureRecognizerToFail(pan)
+        collectionView?.addGestureRecognizer(pan)
         
         // 更新选中数量
-        onSelectedCountChanged(picker?.selectedItems.count ?? 0)
+        selectedCountChanged(picker?.selectedItems.count ?? 0)
         
         // 监听
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "onSelectedCountChangedNTF:", name: SIMChatPhotoPickerCountDidChangedNotification, object: nil)
@@ -79,10 +77,10 @@ internal class SIMChatPhotoPickerAssets: UICollectionViewController, UICollectio
         super.viewWillAppear(animated)
         SIMLog.trace()
         // 开启工具栏
-        navigationController?.setToolbarHidden(false, animated: animated)
+        navigationController?.setToolbarHidden(!(picker?.allowsMultipleSelection ?? false), animated: animated)
         
         // 回来的时候重置当前显示的
-        if let indexs = collectionView?.indexPathsForVisibleItems() where album?.count ?? 0 != 0 {
+        if let indexs = collectionView?.indexPathsForVisibleItems() where album?.count ?? 0 != 0 && needUpdateSelectedItems {
             let cur = NSIndexPath(forItem: self.currentSelectedIndex, inSection: 0)
             // 重置可见的单元格
             if let cells = collectionView?.visibleCells() {
@@ -100,7 +98,8 @@ internal class SIMChatPhotoPickerAssets: UICollectionViewController, UICollectio
             }
         }
         
-        SIMChatPhotoLibrary.sharedLibrary().caches
+        // 重置显示
+        onOrigin(nil)
     }
     
     /// 视图将要消失
@@ -135,6 +134,7 @@ internal class SIMChatPhotoPickerAssets: UICollectionViewController, UICollectio
         // 标记和默认值
         cell.tag = indexPath.row
         cell.mark = false
+        cell.markView.hidden = !(picker?.allowsMultipleSelection ?? false)
         // 更新内容
         album?.asset(indexPath.row) { [weak self]asset in
             // 检查标记
@@ -186,13 +186,7 @@ internal class SIMChatPhotoPickerAssets: UICollectionViewController, UICollectio
         
         currentSelectedIndex = indexPath.row
         
-        // 创建.
-        let vc = SIMChatPhotoPickerPreviews(album, picker, def: currentSelectedIndex)
-        
-        vc.previousViewController = self
-        
-        //navigationController?.delegate = self
-        navigationController?.pushViewController(vc, animated: true)
+        onShowBrowser(album, defIndex: currentSelectedIndex)
     }
     
     // MARK: Rotate
@@ -213,6 +207,23 @@ internal class SIMChatPhotoPickerAssets: UICollectionViewController, UICollectio
         SIMLog.trace()
     }
     
+    private lazy var originButton: UIButton = {
+        let btn = UIButton(type: .System)
+        
+        let img1 = SIMChatPhotoLibrary.sharedLibrary().deselectSmallImage
+        
+        btn.setImage(img1, forState:  .Normal)
+        btn.titleLabel?.font = UIFont.systemFontOfSize(17)
+        btn.setTitle("原图", forState: .Normal)
+        btn.titleEdgeInsets = UIEdgeInsetsMake(0, 8, 0, 0)
+        btn.sizeToFit()
+        btn.frame = CGRectMake(0, 0, btn.bounds.width + 8, btn.bounds.height)
+        
+        btn.addTarget(self, action: "onOrigin:", forControlEvents: .TouchUpInside)
+        
+        return btn
+    }()
+    
     // 批量选中
     private var selectedBegin: Int?
     private var selectedEnd: Int?
@@ -223,9 +234,17 @@ internal class SIMChatPhotoPickerAssets: UICollectionViewController, UICollectio
     
     private let portraitColumn = 4
     private let landscapeColumn = 7
+    private var needUpdateSelectedItems = false
     
     // 当前选中的
-    var currentSelectedIndex: Int = 0
+    var currentSelectedIndex: Int = 0 {
+        didSet {
+            guard currentSelectedIndex != oldValue else {
+                return
+            }
+            needUpdateSelectedItems = true
+        }
+    }
     
     /// 选择器
     weak var picker: SIMChatPhotoPicker?
@@ -410,28 +429,88 @@ extension SIMChatPhotoPickerAssets : UIGestureRecognizerDelegate {
         return true
     }
     
+    /// 显示预览
+    @inline(__always) private func onShowBrowser(source: SIMChatPhotoBrowseDataSource?, defIndex: Int) {
+        // 创建.
+        let vc = SIMChatPhotoPickerPreviews(source, picker, def: defIndex)
+        
+        vc.previousViewController = self
+        
+        //navigationController?.delegate = self
+        navigationController?.pushViewController(vc, animated: true)
+    }
+    
     /// 数量改变
-    @inline(__always) private func onSelectedCountChanged(count: Int) {
+    @inline(__always) private func selectedCountChanged(count: Int) {
         if let it = toolbarItems?.last as UIBarButtonItem? {
-            it.enabled = (count != 0)
+            let nmin = max(picker?.minimumNumberOfSelection ?? 0, 1)
+            let nmax = picker?.maximumNumberOfSelection ?? 0 < nmin ? Int.max : picker?.maximumNumberOfSelection ?? 0
+            
+            it.enabled = count >= nmin && count <= nmax
             it.title = "发送(\(count))"
+        }
+        if let it = toolbarItems?.first as UIBarButtonItem? {
+            it.enabled = count > 0
+            originButton.enabled = count > 0
         }
     }
     private dynamic func onSelectedCountChangedNTF(sender: NSNotification) {
-        onSelectedCountChanged((sender.object as? Int) ?? 0)
+        selectedCountChanged((sender.object as? Int) ?? 0)
     }
-    
-    /// 取消
+    ///
+    /// 点击取消
+    ///
     private dynamic func onCancel(sender: AnyObject) {
         SIMLog.trace()
-        navigationController?.dismissViewControllerAnimated(true, completion: nil)
+        picker?.cancel()
     }
-    /// 返回
+    ///
+    /// 点击返回
+    ///
     private dynamic func onBack(sender: AnyObject) {
         SIMLog.trace()
         navigationController?.popViewControllerAnimated(true)
     }
+    ///
+    /// 点击发送
+    ///
+    private dynamic func onSend(sender: AnyObject) {
+        SIMLog.trace()
+        picker?.confirm()
+    }
+    ///
+    /// 更新原图选项
+    ///
+    private dynamic func onOrigin(sender: AnyObject?) {
+        SIMLog.trace()
+        
+        let img1 = SIMChatPhotoLibrary.sharedLibrary().deselectSmallImage
+        let img2 = SIMChatPhotoLibrary.sharedLibrary().selectSmallImage
+        
+        // 按钮才改变
+        if sender != nil {
+           picker?.requireOrigin = !(picker?.requireOrigin ?? false)
+        }
+        
+        if picker?.requireOrigin ?? false {
+            originButton.setImage(img2, forState: .Normal)
+            //originButton.setImage(img1, forState: .Highlighted)
+        } else {
+            originButton.setImage(img1, forState: .Normal)
+            //originButton.setImage(img2, forState: .Highlighted)
+        }
+    }
+    ///
+    /// 预览
+    ///
+    private dynamic func onPreview(sender: AnyObject) {
+        SIMLog.trace()
+        let source = (picker?.selectedItems.array as NSArray?)?.copy() as? NSArray
+        onShowBrowser(source, defIndex: 0)
+    }
+    ///
     /// 批量选中
+    ///
     private dynamic func onSelectItems(sender: UIPanGestureRecognizer) {
         let pt = sender.locationInView(collectionView)
         // 离开作用哉的时候检查状态
@@ -524,6 +603,17 @@ extension SIMChatPhotoPickerAssets : UIGestureRecognizerDelegate {
         }
         
         // 数量改变
-        onSelectedCountChanged(count)
+        selectedCountChanged(count)
+    }
+}
+
+// MARK: -  SIMChatPhotoBrowseDataSource
+extension NSArray : SIMChatPhotoBrowseDataSource {
+    public func fetch(index: Int, block: SIMChatPhotoBrowseElement? -> Void) {
+        if index < count {
+            block(self[index] as? SIMChatPhotoBrowseElement)
+        } else {
+            block(nil)
+        }
     }
 }

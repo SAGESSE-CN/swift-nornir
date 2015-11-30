@@ -36,8 +36,6 @@ class SIMChatPhotoPickerAlbums : UITableViewController {
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "onLibraryDidChanged:", name: SIMChatPhotoLibraryDidChangedNotification, object: nil)
         
         // 默认, 未加载的页面显示
-        
-        // .
         onRefresh(self)
     }
     
@@ -136,7 +134,7 @@ extension SIMChatPhotoPickerAlbums {
     /// 取消
     private dynamic func onCancel(sender: AnyObject) {
         SIMLog.trace()
-        navigationController?.dismissViewControllerAnimated(true, completion: nil)
+        picker?.cancel()
     }
     /// 加载数据
     private dynamic func onRefresh(sender: AnyObject) {

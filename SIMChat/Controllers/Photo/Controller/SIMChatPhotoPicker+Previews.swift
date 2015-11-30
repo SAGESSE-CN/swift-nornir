@@ -23,22 +23,25 @@ class SIMChatPhotoPickerPreviews: UIViewController {
         // 完成。清除他
         NSNotificationCenter.defaultCenter().removeObserver(self)
     }
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         title = "\(currentShowIndex + 1)/\(dataSource?.count ?? 0)"
-        navigationItem.rightBarButtonItem = UIBarButtonItem(customView: selectedButton)
         
-        let s1 = UIBarButtonItem(barButtonSystemItem: .FlexibleSpace, target: nil, action: "")
-//        let s2 = UIBarButtonItem(barButtonSystemItem: .FlexibleSpace, target: nil, action: "")
-        let i3 = UIBarButtonItem(title: "原图", style: .Bordered, target: nil, action: "")
-        let i4 = UIBarButtonItem(title: "发送(99)", style: .Done, target: nil, action: "")
+        let i4 = UIBarButtonItem(title: "发送", style: .Done, target: self, action: "onSend:")
         
-        i4.width = 48
-        
-        //setToolbarHidden(false)
-        toolbarItems = [i3, s1, i4]
+        if picker?.allowsMultipleSelection ?? false {
+            let s1 = UIBarButtonItem(barButtonSystemItem: .FlexibleSpace, target: nil, action: "")
+            let i3 = UIBarButtonItem(customView: originButton)
+            
+            i4.width = 48
+            
+            toolbarItems = [i3, s1, i4]
+            navigationItem.rightBarButtonItem = UIBarButtonItem(customView: selectedButton)
+        } else {
+            navigationItem.rightBarButtonItem = i4
+        }
         
         // 禁止缩进
         automaticallyAdjustsScrollViewInsets = false
@@ -46,6 +49,7 @@ class SIMChatPhotoPickerPreviews: UIViewController {
         browseView.frame = view.bounds
         browseView.delegate = self
         browseView.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
+        browseView.dataSource = self.dataSource
         
         view.backgroundColor = UIColor.blackColor()
         view.addSubview(browseView)
@@ -63,7 +67,7 @@ class SIMChatPhotoPickerPreviews: UIViewController {
         }
         
         // 更新选中数量
-        onSelectedCountChanged(picker?.selectedItems.count ?? 0)
+        selectedCountChanged(picker?.selectedItems.count ?? 0)
         
         // 监听
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "onSelectedCountChangedNTF:", name: SIMChatPhotoPickerCountDidChangedNotification, object: nil)
@@ -74,7 +78,8 @@ class SIMChatPhotoPickerPreviews: UIViewController {
         super.viewWillAppear(animated)
         SIMLog.trace()
         // 开启工具栏
-        navigationController?.setToolbarHidden(false, animated: animated)
+        navigationController?.setToolbarHidden(!(picker?.allowsMultipleSelection ?? false), animated: animated)
+        onOrigin(nil)
     }
     
     /// 视图将要消失
@@ -102,6 +107,9 @@ class SIMChatPhotoPickerPreviews: UIViewController {
     }
     
     override func prefersStatusBarHidden() -> Bool {
+        if !(picker?.allowsMultipleSelection ?? false) {
+            return super.prefersStatusBarHidden()
+        }
         if let hidden = navigationController?.toolbarHidden where hidden {
             return hidden
         }
@@ -110,7 +118,6 @@ class SIMChatPhotoPickerPreviews: UIViewController {
     
     func setSelected(selected: Bool, animated: Bool) {
         self.selected = selected
-        
         if animated {
             // 选中时, 加点特效
             let a = CAKeyframeAnimation(keyPath: "transform.scale")
@@ -138,6 +145,23 @@ class SIMChatPhotoPickerPreviews: UIViewController {
         
         return btn
     }()
+    private lazy var originButton: UIButton = {
+        let btn = UIButton(type: .System)
+        
+        let img1 = SIMChatPhotoLibrary.sharedLibrary().deselectSmallImage
+        
+        btn.setImage(img1, forState:  .Normal)
+        btn.titleLabel?.font = UIFont.systemFontOfSize(17)
+        btn.setTitle("原图", forState: .Normal)
+        btn.titleEdgeInsets = UIEdgeInsetsMake(0, 8, 0, 0)
+        btn.sizeToFit()
+        btn.frame = CGRectMake(0, 0, btn.bounds.width + 8, btn.bounds.height)
+        
+        btn.addTarget(self, action: "onOrigin:", forControlEvents: .TouchUpInside)
+        
+        return btn
+    }()
+    
     private var selected: Bool = false {
         didSet {
             guard selected != oldValue else {
@@ -163,9 +187,8 @@ class SIMChatPhotoPickerPreviews: UIViewController {
     weak var previousViewController: SIMChatPhotoPickerAssets?
     
     /// 数据源
-    weak var dataSource: SIMChatPhotoBrowseDataSource? {
-        set { return browseView.dataSource = newValue }
-        get { return browseView.dataSource }
+    var dataSource: SIMChatPhotoBrowseDataSource? {
+        didSet { browseView.dataSource = dataSource }
     }
     
     /// 默认值
@@ -181,19 +204,25 @@ class SIMChatPhotoPickerPreviews: UIViewController {
 
 // MARK: - SIMChatPhotoBrowseDelegate
 extension SIMChatPhotoPickerPreviews : SIMChatPhotoBrowseDelegate {
-    /// 点击
+    ///
+    /// 点击(单击)
+    ///
     func browseViewDidClick(browseView: SIMChatPhotoBrowseView) {
         let hidden = navigationController?.toolbarHidden ?? true
         
         dispatch_async(dispatch_get_main_queue()) {
             self.navigationController?.setNavigationBarHidden(!hidden, animated: true)
             dispatch_async(dispatch_get_main_queue()) {
-                self.navigationController?.setToolbarHidden(!hidden, animated: true)
+                if self.picker?.allowsMultipleSelection ?? false {
+                    self.navigationController?.setToolbarHidden(!hidden, animated: true)
+                }
                 self.setNeedsStatusBarAppearanceUpdate()
             }
         }
     }
+    ///
     /// 将要显示
+    ///
     func browseView(browseView: SIMChatPhotoBrowseView, willDisplayElement element: SIMChatPhotoBrowseElement) {
         SIMLog.trace("index: \(browseView.currentShowIndex) view: \(element)")
         
@@ -207,18 +236,59 @@ extension SIMChatPhotoPickerPreviews : SIMChatPhotoBrowseDelegate {
 
 // MARK: - Event
 extension SIMChatPhotoPickerPreviews {
-    
+    ///
     /// 数量改变
-    @inline(__always) private func onSelectedCountChanged(count: Int) {
+    ///
+    @inline(__always) private func selectedCountChanged(count: Int) {
         if let it = toolbarItems?.last as UIBarButtonItem? {
-            it.enabled = (count != 0)
+            let nmin = max(picker?.minimumNumberOfSelection ?? 0, 1)
+            let nmax = picker?.maximumNumberOfSelection ?? 0 < nmin ? Int.max : picker?.maximumNumberOfSelection ?? 0
+            
+            it.enabled = count >= nmin && count <= nmax
             it.title = "发送(\(count))"
         }
+        if let it = toolbarItems?.first as UIBarButtonItem? {
+            it.enabled = count > 0
+        }
     }
+    ///
+    /// 选择数量改变通知
+    ///
     private dynamic func onSelectedCountChangedNTF(sender: NSNotification) {
-        onSelectedCountChanged((sender.object as? Int) ?? 0)
+        selectedCountChanged((sender.object as? Int) ?? 0)
     }
-    /// 标记
+    ///
+    /// 点击发送
+    ///
+    private dynamic func onSend(sender: AnyObject) {
+        SIMLog.trace()
+        picker?.confirm()
+    }
+    ///
+    /// 更新原图选项
+    ///
+    private dynamic func onOrigin(sender: AnyObject?) {
+        SIMLog.trace()
+        
+        let img1 = SIMChatPhotoLibrary.sharedLibrary().deselectSmallImage
+        let img2 = SIMChatPhotoLibrary.sharedLibrary().selectSmallImage
+        
+        // 按钮才改变
+        if sender != nil {
+           picker?.requireOrigin = !(picker?.requireOrigin ?? false)
+        }
+        
+        if picker?.requireOrigin ?? false {
+            originButton.setImage(img2, forState: .Normal)
+            //originButton.setImage(img1, forState: .Highlighted)
+        } else {
+            originButton.setImage(img1, forState: .Normal)
+            //originButton.setImage(img2, forState: .Highlighted)
+        }
+    }
+    ///
+    /// 更新选择
+    ///
     private dynamic func onSelectItem(sender: AnyObject) {
         SIMLog.trace()
         
@@ -248,7 +318,6 @@ extension SIMChatPhotoPickerPreviews {
 
 extension SIMChatPhotoAsset : SIMChatPhotoBrowseElement {
 }
-
 extension SIMChatPhotoAlbum : SIMChatPhotoBrowseDataSource {
     /// 获取对象
     public func fetch(index: Int, block: SIMChatPhotoBrowseElement? -> Void) {

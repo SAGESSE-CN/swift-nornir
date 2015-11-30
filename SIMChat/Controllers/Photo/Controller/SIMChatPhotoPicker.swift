@@ -6,12 +6,79 @@
 //  Copyright © 2015 Sagesse. All rights reserved.
 //
 
+// TODO: 还要预加载没有优化
+
 import UIKit
+
+///
+/// 图片选择(多选, 代理)
+///
+@objc public protocol SIMChatPhotoPickerDelegate : NSObjectProtocol {
+    
+    ///
+    /// 是否取消选择
+    ///
+    optional func pickerShouldCancel(picker: SIMChatPhotoPicker) -> Bool
+    ///
+    /// 取消选择
+    ///
+    optional func pickerDidCancel(picker: SIMChatPhotoPicker)
+    
+    ///
+    /// 是否选择完成
+    ///
+    optional func picker(picker: SIMChatPhotoPicker, shouldFinishPickingAssets assets: [SIMChatPhotoAsset]) -> Bool
+    ///
+    /// 选择完成
+    ///
+    optional func picker(picker: SIMChatPhotoPicker, didFinishPickingAssets assets: [SIMChatPhotoAsset])
+    
+    ///
+    /// 是否允许选择图像
+    ///
+    optional func picker(picker: SIMChatPhotoPicker, shouldSelectAsset asset: SIMChatPhotoAsset) -> Bool
+    ///
+    /// 选择图像
+    ///
+    optional func picker(picker: SIMChatPhotoPicker, didSelectAsset asset: SIMChatPhotoAsset)
+    
+    ///
+    /// 是否允许选择图像
+    ///
+    optional func picker(picker: SIMChatPhotoPicker, shouldDeselectAsset asset: SIMChatPhotoAsset) -> Bool
+    ///
+    /// 选择图像
+    ///
+    optional func picker(picker: SIMChatPhotoPicker, didDeselectAsset asset: SIMChatPhotoAsset)
+}
 
 ///
 /// 图片选择(多选)
 ///
 public class SIMChatPhotoPicker: UINavigationController {
+    
+    ///
+    /// 是否允许多选
+    ///
+    public var allowsMultipleSelection = true
+    ///
+    /// 最小选择数量, 默认为0,
+    /// 如果为0, 不限制
+    ///
+    public var minimumNumberOfSelection = 0
+    ///
+    /// 最大选择数量, 默认为0,
+    /// 如果为0, 不限制
+    ///
+    public var maximumNumberOfSelection = 0
+    ///
+    /// 是否要示使用原图
+    ///
+    public var requireOrigin = false
+    ///
+    /// 选择的图片
+    ///
+    public private(set) var selectedItems = NSMutableOrderedSet()
     
     /// 初始化
     convenience init(){
@@ -54,10 +121,13 @@ public class SIMChatPhotoPicker: UINavigationController {
     public override func viewWillDisappear(animated: Bool) {
         SIMLog.trace()
         super.viewWillDisappear(animated)
+        
     }
     
-    /// 只读, NSMutableOrderedSet<SIMChatPhotoAsset>
-    private(set) var selectedItems = NSMutableOrderedSet()
+    ///
+    /// 代理(因为原来有一个delegate, 暂时没有找到很好的解决方法)
+    ///
+   public weak var delegate2: SIMChatPhotoPickerDelegate?
     
     // 根控制器
     private var rootViewController: SIMChatPhotoPickerAlbums!
@@ -67,11 +137,15 @@ public class SIMChatPhotoPicker: UINavigationController {
 extension SIMChatPhotoPicker {
    
     /// 选择图片
-    public func selectItem(asset: SIMChatPhotoAsset?) {
+    internal func selectItem(asset: SIMChatPhotoAsset?) {
         guard let asset = asset else {
             return
         }
         SIMLog.trace(asset.identifier)
+        // 检查是否允许选择
+        guard delegate2?.picker?(self, shouldSelectAsset: asset) ?? true else {
+            return
+        }
         
         let count = selectedItems.count
         selectedItems.addObject(asset)
@@ -81,14 +155,22 @@ extension SIMChatPhotoPicker {
             self.dynamicType.cancelPreviousPerformRequestsWithTarget(self, selector: "countDidChanged:", object: self)
             self.performSelector("countDidChanged:", withObject: self, afterDelay: 0.1)
         }
+        // 通知
+        delegate2?.picker?(self, didSelectAsset: asset)
     }
     
     /// 取消选择
-    public func deselectItem(asset: SIMChatPhotoAsset?) {
+    internal func deselectItem(asset: SIMChatPhotoAsset?) {
         guard let asset = asset else {
             return
         }
         SIMLog.trace(asset.identifier)
+        
+        // 检查是否允许取消
+        guard delegate2?.picker?(self, shouldDeselectAsset: asset) ?? true else {
+            return
+        }
+        
         let count = selectedItems.count
         selectedItems.removeObject(asset)
         // 检查数量是否有改变
@@ -97,10 +179,13 @@ extension SIMChatPhotoPicker {
             self.dynamicType.cancelPreviousPerformRequestsWithTarget(self, selector: "countDidChanged:", object: self)
             self.performSelector("countDidChanged:", withObject: self, afterDelay: 0.01)
         }
+        
+        // 通知
+        delegate2?.picker?(self, didDeselectAsset: asset)
     }
     
     /// 检查是否是选择
-    public func checkItem(asset: SIMChatPhotoAsset?) -> Bool {
+    internal func checkItem(asset: SIMChatPhotoAsset?) -> Bool {
         guard let asset = asset else {
             return false
         }
@@ -112,6 +197,31 @@ extension SIMChatPhotoPicker {
         let count = selectedItems.count
         SIMLog.trace("\(count)")
         NSNotificationCenter.defaultCenter().postNotificationName(SIMChatPhotoPickerCountDidChangedNotification, object: count)
+    }
+    
+    ///
+    /// 取消
+    ///
+    public func cancel() {
+        SIMLog.trace()
+        if delegate2?.pickerShouldCancel?(self) ?? true {
+            dismissViewControllerAnimated(true, completion: nil)
+            delegate2?.pickerDidCancel?(self)
+        }
+    }
+    
+    ///
+    /// 确认
+    ///
+    public func confirm() {
+        guard let rs = selectedItems.array as? [SIMChatPhotoAsset] else {
+            return
+        }
+        SIMLog.trace()
+        if delegate2?.picker?(self, shouldFinishPickingAssets: rs) ?? true {
+            dismissViewControllerAnimated(true, completion: nil)
+            delegate2?.picker?(self, didFinishPickingAssets: rs)
+        }
     }
 }
 
