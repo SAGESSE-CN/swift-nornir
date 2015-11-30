@@ -29,6 +29,14 @@ class SDChatTableViewController: UITableViewController {
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         let picker = SIMChatPhotoPicker()
         
+        picker.delegate2 = self
+        
         self.presentViewController(picker, animated: true, completion: nil)
+    }
+}
+
+extension SDChatTableViewController : SIMChatPhotoPickerDelegate {
+    func picker(picker: SIMChatPhotoPicker, canSelectAsset asset: SIMChatPhotoAsset) -> Bool {
+        return asset.mediaType != .Video
     }
 }
