@@ -8,7 +8,7 @@
 		)](http://mit-license.org)
 
 # TODO
-* [ ] **多图选择(进行中)**
+* [X] **多图选择**
 * [ ] **多图片预览(进行中)**
 * [ ] **优化UITableView(使用UICollectionView?)**
 * [ ] **横屏支持**
