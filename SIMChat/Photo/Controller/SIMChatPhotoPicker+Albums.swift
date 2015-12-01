@@ -11,7 +11,7 @@ import UIKit
 ///
 /// 图集
 ///
-class SIMChatPhotoPickerAlbums : UITableViewController {
+internal class SIMChatPhotoPickerAlbums : UITableViewController {
     
     init(_ picker: SIMChatPhotoPicker?) {
         self.picker = picker

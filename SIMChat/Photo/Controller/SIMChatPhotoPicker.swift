@@ -69,7 +69,7 @@ public class SIMChatPhotoPicker: UINavigationController {
     /// 最大选择数量, 默认为0,
     /// 如果为0, 不限制
     ///
-    public var maximumNumberOfSelection = 9
+    public var maximumNumberOfSelection = 0
     ///
     /// 是否要示使用原图
     ///

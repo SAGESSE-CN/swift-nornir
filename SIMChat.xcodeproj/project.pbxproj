@@ -421,8 +421,8 @@
 			isa = PBXGroup;
 			children = (
 				0CCF0F2F1C0C8E2700CC159F /* SIMChatPhotoBrowser.swift */,
-				0CCF0F301C0C8E2700CC159F /* SIMChatPhotoPicker+Albums.swift */,
 				0CCF0F311C0C8E2700CC159F /* SIMChatPhotoPicker+Assets.swift */,
+				0CCF0F301C0C8E2700CC159F /* SIMChatPhotoPicker+Albums.swift */,
 				0CCF0F321C0C8E2700CC159F /* SIMChatPhotoPicker+Previews.swift */,
 				0CCF0F331C0C8E2700CC159F /* SIMChatPhotoPicker.swift */,
 			);
@@ -432,8 +432,8 @@
 		0CCF0F341C0C8E2700CC159F /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				0CCF0F351C0C8E2700CC159F /* SIMChatPhotoAlbum.swift */,
 				0CCF0F361C0C8E2700CC159F /* SIMChatPhotoAsset.swift */,
+				0CCF0F351C0C8E2700CC159F /* SIMChatPhotoAlbum.swift */,
 				0CCF0F371C0C8E2700CC159F /* SIMChatPhotoLibrary.swift */,
 			);
 			path = Model;
@@ -458,10 +458,10 @@
 			isa = PBXGroup;
 			children = (
 				0CCF0F421C0C8E2700CC159F /* SIMChatPhotoAlbumView.swift */,
-				0CCF0F431C0C8E2700CC159F /* SIMChatPhotoAssetView+Badge.swift */,
 				0CCF0F441C0C8E2700CC159F /* SIMChatPhotoAssetView.swift */,
-				0CCF0F451C0C8E2700CC159F /* SIMChatPhotoBrowseView+Image.swift */,
+				0CCF0F431C0C8E2700CC159F /* SIMChatPhotoAssetView+Badge.swift */,
 				0CCF0F461C0C8E2700CC159F /* SIMChatPhotoBrowseView.swift */,
+				0CCF0F451C0C8E2700CC159F /* SIMChatPhotoBrowseView+Image.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";

@@ -46,42 +46,33 @@ public class SIMChatPhotoLibrary: NSObject {
             // 遍历， 这是异步的
             dispatch_async(dispatch_get_global_queue(0, 0)) {
                 
-                let group = dispatch_group_create()
-                let queue = dispatch_queue_create("QueryCollection", DISPATCH_QUEUE_CONCURRENT)
-                
                 var rs1: [SIMChatPhotoAlbum] = []
                 var rs2: [SIMChatPhotoAlbum] = []
-               
-                dispatch_group_async(group, queue) {
-                    let c1 = PHAssetCollection.fetchAssetCollectionsWithType(.SmartAlbum, subtype: .Any, options: nil)
-                    for i in 0 ..< c1.count {
-                        if let v = c1[i] as? PHAssetCollection {
-                            let album = SIMChatPhotoAlbum(v)
-                            if album.count > 0 {
-                                rs1.append(album)
-                            }
+                
+                let c1 = PHAssetCollection.fetchAssetCollectionsWithType(.SmartAlbum, subtype: .Any, options: nil)
+                for i in 0 ..< c1.count {
+                    if let v = c1[i] as? PHAssetCollection {
+                        let album = SIMChatPhotoAlbum(v)
+                        if album.count > 0 {
+                            rs1.append(album)
                         }
                     }
                 }
                 
-                dispatch_group_async(group, queue) {
-                    let c2 = PHAssetCollection.fetchAssetCollectionsWithType(.Album, subtype: .Any, options: nil)
-                    for i in 0 ..< c2.count {
-                        if let v = c2[i] as? PHAssetCollection {
-                            let album = SIMChatPhotoAlbum(v)
-                            if album.count > 0 {
-                                rs2.append(album)
-                            }
+                let c2 = PHAssetCollection.fetchAssetCollectionsWithType(.Album, subtype: .Any, options: nil)
+                for i in 0 ..< c2.count {
+                    if let v = c2[i] as? PHAssetCollection {
+                        let album = SIMChatPhotoAlbum(v)
+                        if album.count > 0 {
+                            rs2.append(album)
                         }
                     }
                 }
                 
-                dispatch_group_notify(group, queue) {
-                    SIMLog.trace("finish")
-                    // 合并
-                    rs1.appendContentsOf(rs2)
-                    finish?(rs1)
-                }
+                SIMLog.trace("finish")
+                // 合并
+                rs1.appendContentsOf(rs2)
+                finish?(rs1)
             }
         } else {
             var rs: [SIMChatPhotoAlbum] = []

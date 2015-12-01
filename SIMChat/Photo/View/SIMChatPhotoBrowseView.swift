@@ -62,10 +62,19 @@ public protocol SIMChatPhotoBrowseDataSource : class {
 ///
 /// 图片浏览
 ///
-public class SIMChatPhotoBrowseView: SIMView {
-    override func build() {
-        super.build()
-        
+public class SIMChatPhotoBrowseView: UIView {
+    /// 序列化
+    public required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+        self.build()
+    }
+    /// 初始化
+    public override init(frame: CGRect) {
+        super.init(frame: frame)
+        self.build()
+    }
+    /// 构建
+    func build() {
         let itemSpacing = SIMChatPhotoBrowseView.itemSpacing
         
         collectionView.frame = CGRectMake(-itemSpacing, 0, bounds.width + itemSpacing * 2, bounds.height)

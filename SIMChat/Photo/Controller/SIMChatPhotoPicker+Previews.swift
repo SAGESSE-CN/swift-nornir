@@ -8,7 +8,7 @@
 
 import UIKit
 
-class SIMChatPhotoPickerPreviews: UIViewController {
+internal class SIMChatPhotoPickerPreviews: UIViewController {
     
     init(_ dataSource: SIMChatPhotoBrowseDataSource?, _ picker: SIMChatPhotoPicker?, def: Int = 0) {
         self.picker = picker

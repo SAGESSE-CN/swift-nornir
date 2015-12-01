@@ -8,7 +8,7 @@
 
 import UIKit
 
-class SIMChatPhotoAlbumView: SIMView {
+internal class SIMChatPhotoAlbumView: SIMView {
     override func build() {
         super.build()
         for i in 0 ..< 3 {

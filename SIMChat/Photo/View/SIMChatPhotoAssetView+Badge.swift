@@ -11,7 +11,7 @@ import UIKit
 ///
 /// 标记类型
 ///
-enum SIMChatPhotoAssetBadgeStyle : Int {
+internal enum SIMChatPhotoAssetBadgeStyle : Int {
     case None = 0
     
     case Image
@@ -24,7 +24,7 @@ enum SIMChatPhotoAssetBadgeStyle : Int {
 ///
 /// 标记
 ///
-class SIMChatPhotoAssetBadgeView: SIMView {
+internal class SIMChatPhotoAssetBadgeView: SIMView {
     override func build() {
         super.build()
         

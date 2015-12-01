@@ -8,7 +8,7 @@
 
 import UIKit
 
-class SIMChatPhotoAssetView: SIMView {
+internal class SIMChatPhotoAssetView: SIMView {
     override func build() {
         super.build()
         
