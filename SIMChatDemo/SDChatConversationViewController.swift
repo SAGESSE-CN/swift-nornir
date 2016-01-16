@@ -8,20 +8,25 @@
 
 import UIKit
 
-class SDChatUser : NSObject, SIMChatUserProtocol {
-    init(identifier: String, name: String?, portrait: String?, gender: SIMChatUserGender) {
-        self.name = name
-        self.identifier = identifier
-        self.portrait = portrait
-        super.init()
+
+public class SIMDemoUser: SIMChatBaseUser {
+    ///
+    /// 初始化
+    ///
+    public convenience init(
+        identifier: String,
+        name: String?,
+        gender: SIMChatUserGender,
+        portrait: String? = nil) {
+            self.init(
+                identifier: identifier,
+                name: name,
+                portrait: portrait)
+            self.gender = gender
     }
     
-    /// 用户名
-    var name: String?
-    /// 用户头像
-    var portrait: String?
-    /// 用户唯一标识符
-    var identifier: String = NSUUID().UUIDString
+    /// 用户性别
+    var gender: SIMChatUserGender = .Unknow
 }
 
 class SDChatConversationViewController: UITableViewController {
@@ -59,22 +64,22 @@ class SDChatConversationViewController: UITableViewController {
         
         srand(UInt32(time(nil)))
         
-        let s = SDChatUser(identifier: "self", name: "self", portrait: nil, gender: .Male)
-        let o = SDChatUser(identifier: "other", name: "other", portrait: nil, gender: .Female)
-
-        //
-        m.login(s, finish: nil)
-        // ;
-        let cv = m.conversationWithRecver(o)
-        let cc = SDChatViewController(conversation: cv)
+        let s = SIMDemoUser(identifier: "self", name: "self", gender: .Male, portrait: nil)
+        let o = SIMDemoUser(identifier: "other", name: "other", gender: .Female, portrait: nil)
         
 //        for _ in 0 ..< 20 {
 //            let m = SIMChatMessage(SIMChatMessageContentImage(origin: UIImage(named: "t1.jpg")))
 //            cv.messages.append(m)
 //        }
         
-        // 显示
-        self.navigationController?.pushViewController(cc, animated: true)
+        m.login(s).response { result in
+            let cv = self.m.conversation(o)
+            let cc = SDChatViewController(conversation: cv)
+            dispatch_async(dispatch_get_main_queue()) {
+                // 显示
+                self.navigationController?.pushViewController(cc, animated: true)
+            }
+        }
     }
 }
 

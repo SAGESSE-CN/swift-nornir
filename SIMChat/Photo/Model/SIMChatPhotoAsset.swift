@@ -42,6 +42,14 @@ public class SIMChatPhotoAsset: NSObject {
     /// - parameter block 结果
     ///
     public func fullscreen(block: UIImage? -> Void) {
+        fullscreen(false, block: block)
+    }
+    ///
+    /// 获取屏幕大小的图片
+    /// - parameter synchronous 是否等待(true只有一次结果)
+    /// - parameter block 结果
+    ///
+    public func fullscreen(synchronous: Bool, block: UIImage? -> Void) {
         // 如果己经加载了
         if let img = fullscreenCache {
             block(img)
@@ -62,10 +70,13 @@ public class SIMChatPhotoAsset: NSObject {
                 let op = PHImageRequestOptions()
                 let size = CGSizeMake(UIScreen.mainScreen().bounds.size, scale: UIScreen.mainScreen().scale)
                 
-                op.synchronous = false
+                if synchronous {
+                    op.deliveryMode = .HighQualityFormat
+                }
+                op.synchronous = synchronous
                 op.resizeMode = .Fast
                 
-                lib.manager.requestImageForAsset(v, targetSize: size, contentMode: .AspectFill, options: nil) { [weak self]img, info in
+                lib.manager.requestImageForAsset(v, targetSize: size, contentMode: .AspectFill, options: op) { [weak self]img, info in
                     if let img = img {
                         // 加载成功, 计算价值
                         let cost = Int(img.size.width * img.size.height)
@@ -171,6 +182,14 @@ public class SIMChatPhotoAsset: NSObject {
         return 0
     }
     
+    /// 比较
+    public override func isEqual(object: AnyObject?) -> Bool {
+        if let object = object as? SIMChatPhotoAsset {
+            return object.identifier == identifier
+        }
+        return super.isEqual(object)
+    }
+    
     /// 提供一个唯一标识, 用于NSSet
     public private(set) lazy var identifier: String = {
         if #available(iOS 9.0, *) {
@@ -186,6 +205,9 @@ public class SIMChatPhotoAsset: NSObject {
         }
         return NSUUID().UUIDString
     }()
+    
+    public override var hash: Int { return identifier.hashValue }
+    public override var hashValue: Int { return identifier.hashValue }
     
     // 缓存的图片(使用这个是因为如果NSCache只清除了这个元素, 但这个元素正在使用, 这就不需要重新加载了)
     private weak var originalCache: UIImage?

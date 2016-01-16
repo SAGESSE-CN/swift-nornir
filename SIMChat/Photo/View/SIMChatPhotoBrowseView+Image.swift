@@ -117,7 +117,7 @@ internal class SIMChatPhotoBrowseViewImage: SIMView {
     
     
     /// 需要显示的图片:)
-    var image: SIMChatMessageContentImage!
+//    var image: SIMChatMessageContentImage!
 //    /// 代理
 //    weak var delegate: SIMChatPhotoViewDelegate?
     

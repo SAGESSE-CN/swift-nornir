@@ -77,7 +77,7 @@ public class SIMChatPhotoPicker: UINavigationController {
     ///
     /// 选择的图片
     ///
-    public private(set) var selectedItems = NSMutableOrderedSet()
+    public var selectedItems = NSMutableOrderedSet()
     
     /// 初始化
     convenience init(){
