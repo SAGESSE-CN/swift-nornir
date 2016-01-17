@@ -52,11 +52,6 @@ class SDChatConversationViewController: UITableViewController {
         return false
     }
 
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
-    
     let m = SDChatManager()
     
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
@@ -67,12 +62,8 @@ class SDChatConversationViewController: UITableViewController {
         let s = SIMDemoUser(identifier: "self", name: "self", gender: .Male, portrait: nil)
         let o = SIMDemoUser(identifier: "other", name: "other", gender: .Female, portrait: nil)
         
-//        for _ in 0 ..< 20 {
-//            let m = SIMChatMessage(SIMChatMessageContentImage(origin: UIImage(named: "t1.jpg")))
-//            cv.messages.append(m)
-//        }
-        
-        m.login(s).response { result in
+        m.login(s).response { _ in
+            // 登录完成
             let cv = self.m.conversation(o)
             let cc = SDChatViewController(conversation: cv)
             dispatch_async(dispatch_get_main_queue()) {

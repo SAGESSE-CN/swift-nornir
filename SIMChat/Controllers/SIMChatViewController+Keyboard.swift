@@ -9,12 +9,54 @@
 import UIKit
 import AVFoundation
 
-//// MARK: - Keyboard
-//extension SIMChatViewController {
-//    /// 更新键盘(类型)
-//    func updateKeyboard(style style: SIMChatTextFieldItemStyle) {
-//        SIMLog.trace()
-//        let newValue = self.makeKeyboard(style)
+// MARK: - Keyboard Notification
+
+extension SIMChatViewController {
+    ///
+    /// 键盘显示通知
+    ///
+    private dynamic func keyboardWillShow(sender: NSNotification) {
+        if let r1 = sender.userInfo?[UIKeyboardFrameEndUserInfoKey]?.CGRectValue {
+            
+        UIView.animateWithDuration(0.25) {
+            self.inputBarLayout?.bottom = -r1.height
+            self.inputBar.layoutIfNeeded()
+        }
+            
+//            // Note: 在iPad这可能会有键盘高度不变但y改变的情况
+//            let h = r1.height//self.view.bounds.height - r1.origin.y
+//            if self.keyboardHeight != h {
+//                SIMLog.trace()
+//                self.onKeyboardShow(CGRectMake(0, 0, r1.width, h))
+//            }
+//            // 取消隐藏动画
+//            self.keyboardHiddenAnimation = false
+        }
+    }
+    ///
+    /// 键盘隐藏通知
+    ///
+    private dynamic func keyboardWillHide(sender: NSNotification) {
+        
+        UIView.animateWithDuration(0.25) {
+            self.inputBarLayout?.bottom = 0
+            self.inputBar.layoutIfNeeded()
+        }
+        
+//        if self.keyboardHeight != 0 {
+//            SIMLog.trace()
+//            // 转发
+//            self.onKeyboardHidden(self.keyboard?.frame ?? CGRectZero, delay: false)
+//        }
+    }
+}
+
+// MARK: - Keyboard
+extension SIMChatViewController {
+    /// 更新键盘(类型)
+    func updateKeyboard(style style: SIMChatTextFieldItemStyle) {
+        SIMLog.trace()
+        let newValue = self.makeKeyboard(style)
 //        // 隐藏旧的.
 //        if let view = self.keyboard {
 //            // 通知
@@ -35,9 +77,9 @@ import AVFoundation
 //                view.layer.transform = CATransform3DMakeTranslation(0, -view.bounds.height, 1)
 //            }
 //        }
-//    }
-//    /// 更新键盘(高度)
-//    func updateKeyboard(height newValue: CGFloat) {
+    }
+    /// 更新键盘(高度)
+    func updateKeyboard(height newValue: CGFloat) {
 //        // 修正
 //        var fix = self.tableView.contentInset
 //        // 如果开启了自动调整, 并且更新了inset才开始计算
@@ -63,9 +105,10 @@ import AVFoundation
 //        SIMLog.debug("\(newValue), fix: \(NSStringFromUIEdgeInsets(fix))")
 //        // 更新
 //        self.keyboardHeight = newValue
-//    }
-//    /// 获取键盘.
-//    private func makeKeyboard(style: SIMChatTextFieldItemStyle) -> UIView? {
+    }
+    /// 获取键盘.
+    private func makeKeyboard(style: SIMChatTextFieldItemStyle) -> UIView? {
+        return nil
 //        // 己经加载过了?
 //        if let view = keyboards[style] {
 //            return view
@@ -99,50 +142,28 @@ import AVFoundation
 //        self.keyboards[style] = kb
 //        // ok
 //        return kb
-//    }
-//    /// 键盘显示
-//    private dynamic func onKeyboardWillShow(sender: NSNotification) {
-//        // 获取高度
-//        if let r1 = sender.userInfo?[UIKeyboardFrameEndUserInfoKey]?.CGRectValue {
-//            // Note: 在iPad这可能会有键盘高度不变但y改变的情况
-//            let h = r1.height//self.view.bounds.height - r1.origin.y
-//            if self.keyboardHeight != h {
-//                SIMLog.trace()
-//                self.onKeyboardShow(CGRectMake(0, 0, r1.width, h))
-//            }
-//            // 取消隐藏动画
-//            self.keyboardHiddenAnimation = false
-//        }
-//    }
-//    /// 键盘隐藏
-//    private dynamic func onKeyboardWillHide(sender: NSNotification) {
-//        if self.keyboardHeight != 0 {
-//            SIMLog.trace()
-//            // 转发
-//            self.onKeyboardHidden(self.keyboard?.frame ?? CGRectZero, delay: false)
-//        }
-//    }
-//    ///
-//    /// 工具栏显示
-//    ///
-//    /// :param: frame 接下来键盘的大小
-//    ///
-//    private dynamic func onKeyboardShow(frame: CGRect) {
-//        SIMLog.debug(frame)
-//        
-//        // 填充动画
-//        UIView.animateWithDuration(0.25) {
-//            // 更新键盘高度
-//            self.updateKeyboard(height: frame.height)
-//        }
-//    }
-//    ///
-//    /// 工具栏显示 
-//    ///
-//    /// :param: frame 接下来键盘的大小
-//    /// :param: delay 是否需要延迟加载(键盘切换需要延迟一下)
-//    ///
-//    private dynamic func onKeyboardHidden(frame: CGRect, delay: Bool = false) {
+    }
+    ///
+    /// 工具栏显示
+    ///
+    /// :param: frame 接下来键盘的大小
+    ///
+    private dynamic func onKeyboardShow(frame: CGRect) {
+        SIMLog.debug(frame)
+        
+        // 填充动画
+        UIView.animateWithDuration(0.25) {
+            // 更新键盘高度
+            self.updateKeyboard(height: frame.height)
+        }
+    }
+    ///
+    /// 工具栏显示 
+    ///
+    /// :param: frame 接下来键盘的大小
+    /// :param: delay 是否需要延迟加载(键盘切换需要延迟一下)
+    ///
+    private dynamic func onKeyboardHidden(frame: CGRect, delay: Bool = false) {
 //        SIMLog.debug("\(frame) \(delay)")
 //        
 //        let block = { () -> () in
@@ -166,9 +187,9 @@ import AVFoundation
 //            }
 //            block()
 //        }
-//    }
-//}
-//
+    }
+}
+
 //// MARK: - Extension Keyboard Emoji
 //extension SIMChatViewController : SIMChatKeyboardEmojiDelegate {
 //    /// 选择了表情
@@ -260,35 +281,8 @@ import AVFoundation
 //        self.sendMessageForAudio(url, duration: duration)
 //    }
 //}
-//
-//// MARK: - Text Field
-//extension SIMChatViewController : SIMChatTextFieldDelegate {
-//    /// 选中..
-//    func chatTextField(chatTextField: SIMChatTextField, didSelectItem item: Int) {
-//        SIMLog.trace()
-//        if let style = SIMChatTextFieldItemStyle(rawValue: item) {
-//            self.updateKeyboard(style: style)
-//        }
-//    }
-//    /// ...
-//    func chatTextFieldContentSizeDidChange(chatTextField: SIMChatTextField) {
-//        // 填充动画更新
-//        UIView.animateWithDuration(0.25) {
-//            // 更新键盘高度
-//            self.view.layoutIfNeeded()
-//            self.updateKeyboard(height: self.keyboardHeight)
-//        }
-//    }
-//    /// ok
-//    func chatTextFieldShouldReturn(chatTextField: SIMChatTextField) -> Bool {
-//        // 发送.
-//        self.sendMessageForText(self.textField.text ?? "")
-//        self.textField.text = nil
-//        // 不可能return
-//        return false
-//    }
-//}
-//
+
+
 ///// MAKR: - /// Select Image
 //extension SIMChatViewController : UIImagePickerControllerDelegate, UINavigationControllerDelegate {
 //    /// 完成选择
@@ -343,3 +337,35 @@ import AVFoundation
 //        self.presentViewController(picker, animated: true, completion: nil)
 //    }
 //}
+
+
+
+// MARK: - Input bar
+
+extension SIMChatViewController: SIMChatTextFieldDelegate {
+    /// 选中..
+    func chatTextField(chatTextField: SIMChatTextField, didSelectItem item: Int) {
+        SIMLog.trace()
+        if let style = SIMChatTextFieldItemStyle(rawValue: item) {
+            self.updateKeyboard(style: style)
+        }
+    }
+    /// ...
+    func chatTextFieldContentSizeDidChange(chatTextField: SIMChatTextField) {
+        SIMLog.trace()
+//        // 填充动画更新
+//        UIView.animateWithDuration(0.25) {
+//            // 更新键盘高度
+//            self.view.layoutIfNeeded()
+//            self.updateKeyboard(height: self.keyboardHeight)
+//        }
+    }
+    /// ok
+    func chatTextFieldShouldReturn(chatTextField: SIMChatTextField) -> Bool {
+//        // 发送.
+//        self.sendMessageForText(self.textField.text ?? "")
+//        self.textField.text = nil
+        // 不可能return
+        return false
+    }
+}

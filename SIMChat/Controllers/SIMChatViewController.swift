@@ -9,7 +9,7 @@
 import UIKit
 
 ///
-/// 聊天对话
+/// 聊天控制器
 ///
 public class SIMChatViewController: UIViewController {
     ///
@@ -20,20 +20,137 @@ public class SIMChatViewController: UIViewController {
     }
     /// 初始化
     public required init(conversation: SIMChatConversationProtocol) {
-        self.conversation = conversation
-        //self.conversation.delegate = self
+        _conversation = conversation
         super.init(nibName: nil, bundle: nil)
+//        _conversation.delegate = self
+        
+        hidesBottomBarWhenPushed = true
+        
+        let name = conversation.receiver.name ?? conversation.receiver.identifier
+        if conversation.receiver.type == .User {
+            title = "正在和\(name)聊天"
+        } else {
+            title = name
+        }
     }
     
     public override func viewDidLoad() {
         super.viewDidLoad()
         
-        view.backgroundColor = UIColor.purpleColor()
+        // 背景
+        backgroundView.frame = view.bounds
+        backgroundView.backgroundColor = UIColor.purpleColor()
+        backgroundView.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
+        // 表格
+        contentView.translatesAutoresizingMaskIntoConstraints = false
+        contentView.backgroundColor = UIColor.orangeColor() //.clearColor()
+        contentView.showsHorizontalScrollIndicator = false
+        contentView.showsVerticalScrollIndicator = false
+        // 输入框
+        inputBar.translatesAutoresizingMaskIntoConstraints = false
+        inputBar.backgroundColor = UIColor(hex: 0xEBECEE)
+        _inputBar.delegate = self
+        // 输入面板
+        inputPanelView.translatesAutoresizingMaskIntoConstraints = false
+        inputPanelView.backgroundColor = UIColor.redColor()
+        
+        view.addSubview(backgroundView)
+        view.addSubview(contentView)
+        view.addSubview(inputBar)
+        view.addSubview(inputPanelView)
+       
+        // 添加布局
+        _contentViewLayout = SIMChatLayout.make(contentView)
+            .top.equ(view).top
+            .left.equ(view).left
+            .right.equ(view).right
+            .bottom.equ(view).bottom(-44)
+            .submit()
+        
+        _inputBarLayout = SIMChatLayout.make(inputBar)
+            //.height.equ(44)
+            .top.gte(view).top
+            .left.equ(view).left
+            .right.equ(view).right
+            .bottom.equ(view).bottom
+            .submit()
+        
+        _inputPanelViewLayout = SIMChatLayout.make(inputPanelView)
+            .height.equ(252)
+            .left.equ(view).left
+            .right.equ(view).right
+            .bottom.equ(view).bottom(252)
+            .submit()
+        
     }
     
-    /// 聊天会话
-    public var conversation: SIMChatConversationProtocol
+    private var _contentViewLayout: SIMChatLayout?
+    private var _inputBarLayout: SIMChatLayout?
+    private var _inputPanelViewLayout: SIMChatLayout?
+    
+    private lazy var _contentView = UITableView()
+    private lazy var _inputBar = SIMChatTextField(frame: CGRectZero)
+    private lazy var _inputPanelView: UIView = UIView()
+    private lazy var _inputPanels: [UIView] = []
+    
+    private lazy var _backgroundView = UIImageView()
+    private lazy var _messages: [SIMChatMessageProtocol] = []
+    
+    private var _conversation: SIMChatConversationProtocol
 }
+
+// MARK: - Public Propertys
+
+extension SIMChatViewController {
+    ///
+    /// 聊天会话
+    ///
+    public var conversation: SIMChatConversationProtocol { return _conversation }
+    ///
+    /// 内容
+    ///
+    public var contentView: UITableView { return _contentView }
+    public var contentViewLayout: SIMChatLayout? { return _contentViewLayout }
+    ///
+    /// 输入栏
+    ///
+    public var inputBar: UIView { return _inputBar }
+    public var inputBarLayout: SIMChatLayout? { return _inputBarLayout }
+    ///
+    /// 输入面板(选择表情之类的)
+    ///
+    public var inputPanelView: UIView { return _inputPanelView }
+    public var inputPanelViewLayout: SIMChatLayout? { return _inputPanelViewLayout }
+    ///
+    /// 聊天背景
+    ///
+    public var backgroundView: UIImageView { return _backgroundView }
+}
+
+// MARK: - Life Cycle
+
+extension SIMChatViewController {
+    
+    public override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        let center = NSNotificationCenter.defaultCenter()
+        center.addObserver(self, selector: "keyboardWillShow:", name: UIKeyboardWillShowNotification, object: nil)
+        center.addObserver(self, selector: "keyboardWillHide:", name: UIKeyboardWillHideNotification, object: nil)
+    }
+    
+    public override func viewWillDisappear(animated: Bool) {
+        super.viewWillDisappear(animated)
+        
+        // 禁止播放
+        SIMChatAudioManager.sharedManager.stop()
+        
+        let center = NSNotificationCenter.defaultCenter()
+        center.removeObserver(self, name: UIKeyboardWillShowNotification, object: nil)
+        center.removeObserver(self, name: UIKeyboardWillHideNotification, object: nil)
+    }
+}
+
 ////    init(conversation: SIMChatConversation) {
 ////        super.init(nibName: nil, bundle: nil)
 ////        self.conversation = conversation
@@ -257,3 +374,5 @@ public class SIMChatViewController: UIViewController {
 //        }
 //    }
 //}
+
+
