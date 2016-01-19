@@ -41,6 +41,10 @@ public protocol SIMChatMessageProtocol: class {
     /// 消息状态(发送/接收)
     ///
     var status: SIMChatMessageStatus { set get }
+    ///
+    /// 消息的一些选项, 默认None
+    ///
+    var option: SIMChatMessageOption { set get }
     
     ///
     /// 创建一个新的消息
@@ -57,13 +61,6 @@ public protocol SIMChatMessageProtocol: class {
 // MARK: - Convenience
 
 extension SIMChatMessageProtocol {
-    
-    ///
-    /// 消息的一些选项, 默认None
-    ///
-    public var option: SIMChatMessageOption {
-        return [.None]
-    }
     
     ///
     /// 创建一个新的消息
@@ -102,17 +99,13 @@ public struct SIMChatMessageOption: OptionSetType {
         return SIMChatMessageOption(rawValue: 0x0002)
     }
 
-    /// 名片强制显示
+    /// 名片强制显示, 默认是自动选项
     static var ContactShow: SIMChatMessageOption {
         return SIMChatMessageOption(rawValue: 0x0100)
     }
-    /// 名片强制隐藏
+    /// 名片强制隐藏, 默认是自动选项
     static var ContactHidden: SIMChatMessageOption {
         return SIMChatMessageOption(rawValue: 0x0200)
-    }
-    /// 名片根据环境自动显示/隐藏
-    static var ContactAutomatic: SIMChatMessageOption {
-        return SIMChatMessageOption(rawValue: 0x0400)
     }
 }
 

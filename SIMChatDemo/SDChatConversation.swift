@@ -14,10 +14,35 @@ class Unknow: SIMChatContentProtocol {
 class SDChatConversation: SIMChatBaseConversation {
     
     func makeTestData() {
-        let o = receiver
-        let s = sender!
         
-        for _ in 0 ..< 20 {
+        let img = UIImage(named: "t1.jpg")
+        
+        for i in 0 ..< 20 {
+            let o = (i % 2 == 0) ? receiver : sender!
+            let s = (i % 2 == 0) ? sender!  : receiver 
+            if true {
+                let c = SIMChatBaseContent.Text(content: "this is a tips\nThis is a very long long long long long long long long the tips")
+                let m = SIMChatBaseMessage.messageWithContent(c, receiver: o, sender: s)
+                //m.option = [.ContactShow]
+                m.isSelf = (i % 2 == 0)
+                messages.append(m)
+            }
+            if true {
+                let c = SIMChatBaseContent.Image(content: "")
+                c.image = img
+                c.size = img?.size ?? CGSizeZero
+                let m = SIMChatBaseMessage.messageWithContent(c, receiver: o, sender: s)
+                //m.option = [.ContactShow]
+                m.isSelf = (i % 2 == 0)
+                messages.append(m)
+            }
+            if true {
+                let c = SIMChatBaseContent.Audio(content: "")
+                let m = SIMChatBaseMessage.messageWithContent(c, receiver: o, sender: s)
+                //m.option = [.ContactShow]
+                m.isSelf = (i % 2 == 0)
+                messages.append(m)
+            }
             if true {
                 let c = SIMChatBaseContent.Date(content: NSDate())
                 messages.append(SIMChatBaseMessage.messageWithContent(c, receiver: o, sender: s))

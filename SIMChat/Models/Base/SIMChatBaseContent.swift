@@ -6,7 +6,7 @@
 //  Copyright © 2016 Sagesse. All rights reserved.
 //
 
-import Foundation
+import UIKit
 
 
 ///
@@ -40,6 +40,9 @@ extension SIMChatBaseContent {
         public init(content: String) {
             self.content = content
         }
+        
+        public var size: CGSize = CGSizeZero
+        public var image: UIImage?
         /// 内容(本地路径)
         public let content: String
     }

@@ -39,6 +39,15 @@ public class SIMChatBaseUser: SIMChatUserProtocol {
     public var portrait: String?
     
     ///
+    /// 用户类型, 默认为User
+    ///
+    public var type: SIMChatUserType = .User
+    ///
+    /// 用户类型, 该属性只对User类型有效, 默认为Unknow
+    ///
+    public var gender: SIMChatUserGender = .Unknow
+    
+    ///
     /// 创建一个新的用户
     ///
     /// - parameter identifier: 唯一标识符

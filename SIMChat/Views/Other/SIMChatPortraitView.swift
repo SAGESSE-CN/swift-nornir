@@ -56,11 +56,15 @@ class SIMChatPortraitView: SIMView {
     }
     /// 
     private var defaultPortrait: UIImage? {
-//        // 如果性别为女, 显示2号头像
-//        if let u = self.user as? SIMChatUser where u.gender == .Female {
-//            return SIMChatImageManager.defaultPortrait2
-//        }
-        // 否则
+        // 如果性别为女, 显示2号头像
+        if user?.gender == .Female {
+            return SIMChatImageManager.defaultPortrait2
+        }
+        /// 如果性别为男, 显示1号头像
+        if user?.gender == .Male {
+            return SIMChatImageManager.defaultPortrait1
+        }
+        // 否则.. 显示未
         return SIMChatImageManager.defaultPortrait1
     }
     

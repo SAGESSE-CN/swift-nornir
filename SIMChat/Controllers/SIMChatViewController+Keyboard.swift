@@ -56,7 +56,7 @@ extension SIMChatViewController {
     /// 更新键盘(类型)
     func updateKeyboard(style style: SIMChatTextFieldItemStyle) {
         SIMLog.trace()
-        let newValue = self.makeKeyboard(style)
+//        let newValue = self.makeKeyboard(style)
 //        // 隐藏旧的.
 //        if let view = self.keyboard {
 //            // 通知

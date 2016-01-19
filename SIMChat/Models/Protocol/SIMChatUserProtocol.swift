@@ -28,6 +28,15 @@ public protocol SIMChatUserProtocol: class {
     var identifier: String { get }
     
     ///
+    /// 用户类型, 默认为User
+    ///
+    var type: SIMChatUserType { get }
+    ///
+    /// 用户类型, 该属性只对User类型有效, 默认为Unknow
+    ///
+    var gender: SIMChatUserGender { get }
+    
+    ///
     /// 创建一个新的用户
     ///
     /// - parameter identifier: 唯一标识符
@@ -41,18 +50,6 @@ public protocol SIMChatUserProtocol: class {
 // MARK: - Convenience
 
 extension SIMChatUserProtocol {
-    ///
-    /// 用户类型, 默认为User
-    ///
-    public var type: SIMChatUserType {
-        return .User
-    }
-    ///
-    /// 用户类型, 该属性只对User类型有效, 默认为Unknow
-    ///
-    public var gender: SIMChatUserGender {
-        return .Unknow
-    }
     ///
     /// 创建用户(便利版本)
     ///

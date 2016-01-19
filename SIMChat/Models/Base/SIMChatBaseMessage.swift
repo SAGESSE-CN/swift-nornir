@@ -59,6 +59,10 @@ public class SIMChatBaseMessage: SIMChatMessageProtocol {
     /// 消息状态(发送/接收)
     ///
     public lazy var status: SIMChatMessageStatus = .Unknow
+    ///
+    /// 消息的一些选项, 默认None
+    ///
+    public lazy var option: SIMChatMessageOption = [.None]
     
     ///
     /// 创建一个新的消息

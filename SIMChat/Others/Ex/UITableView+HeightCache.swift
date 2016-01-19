@@ -30,18 +30,18 @@ extension UITableView {
     /// - parameter identifier: Reuse identifier for cell which must be registered.
     ///
     private func fd_templateReusableCellForIdentifier(identifier: String) -> UITableViewCell {
-        let reusableCells = (objc_getAssociatedObject(self, self.dynamicType.fd_templateReusableCellForIdentifierKey) as? NSMutableDictionary) ?? {
-            let dic = NSMutableDictionary()
+        let reusableCells = (objc_getAssociatedObject(self, self.dynamicType.fd_templateReusableCellForIdentifierKey) as? NSCache) ?? {
+            let dic = NSCache()
             objc_setAssociatedObject(self, self.dynamicType.fd_templateReusableCellForIdentifierKey, dic, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
             return dic
         }()
-        return (reusableCells[identifier] as? UITableViewCell) ?? {
+        return (reusableCells.objectForKey(identifier) as? UITableViewCell) ?? {
             guard let templateCell = dequeueReusableCellWithIdentifier(identifier) else {
                 fatalError("Cell must be registered to table view for identifier - \(identifier)")
             }
             templateCell.fd_isTemplateLayoutCell = true
             templateCell.contentView.translatesAutoresizingMaskIntoConstraints = false
-            reusableCells[identifier] = templateCell
+            reusableCells.setObject(templateCell, forKey: identifier)
             fd_debugLog("template cell created - \(identifier)")
             return templateCell
         }()

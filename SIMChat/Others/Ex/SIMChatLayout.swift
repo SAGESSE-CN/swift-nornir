@@ -146,7 +146,7 @@ public final class SIMChatLayout {
         }
         private func setV2(att: NSLayoutAttribute) -> RelationOfConst {
             let context = Context()
-            context.firstAttribute = .Height
+            context.firstAttribute = att
             return RelationOfConst(layout, context)
         }
         private init(_ layout: SIMChatLayout, _ context: Context? = nil) {

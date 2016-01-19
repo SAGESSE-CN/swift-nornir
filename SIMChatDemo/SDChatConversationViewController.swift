@@ -24,9 +24,6 @@ public class SIMDemoUser: SIMChatBaseUser {
                 portrait: portrait)
             self.gender = gender
     }
-    
-    /// 用户性别
-    var gender: SIMChatUserGender = .Unknow
 }
 
 class SDChatConversationViewController: UITableViewController {

@@ -101,7 +101,6 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate {
             // custom configuation
             mcell.conversation = self.conversation
             mcell.message = message
-            SIMLog.trace(message.identifier)
         }
     }
 }
