@@ -21,8 +21,10 @@ public class SIMChatViewController: UIViewController {
     /// 初始化
     public required init(conversation: SIMChatConversationProtocol) {
         _conversation = conversation
+        _messageManager = MessageManager(conversation: conversation)
         super.init(nibName: nil, bundle: nil)
-//        _conversation.delegate = self
+        
+        _messageManager.contentView = contentView
         
         hidesBottomBarWhenPushed = true
         
@@ -34,55 +36,6 @@ public class SIMChatViewController: UIViewController {
         }
     }
     
-    public override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        // 背景
-        backgroundView.frame = view.bounds
-        backgroundView.backgroundColor = UIColor.purpleColor()
-        backgroundView.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
-        // 表格
-        contentView.translatesAutoresizingMaskIntoConstraints = false
-        contentView.backgroundColor = UIColor.orangeColor() //.clearColor()
-        contentView.showsHorizontalScrollIndicator = false
-        contentView.showsVerticalScrollIndicator = false
-        // 输入框
-        inputBar.translatesAutoresizingMaskIntoConstraints = false
-        inputBar.backgroundColor = UIColor(hex: 0xEBECEE)
-        _inputBar.delegate = self
-        // 输入面板
-        inputPanelView.translatesAutoresizingMaskIntoConstraints = false
-        inputPanelView.backgroundColor = UIColor.redColor()
-        
-        view.addSubview(backgroundView)
-        view.addSubview(contentView)
-        view.addSubview(inputBar)
-        view.addSubview(inputPanelView)
-       
-        // 添加布局
-        _contentViewLayout = SIMChatLayout.make(contentView)
-            .top.equ(view).top
-            .left.equ(view).left
-            .right.equ(view).right
-            .bottom.equ(view).bottom(-44)
-            .submit()
-        
-        _inputBarLayout = SIMChatLayout.make(inputBar)
-            //.height.equ(44)
-            .top.gte(view).top
-            .left.equ(view).left
-            .right.equ(view).right
-            .bottom.equ(view).bottom
-            .submit()
-        
-        _inputPanelViewLayout = SIMChatLayout.make(inputPanelView)
-            .height.equ(252)
-            .left.equ(view).left
-            .right.equ(view).right
-            .bottom.equ(view).bottom(252)
-            .submit()
-        
-    }
     
     private var _contentViewLayout: SIMChatLayout?
     private var _inputBarLayout: SIMChatLayout?
@@ -94,9 +47,9 @@ public class SIMChatViewController: UIViewController {
     private lazy var _inputPanels: [UIView] = []
     
     private lazy var _backgroundView = UIImageView()
-    private lazy var _messages: [SIMChatMessageProtocol] = []
     
     private var _conversation: SIMChatConversationProtocol
+    private var _messageManager: MessageManager
 }
 
 // MARK: - Public Propertys
@@ -130,6 +83,61 @@ extension SIMChatViewController {
 // MARK: - Life Cycle
 
 extension SIMChatViewController {
+    
+    public override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        // 背景
+        backgroundView.frame = view.bounds
+        backgroundView.image = SIMChatImageManager.defaultBackground
+        backgroundView.contentMode = .ScaleAspectFill
+        backgroundView.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
+        // 表格
+        contentView.translatesAutoresizingMaskIntoConstraints = false
+        contentView.backgroundColor = .clearColor()
+        contentView.showsHorizontalScrollIndicator = false
+        contentView.showsVerticalScrollIndicator = false
+        // 输入框
+        inputBar.translatesAutoresizingMaskIntoConstraints = false
+        inputBar.backgroundColor = UIColor(hex: 0xEBECEE)
+        _inputBar.delegate = self
+        // 输入面板
+        inputPanelView.translatesAutoresizingMaskIntoConstraints = false
+        inputPanelView.backgroundColor = UIColor.redColor()
+        
+        view.addSubview(backgroundView)
+        view.addSubview(contentView)
+        view.addSubview(inputBar)
+        view.addSubview(inputPanelView)
+       
+        // 添加布局
+        _contentViewLayout = SIMChatLayout.make(contentView)
+            .top.equ(view).top
+            .left.equ(view).left
+            .right.equ(view).right
+            .bottom.equ(view).bottom(44)
+            .submit()
+        
+        _inputBarLayout = SIMChatLayout.make(inputBar)
+            //.height.equ(44)
+            .top.gte(view).top
+            .left.equ(view).left
+            .right.equ(view).right
+            .bottom.equ(view).bottom
+            .submit()
+        
+        _inputPanelViewLayout = SIMChatLayout.make(inputPanelView)
+            .height.equ(252)
+            .left.equ(view).left
+            .right.equ(view).right
+            .bottom.equ(view).bottom(-252)
+            .submit()
+        
+        _messageManager.prepare()
+        
+        // up
+        contentView.contentInset = UIEdgeInsetsMake(64, 0, 0, 0)
+    }
     
     public override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)

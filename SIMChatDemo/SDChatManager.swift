@@ -10,6 +10,11 @@ import UIKit
 
 /// SIM Demo Chat Manager
 class SDChatManager: SIMChatBaseManager {
+    override init() {
+        super.init()
+        
+        classProvider.conversation = SDChatConversation.self
+    }
     
 }
 

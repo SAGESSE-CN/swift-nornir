@@ -8,7 +8,30 @@
 
 import UIKit
 
+class Unknow: SIMChatContentProtocol {
+}
+
 class SDChatConversation: SIMChatBaseConversation {
+    
+    func makeTestData() {
+        let o = receiver
+        let s = sender!
+        
+        for _ in 0 ..< 20 {
+            if true {
+                let c = SIMChatBaseContent.Date(content: NSDate())
+                messages.append(SIMChatBaseMessage.messageWithContent(c, receiver: o, sender: s))
+            }
+            if true {
+                let c = SIMChatBaseContent.Tips(content: "this is a tips\nThis is a very long long long long long long long long the tips")
+                messages.append(SIMChatBaseMessage.messageWithContent(c, receiver: o, sender: s))
+            }
+            if true {
+                let c = Unknow()
+                messages.append(SIMChatBaseMessage.messageWithContent(c, receiver: o, sender: s))
+            }
+        }
+    }
     
     var allLoaded = false
 }

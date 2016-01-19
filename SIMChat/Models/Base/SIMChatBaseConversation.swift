@@ -56,7 +56,7 @@ public class SIMChatBaseConversation: SIMChatConversationProtocol {
     }
     
     /// 所有的消息
-    private var messages: Array<SIMChatMessageProtocol> = []
+    /*private*/ var messages: Array<SIMChatMessageProtocol> = []
 }
 
 // MARK: - Util
@@ -91,7 +91,7 @@ extension SIMChatBaseConversation {
         count: Int) -> SIMChatRequest<Array<SIMChatMessageProtocol>> {
             SIMLog.trace()
             return SIMChatRequest.request {
-                $0.success([])
+                $0.success(self.messages)
             }
     }
     ///

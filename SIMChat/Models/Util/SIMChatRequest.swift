@@ -21,7 +21,7 @@ public final class SIMChatRequest<R> {
     ///
     public static func request(clouser: ((success: (R -> Void), failure: (NSError -> Void)) -> Void)) -> Self {
         let request = self.init()
-        dispatch_async(SIMChatRequestQueue) {
+        dispatch_async(dispatch_get_main_queue()) {
             clouser(success: { request.responseClouser?(.Success($0)) },
                     failure: { request.responseClouser?(.Failure($0)) })
         }
@@ -39,4 +39,3 @@ public final class SIMChatRequest<R> {
     private var responseClouser: (Result -> Void)?
 }
 
-public let SIMChatRequestQueue = dispatch_get_global_queue(0, 0)

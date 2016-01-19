@@ -64,8 +64,11 @@ class SDChatConversationViewController: UITableViewController {
         
         m.login(s).response { _ in
             // 登录完成
-            let cv = self.m.conversation(o)
+            let cv = self.m.conversation(o) as! SDChatConversation
+            cv.makeTestData()
+            
             let cc = SDChatViewController(conversation: cv)
+            
             dispatch_async(dispatch_get_main_queue()) {
                 // 显示
                 self.navigationController?.pushViewController(cc, animated: true)

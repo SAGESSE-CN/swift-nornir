@@ -8,6 +8,107 @@
 
 import UIKit
 
+extension SIMChatViewController {
+    class MessageManager: NSObject {
+        init(conversation: SIMChatConversationProtocol) {
+            self.allMessages = []
+            self.conversation = conversation
+            super.init()
+            self.conversation.delegate = self
+        }
+        
+        private var allMessages: Array<SIMChatMessageProtocol>
+        private var conversation: SIMChatConversationProtocol
+        
+        var contentView: UITableView? {
+            didSet {
+                oldValue?.delegate = nil
+                oldValue?.dataSource = nil
+                contentView?.delegate = self
+                contentView?.dataSource = self
+            }
+        }
+        private var manager: SIMChatManagerProtocol? {
+            return self.conversation.manager
+        }
+    }
+}
+
+extension SIMChatViewController.MessageManager: UITableViewDataSource {
+    /// some prepare
+    func prepare() {
+        // reigster cell class
+        manager?.classProvider.cells.forEach {
+            self.contentView?.registerClass($0.1, forCellReuseIdentifier: $0.0)
+            SIMLog.debug("\($0.0) => \(NSStringFromClass($0.1))")
+        }
+        // regitster unknow cell
+        if let unknowCls = manager?.classProvider.unknowCell as? AnyClass {
+            contentView?.registerClass(unknowCls, forCellReuseIdentifier: "SIMChat.Unknow")
+        } else {
+            fatalError("Must provider unknow cell class")
+        }
+        // config contentView
+        contentView?.separatorStyle = .None
+        // load for conversation
+        conversation.loadHistoryMessages(200).response { [weak self] in
+            if let allMessages = $0.value {
+                self?.allMessages = allMessages
+                self?.contentView?.reloadData()
+            }
+        }
+    }
+    /// query reuseindentifier with message
+    private func reuseIndentifierWithMessage(message: SIMChatMessageProtocol) -> String {
+        let key = NSStringFromClass(message.content.dynamicType)
+        if manager?.classProvider.cells.contains({ $0.0 == key }) ?? false {
+            return key
+        }
+        return "SIMChat.Unknow"
+    }
+    
+    @objc func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return allMessages.count
+    }
+    /// 计算高度
+    @objc func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
+        let message = allMessages[indexPath.row]
+        let identifier = reuseIndentifierWithMessage(message)
+        return tableView.fd_heightForCellWithIdentifier(identifier, cacheByKey: message.identifier) {
+            if let mcell = $0 as? SIMChatCellProtocol where message != mcell.message {
+                // configuation
+                mcell.conversation = self.conversation
+                mcell.message = message
+            }
+        }
+    }
+    /// 创建
+    @objc func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+        let identifier = reuseIndentifierWithMessage(allMessages[indexPath.row])
+        return tableView.dequeueReusableCellWithIdentifier(identifier, forIndexPath: indexPath)
+    }
+}
+
+extension SIMChatViewController.MessageManager: UITableViewDelegate {
+    /// 绑定
+    @objc func tableView(tableView: UITableView, willDisplayCell cell: UITableViewCell, forRowAtIndexPath indexPath: NSIndexPath) {
+        // default configuation
+        cell.selectionStyle = .None
+        cell.backgroundColor = .clearColor()
+        
+        let message = allMessages[indexPath.row]
+        if let mcell = cell as? SIMChatCellProtocol where message != mcell.message {
+            // custom configuation
+            mcell.conversation = self.conversation
+            mcell.message = message
+            SIMLog.trace(message.identifier)
+        }
+    }
+}
+
+extension SIMChatViewController.MessageManager: SIMChatConversationDelegate {
+}
+
 
 //// MARK: - Message
 //extension SIMChatViewController {
