@@ -37,7 +37,7 @@ extension SIMChatBaseManager {
     public func login(user: SIMChatUserProtocol) -> SIMChatRequest<Void> {
         SIMLog.trace()
         
-        return SIMChatRequest.request {
+        return SIMChatRequest.requestOnMainThread {
             self.user = user
             $0.success()
         }
@@ -51,7 +51,7 @@ extension SIMChatBaseManager {
     public func logout() -> SIMChatRequest<Void> {
         SIMLog.trace()
         
-        return SIMChatRequest.request {
+        return SIMChatRequest.requestOnMainThread {
             self.user = nil
             $0.success()
         }

@@ -33,6 +33,7 @@ public protocol SIMChatUserProtocol: class {
     var type: SIMChatUserType { get }
     ///
     /// 用户类型, 该属性只对User类型有效, 默认为Unknow
+    /// - TODO: 这个类型不应该放在这里.
     ///
     var gender: SIMChatUserGender { get }
     
@@ -102,3 +103,6 @@ public enum SIMChatUserType: Int {
     case Group
     case System
 }
+
+
+public let SIMChatUserInfoDidChangeNotification = "SIMChatUserInfoDidChangeNotification"

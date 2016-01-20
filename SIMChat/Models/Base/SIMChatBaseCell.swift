@@ -11,19 +11,20 @@ import UIKit
 ///
 /// 打包起来
 ///
-public struct SIMChatBaseCell {}
-
-
-// MARK: - Base
-
-extension SIMChatBaseCell {
+public struct SIMChatBaseCell {
     ///
     /// 最基本的实现
     ///
     public class Base: UITableViewCell, SIMChatCellProtocol {
         public var message: SIMChatMessageProtocol?
         public var conversation: SIMChatConversationProtocol?
+        public weak var eventDelegate: SIMChatCellEventDelegate?
     }
+}
+
+// MARK: - Bubble
+
+extension SIMChatBaseCell {
     ///
     /// 包含一个气泡
     ///
@@ -38,6 +39,8 @@ extension SIMChatBaseCell {
         }
         public override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
             super.init(style: style, reuseIdentifier: reuseIdentifier)
+            
+            _bubbleMenuItems = [UIMenuItem(title: "删除", action: "messageDelete:")]
             
             // TODO: 有性能问题, 需要重新实现
         
@@ -71,6 +74,13 @@ extension SIMChatBaseCell {
             portraitView.translatesAutoresizingMaskIntoConstraints = false
             visitCardView.translatesAutoresizingMaskIntoConstraints = false
             
+            stateView.hidden = true
+            
+            //stateView.backgroundColor = UIColor.purpleColor()
+            //bubbleView.backgroundColor = UIColor.purpleColor()
+            //portraitView.backgroundColor = UIColor.purpleColor()
+            //visitCardView.backgroundColor = UIColor.purpleColor()
+            
             // add views
             contentView.addSubview(visitCardView)
             contentView.addSubview(portraitView)
@@ -78,7 +88,6 @@ extension SIMChatBaseCell {
             contentView.addSubview(stateView)
             
             // add constraints
-            
             addConstraints(NSLayoutConstraintMake("H:[p]-mh1@ph0-[b]-mh1@ph1-[p]", views: vs, metrics: ms))
             addConstraints(NSLayoutConstraintMake("H:[p]-mh1@ph0-[c]-mh1@ph1-[p]", views: vs, metrics: ms))
             addConstraints(NSLayoutConstraintMake("H:|-==mh0@ph0-[p(s0)]-mh0@ph2-|", views: vs, metrics: ms))
@@ -102,6 +111,8 @@ extension SIMChatBaseCell {
             
             // add kvos
             addObserver(self, forKeyPath: "visitCardView.hidden", options: .New, context: nil)
+            
+            initEvent()
         }
         /// 销毁
         deinit {
@@ -126,9 +137,6 @@ extension SIMChatBaseCell {
                 }
                 // 气泡方向
                 style = m.isSelf ? .Right : .Left
-                // 关于头像
-                portraitView.user = m.sender
-                visitCardView.user = m.sender
                 // 关于名片显示
                 if m.option.contains(.ContactShow) {
                     // 强制显示
@@ -144,10 +152,12 @@ extension SIMChatBaseCell {
                         visitCardView.hidden = false
                     }
                 }
+                userUpdate()
+                messageUpdate()
             }
         }
         /// 更新类型.
-        public private(set) var style: Style = .Unknow {
+        public var style: Style = .Unknow {
             willSet {
                 // 没有改变
                 guard newValue != style else {
@@ -168,6 +178,8 @@ extension SIMChatBaseCell {
             }
         }
         
+        private lazy var _bubbleMenuItems: Array<UIMenuItem> = []
+        
         /// 自动调整
         private let hPriority = UILayoutPriority(700)
         private let vPriority = UILayoutPriority(800)
@@ -181,335 +193,157 @@ extension SIMChatBaseCell {
         private(set) lazy var visitCardView = SIMChatVisitCardView(frame: CGRectZero)
         
         public var conversation: SIMChatConversationProtocol?
-    }
-}
-
-extension SIMChatBaseCell {
-    ///
-    /// 文本
-    ///
-    public class Text: Bubble {
-        public required init?(coder aDecoder: NSCoder) {
-            super.init(coder: aDecoder)
-        }
-        public override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
-            super.init(style: style, reuseIdentifier: reuseIdentifier)
-            
-            // config views
-            contentLabel.font = UIFont.systemFontOfSize(16)
-            contentLabel.numberOfLines = 0
-            contentLabel.textColor = UIColor.blackColor()
-            // add views
-            bubbleView.contentView.addSubview(contentLabel)
-            // add constraints
-            SIMChatLayout.make(contentLabel)
-                .top.equ(bubbleView.contentView).top(8)
-                .left.equ(bubbleView.contentView).left(8)
-                .right.equ(bubbleView.contentView).right(8)
-                .bottom.equ(bubbleView.contentView).bottom(8)
-                .submit()
-        }
-        /// 显示类型
-        public override var style: Style {
-            didSet {
-                switch style {
-                case .Left:  contentLabel.textColor = UIColor.blackColor()
-                case .Right: contentLabel.textColor = UIColor.whiteColor()
-                case .Unknow: break
-                }
-            }
-        }
-        /// 消息内容
-        public override var message: SIMChatMessageProtocol? {
-            didSet {
-                if let content = message?.content as? SIMChatBaseContent.Text {
-                    self.contentLabel.text = content.content
-                }
-            }
-        }
-        private(set) lazy var contentLabel = SIMChatLabel(frame: CGRectZero)
-    }
-    ///
-    /// 图片
-    ///
-    public class Image: Bubble {
-        public required init?(coder aDecoder: NSCoder) {
-            super.init(coder: aDecoder)
-        }
-        public override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
-            super.init(style: style, reuseIdentifier: reuseIdentifier)
-            
-            // config
-            previewImageView.clipsToBounds = true
-            previewImageView.contentMode = .ScaleAspectFill
-            previewImageView.translatesAutoresizingMaskIntoConstraints = false
-            
-            // add views
-            bubbleView.contentView.addSubview(previewImageView)
-            
-            previewImageViewLayout = SIMChatLayout.make(previewImageView)
-                .top.equ(bubbleView.contentView).top
-                .left.equ(bubbleView.contentView).left
-                .right.equ(bubbleView.contentView).right
-                .bottom.equ(bubbleView.contentView).bottom
-                .width.equ(0).priority(751)
-                .height.equ(0).priority(751)
-                .submit()
-        }
-        /// 消息内容
-        public override var message: SIMChatMessageProtocol? {
-            didSet {
-                if let content = message?.content as? SIMChatBaseContent.Image {
-                    let width = max(content.size.width, 32)
-                    let height = max(content.size.height, 1)
-                    let scale = min(min(135, width) / width, min(135, height) / height)
-                    
-                    previewImageViewLayout?.width = width * scale
-                    previewImageViewLayout?.height = height * scale
-                    
-                    setNeedsLayout()
-                    
-                    if superview != nil {
-                        previewImageView.image = content.image
-                    }
-                }
-            }
-        }
-        
-        private(set) var previewImageViewLayout: SIMChatLayout?
-        private(set) lazy var previewImageView = UIImageView()
-    }
-    ///
-    /// 音频
-    ///
-    public class Audio: Bubble {
-        public required init?(coder aDecoder: NSCoder) {
-            super.init(coder: aDecoder)
-        }
-        public override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
-            super.init(style: style, reuseIdentifier: reuseIdentifier)
-            
-            let vs = ["c": titleLabel,
-                "i": animationView]
-            
-            let ms = ["s0": 20,
-                "m0": 0,
-                "hp0": hPriority2,
-                "hp1": hPriority2 - 1]
-            
-            let addConstraints = bubbleView.contentView.addConstraints
-            
-            // config
-            titleLabel.translatesAutoresizingMaskIntoConstraints = false
-            animationView.translatesAutoresizingMaskIntoConstraints = false
-            
-            // add views
-            bubbleView.contentView.addSubview(animationView)
-            bubbleView.contentView.addSubview(titleLabel)
-            
-            // add constraints
-            addConstraints(NSLayoutConstraintMake("H:|-12@hp1-[c]-10@hp1-[i]-10@hp1-|", views: vs, options: .AlignAllCenterY, metrics: ms))
-            addConstraints(NSLayoutConstraintMake("H:|-10@hp0-[i]-10@hp0-[c]-12@hp0-|", views: vs, options: .AlignAllCenterY, metrics: ms))
-            addConstraints(NSLayoutConstraintMake("V:|->=8-[i]->=8-|", views: vs))
-            addConstraints(NSLayoutConstraintMake("H:[i(s0)]", views: vs, metrics: ms))
-            addConstraints(NSLayoutConstraintMake("V:[i(s0)]", views: vs, metrics: ms))
-            
-            // get constraints
-            for c in bubbleView.contentView.constraints {
-                if c.priority == hPriority2 {
-                    leftConstraints2.append(c)
-                }
-            }
-        }
-        /// 显示类型
-        public override var style: Style {
-            didSet {
-                // 没有改变
-                guard oldValue != style else {
-                    return
-                }
-                // 检查
-                switch style {
-                case .Left:
-                    
-                    animationView.animationDuration = 1
-                    titleLabel.textColor = UIColor.blackColor()
-                    (animationView.image, animationView.animationImages) = self.dynamicType.leftImages
-                    
-                case .Right:
-                    
-                    titleLabel.textColor = UIColor.whiteColor()
-                    animationView.stopAnimating()
-                    animationView.animationDuration = 1
-                    (animationView.image, animationView.animationImages) = self.dynamicType.rightImages
-                    
-                case .Unknow:
-                    break
-                }
-                
-                for c in leftConstraints {
-                    c.priority = style == .Left ? hPriority : 1
-                }
-                
-                setNeedsLayout()
-            }
-        }
-    /// 消息内容
-        public override var message: SIMChatMessageProtocol? {
-            didSet {
-                if let _ = message?.content as? SIMChatBaseContent.Audio {
-                    titleLabel.text = "99'99''"
-                    //            // 播放中.
-                    //            if content.playing {
-                    //                animationView.startAnimating()
-                    //            }
-                }
-            }
-        }
-        
-        private let hPriority2 = UILayoutPriority(750)
-        private lazy var leftConstraints2 = [NSLayoutConstraint]()
-        
-        private lazy var titleLabel = UILabel()
-        private lazy var animationView = UIImageView()
-    }
-}
-
-// MARK: - Util
-
-extension SIMChatBaseCell {
-    ///
-    /// 提示信息
-    ///
-    public class Tips: Base {
-        public required init?(coder aDecoder: NSCoder) {
-            super.init(coder: aDecoder)
-        }
-        public override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
-            super.init(style: style, reuseIdentifier: reuseIdentifier)
-            
-            // config
-            titleLabel.numberOfLines = 0
-            titleLabel.font = UIFont.systemFontOfSize(11)
-            titleLabel.textColor = UIColor(hex: 0x7B7B7B)
-            titleLabel.textAlignment = NSTextAlignment.Center
-            // add views
-            contentView.addSubview(titleLabel)
-            // add constraints
-            SIMChatLayout.make(titleLabel)
-                .top.equ(contentView).top(16)
-                .left.equ(contentView).left(8)
-                .right.equ(contentView).right(8)
-                .bottom.equ(contentView).bottom(8)
-                .submit()
-        }
-        /// 关联的消息
-        public override var message: SIMChatMessageProtocol? {
-            didSet {
-                if let content = message?.content as? SIMChatBaseContent.Tips {
-                    titleLabel.text = content.content
-                }
-            }
-        }
-        private lazy var titleLabel = UILabel()
-    }
-    ///
-    /// 日期信息
-    ///
-    public class Date: Base {
-        public required init?(coder aDecoder: NSCoder) {
-            super.init(coder: aDecoder)
-        }
-        public override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
-            super.init(style: style, reuseIdentifier: reuseIdentifier)
-            
-            // config
-            titleLabel.text = ""
-            titleLabel.numberOfLines = 0
-            titleLabel.font = UIFont.systemFontOfSize(11)
-            titleLabel.textColor = UIColor(hex: 0x7B7B7B)
-            titleLabel.textAlignment = NSTextAlignment.Center
-            // add views
-            contentView.addSubview(titleLabel)
-            // add constraints
-            SIMChatLayout.make(titleLabel)
-                .top.equ(contentView).top(16)
-                .left.equ(contentView).left(8)
-                .right.equ(contentView).right(8)
-                .bottom.equ(contentView).bottom(8)
-                .submit()
-        }
-        /// 关联的消息
-        public override var message: SIMChatMessageProtocol? {
-            didSet {
-                if let content = message?.content as? SIMChatBaseContent.Date {
-                    titleLabel.text = "\(content.content)"
-                }
-            }
-        }
-        private lazy var titleLabel = UILabel()
-    }
-    ///
-    /// 未知的信息
-    ///
-    public class Unknow: Base {
-        public required init?(coder aDecoder: NSCoder) {
-            super.init(coder: aDecoder)
-        }
-        public override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
-            super.init(style: style, reuseIdentifier: reuseIdentifier)
-            
-            // config
-            titleLabel.text = "未知的消息类型"
-            titleLabel.numberOfLines = 0
-            titleLabel.font = UIFont.systemFontOfSize(11)
-            titleLabel.textColor = UIColor(hex: 0x7B7B7B)
-            titleLabel.textAlignment = NSTextAlignment.Center
-            // add views
-            contentView.addSubview(titleLabel)
-            // add constraints
-            SIMChatLayout.make(titleLabel)
-                .top.equ(contentView).top(16)
-                .left.equ(contentView).left(8)
-                .right.equ(contentView).right(8)
-                .bottom.equ(contentView).bottom(8)
-                .submit()
-        }
-        private lazy var titleLabel = UILabel()
+        public weak var eventDelegate: SIMChatCellEventDelegate?
     }
 }
 
 
+// MARK: - Event
 
-
-// MARK: - Resources
-extension SIMChatBaseCell.Audio {
-
-    /// 左边
-    static let leftImages: (UIImage?, [UIImage]?) = {
-        let a = NSMutableArray()
-        for n in ["simchat_audio_receive_icon_nor",
-                  "simchat_audio_receive_icon_1",
-                  "simchat_audio_receive_icon_2",
-                  "simchat_audio_receive_icon_3"] {
-            if let img = UIImage(named: n) {
-                a.addObject(img)
-            }
-        }
-        return (a[0] as? UIImage, a.subarrayWithRange(NSMakeRange(1, a.count - 1)) as? [UIImage])
-    }()
+extension SIMChatBaseCell.Bubble {
+    // TODO: 设计存在问题. 需要重构
     
-    /// 右边
-    static let rightImages: (UIImage?, [UIImage]?) = {
-        let a = NSMutableArray()
-        for n in ["simchat_audio_send_icon_nor",
-                  "simchat_audio_send_icon_1",
-                  "simchat_audio_send_icon_2",
-                  "simchat_audio_send_icon_3"] {
-            if let img = UIImage(named: n) {
-                a.addObject(img)
-            }
+    /// 气泡长按的菜单项
+    public var bubbleMenuItems: Array<UIMenuItem> { return _bubbleMenuItems }
+    
+    /// 初始化事件
+    private func initEvent() {
+        
+        SIMChatNotificationCenter.addObserver(self,
+            selector: "onUserInfoDidChange:",
+            name: SIMChatUserInfoDidChangeNotification)
+        SIMChatNotificationCenter.addObserver(self,
+            selector: "onMessageStatusDidChange:",
+            name: SIMChatMessageStatusChangedNotification)
+
+        // add events
+        bubbleView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: "onPressOfBubble:"))
+        bubbleView.addGestureRecognizer(UILongPressGestureRecognizer(target: self, action: "onLongPressOfBubble:"))
+        portraitView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: "onPressOfPortrait:"))
+        portraitView.addGestureRecognizer(UILongPressGestureRecognizer(target: self, action: "onLongPressOfPortrait:"))
+        
+        stateView.addTarget(self, action: "onPressOfStatusRetry:", forControlEvents: .TouchUpInside)
+    }
+    /// 检查是否允许获取焦点
+    public override func canBecomeFirstResponder() -> Bool {
+        return true
+    }
+    /// 检查是否使用该菜单
+    public override func canPerformAction(action: Selector, withSender sender: AnyObject?) -> Bool {
+        return bubbleMenuItems.contains {
+            return $0.action == action
         }
-        return (a[0] as? UIImage, a.subarrayWithRange(NSMakeRange(1, a.count - 1)) as? [UIImage])
-    }()
+    }
+    /// 重新定义点击区域
+    public override func hitTest(point: CGPoint, withEvent event: UIEvent?) -> UIView? {
+        if isFirstResponder() {
+            resignFirstResponder()
+            return nil
+        }
+        let view = super.hitTest(point, withEvent: event)
+        if view != nil && view != contentView {
+            return view
+        }
+        return nil
+    }
+    /// 气泡点击事件
+    private dynamic func onPressOfBubble(sender: UITapGestureRecognizer) {
+        guard let message = message where sender.state == .Ended else {
+            return
+        }
+        eventDelegate?.cellEvent(self, clickMessage: message)
+    }
+    /// 气泡长按事件
+    private dynamic func onLongPressOfBubble(sender: UILongPressGestureRecognizer) {
+        guard sender.state == .Began && !bubbleMenuItems.isEmpty else {
+            return
+        }
+        // 准备菜单
+        let mu = UIMenuController.sharedMenuController()
+        
+        becomeFirstResponder()
+        
+        mu.menuItems = bubbleMenuItems
+        mu.setTargetRect(bubbleView.frame, inView: self)
+        mu.setMenuVisible(true, animated: true)
+    }
+    /// 状态
+    private dynamic func onPressOfStatusRetry(sender: AnyObject) {
+        guard let message = message else {
+            return
+        }
+        eventDelegate?.cellEvent(self, retryMessage: message)
+    }
+    /// 头像点击事件
+    private dynamic func onPressOfPortrait(sender: UITapGestureRecognizer) {
+        guard let user = portraitView.user where sender.state == .Ended else {
+            return
+        }
+        eventDelegate?.cellEvent(self, showProfile: user)
+    }
+    /// 头像长按事件
+    private dynamic func onLongPressOfPortrait(sender: UILongPressGestureRecognizer) {
+        guard let user = portraitView.user where sender.state == .Began else {
+            return
+        }
+        eventDelegate?.cellEvent(self, replyUser: user)
+    }
+    
+    /// 消息状态改变通知
+    private dynamic func onMessageStatusDidChange(sender: NSNotification) {
+        guard let message = sender.object as? SIMChatMessageProtocol where message == self.message else {
+            return
+        }
+        messageUpdate()
+    }
+    /// 用户信息改变通知
+    private dynamic func onUserInfoDidChange(sender: NSNotification) {
+        guard let user = sender.object as? SIMChatUserProtocol where user == portraitView.user else {
+            return
+        }
+        userUpdate()
+    }
+    
+    /// 复制消息
+    private dynamic func messageCopy(sender: AnyObject) {
+        guard let message = message else {
+            return
+        }
+        eventDelegate?.cellEvent(self, copyMessage: message)
+    }
+    /// 删除消息
+    private dynamic func messageDelete(sender: AnyObject) {
+        guard let message = message else {
+            return
+        }
+        eventDelegate?.cellEvent(self, removeMessage: message)
+    }
+    /// 更新消息
+    private func messageUpdate() {
+        guard let message = message where superview != nil else {
+            return
+        }
+        switch message.status {
+        case .Error:
+            stateView.status = .Failed
+            stateView.userInteractionEnabled = true
+            stateView.hidden = false
+        case .Receiving, .Sending:
+            stateView.status = .Waiting
+            stateView.userInteractionEnabled = false
+            stateView.hidden = false
+        default:
+            stateView.status = .None
+            stateView.hidden = true
+        }
+    }
+    /// 更新用户
+    private func userUpdate() {
+        guard superview != nil else {
+            return
+        }
+        portraitView.user = message?.sender
+        visitCardView.user = message?.sender
+    }
 }
+

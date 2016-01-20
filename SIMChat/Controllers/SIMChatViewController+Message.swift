@@ -66,7 +66,7 @@ extension SIMChatViewController.MessageManager: UITableViewDataSource {
         }
         return "SIMChat.Unknow"
     }
-    
+    /// 消息数量
     @objc func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return allMessages.count
     }
@@ -101,11 +101,47 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate {
             // custom configuation
             mcell.conversation = self.conversation
             mcell.message = message
+            mcell.eventDelegate = self
         }
     }
 }
 
 extension SIMChatViewController.MessageManager: SIMChatConversationDelegate {
+}
+
+// MARK: - Cell Event Delegate
+
+extension SIMChatViewController.MessageManager: SIMChatCellEventDelegate {
+    /// 回复用户
+    func cellEvent(cell: SIMChatCellProtocol, replyUser user: SIMChatUserProtocol) {
+        SIMLog.debug(user.identifier)
+    }
+    /// 显示用户信息
+    func cellEvent(cell: SIMChatCellProtocol, showProfile user: SIMChatUserProtocol) {
+        SIMLog.debug(user.identifier)
+    }
+    
+    /// 复制消息
+    func cellEvent(cell: SIMChatCellProtocol, copyMessage message: SIMChatMessageProtocol) {
+        SIMLog.debug(message.identifier)
+    }
+    /// 删除消息
+    func cellEvent(cell: SIMChatCellProtocol, removeMessage message: SIMChatMessageProtocol) {
+        SIMLog.debug(message.identifier)
+    }
+    /// 撤回消息
+    func cellEvent(cell: SIMChatCellProtocol, revocationMessage message: SIMChatMessageProtocol) {
+        SIMLog.debug(message.identifier)
+    }
+    
+    /// 点
+    func cellEvent(cell: SIMChatCellProtocol, clickMessage message: SIMChatMessageProtocol) {
+        SIMLog.debug(message.identifier)
+    }
+    /// 重试(发送/上传/下载)
+    func cellEvent(cell: SIMChatCellProtocol, retryMessage message: SIMChatMessageProtocol) {
+        SIMLog.debug(message.identifier)
+    }
 }
 
 

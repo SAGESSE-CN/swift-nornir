@@ -23,8 +23,9 @@ class SDChatConversation: SIMChatBaseConversation {
             if true {
                 let c = SIMChatBaseContent.Text(content: "this is a tips\nThis is a very long long long long long long long long the tips")
                 let m = SIMChatBaseMessage.messageWithContent(c, receiver: o, sender: s)
-                //m.option = [.ContactShow]
+                m.option = [.ContactShow]
                 m.isSelf = (i % 2 == 0)
+                m.status = .Sending
                 messages.append(m)
             }
             if true {
@@ -32,15 +33,17 @@ class SDChatConversation: SIMChatBaseConversation {
                 c.image = img
                 c.size = img?.size ?? CGSizeZero
                 let m = SIMChatBaseMessage.messageWithContent(c, receiver: o, sender: s)
-                //m.option = [.ContactShow]
+                m.option = [.ContactShow]
                 m.isSelf = (i % 2 == 0)
+                m.status = .Receiving
                 messages.append(m)
             }
             if true {
                 let c = SIMChatBaseContent.Audio(content: "")
                 let m = SIMChatBaseMessage.messageWithContent(c, receiver: o, sender: s)
-                //m.option = [.ContactShow]
+                m.option = [.ContactShow]
                 m.isSelf = (i % 2 == 0)
+                m.status = .Error
                 messages.append(m)
             }
             if true {

@@ -152,3 +152,7 @@ public func !=(lhs: SIMChatMessageProtocol, rhs: SIMChatMessageProtocol?) -> Boo
 public func ==(lhs: SIMChatMessageProtocol, rhs: SIMChatMessageProtocol?) -> Bool {
     return lhs.identifier == rhs?.identifier
 }
+
+
+/// 消息改变通知
+public let SIMChatMessageStatusChangedNotification = "SIMChatMessageStatusChangedNotification"
