@@ -15,7 +15,7 @@ class SDChatConversation: SIMChatBaseConversation {
     
     func makeTestData() {
         
-        let img = UIImage(named: "t1.jpg")
+        let path = NSBundle.mainBundle().pathForResource("t1", ofType: "jpg")!
         
         for i in 0 ..< 20 {
             let o = (i % 2 == 0) ? receiver : sender!
@@ -29,9 +29,7 @@ class SDChatConversation: SIMChatBaseConversation {
                 messages.append(m)
             }
             if true {
-                let c = SIMChatBaseContent.Image(content: "")
-                c.image = img
-                c.size = img?.size ?? CGSizeZero
+                let c = SIMChatBaseContent.Image(remote: path, size: CGSizeMake(640, 480))
                 let m = SIMChatBaseMessage.messageWithContent(c, receiver: o, sender: s)
                 m.option = [.ContactShow]
                 m.isSelf = (i % 2 == 0)
@@ -39,7 +37,7 @@ class SDChatConversation: SIMChatBaseConversation {
                 messages.append(m)
             }
             if true {
-                let c = SIMChatBaseContent.Audio(content: "")
+                let c = SIMChatBaseContent.Audio(remote: path, duration: 6.2 * Double(i + 1))
                 let m = SIMChatBaseMessage.messageWithContent(c, receiver: o, sender: s)
                 m.option = [.ContactShow]
                 m.isSelf = (i % 2 == 0)

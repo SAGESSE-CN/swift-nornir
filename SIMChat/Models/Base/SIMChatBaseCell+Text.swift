@@ -19,7 +19,8 @@ extension SIMChatBaseCell {
         public override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
             super.init(style: style, reuseIdentifier: reuseIdentifier)
             
-            //_bubbleMenuItems.insert(UIMenuItem(title: "复制", action: "messageCopy:"), atIndex: 0)
+            // 添加父类的
+            _bubbleMenuItems.appendContentsOf(super.bubbleMenuItems)
             
             // TODO: 有性能问题, 需要重新实现
             
@@ -55,6 +56,19 @@ extension SIMChatBaseCell {
                 }
             }
         }
-        private(set) lazy var contentLabel = SIMChatLabel(frame: CGRectZero)
+        private lazy var contentLabel = SIMChatLabel(frame: CGRectZero)
+        
+        private lazy var _bubbleMenuItems: Array<UIMenuItem> = [
+            UIMenuItem(title: "复制", action: "messageCopy:")
+        ]
+    }
+}
+
+// MARK: - Event
+
+extension SIMChatBaseCell.Text {
+    /// 气泡菜单
+    public override var bubbleMenuItems: Array<UIMenuItem> {
+        return _bubbleMenuItems
     }
 }

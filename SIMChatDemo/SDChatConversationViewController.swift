@@ -56,8 +56,8 @@ class SDChatConversationViewController: UITableViewController {
         
         srand(UInt32(time(nil)))
         
-        let s = SIMDemoUser(identifier: "self", name: "self", gender: .Male, portrait: nil)
-        let o = SIMDemoUser(identifier: "other", name: "other", gender: .Female, portrait: nil)
+        let s = SIMDemoUser(identifier: NSUUID().UUIDString, name: "self", gender: .Male, portrait: nil)
+        let o = SIMDemoUser(identifier: NSUUID().UUIDString, name: "other", gender: .Female, portrait: nil)
         
         m.login(s).response { _ in
             // 登录完成

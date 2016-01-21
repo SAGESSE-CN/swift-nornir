@@ -16,44 +16,36 @@ public final class SIMChatRequest<R> {
     /// 操作返回结果
     ///
     public typealias Result = SIMChatResult<R, NSError>
-    ///
-    ///发出请求
-    ///
-    public static func request(clouser: ((success: (R -> Void), failure: (NSError -> Void)) -> Void)) -> Self {
-        let request = self.init()
-        clouser(success: { request.responseClouser?(.Success($0)) },
-                failure: { request.responseClouser?(.Failure($0)) })
-        return request
-    }
-    ///
-    ///发出请求
-    ///
-    public static func requestOnThread(queue: dispatch_queue_t, clouser: ((success: (R -> Void), failure: (NSError -> Void)) -> Void)) -> Self {
-        let request = self.init()
-        dispatch_async(queue) {
-            clouser(success: { request.responseClouser?(.Success($0)) },
-                    failure: { request.responseClouser?(.Failure($0)) })
-        }
-        return request
-    }
+    public typealias Operator = (success: (R -> Void), failure: (NSError -> Void))
+    
     ///
     /// 发出请求.
     ///
-    public static func requestOnMainThread(clouser: ((success: (R -> Void), failure: (NSError -> Void)) -> Void)) -> Self {
+    public static func request(clouser: (Operator -> Void)) -> Self {
         let request = self.init()
-        dispatch_async(dispatch_get_main_queue()) {
-            clouser(success: { request.responseClouser?(.Success($0)) },
-                    failure: { request.responseClouser?(.Failure($0)) })
-        }
+        request.execute(clouser)
         return request
     }
-    
     ///
     /// 响应
     ///
     public func response(clouser: (Result -> Void)) -> Self {
         responseClouser = clouser
         return self
+    }
+    
+    /// 延迟执行
+    private func execute(clouser: (Operator -> Void)) {
+        let runLoop = CFRunLoopGetCurrent()
+        let runLoopMode = kCFRunLoopCommonModes//kCFRunLoopDefaultMode
+        let observer = CFRunLoopObserverCreateWithHandler(kCFAllocatorDefault, CFRunLoopActivity.BeforeWaiting.rawValue, false, 0) { observer, _ in
+            CFRunLoopRemoveObserver(runLoop, observer, runLoopMode)
+            
+            clouser(Operator(success: { self.responseClouser?(.Success($0)) },
+                             failure: { self.responseClouser?(.Failure($0)) }))
+        }
+        
+        CFRunLoopAddObserver(runLoop, observer, runLoopMode)
     }
     
     private var responseClouser: (Result -> Void)?

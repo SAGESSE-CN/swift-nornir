@@ -41,7 +41,7 @@ extension SIMChatBaseCell {
         /// 消息内容
         public override var message: SIMChatMessageProtocol? {
             didSet {
-                if let content = message?.content as? SIMChatBaseContent.Image {
+                if let message = message, content = message.content as? SIMChatBaseContent.Image {
                     let width = max(content.size.width, 32)
                     let height = max(content.size.height, 1)
                     let scale = min(min(135, width) / width, min(135, height) / height)
@@ -49,11 +49,19 @@ extension SIMChatBaseCell {
                     previewImageViewLayout?.width = width * scale
                     previewImageViewLayout?.height = height * scale
                     
-                    setNeedsLayout()
-                    
-                    if superview != nil {
-                        previewImageView.image = content.image
+                    guard superview != nil else {
+                        return
                     }
+                    
+                    previewImageView.image = UIImage(named: "simchat_images_default")
+                    // 下载缩略图
+                    conversation?.manager?.fileProvider.download(content.thumbnail)
+                        .response { [weak self] in
+                            guard message == self?.message else {
+                                return
+                            }
+                            self?.previewImageView.image = $0.value as? UIImage
+                        }
                 }
             }
         }

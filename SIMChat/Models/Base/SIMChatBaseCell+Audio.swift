@@ -91,8 +91,14 @@ extension SIMChatBaseCell {
     /// 消息内容
         public override var message: SIMChatMessageProtocol? {
             didSet {
-                if let _ = message?.content as? SIMChatBaseContent.Audio {
-                    titleLabel.text = "99'99''"
+                if let content = message?.content as? SIMChatBaseContent.Audio {
+                    titleLabel.text = { duration in
+                        if duration < 60 {
+                            return String(format: "%d''", Int(duration % 60))
+                        }
+                        return String(format: "%d'%02d''", Int(duration / 60), Int(duration % 60))
+                    }(content.duration)
+                    
                     // 播放中.
 //                    if content.playing {
 //                        animationView.startAnimating()

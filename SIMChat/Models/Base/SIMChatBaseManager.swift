@@ -18,6 +18,9 @@ public class SIMChatBaseManager: SIMChatManagerProtocol {
     
     /// 用户信息提供者
     public lazy var userProvider: SIMChatUserProvider =  SIMChatUserProvider(self)
+    
+    /// 文件提供者
+    public lazy var fileProvider: SIMChatFileProvider = SIMChatFileProvider()
     /// 类提供者, 用户可以在这里修改所有使用的实际类型
     public lazy var classProvider: SIMChatClassProvider = SIMChatClassProvider()
     
@@ -37,7 +40,7 @@ extension SIMChatBaseManager {
     public func login(user: SIMChatUserProtocol) -> SIMChatRequest<Void> {
         SIMLog.trace()
         
-        return SIMChatRequest.requestOnMainThread {
+        return SIMChatRequest.request {
             self.user = user
             $0.success()
         }
@@ -51,7 +54,7 @@ extension SIMChatBaseManager {
     public func logout() -> SIMChatRequest<Void> {
         SIMLog.trace()
         
-        return SIMChatRequest.requestOnMainThread {
+        return SIMChatRequest.request {
             self.user = nil
             $0.success()
         }

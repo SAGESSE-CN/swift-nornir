@@ -8,38 +8,50 @@
 
 import UIKit
 
+extension SIMChatBaseContent {
+    public class File: SIMChatContentProtocol {
+    }
+}
+
 
 extension SIMChatBaseContent {
     ///
     /// 图片
     ///
     public class Image: SIMChatContentProtocol {
-        ///
-        /// 初始化
-        ///
-        public init(content: String) {
-            self.content = content
+        /// 使用本地链接创建内容
+        public init(local: String, thumbnail: String? = nil, size: CGSize) {
+            let l = local.stringByAddingPercentEncodingWithAllowedCharacters(.URLFragmentAllowedCharacterSet())!
+            let t = thumbnail?.stringByAddingPercentEncodingWithAllowedCharacters(.URLFragmentAllowedCharacterSet()) ?? l
+            
+            self.size = size
+            
+            self.local = NSURL(string: "chat-image://\(l)")!
+            self.remote = NSURL(string: "chat-image://\(l)")!
+            self.thumbnail = NSURL(string: "chat-image://\(t)")!
+        }
+        /// 使用服务器链接创建内容
+        public init(remote: String, thumbnail: String? = nil, size: CGSize) {
+            let r = remote.stringByAddingPercentEncodingWithAllowedCharacters(.URLFragmentAllowedCharacterSet())!
+            let t = thumbnail?.stringByAddingPercentEncodingWithAllowedCharacters(.URLFragmentAllowedCharacterSet()) ?? r
+            
+            self.size = size
+            
+            self.local = nil
+            self.remote = NSURL(string: "chat-image://\(r)")!
+            self.thumbnail = NSURL(string: "chat-image://\(t)")!
         }
         
-        public var size: CGSize = CGSizeZero
-        public var image: UIImage?
-        /// 内容(本地路径)
-        public let content: String
+        /// 图片在本地的路径, 只有在需要上传的时候这个值才会存在
+        public let local: NSURL?
+        /// 图片在服务器上的路径
+        public let remote: NSURL
+        /// 缩略图在服务器上的路径
+        public let thumbnail: NSURL
         
-        /// 是否己经加载了
-        public var isLoaded: Bool {
-            return false
-        }
-        /// 加载文件
-        public func load() -> SIMChatRequest<String> {
-            return SIMChatRequest.requestOnThread(dispatch_get_global_queue(0, 0)) {
-                guard !self.isLoaded else {
-                    // 己经下载了..
-                    return $0.success("test")
-                }
-                // 如果并没有.
-                $0
-            }
-        }
+        /// 图片实际大小
+        public let size: CGSize
+        
+        /// 上传进度/操作
     }
 }

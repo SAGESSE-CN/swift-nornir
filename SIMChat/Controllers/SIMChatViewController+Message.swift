@@ -107,6 +107,13 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate {
 }
 
 extension SIMChatViewController.MessageManager: SIMChatConversationDelegate {
+    func conversation(conversation: SIMChatConversationProtocol, didReciveMessage message: SIMChatMessageProtocol) {
+    }
+    func conversation(conversation: SIMChatConversationProtocol, didRemoveMessage message: SIMChatMessageProtocol) {
+    }
+    func conversation(conversation: SIMChatConversationProtocol, didUpdateMessage message: SIMChatMessageProtocol) {
+        
+    }
 }
 
 // MARK: - Cell Event Delegate

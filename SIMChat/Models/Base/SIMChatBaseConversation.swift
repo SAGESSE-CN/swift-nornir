@@ -90,7 +90,7 @@ extension SIMChatBaseConversation {
         last: SIMChatMessageProtocol?,
         count: Int) -> SIMChatRequest<Array<SIMChatMessageProtocol>> {
             SIMLog.trace()
-            return SIMChatRequest.requestOnMainThread {
+            return SIMChatRequest.request {
                 $0.success(self.messages)
             }
     }
@@ -105,7 +105,7 @@ extension SIMChatBaseConversation {
         message: SIMChatMessageProtocol,
         isResend: Bool) -> SIMChatRequest<SIMChatMessageProtocol> {
             SIMLog.trace()
-            return SIMChatRequest.requestOnMainThread {
+            return SIMChatRequest.request {
                 $0.success(message)
             }
     }
@@ -117,7 +117,7 @@ extension SIMChatBaseConversation {
     ///
     public func sendMessageState(message: SIMChatMessageProtocol) -> SIMChatRequest<SIMChatMessageProtocol> {
         SIMLog.trace()
-        return SIMChatRequest.requestOnMainThread {
+        return SIMChatRequest.request {
             $0.success(message)
         }
     }
@@ -129,7 +129,7 @@ extension SIMChatBaseConversation {
     ///
     public func removeMessage(message: SIMChatMessageProtocol) -> SIMChatRequest<Void> {
         SIMLog.trace()
-        return SIMChatRequest.requestOnMainThread {
+        return SIMChatRequest.request {
             $0.success()
         }
     }

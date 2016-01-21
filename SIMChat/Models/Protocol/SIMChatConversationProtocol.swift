@@ -146,42 +146,27 @@ extension SIMChatConversationProtocol {
 
 /// 代理
 public protocol SIMChatConversationDelegate: class {
-}
-
-extension SIMChatConversationDelegate {
     ///
     /// 新消息通知
     ///
     /// - parameter conversation: 发生事件的会话
     /// - parameter message: 接收到的消息
     ///
-    public func conversation(
-        conversation: SIMChatConversationProtocol,
-        didReciveMessage message: SIMChatMessageProtocol) {
-            // not implemented
-    }
+    func conversation(conversation: SIMChatConversationProtocol, didReciveMessage message: SIMChatMessageProtocol)
     ///
     /// 删除消息通知
     ///
     /// - parameter conversation: 发生事件的会话
     /// - parameter message: 接收到的消息
     ///
-    public func conversation(
-        conversation: SIMChatConversationProtocol,
-        didRemoveMessage message: SIMChatMessageProtocol) {
-            // not implemented
-    }
+    func conversation(conversation: SIMChatConversationProtocol, didRemoveMessage message: SIMChatMessageProtocol)
     ///
     /// 更新消息通知
     ///
     /// - parameter conversation: 发生事件的会话
     /// - parameter message: 接收到的消息
     ///
-    public func conversation(
-        conversation: SIMChatConversationProtocol,
-        didUpdateMessage message: SIMChatMessageProtocol) {
-            // not implemented
-    }
+    func conversation(conversation: SIMChatConversationProtocol, didUpdateMessage message: SIMChatMessageProtocol)
 }
 
 ///
