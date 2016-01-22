@@ -230,16 +230,17 @@ extension SIMChatBaseCell.Bubble {
     }
     /// 检查是否使用该菜单
     public override func canPerformAction(action: Selector, withSender sender: AnyObject?) -> Bool {
-        return bubbleMenuItems.contains {
-            return $0.action == action
-        }
+        return true
+//        return bubbleMenuItems.contains {
+//            return $0.action == action
+//        }
     }
     /// 重新定义点击区域
     public override func hitTest(point: CGPoint, withEvent event: UIEvent?) -> UIView? {
-        if isFirstResponder() {
-            resignFirstResponder()
-            return nil
-        }
+//        if isFirstResponder() {
+//            resignFirstResponder()
+//            return nil
+//        }
         let view = super.hitTest(point, withEvent: event)
         if view != nil && view != contentView {
             return view
@@ -261,11 +262,10 @@ extension SIMChatBaseCell.Bubble {
         // 准备菜单
         let mu = UIMenuController.sharedMenuController()
         
-        becomeFirstResponder()
-        
+        //becomeFirstResponder()
         mu.menuItems = bubbleMenuItems
-        mu.setTargetRect(bubbleView.frame, inView: self)
         mu.setMenuVisible(true, animated: true)
+        mu.setTargetRect(bubbleView.frame, inView: self)
     }
     /// 状态
     private dynamic func onPressOfStatusRetry(sender: AnyObject) {

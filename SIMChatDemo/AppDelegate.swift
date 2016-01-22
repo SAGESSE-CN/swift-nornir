@@ -8,12 +8,113 @@
 
 import UIKit
 
+//- (UIDevicePlatform) devicePlatformType
+//    {
+//        NSString *platform = [self devicePlatform];
+//        
+//        // The ever mysterious iFPGA
+//        if ([platform isEqualToString:@"iFPGA"])        return UIDeviceIFPGA;
+//        
+//        // iPhone
+//        if ([platform isEqualToString:@"iPhone1,1"])    return UIDevice1GiPhone;
+//        if ([platform isEqualToString:@"iPhone1,2"])    return UIDevice3GiPhone;
+//        if ([platform hasPrefix:@"iPhone2"])            return UIDevice3GSiPhone;
+//        if ([platform hasPrefix:@"iPhone3"])            return UIDevice4iPhone;
+//        if ([platform hasPrefix:@"iPhone4"])            return UIDevice4SiPhone;
+//        
+//        if ([platform isEqualToString:@"iPhone5,1"] || [platform isEqualToString:@"iPhone5,2"]) {
+//            return UIDevice5iPhone;
+//        }
+//        if ([platform isEqualToString:@"iPhone5,3"] || [platform isEqualToString:@"iPhone5,4"]) {
+//            return UIDevice5CiPhone;
+//        }
+//        if ([platform hasPrefix:@"iPhone6"]) {
+//            return UIDevice5SiPhone;
+//        }
+//        
+//        if ([platform isEqualToString:@"iPhone7,1"]) {
+//            return UIDevice6PiPhone;
+//        }
+//        if ([platform isEqualToString:@"iPhone7,2"]) {
+//            return UIDevice6iPhone;
+//        }
+//        if ([platform isEqualToString:@"iPhone8,1"]) {
+//            return UIDevice6SiPhone;
+//        }
+//        if ([platform isEqualToString:@"iPhone8,2"]) {
+//            return UIDevice6SPiPhone;
+//        }
+//        
+//        // iPod
+//        if ([platform hasPrefix:@"iPod1"])              return UIDevice1GiPod;
+//        if ([platform hasPrefix:@"iPod2"])              return UIDevice2GiPod;
+//        if ([platform hasPrefix:@"iPod3"])              return UIDevice3GiPod;
+//        if ([platform hasPrefix:@"iPod4"])              return UIDevice4GiPod;
+//        if ([platform hasPrefix:@"iPod5"])              return UIDevice5GiPod;
+//        if ([platform hasPrefix:@"iPod7,1"])            return UIDeviceTouch6GiPod;
+//        
+//        // iPad
+//        if ([platform hasPrefix:@"iPad1"])              return UIDevice1GiPad;
+//        if ([platform isEqualToString:@"iPad2,1"] || [platform isEqualToString:@"iPad2,2"] || [platform isEqualToString:@"iPad2,3"] || [platform isEqualToString:@"iPad2,4"]) {
+//            return UIDevice2GiPad;
+//        }
+//        //iPad Mini
+//        if ([platform isEqualToString:@"iPad2,5"] || [platform isEqualToString:@"iPad2,6"] || [platform isEqualToString:@"iPad2,7"]) {
+//            return UIDeviceMiniiPad;
+//        }
+//        if ([platform isEqualToString:@"iPad3,1"] || [platform isEqualToString:@"iPad3,2"] || [platform isEqualToString:@"iPad3,3"]) {
+//            return UIDevice3GiPad;
+//        }
+//        if ([platform isEqualToString:@"iPad3,4"] || [platform isEqualToString:@"iPad3,5"] || [platform isEqualToString:@"iPad3,6"]) {
+//            return UIDevice4GiPad;
+//        }
+//        //iPad Air
+//        if ([platform isEqualToString:@"iPad4,1"] || [platform isEqualToString:@"iPad4,2"] || [platform isEqualToString:@"iPad4,3"]) {
+//            return UIDeviceAiriPad;
+//        }
+//        //iPad Mini2
+//        if ([platform isEqualToString:@"iPad4,4"] || [platform isEqualToString:@"iPad4,5"] || [platform isEqualToString:@"iPad4,6"]) {
+//            return UIDeviceMini2iPad;
+//        }
+//        //iPad Mini3
+//        if ([platform isEqualToString:@"iPad4,7"] || [platform isEqualToString:@"iPad4,8"] || [platform isEqualToString:@"iPad4,9"]) {
+//            return UIDeviceMini3iPad;
+//        }
+//        //iPad Mini4
+//        if ([platform isEqualToString:@"iPad5,1"] || [platform isEqualToString:@"iPad5,2"]) {
+//            return UIDeviceMini4iPad;
+//        }
+//        //iPad Air2
+//        if ([platform hasPrefix:@"iPad5,3"] || [platform isEqualToString:@"iPad5,4"]) {
+//            return UIDeviceAir2iPad;
+//        }
+//        
+//        // Apple TV
+//        if ([platform hasPrefix:@"AppleTV2"])           return UIDeviceAppleTV2;
+//        if ([platform hasPrefix:@"AppleTV3"])           return UIDeviceAppleTV3;
+//        
+//        if ([platform hasPrefix:@"iPhone"])             return UIDeviceUnknowniPhone;
+//        if ([platform hasPrefix:@"iPod"])               return UIDeviceUnknowniPod;
+//        if ([platform hasPrefix:@"iPad"])               return UIDeviceUnknowniPad;
+//        if ([platform hasPrefix:@"AppleTV"])            return UIDeviceUnknownAppleTV;
+//        
+//        // Simulator thanks Jordan Breeding
+//        if ([platform hasSuffix:@"86"] || [platform isEqual:@"x86_64"])
+//        {
+//            BOOL smallerScreen = [[UIScreen mainScreen] bounds].size.width < 768;
+//            return smallerScreen ? UIDeviceSimulatoriPhone : UIDeviceSimulatoriPad;
+//        }
+//        
+//        return UIDeviceUnknown;
+//}
+
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
 
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
+        UITableView().dequeueReusableCellWithIdentifier("")
         return true
     }
 

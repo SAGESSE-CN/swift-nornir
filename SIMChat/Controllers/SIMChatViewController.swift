@@ -36,7 +36,6 @@ public class SIMChatViewController: UIViewController {
         }
     }
     
-    
     private var _contentViewLayout: SIMChatLayout?
     private var _inputBarLayout: SIMChatLayout?
     private var _inputPanelViewLayout: SIMChatLayout?
@@ -105,14 +104,17 @@ extension SIMChatViewController {
         inputPanelView.translatesAutoresizingMaskIntoConstraints = false
         inputPanelView.backgroundColor = UIColor.redColor()
         
+        // add event
+        contentView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: "onResignKeyboard:"))
+        
         view.addSubview(backgroundView)
         view.addSubview(contentView)
-        view.addSubview(inputBar)
         view.addSubview(inputPanelView)
+        view.addSubview(inputBar)
        
         // 添加布局
         _contentViewLayout = SIMChatLayout.make(contentView)
-            .top.equ(view).top
+            .top.equ(view).top(-44)
             .left.equ(view).left
             .right.equ(view).right
             .bottom.equ(view).bottom(44)
@@ -127,24 +129,21 @@ extension SIMChatViewController {
             .submit()
         
         _inputPanelViewLayout = SIMChatLayout.make(inputPanelView)
-            .height.equ(252)
+            .height.equ(253)
             .left.equ(view).left
             .right.equ(view).right
-            .bottom.equ(view).bottom(-252)
+            .bottom.equ(view).bottom(-253)
             .submit()
         
         _messageManager.prepare()
-        
-        // up
-        contentView.contentInset = UIEdgeInsetsMake(64, 0, 0, 0)
     }
     
     public override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         
         let center = NSNotificationCenter.defaultCenter()
-        center.addObserver(self, selector: "keyboardWillShow:", name: UIKeyboardWillShowNotification, object: nil)
-        center.addObserver(self, selector: "keyboardWillHide:", name: UIKeyboardWillHideNotification, object: nil)
+        center.addObserver(self, selector: "onKeyboardShowNtf:", name: UIKeyboardWillShowNotification, object: nil)
+        center.addObserver(self, selector: "onKeyboardHideNtf:", name: UIKeyboardWillHideNotification, object: nil)
     }
     
     public override func viewWillDisappear(animated: Bool) {
@@ -157,7 +156,17 @@ extension SIMChatViewController {
         center.removeObserver(self, name: UIKeyboardWillShowNotification, object: nil)
         center.removeObserver(self, name: UIKeyboardWillHideNotification, object: nil)
     }
+    
+    public override func viewWillLayoutSubviews() {
+        super.viewWillLayoutSubviews()
+    
+        // 更新inset, 否则tableView显示区域错误
+        var edg = contentView.contentInset
+        edg.top = topLayoutGuide.length + -(contentViewLayout?.top ?? 0)
+        contentView.contentInset = edg
+    }
 }
+
 
 ////    init(conversation: SIMChatConversation) {
 ////        super.init(nibName: nil, bundle: nil)

@@ -205,12 +205,12 @@ public final class SIMChatLayout {
         get { return _left?.constant ?? 0 }
     }
     public var right: CGFloat {
-        set { _right?.constant = newValue }
-        get { return _right?.constant ?? 0 }
+        set { _right?.constant = -newValue }
+        get { return -(_right?.constant ?? 0) }
     }
     public var bottom: CGFloat {
-        set { _bottom?.constant = newValue }
-        get { return _bottom?.constant ?? 0 }
+        set { _bottom?.constant = -newValue }
+        get { return -(_bottom?.constant ?? 0) }
     }
     
     public var leading: CGFloat {

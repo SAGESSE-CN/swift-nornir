@@ -90,6 +90,11 @@ extension SIMChatViewController.MessageManager: UITableViewDataSource {
 }
 
 extension SIMChatViewController.MessageManager: UITableViewDelegate {
+    /// 开始拖动
+    @objc func scrollViewWillBeginDragging(scrollView: UIScrollView) {
+//        SIMLog.trace()
+//        scrollView.window?.endEditing(true)
+    }
     /// 绑定
     @objc func tableView(tableView: UITableView, willDisplayCell cell: UITableViewCell, forRowAtIndexPath indexPath: NSIndexPath) {
         // default configuation
@@ -107,10 +112,13 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate {
 }
 
 extension SIMChatViewController.MessageManager: SIMChatConversationDelegate {
+    
     func conversation(conversation: SIMChatConversationProtocol, didReciveMessage message: SIMChatMessageProtocol) {
     }
+    
     func conversation(conversation: SIMChatConversationProtocol, didRemoveMessage message: SIMChatMessageProtocol) {
     }
+    
     func conversation(conversation: SIMChatConversationProtocol, didUpdateMessage message: SIMChatMessageProtocol) {
         
     }

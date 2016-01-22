@@ -93,6 +93,9 @@ class SIMChatTextField : SIMView {
     }
     /// 当前焦点
     override func isFirstResponder() -> Bool {
+        if selectedStyle != .None {
+            return true
+        }
         return self.textView.isFirstResponder() || super.isFirstResponder()
     }
     /// 放弃焦点
