@@ -48,9 +48,7 @@ extension SIMChatViewController.MessageManager: UITableViewDataSource {
         } else {
             fatalError("Must provider unknow cell class")
         }
-        // config contentView
         contentView?.separatorStyle = .None
-        // load for conversation
         conversation.loadHistoryMessages(200).response { [weak self] in
             if let allMessages = $0.value {
                 self?.allMessages = allMessages

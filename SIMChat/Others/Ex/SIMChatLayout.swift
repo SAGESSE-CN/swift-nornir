@@ -10,64 +10,19 @@ import UIKit
 
 public final class SIMChatLayout {
     public class Config: FirstAttribute {
-        func priority(v: CGFloat) -> Self {
+        public func priority(v: CGFloat) -> Self {
             context?.priority = UILayoutPriority(v)
             return self
         }
-        func multiplier(v: CGFloat) -> Self {
+        public func multiplier(v: CGFloat) -> Self {
             context?.multiplier = v
             return self
         }
-        func submit() -> SIMChatLayout {
-            // 生成.
-            for context in layout.contexts {
-                guard let firstAttribute = context.firstAttribute else {
-                    continue
-                }
-                guard let relation = context.relation else {
-                    continue
-                }
-                guard let secondAttribute = context.secondAttribute else {
-                    continue
-                }
-                
-                let constraint = NSLayoutConstraint(
-                    item: layout.value,
-                    attribute: firstAttribute,
-                    relatedBy: relation,
-                    toItem: context.secondItem,
-                    attribute: secondAttribute,
-                    multiplier: context.multiplier ?? 1,
-                    constant: context.constant ?? 0)
-                
-                constraint.priority = context.priority ?? UILayoutPriorityRequired
-                if let secondItem = context.secondItem {
-                    if let view = secondItem as? UIView {
-                        view.addConstraint(constraint)
-                    }
-                } else {
-                    if let view = layout.value as? UIView {
-                        view.addConstraint(constraint)
-                    }
-                }
-                context.constraint = constraint
-                switch firstAttribute {
-                case .Top:      layout._top = constraint
-                case .Left:     layout._left = constraint
-                case .Right:    layout._right = constraint
-                case .Bottom:   layout._bottom = constraint
-                case .Leading:  layout._leading = constraint
-                case .Trailing: layout._trailing = constraint
-                case .CenterX:  layout._centerX = constraint
-                case .CenterY:  layout._centerY = constraint
-                case .Baseline: layout._baseline = constraint
-                case .Width:    layout._width = constraint
-                case .Height:   layout._height = constraint
-                default : break
-                }
-            }
+        public func submit() -> SIMChatLayout {
+            layout.submit()
             return layout
         }
+        
         private override init(_ layout: SIMChatLayout, _ context: Context?) {
             super.init(layout, context)
             if let context = context {
@@ -244,11 +199,13 @@ public final class SIMChatLayout {
         get { return _height?.constant ?? 0 }
     }
     
-    static func make(v: AnyObject) -> Config {
-        if let view = v as? UIView {
-            view.translatesAutoresizingMaskIntoConstraints = false
+    static func make(v: UIView) -> Config {
+        if v.translatesAutoresizingMaskIntoConstraints {
+            v.translatesAutoresizingMaskIntoConstraints = false
         }
-        return Config(self.init(v), nil)
+        let layout = self.init(v)
+        layout.autoSubmit()
+        return Config(layout, nil)
     }
     
     private class Context {
@@ -261,7 +218,7 @@ public final class SIMChatLayout {
         
         // firstItem.firstAttribute {==,<=,>=} secondItem.secondAttribute * multiplier + constant
         
-        private var firstItem: AnyObject?
+        private var firstItem: UIView?
         private var firstAttribute: NSLayoutAttribute?
         private var relation: NSLayoutRelation?
         private var secondItem: AnyObject?
@@ -270,11 +227,97 @@ public final class SIMChatLayout {
         private var constraint: NSLayoutConstraint?
     }
     
-    private init(_ v: AnyObject) {
+    /// 提交
+    private func submit() {
+        guard !isSubmit else {
+            return
+        }
+        // 生成.
+        for context in contexts {
+            guard let firstAttribute = context.firstAttribute else {
+                continue
+            }
+            guard let relation = context.relation else {
+                continue
+            }
+            guard let secondAttribute = context.secondAttribute else {
+                continue
+            }
+            
+            let constraint = NSLayoutConstraint(
+                item: value,
+                attribute: firstAttribute,
+                relatedBy: relation,
+                toItem: context.secondItem,
+                attribute: secondAttribute,
+                multiplier: context.multiplier ?? 1,
+                constant: context.constant ?? 0)
+            
+            constraint.priority = context.priority ?? UILayoutPriorityRequired
+            if let secondItem = context.secondItem {
+                let container: UIView = {
+                    if let view = secondItem as? UIView {
+                        var a = view
+                        while true {
+                            var b = self.value
+                            while true {
+                                if a === b {
+                                    return a
+                                }
+                                guard let s = b.superview else {
+                                    break
+                                }
+                                b = s
+                            }
+                            guard let s = a.superview else {
+                                break
+                            }
+                            a = s
+                        }
+                    }
+                    return self.value
+                }()
+                container.addConstraint(constraint)
+            } else {
+                value.addConstraint(constraint)
+            }
+            context.constraint = constraint
+            switch firstAttribute {
+            case .Top:      _top = constraint
+            case .Left:     _left = constraint
+            case .Right:    _right = constraint
+            case .Bottom:   _bottom = constraint
+            case .Leading:  _leading = constraint
+            case .Trailing: _trailing = constraint
+            case .CenterX:  _centerX = constraint
+            case .CenterY:  _centerY = constraint
+            case .Baseline: _baseline = constraint
+            case .Width:    _width = constraint
+            case .Height:   _height = constraint
+            default : break
+            }
+        }
+        isSubmit = true
+    }
+    
+    /// 延迟执行
+    private func autoSubmit() {
+//        let runLoop = CFRunLoopGetCurrent()
+//        let runLoopMode = kCFRunLoopCommonModes//kCFRunLoopDefaultMode
+//        let observer = CFRunLoopObserverCreateWithHandler(kCFAllocatorDefault, CFRunLoopActivity.BeforeWaiting.rawValue, false, 0) { observer, _ in
+//            CFRunLoopRemoveObserver(runLoop, observer, runLoopMode)
+//            self.submit()
+//        }
+//        
+//        CFRunLoopAddObserver(runLoop, observer, runLoopMode)
+    }
+    
+    private init(_ v: UIView) {
         self.value = v
     }
     
-    private var value: AnyObject
+    private var value: UIView
+    private var isSubmit: Bool = false
     private var contexts: [Context] = []
     
     private weak var _top: NSLayoutConstraint?

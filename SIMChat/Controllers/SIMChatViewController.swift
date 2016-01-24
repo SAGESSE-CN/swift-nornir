@@ -35,15 +35,24 @@ public class SIMChatViewController: UIViewController {
             title = name
         }
     }
+    deinit {
+        SIMChatNotificationCenter.removeObserver(self)
+        SIMLog.trace()
+    }
     
     private var _contentViewLayout: SIMChatLayout?
     private var _inputBarLayout: SIMChatLayout?
     private var _inputPanelViewLayout: SIMChatLayout?
     
     private lazy var _contentView = UITableView()
-    private lazy var _inputBar = SIMChatTextField(frame: CGRectZero)
-    private lazy var _inputPanelView: UIView = UIView()
+    private lazy var _inputPanelView = SIMChatInputPanel(frame: CGRectZero)
     private lazy var _inputPanels: [UIView] = []
+    
+    private lazy var _inputBar: SIMChatInputBar = {
+        let bar = SIMChatInputBar(frame: CGRectZero)
+        bar.delegate = self
+        return bar
+    }()
     
     private lazy var _backgroundView = UIImageView()
     
@@ -86,23 +95,17 @@ extension SIMChatViewController {
     public override func viewDidLoad() {
         super.viewDidLoad()
         
+        SIMLog.trace()
+        
         // 背景
         backgroundView.frame = view.bounds
         backgroundView.image = SIMChatImageManager.defaultBackground
         backgroundView.contentMode = .ScaleAspectFill
         backgroundView.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
-        // 表格
-        contentView.translatesAutoresizingMaskIntoConstraints = false
+        // 内容
         contentView.backgroundColor = .clearColor()
         contentView.showsHorizontalScrollIndicator = false
         contentView.showsVerticalScrollIndicator = false
-        // 输入框
-        inputBar.translatesAutoresizingMaskIntoConstraints = false
-        inputBar.backgroundColor = UIColor(hex: 0xEBECEE)
-        _inputBar.delegate = self
-        // 输入面板
-        inputPanelView.translatesAutoresizingMaskIntoConstraints = false
-        inputPanelView.backgroundColor = UIColor.redColor()
         
         // add event
         contentView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: "onResignKeyboard:"))
@@ -114,10 +117,10 @@ extension SIMChatViewController {
        
         // 添加布局
         _contentViewLayout = SIMChatLayout.make(contentView)
-            .top.equ(view).top(-44)
+            .top.equ(view).top
             .left.equ(view).left
             .right.equ(view).right
-            .bottom.equ(view).bottom(44)
+            .bottom.equ(view).bottom
             .submit()
         
         _inputBarLayout = SIMChatLayout.make(inputBar)
@@ -129,11 +132,19 @@ extension SIMChatViewController {
             .submit()
         
         _inputPanelViewLayout = SIMChatLayout.make(inputPanelView)
-            .height.equ(253)
+            //.height.equ(253)
+            .top.equ(view).bottom
             .left.equ(view).left
             .right.equ(view).right
-            .bottom.equ(view).bottom(-253)
             .submit()
+        
+        SIMChatNotificationCenter.addObserver(self,
+            selector: "onInputBarChangeNtf:",
+            name: SIMChatInputBarFrameDidChangeNotification)
+        
+        // 更新键盘
+        view.layoutIfNeeded()
+        keyboardHeight = 0
         
         _messageManager.prepare()
     }
@@ -157,8 +168,8 @@ extension SIMChatViewController {
         center.removeObserver(self, name: UIKeyboardWillHideNotification, object: nil)
     }
     
-    public override func viewWillLayoutSubviews() {
-        super.viewWillLayoutSubviews()
+    public override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
     
         // 更新inset, 否则tableView显示区域错误
         var edg = contentView.contentInset
@@ -277,7 +288,7 @@ extension SIMChatViewController {
 //    
 //    private(set) lazy var maskView = UIView()
 //    private(set) lazy var tableView = UITableView()
-//    private(set) lazy var textField = SIMChatTextField(frame: CGRectZero)
+//    private(set) lazy var textField = SIMChatInputBar(frame: CGRectZero)
 //  
 //    /// 数据源
 //    internal lazy var source = Array<SIMChatMessage>()
@@ -289,7 +300,7 @@ extension SIMChatViewController {
 //    
 //    /// 自定义键盘
 //    internal lazy var keyboard = UIView?()
-//    internal lazy var keyboards = Dictionary<SIMChatTextFieldItemStyle, UIView>()
+//    internal lazy var keyboards = Dictionary<SIMChatInputBarItemStyle, UIView>()
 //    internal lazy var keyboardHeight =  CGFloat(0)
 //    internal lazy var keyboardHiddenAnimation = false
 //}

@@ -12,23 +12,22 @@ import AVFoundation
 // MARK: - Keyboard Notification
 
 extension SIMChatViewController {
-    ///
     /// 键盘显示通知
-    ///
     private dynamic func onKeyboardShowNtf(sender: NSNotification) {
-        if let r1 = sender.userInfo?[UIKeyboardFrameEndUserInfoKey]?.CGRectValue {
-            // Note: 在iPad这可能会有键盘高度不变但y改变的情况
-            let h = r1.height//self.view.bounds.height - r1.origin.y
-            self.onKeyboardShow(CGRectMake(0, 0, r1.width, h))
+        guard let r1 = sender.userInfo?[UIKeyboardFrameEndUserInfoKey]?.CGRectValue else {
+            return
         }
+        // Note: 在iPad这可能会有键盘高度不变但y改变的情况
+        let h = r1.height//self.view.bounds.height - r1.origin.y
+        onKeyboardShow(CGRectMake(0, 0, r1.width, h))
     }
-    ///
     /// 键盘隐藏通知
-    ///
     private dynamic func onKeyboardHideNtf(sender: NSNotification) {
-        if (inputPanelViewLayout?.bottom ?? -1) < 0 {
-            onKeyboardHidden(CGRectZero)
-        }
+        onKeyboardHidden(CGRectZero)
+    }
+    /// 输入栏改变
+    private dynamic func onInputBarChangeNtf(sender: NSNotification) {
+        onUpdateKeyboardHeight(keyboardHeight)
     }
 }
 
@@ -63,27 +62,27 @@ extension SIMChatViewController {
         }
     }
     /// 更新类型
-    private func onUpdateKeyboardStyle(style: SIMChatTextFieldItemStyle) {
-        SIMLog.trace()
-        
-        // TODO: 逻辑混乱, 需要重新设计
-        
-        let height = self.inputPanelView.frame.height
-        
-        if style == .None {
-            onUpdateKeyboardHeight(0)
-        } else if keyboardHeight != height {
-            onUpdateKeyboardHeight(height)
-        }
-        UIView.animateWithDuration(0.25) {
-            if style == .None || style == .Keyboard {
-                self.inputPanelViewLayout?.bottom = -height
-            } else {
-                self.inputPanelViewLayout?.bottom = 0//-height
-            }
-            self.inputPanelView.layoutIfNeeded()
-            self.view.layoutIfNeeded()
-        }
+    private func onUpdateKeyboardStyle(style: SIMChatInputBarItemStyle) {
+//        SIMLog.trace()
+//        
+//        // TODO: 逻辑混乱, 需要重新设计
+//        
+//        let height = self.inputPanelView.frame.height
+//        
+//        if style == .None || style == .Keyboard {
+//            onUpdateKeyboardHeight(0)
+//        } else if keyboardHeight != height {
+//            onUpdateKeyboardHeight(height)
+//        }
+//        UIView.animateWithDuration(0.25) {
+//            if style == .None || style == .Keyboard {
+//                self.inputPanelViewLayout?.top = 0
+//            } else {
+//                self.inputPanelViewLayout?.top = -height
+//            }
+//            self.inputPanelView.layoutIfNeeded()
+//            self.view.layoutIfNeeded()
+//        }
     }
     
     /// 放弃
@@ -96,7 +95,7 @@ extension SIMChatViewController {
     }
     
     /// 更新键盘(类型)
-    func updateKeyboard(style style: SIMChatTextFieldItemStyle) {
+    func updateKeyboard(style style: SIMChatInputBarItemStyle) {
         SIMLog.trace()
 //        let newValue = self.makeKeyboard(style)
 //        // 隐藏旧的.
@@ -151,7 +150,7 @@ extension SIMChatViewController {
 //        self.keyboardHeight = newValue
 //    }
     /// 获取键盘.
-    private func makeKeyboard(style: SIMChatTextFieldItemStyle) -> UIView? {
+    private func makeKeyboard(style: SIMChatInputBarItemStyle) -> UIView? {
         return nil
 //        // 己经加载过了?
 //        if let view = keyboards[style] {
@@ -360,25 +359,25 @@ extension SIMChatViewController {
 
 // MARK: - Input bar
 
-extension SIMChatViewController: SIMChatTextFieldDelegate {
-    /// 选中..
-    func chatTextField(chatTextField: SIMChatTextField, didSelectItem item: Int) {
-        SIMLog.trace()
-        if let style = SIMChatTextFieldItemStyle(rawValue: item) {
-            onUpdateKeyboardStyle(style)
-        }
-    }
-    /// 高度改变
-    func chatTextFieldContentSizeDidChange(chatTextField: SIMChatTextField) {
-        SIMLog.trace()
-        self.onUpdateKeyboardHeight(self.keyboardHeight)
-    }
-    /// ok
-    func chatTextFieldShouldReturn(chatTextField: SIMChatTextField) -> Bool {
-//        // 发送.
-//        self.sendMessageForText(self.textField.text ?? "")
-//        self.textField.text = nil
-        // 不可能return
-        return false
-    }
+extension SIMChatViewController: SIMChatInputBarDelegate {
+//    /// 选中..
+//    func chatTextField(chatTextField: SIMChatInputBar, didSelectItem item: Int) {
+//        SIMLog.trace()
+//        if let style = SIMChatInputBarItemStyle(rawValue: item) {
+//            onUpdateKeyboardStyle(style)
+//        }
+//    }
+//    /// 高度改变
+//    func chatTextFieldContentSizeDidChange(chatTextField: SIMChatInputBar) {
+//        SIMLog.trace()
+//        self.onUpdateKeyboardHeight(self.keyboardHeight)
+//    }
+//    /// ok
+//    func chatTextFieldShouldReturn(chatTextField: SIMChatInputBar) -> Bool {
+////        // 发送.
+////        self.sendMessageForText(self.textField.text ?? "")
+////        self.textField.text = nil
+//        // 不可能return
+//        return false
+//    }
 }
