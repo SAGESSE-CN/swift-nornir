@@ -20,7 +20,7 @@ extension SIMChatInputPanel {
         }
         
         private func build() {
-            backgroundColor = UIColor(hex: 0xEBECEE)
+            backgroundColor = UIColor(argb: 0xFFEBECEE)
         }
     }
 }

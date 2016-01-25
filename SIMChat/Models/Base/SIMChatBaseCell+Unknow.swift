@@ -23,7 +23,7 @@ extension SIMChatBaseCell {
             titleLabel.text = "未知的消息类型"
             titleLabel.numberOfLines = 0
             titleLabel.font = UIFont.systemFontOfSize(11)
-            titleLabel.textColor = UIColor(hex: 0x7B7B7B)
+            titleLabel.textColor = UIColor(argb: 0xFF7B7B7B)
             titleLabel.textAlignment = NSTextAlignment.Center
             // add views
             contentView.addSubview(titleLabel)

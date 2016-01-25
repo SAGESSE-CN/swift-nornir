@@ -51,6 +51,22 @@ public class SIMChatViewController: UIViewController {
     private lazy var _inputBar: SIMChatInputBar = {
         let bar = SIMChatInputBar(frame: CGRectZero)
         bar.delegate = self
+        bar.leftBarButtonItems = [
+            SIMChatInputBar.Accessory()
+        ]
+        bar.rightBarButtonItems = [
+            SIMChatInputBar.Accessory(),
+            SIMChatInputBar.Accessory()
+        ]
+//        bar.bottomBarButtonItems = [
+//            SIMChatInputBar.Accessory(),
+//            SIMChatInputBar.Accessory(),
+//            SIMChatInputBar.Accessory(),
+//            SIMChatInputBar.Accessory(),
+//            SIMChatInputBar.Accessory(),
+//            SIMChatInputBar.Accessory(),
+//            SIMChatInputBar.Accessory()
+//        ]
         return bar
     }()
     

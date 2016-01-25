@@ -81,13 +81,13 @@ class SIMChatKeyboardAudio: SIMView {
         view.translatesAutoresizingMaskIntoConstraints = false
         
         send.setTitle("发送", forState: .Normal)
-        send.setTitleColor(UIColor(hex: 0x18B4ED), forState: .Normal)
+        send.setTitleColor(UIColor(argb: 0xFF18B4ED), forState: .Normal)
         send.setBackgroundImage(UIImage(named: "simchat_keyboard_voice_more_send_nor"), forState: .Normal)
         send.setBackgroundImage(UIImage(named: "simchat_keyboard_voice_more_send_press"), forState: .Highlighted)
         send.translatesAutoresizingMaskIntoConstraints = false
         
         cancel.setTitle("取消", forState: .Normal)
-        cancel.setTitleColor(UIColor(hex: 0x18B4ED), forState: .Normal)
+        cancel.setTitleColor(UIColor(argb: 0xFF18B4ED), forState: .Normal)
         cancel.setBackgroundImage(UIImage(named: "simchat_keyboard_voice_more_cancel_nor"), forState: .Normal)
         cancel.setBackgroundImage(UIImage(named: "simchat_keyboard_voice_more_cancel_press"), forState: .Highlighted)
         cancel.translatesAutoresizingMaskIntoConstraints = false
@@ -140,7 +140,7 @@ extension SIMChatKeyboardAudio {
             playProgress.lineWidth = 3.5
             playProgress.fillColor = nil
             playProgress.fillColor = nil
-            playProgress.strokeColor = UIColor(hex: 0x18B4ED).CGColor
+            playProgress.strokeColor = UIColor(argb: 0xFF18B4ED).CGColor
             playProgress.strokeStart = 0
             playProgress.strokeEnd = 0
             playProgress.frame = playButton.bounds
@@ -151,10 +151,10 @@ extension SIMChatKeyboardAudio {
             
             tipsLabel.text = "点击播放"
             tipsLabel.font = UIFont.systemFontOfSize(16)
-            tipsLabel.textColor = UIColor(hex: 0x7B7B7B)
+            tipsLabel.textColor = UIColor(argb: 0xFF7B7B7B)
             tipsLabel.translatesAutoresizingMaskIntoConstraints = false
             
-            spectrumView.color = UIColor(hex: 0xFB7A0D)
+            spectrumView.color = UIColor(argb: 0xFFFB7A0D)
             spectrumView.hidden = true
             spectrumView.delegate = self
             spectrumView.translatesAutoresizingMaskIntoConstraints = false
@@ -384,10 +384,10 @@ extension SIMChatKeyboardAudio {
             
             tipsLabel.text = "-:--"
             tipsLabel.font = UIFont.systemFontOfSize(16)
-            tipsLabel.textColor = UIColor(hex: 0x7B7B7B)
+            tipsLabel.textColor = UIColor(argb: 0xFF7B7B7B)
             tipsLabel.translatesAutoresizingMaskIntoConstraints = false
             
-            spectrumView.color = UIColor(hex: 0xFB7A0D)
+            spectrumView.color = UIColor(argb: 0xFFFB7A0D)
             spectrumView.hidden = true
             spectrumView.delegate = self
             spectrumView.translatesAutoresizingMaskIntoConstraints = false

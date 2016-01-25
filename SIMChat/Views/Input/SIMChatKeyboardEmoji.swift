@@ -43,10 +43,10 @@ class SIMChatKeyboardEmoji: SIMView {
         collectionView.registerClass(SIMChatKeyboardEmojiContentCell.self, forCellWithReuseIdentifier: "Cell")
         
         line.contentMode = .Top
-        line.tintColor = UIColor(hex: 0xBDBDBD)
+        line.tintColor = UIColor(argb: 0xFFBDBDBD)
         line.translatesAutoresizingMaskIntoConstraints = false
         
-        button.tintColor = UIColor(hex: 0x7B7B7B)
+        button.tintColor = UIColor(argb: 0xFF7B7B7B)
         button.setTitle("发送", forState: .Normal)
         button.translatesAutoresizingMaskIntoConstraints = false
         

@@ -144,24 +144,11 @@ public class SIMChatInputBar : UIView {
         didSet  { self.selectedItem?.actived = true }
     }
     
-    private lazy var leftItems: [SIMChatInputBarItem] = [
-        SIMChatInputBarItem(style: .Voice)
-    ]
-    private lazy var rightItems: [SIMChatInputBarItem] = [
-        SIMChatInputBarItem(style: .Emoji),
-        SIMChatInputBarItem(style: .Tool)
-    ]
-    
+    private lazy var lineView: UIView = UIView()
     
     private lazy var _backgroundView: UIImageView = {
         let view =  UIImageView()
         view.image = SIMChatImageManager.defautlInputBackground
-        return view
-    }()
-    private lazy var _accessoryView: AccessoryView = {
-        let view = AccessoryView(frame: self.bounds)
-        view.dataSource = self
-        view.backgroundColor = UIColor.clearColor()
         return view
     }()
     private lazy var _textView: TextView = {
@@ -173,16 +160,58 @@ public class SIMChatInputBar : UIView {
         return view
     }()
     
-    private lazy var lineView: UIView = UIView()
+    private lazy var _leftBarButtonItemsView: ToolView = {
+        let view = ToolView()
+        view.setContentHuggingPriority(UILayoutPriorityDefaultLow + 1, forAxis: .Horizontal)
+        return view
+    }()
+    private lazy var _rightBarButtonItemsView: ToolView = {
+        let view = ToolView()
+        view.setContentHuggingPriority(UILayoutPriorityDefaultLow + 1, forAxis: .Horizontal)
+        return view
+    }()
+    private lazy var _bottomBarButtonItemsView: AccessoryView = {
+        let view = AccessoryView(frame: self.bounds)
+        view.dataSource = self
+        view.backgroundColor = UIColor.clearColor()
+        return view
+    }()
+    
+    private var _bottomBarButtonItems: [Accessory]?
+    
+    
 }
 
 extension SIMChatInputBar {
     /// 输入框
     public var textView: UITextView { return _textView }
     /// 额外选项
-    public var accessoryView: UIView { return _accessoryView }
+    public var leftBarButtonItemsView: UIView { return _leftBarButtonItemsView }
+    public var rightBarButtonItemsView: UIView { return _rightBarButtonItemsView }
+    public var bottomBarButtonItemsView: UIView { return _bottomBarButtonItemsView }
     /// 背景
     public var backgroundView: UIView { return _backgroundView }
+    
+    /// 左侧菜单项
+    public var leftBarButtonItems: [Accessory]? {
+        set { return _leftBarButtonItemsView.items = newValue }
+        get { return _leftBarButtonItemsView.items }
+    }
+    /// 右侧菜单项
+    public var rightBarButtonItems: [Accessory]? {
+        set { return _rightBarButtonItemsView.items = newValue }
+        get { return _rightBarButtonItemsView.items }
+    }
+    /// 底部菜单项
+    public var bottomBarButtonItems: [Accessory]? {
+        set {
+            _bottomBarButtonItems = newValue
+            _bottomBarButtonItemsView.reloadData()
+        }
+        get {
+            return _bottomBarButtonItems
+        }
+    }
     
     /// 内容
     public var text: String? {
@@ -192,17 +221,13 @@ extension SIMChatInputBar {
 }
 
 extension SIMChatInputBar {
-    /// 输入样式
-    public enum Style: Int {
-        case None   = 0
-        case Emoji
-        case Tool
-        case Audio
-    }
+}
+
+extension SIMChatInputBar {
     /// 额外选项
     public class Accessory {
-        public init(image: UIImage?, tag: Int) {
-        }
+//        public init(image: UIImage?, tag: Int) {
+//        }
     }
 }
 
@@ -210,21 +235,43 @@ extension SIMChatInputBar {
     /// 初始化
     private func build() {
         
-        backgroundColor = UIColor(hex: 0xEBECEE)
+        backgroundColor = UIColor(argb: 0xFFEBECEE)
+        lineView.backgroundColor = UIColor(argb: 0x4D000000)
         textView.delegate = self
-        lineView.backgroundColor = UIColor.grayColor()
         
+        // 背景
         addSubview(backgroundView)
-        addSubview(textView)
         addSubview(lineView)
-        addSubview(accessoryView)
+        // 核心
+        addSubview(textView)
+        // 额外选项
+        addSubview(leftBarButtonItemsView)
+        addSubview(rightBarButtonItemsView)
+        addSubview(bottomBarButtonItemsView)
         
         // add layout
         
+        SIMChatLayout.make(lineView)
+            .left.equ(self).left
+            .right.equ(self).right
+            .bottom.equ(self).top
+            .height.equ(1 / UIScreen.mainScreen().scale)
+            .submit()
+        
         SIMChatLayout.make(backgroundView)
-            .top.equ(self).top(7)
-            .left.equ(self).left(10)
-            .right.equ(self).right(10)
+            .top.equ(self).top(5)
+            .submit()
+        
+        SIMChatLayout.make(leftBarButtonItemsView)
+            .left.equ(self).left(5)
+            .right.equ(backgroundView).left(-5)
+            .bottom.equ(bottomBarButtonItemsView).top(-1)
+            .submit()
+        
+        SIMChatLayout.make(rightBarButtonItemsView)
+            .left.equ(backgroundView).right(-5)
+            .right.equ(self).right(5)
+            .bottom.equ(bottomBarButtonItemsView).top(-1)
             .submit()
         
         SIMChatLayout.make(textView)
@@ -234,14 +281,7 @@ extension SIMChatInputBar {
             .bottom.equ(backgroundView).bottom
             .submit()
         
-        SIMChatLayout.make(lineView)
-            .top.equ(self).top
-            .left.equ(self).left
-            .right.equ(self).right
-            .height.equ(1 / UIScreen.mainScreen().scale)
-            .submit()
-        
-        SIMChatLayout.make(accessoryView)
+        SIMChatLayout.make(bottomBarButtonItemsView)
             .top.equ(backgroundView).bottom
             .left.equ(self).left
             .right.equ(self).right
@@ -253,6 +293,53 @@ extension SIMChatInputBar {
 
 // MARK: - Accessory
 extension SIMChatInputBar  {
+    /// 工具
+    private class ToolView: UIView {
+        
+        private override func intrinsicContentSize() -> CGSize {
+            return CGSizeMake(CGFloat(items?.count ?? 0) * (34 + 5) - 5, 34)
+        }
+        private override func layoutSubviews() {
+            super.layoutSubviews()
+            var x = CGFloat(0)
+            buttons.forEach {
+                let nframe = CGRectMake(x, 0, 34, 34)
+                $0.frame = nframe
+                x += nframe.width + 5
+            }
+        }
+        
+        private func reloadData() {
+            var btns = buttons
+            buttons = []
+            let img = UIImage(named: "chat_bottom_smile_nor")
+            let img2 = UIImage(named: "chat_bottom_smile_press")
+            items?.forEach { _ in
+                let btn = btns.isEmpty ? UIButton() : btns.removeFirst()
+                
+                btn.setImage(img, forState: .Normal)
+                btn.setImage(img2, forState: .Highlighted)
+                
+                addSubview(btn)
+                buttons.append(btn)
+            }
+            btns.forEach {
+                $0.removeFromSuperview()
+            }
+            setNeedsLayout()
+        }
+        
+        private var buttons: [UIButton] = []
+        private var items: [Accessory]? {
+            didSet {
+                reloadData()
+                guard items?.count != oldValue?.count else {
+                    return
+                }
+                invalidateIntrinsicContentSize()
+            }
+        }
+    }
     /// 自定义的输入框
     private class TextView: UITextView {
         private override func intrinsicContentSize() -> CGSize {
@@ -293,11 +380,17 @@ extension SIMChatInputBar  {
             layout.sectionInset = UIEdgeInsetsMake(8, 10, 8, 10)
             super.init(frame: frame, collectionViewLayout: layout)
             registerClass(Cell.self, forCellWithReuseIdentifier: "Cell")
+            scrollEnabled = false
+            showsHorizontalScrollIndicator = false
+            showsVerticalScrollIndicator = false
         }
         private required init?(coder aDecoder: NSCoder) {
             super.init(coder: aDecoder)
         }
         private override func intrinsicContentSize() -> CGSize {
+            if numberOfItemsInSection(0) == 0 {
+                return CGSizeMake(contentSize.width, 0)
+            }
             return contentSize
         }
         private override var contentSize: CGSize {
@@ -312,9 +405,11 @@ extension SIMChatInputBar  {
 
 // MARK: - UICollectionViewDelegate & UICollectionViewDateSource
 extension SIMChatInputBar: UICollectionViewDataSource {
+    
     public func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 7
+        return bottomBarButtonItems?.count ?? 0
     }
+    
     public func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier("Cell", forIndexPath: indexPath)
         cell.backgroundColor = UIColor.purpleColor()
@@ -496,6 +591,7 @@ public enum SIMChatInputBarItemStyle : Int {
     case Emoji      = 0x0102
     case Tool       = 0x0103
 }
+
 
 @objc public protocol SIMChatInputBarDelegate: NSObjectProtocol {
     
