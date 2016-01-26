@@ -9,13 +9,24 @@
 import UIKit
 
 public class SIMChatInputPanel: UIView {
-    /// 面板样式
-    public enum Style: Int {
-        case None   = 0
-        case Emoji
-        case Tool
-        case Audio
-    }
+//    /// 面板样式
+//    public class Style: SIMChatInputBarAccessory {
+//        @objc public var accessoryName: String? {
+//            return "test"
+//        }
+//        @objc public var accessoryImage: UIImage? {
+//            return UIImage(named: "chat_bottom_smile_nor")
+//        }
+//        @objc public var accessorySelecteImage: UIImage? {
+//            return UIImage(named: "chat_bottom_smile_press")
+//        }
+//    }
+//    @objc public enum Style: Int {
+//        case None   = 0
+//        case Emoji
+//        case Tool
+//        case Audio
+//    }
     
     public override init(frame: CGRect) {
         super.init(frame: frame)
@@ -28,14 +39,26 @@ public class SIMChatInputPanel: UIView {
     }
     
     /// 面板样式
-    public var style: Style = .None {
+    public var selectedItem: SIMChatInputBarAccessory? {
         didSet {
         }
     }
 }
+
+// MARK: - Life Cycle
 
 extension SIMChatInputPanel {
     public override func intrinsicContentSize() -> CGSize {
         return CGSizeMake(0, 216)
     }
 }
+
+// MARK: - Public Method
+extension SIMChatInputPanel {
+    /// 注册面板
+    public static func registerClass(cls: UIView.Type, byIdentifier identifier: String) {
+    }
+    
+    private static var subpanels: Dictionary<String, UIView.Type> = [:]
+}
+

@@ -23,7 +23,9 @@ extension SIMChatViewController {
     }
     /// 键盘隐藏通知
     private dynamic func onKeyboardHideNtf(sender: NSNotification) {
-        onKeyboardHidden(CGRectZero)
+        if inputBar.selectedBarButtonItem == nil {
+            onKeyboardHidden(CGRectZero)
+        }
     }
     /// 输入栏改变
     private dynamic func onInputBarChangeNtf(sender: NSNotification) {
@@ -36,7 +38,7 @@ extension SIMChatViewController {
     /// 更新键盘高度
     public var keyboardHeight: CGFloat {
         set {
-            SIMLog.trace(newValue)
+            SIMLog.trace("\(newValue) => \(inputBar.frame.height)")
             
             // 必须先更新inset, 否则如果offset在0的位置时会产生肉眼可见的抖动
             var edg = contentView.contentInset
@@ -61,29 +63,6 @@ extension SIMChatViewController {
             self.keyboardHeight = height
         }
     }
-    /// 更新类型
-    private func onUpdateKeyboardStyle(style: SIMChatInputBarItemStyle) {
-//        SIMLog.trace()
-//        
-//        // TODO: 逻辑混乱, 需要重新设计
-//        
-//        let height = self.inputPanelView.frame.height
-//        
-//        if style == .None || style == .Keyboard {
-//            onUpdateKeyboardHeight(0)
-//        } else if keyboardHeight != height {
-//            onUpdateKeyboardHeight(height)
-//        }
-//        UIView.animateWithDuration(0.25) {
-//            if style == .None || style == .Keyboard {
-//                self.inputPanelViewLayout?.top = 0
-//            } else {
-//                self.inputPanelViewLayout?.top = -height
-//            }
-//            self.inputPanelView.layoutIfNeeded()
-//            self.view.layoutIfNeeded()
-//        }
-    }
     
     /// 放弃
     private dynamic func onResignKeyboard(sender: AnyObject) {
@@ -94,98 +73,6 @@ extension SIMChatViewController {
         }
     }
     
-    /// 更新键盘(类型)
-    func updateKeyboard(style style: SIMChatInputBarItemStyle) {
-        SIMLog.trace()
-//        let newValue = self.makeKeyboard(style)
-//        // 隐藏旧的.
-//        if let view = self.keyboard {
-//            // 通知
-//            self.onKeyboardHidden(newValue?.bounds ?? CGRectZero, delay: self.textField.selectedStyle == .Keyboard)
-//            
-//            UIView.animateWithDuration(0.25) {
-//                view.layer.transform = CATransform3DMakeTranslation(0, 0, 1)
-//            }
-//        }
-//        // 切换键盘
-//        self.keyboard = newValue
-//        // 显示新的
-//        if let view = self.keyboard {
-//            // 通知
-//            self.onKeyboardShow(view.frame)
-//            
-//            UIView.animateWithDuration(0.25) {
-//                view.layer.transform = CATransform3DMakeTranslation(0, -view.bounds.height, 1)
-//            }
-//        }
-    }
-//    /// 更新键盘(高度)
-//    func updateKeyboard(height newValue: CGFloat) {
-    
-        
-//        // 修正
-//        var fix = self.tableView.contentInset
-//        // 如果开启了自动调整, 并且更新了inset才开始计算
-//        if self.automaticallyAdjustsScrollViewInsets && self.tableView.contentInset.top != 0 {
-//            fix.top = self.tableView.contentInset.top + self.tableView.layer.transform.m42
-//        } else {
-//            fix.top = 0
-//        }
-//        // 计算
-//        let h1 = newValue
-//        let h2 = newValue + self.textField.bounds.height
-//        // 应用
-//        // NOTE: 约束在ios7里面表现得并不理想
-//        //       而且view.transform也有一些bug(约束+transform)
-//        //       只能使用layer.transform
-//        self.textField.layer.transform = CATransform3DMakeTranslation(0, -h1, 0)
-//        self.tableView.layer.transform = CATransform3DMakeTranslation(0, -h2, 0)
-//        //self.textField.transform = CGAffineTransformMakeTranslation(0, -h1)
-//        //self.tableView.transform = CGAffineTransformMakeTranslation(0, -h2)
-//        self.tableView.contentInset = UIEdgeInsetsMake(h2 + fix.top, fix.left, fix.bottom, fix.right)
-//        self.tableView.scrollIndicatorInsets = UIEdgeInsetsMake(h2 + fix.top, fix.left, fix.bottom, fix.right)
-//        // :)
-//        SIMLog.debug("\(newValue), fix: \(NSStringFromUIEdgeInsets(fix))")
-//        // 更新
-//        self.keyboardHeight = newValue
-//    }
-    /// 获取键盘.
-    private func makeKeyboard(style: SIMChatInputBarItemStyle) -> UIView? {
-        return nil
-//        // 己经加载过了?
-//        if let view = keyboards[style] {
-//            return view
-//        }
-//        // 并没有
-//        var kb: UIView!
-//        // 创建.
-//        switch style {
-//        case .Emoji: kb = SIMChatKeyboardEmoji(delegate: self)
-//        case .Voice: kb = SIMChatKeyboardAudio(delegate: self)
-//        case .Tool:  kb = SIMChatKeyboardTool(delegate: self, dataSource: self)
-//        default:     kb = nil
-//        }
-//        // 并没有创建成功?
-//        guard kb != nil else {
-//            return nil
-//        }
-//        
-//        // config
-//        kb.translatesAutoresizingMaskIntoConstraints = false
-//        kb.backgroundColor = self.textField.backgroundColor
-//        // add view
-//        self.view.addSubview(kb)
-//        // add constraints
-//        self.view.addConstraint(NSLayoutConstraintMake(kb, .Left,  .Equal, view, .Left))
-//        self.view.addConstraint(NSLayoutConstraintMake(kb, .Right, .Equal, view, .Right))
-//        self.view.addConstraint(NSLayoutConstraintMake(kb, .Top,   .Equal, view, .Bottom))
-//        ///
-//        kb.layoutIfNeeded()
-//        // 缓存
-//        self.keyboards[style] = kb
-//        // ok
-//        return kb
-    }
     ///
     /// 工具栏显示
     ///
@@ -199,11 +86,41 @@ extension SIMChatViewController {
     /// 工具栏显示 
     ///
     /// :param: frame 接下来键盘的大小
-    /// :param: delay 是否需要延迟加载(键盘切换需要延迟一下)
     ///
     private dynamic func onKeyboardHidden(frame: CGRect) {
         SIMLog.debug(frame)
         onUpdateKeyboardHeight(frame.height)
+    }
+}
+
+
+// MARK: - Panel
+
+extension SIMChatViewController {
+    /// 显示面板
+    private func onPanelShow() {
+        SIMLog.trace()
+        
+        let height = self.inputPanelView.frame.height
+        UIView.animateWithDuration(0.25) {
+            self.keyboardHeight = height
+            self.inputPanelViewLayout?.top = -height
+            self.inputPanelView.layoutIfNeeded()
+            self.view.layoutIfNeeded()
+        }
+    }
+    /// 隐藏面板
+    private func onPanelHide() {
+        SIMLog.trace()
+        UIView.animateWithDuration(0.25) {
+            if !self.inputBar.isFirstResponder() {
+                self.keyboardHeight = 0
+            }
+            self.inputPanelViewLayout?.top = 0
+            self.inputPanelView.layoutIfNeeded()
+            self.view.layoutIfNeeded()
+        }
+        inputPanelView.selectedItem = nil
     }
 }
 
@@ -356,22 +273,59 @@ extension SIMChatViewController {
 //}
 
 
+// MARK: - Input Bar Util Class
 
-// MARK: - Input bar
+extension SIMChatViewController {
+    class BarButtonItem: SIMChatInputBarAccessory {
+        @objc var accessoryIdentifier: String {
+            return "test"
+        }
+        @objc var accessoryName: String? {
+            return "test"
+        }
+        @objc var accessoryImage: UIImage? {
+            return UIImage(named: "chat_bottom_smile_nor")
+        }
+        @objc var accessorySelecteImage: UIImage? {
+            return UIImage(named: "chat_bottom_smile_press")
+        }
+    }
+}
+
+
+// MARK: - Input Bar
 
 extension SIMChatViewController: SIMChatInputBarDelegate {
-//    /// 选中..
-//    func chatTextField(chatTextField: SIMChatInputBar, didSelectItem item: Int) {
-//        SIMLog.trace()
-//        if let style = SIMChatInputBarItemStyle(rawValue: item) {
-//            onUpdateKeyboardStyle(style)
-//        }
-//    }
-//    /// 高度改变
-//    func chatTextFieldContentSizeDidChange(chatTextField: SIMChatInputBar) {
-//        SIMLog.trace()
-//        self.onUpdateKeyboardHeight(self.keyboardHeight)
-//    }
+    /// 检查是否可以选中
+    public func inputBar(inputBar: SIMChatInputBar, shouldSelectItem item: SIMChatInputBarAccessory) -> Bool {
+        SIMLog.trace()
+        // 第一次显示.
+        if inputBar.selectedBarButtonItem == nil {
+            onPanelShow()
+        }
+        return true
+    }
+    /// 选中了
+    public func inputBar(inputBar: SIMChatInputBar, didSelectItem item: SIMChatInputBarAccessory) {
+        SIMLog.trace()
+        inputPanelView.selectedItem = item
+    }
+    /// 取消了
+    public func inputBar(inputBar: SIMChatInputBar, didDeselectItem item: SIMChatInputBarAccessory) {
+        SIMLog.trace()
+        // 最后一次显示
+        if inputBar.selectedBarButtonItem == nil {
+            onPanelHide()
+        }
+    }
+    /// 按下回车
+    public func inputBarShouldReturn(inputBar: SIMChatInputBar) -> Bool {
+        // 发送.
+        //sendMessageForText(self.textField.text ?? "")
+        inputBar.text = nil
+        return false
+    }
+    
 //    /// ok
 //    func chatTextFieldShouldReturn(chatTextField: SIMChatInputBar) -> Bool {
 ////        // 发送.

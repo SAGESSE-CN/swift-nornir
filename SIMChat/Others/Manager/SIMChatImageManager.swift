@@ -32,11 +32,11 @@ class SIMChatImageManager: NSObject {
     static var defaultBubbleSend = UIImage(named: "simchat_bubble_send")
     
     static var defautlInputBackground = UIImage(named: "chat_bottom_textfield")
-    static var inputItemImages: [SIMChatInputBarItemStyle : (n: UIImage?, h: UIImage?)] = [
-        .Keyboard   : (n: UIImage(named: "chat_bottom_keyboard_nor"),   h: UIImage(named: "chat_bottom_keyboard_press")),
-        .Voice      : (n: UIImage(named: "chat_bottom_voice_nor"),      h: UIImage(named: "chat_bottom_voice_press")),
-        .Emoji      : (n: UIImage(named: "chat_bottom_smile_nor"),      h: UIImage(named: "chat_bottom_smile_press")),
-        .Tool       : (n: UIImage(named: "chat_bottom_up_nor"),         h: UIImage(named: "chat_bottom_up_press"))
-    ]
+//    static var inputItemImages: [SIMChatInputBarItemStyle : (n: UIImage?, h: UIImage?)] = [
+//        .Keyboard   : (n: UIImage(named: "chat_bottom_keyboard_nor"),   h: UIImage(named: "chat_bottom_keyboard_press")),
+//        .Voice      : (n: UIImage(named: "chat_bottom_voice_nor"),      h: UIImage(named: "chat_bottom_voice_press")),
+//        .Emoji      : (n: UIImage(named: "chat_bottom_smile_nor"),      h: UIImage(named: "chat_bottom_smile_press")),
+//        .Tool       : (n: UIImage(named: "chat_bottom_up_nor"),         h: UIImage(named: "chat_bottom_up_press"))
+//    ]
     
 }

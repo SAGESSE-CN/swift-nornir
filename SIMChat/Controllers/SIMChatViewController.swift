@@ -46,17 +46,16 @@ public class SIMChatViewController: UIViewController {
     
     private lazy var _contentView = UITableView()
     private lazy var _inputPanelView = SIMChatInputPanel(frame: CGRectZero)
-    private lazy var _inputPanels: [UIView] = []
     
     private lazy var _inputBar: SIMChatInputBar = {
         let bar = SIMChatInputBar(frame: CGRectZero)
         bar.delegate = self
         bar.leftBarButtonItems = [
-            SIMChatInputBar.Accessory()
+            BarButtonItem()
         ]
         bar.rightBarButtonItems = [
-            SIMChatInputBar.Accessory(),
-            SIMChatInputBar.Accessory()
+            BarButtonItem(),
+            BarButtonItem()
         ]
 //        bar.bottomBarButtonItems = [
 //            SIMChatInputBar.Accessory(),
@@ -91,12 +90,12 @@ extension SIMChatViewController {
     ///
     /// 输入栏
     ///
-    public var inputBar: UIView { return _inputBar }
+    public var inputBar: SIMChatInputBar { return _inputBar }
     public var inputBarLayout: SIMChatLayout? { return _inputBarLayout }
     ///
     /// 输入面板(选择表情之类的)
     ///
-    public var inputPanelView: UIView { return _inputPanelView }
+    public var inputPanelView: SIMChatInputPanel { return _inputPanelView }
     public var inputPanelViewLayout: SIMChatLayout? { return _inputPanelViewLayout }
     ///
     /// 聊天背景
@@ -122,6 +121,8 @@ extension SIMChatViewController {
         contentView.backgroundColor = .clearColor()
         contentView.showsHorizontalScrollIndicator = false
         contentView.showsVerticalScrollIndicator = false
+        
+        view.clipsToBounds = true
         
         // add event
         contentView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: "onResignKeyboard:"))
