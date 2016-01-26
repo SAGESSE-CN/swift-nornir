@@ -71,6 +71,7 @@ public class SIMChatInputBar: UIView {
     }()
     private lazy var _bottomBarButtonItemsView: AccessoryListView = {
         let view = AccessoryListView(frame: self.bounds)
+        view.hidden = true
         view.delegate = self
         view.dataSource = self
         view.backgroundColor = UIColor.clearColor()
@@ -81,7 +82,7 @@ public class SIMChatInputBar: UIView {
     
     /// 不使用系统的, 因为系统的isFristResponder更新速度太慢了
     private var _textViewIsFristResponder: Bool = false
-    private var _bottomBarButtonItems: [SIMChatInputBarAccessory]?
+    private var _bottomBarButtonItems: [SIMChatInputAccessory]?
     private var _selectedAccessoryButton: AccessoryButton? {
         didSet {
             guard _selectedAccessoryButton != oldValue else {
@@ -113,7 +114,7 @@ extension SIMChatInputBar {
         get { return textView.text }
     }
     /// 当前选择的选项
-    public var selectedBarButtonItem: SIMChatInputBarAccessory? {
+    public var selectedBarButtonItem: SIMChatInputAccessory? {
         return _selectedAccessoryButton?.accessory
     }
     /// 代理
@@ -133,19 +134,20 @@ extension SIMChatInputBar {
     public var backgroundView: UIView { return _backgroundView }
     
     /// 左侧菜单项
-    public var leftBarButtonItems: [SIMChatInputBarAccessory]? {
+    public var leftBarButtonItems: [SIMChatInputAccessory]? {
         set { return _leftBarButtonItemsView.items = newValue }
         get { return _leftBarButtonItemsView.items }
     }
     /// 右侧菜单项
-    public var rightBarButtonItems: [SIMChatInputBarAccessory]? {
+    public var rightBarButtonItems: [SIMChatInputAccessory]? {
         set { return _rightBarButtonItemsView.items = newValue }
         get { return _rightBarButtonItemsView.items }
     }
     /// 底部菜单项
-    public var bottomBarButtonItems: [SIMChatInputBarAccessory]? {
+    public var bottomBarButtonItems: [SIMChatInputAccessory]? {
         set {
             _bottomBarButtonItems = newValue
+            _bottomBarButtonItemsView.hidden = newValue?.isEmpty ?? true
             _bottomBarButtonItemsView.reloadData()
         }
         get {
@@ -155,14 +157,6 @@ extension SIMChatInputBar {
 }
 
 // MARK: - Public Delegate
-
-@objc public protocol SIMChatInputBarAccessory {
-    var accessoryIdentifier: String { get }
-    
-    var accessoryName: String? { get }
-    var accessoryImage: UIImage? { get }
-    var accessorySelecteImage: UIImage? { get }
-}
 
 @objc public protocol SIMChatInputBarDelegate: NSObjectProtocol {
     
@@ -180,11 +174,11 @@ extension SIMChatInputBar {
     optional func inputBarDidChange(inputBar: SIMChatInputBar)
     optional func inputBarDidChangeSelection(inputBar: SIMChatInputBar)
     
-    optional func inputBar(inputBar: SIMChatInputBar, shouldSelectItem item: SIMChatInputBarAccessory) -> Bool
-    optional func inputBar(inputBar: SIMChatInputBar, didSelectItem item: SIMChatInputBarAccessory)
+    optional func inputBar(inputBar: SIMChatInputBar, shouldSelectItem item: SIMChatInputAccessory) -> Bool
+    optional func inputBar(inputBar: SIMChatInputBar, didSelectItem item: SIMChatInputAccessory)
     
-    optional func inputBar(inputBar: SIMChatInputBar, willDeselectItem item: SIMChatInputBarAccessory)
-    optional func inputBar(inputBar: SIMChatInputBar, didDeselectItem item: SIMChatInputBarAccessory)
+    optional func inputBar(inputBar: SIMChatInputBar, willDeselectItem item: SIMChatInputAccessory)
+    optional func inputBar(inputBar: SIMChatInputBar, didDeselectItem item: SIMChatInputAccessory)
 }
 
 // MARK: - Life Cycel
@@ -282,7 +276,7 @@ extension SIMChatInputBar : UITextViewDelegate {
     }
 }
 
-// MARK: - SIMChatInputBarAccessoryViewDelegate
+// MARK: - SIMChatInputAccessoryViewDelegate
 
 extension SIMChatInputBar: AccessoryButtonDelegate {
     /// 选择这个选项
@@ -419,7 +413,7 @@ extension SIMChatInputBar  {
                 return _selected
             }
         }
-        private var accessory: SIMChatInputBarAccessory? {
+        private var accessory: SIMChatInputAccessory? {
             didSet {
                 _selected = true
                 selected = false
@@ -513,7 +507,7 @@ extension SIMChatInputBar  {
         
         private weak var delegate: AccessoryButtonDelegate?
         private var buttons: [AccessoryButton] = []
-        private var items: [SIMChatInputBarAccessory]? {
+        private var items: [SIMChatInputAccessory]? {
             didSet {
                 reloadData()
                 guard items?.count != oldValue?.count else {

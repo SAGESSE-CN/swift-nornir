@@ -49,13 +49,16 @@ public class SIMChatViewController: UIViewController {
     
     private lazy var _inputBar: SIMChatInputBar = {
         let bar = SIMChatInputBar(frame: CGRectZero)
+        let R = { (name: String) -> UIImage? in
+            return UIImage(named: name)
+        }
         bar.delegate = self
         bar.leftBarButtonItems = [
-            BarButtonItem()
+            SIMChatInputBaseAccessory("kb:audio", R("chat_bottom_voice_nor"), R("chat_bottom_voice_press"))
         ]
         bar.rightBarButtonItems = [
-            BarButtonItem(),
-            BarButtonItem()
+            SIMChatInputBaseAccessory("kb:emoji", R("chat_bottom_smile_nor"), R("chat_bottom_smile_press")),
+            SIMChatInputBaseAccessory("kb:tool", R("chat_bottom_up_nor"), R("chat_bottom_up_press"))
         ]
 //        bar.bottomBarButtonItems = [
 //            SIMChatInputBar.Accessory(),

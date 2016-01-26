@@ -273,31 +273,11 @@ extension SIMChatViewController {
 //}
 
 
-// MARK: - Input Bar Util Class
-
-extension SIMChatViewController {
-    class BarButtonItem: SIMChatInputBarAccessory {
-        @objc var accessoryIdentifier: String {
-            return "test"
-        }
-        @objc var accessoryName: String? {
-            return "test"
-        }
-        @objc var accessoryImage: UIImage? {
-            return UIImage(named: "chat_bottom_smile_nor")
-        }
-        @objc var accessorySelecteImage: UIImage? {
-            return UIImage(named: "chat_bottom_smile_press")
-        }
-    }
-}
-
-
 // MARK: - Input Bar
 
 extension SIMChatViewController: SIMChatInputBarDelegate {
-    /// 检查是否可以选中
-    public func inputBar(inputBar: SIMChatInputBar, shouldSelectItem item: SIMChatInputBarAccessory) -> Bool {
+    
+    public func inputBar(inputBar: SIMChatInputBar, shouldSelectItem item: SIMChatInputAccessory) -> Bool {
         SIMLog.trace()
         // 第一次显示.
         if inputBar.selectedBarButtonItem == nil {
@@ -305,33 +285,21 @@ extension SIMChatViewController: SIMChatInputBarDelegate {
         }
         return true
     }
-    /// 选中了
-    public func inputBar(inputBar: SIMChatInputBar, didSelectItem item: SIMChatInputBarAccessory) {
+    public func inputBar(inputBar: SIMChatInputBar, didSelectItem item: SIMChatInputAccessory) {
         SIMLog.trace()
         inputPanelView.selectedItem = item
     }
-    /// 取消了
-    public func inputBar(inputBar: SIMChatInputBar, didDeselectItem item: SIMChatInputBarAccessory) {
+    public func inputBar(inputBar: SIMChatInputBar, didDeselectItem item: SIMChatInputAccessory) {
         SIMLog.trace()
         // 最后一次显示
         if inputBar.selectedBarButtonItem == nil {
             onPanelHide()
         }
     }
-    /// 按下回车
     public func inputBarShouldReturn(inputBar: SIMChatInputBar) -> Bool {
         // 发送.
         //sendMessageForText(self.textField.text ?? "")
         inputBar.text = nil
         return false
     }
-    
-//    /// ok
-//    func chatTextFieldShouldReturn(chatTextField: SIMChatInputBar) -> Bool {
-////        // 发送.
-////        self.sendMessageForText(self.textField.text ?? "")
-////        self.textField.text = nil
-//        // 不可能return
-//        return false
-//    }
 }
