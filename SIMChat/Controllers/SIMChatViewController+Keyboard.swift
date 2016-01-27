@@ -19,24 +19,28 @@ extension SIMChatViewController {
         }
         // Note: 在iPad这可能会有键盘高度不变但y改变的情况
         let h = r1.height//self.view.bounds.height - r1.origin.y
-        onKeyboardShow(CGRectMake(0, 0, r1.width, h))
+        systemKeyboardFrame = CGRectMake(r1.minX, r1.minY, r1.width, h)
+        // 更新键盘
+        setKeyboardHeight(systemKeyboardFrame.height)
     }
     /// 键盘隐藏通知
     private dynamic func onKeyboardHideNtf(sender: NSNotification) {
+        systemKeyboardFrame = CGRectZero
+        // 更新键盘
         if inputBar.selectedBarButtonItem == nil {
-            onKeyboardHidden(CGRectZero)
+            setKeyboardHeight(systemKeyboardFrame.height)
         }
     }
     /// 输入栏改变
     private dynamic func onInputBarChangeNtf(sender: NSNotification) {
-        onUpdateKeyboardHeight(keyboardHeight)
+        setKeyboardHeight(keyboardHeight)
     }
 }
 
 // MARK: - Keyboard
 extension SIMChatViewController {
-    /// 更新键盘高度
-    public var keyboardHeight: CGFloat {
+    /// 键盘高度
+    private dynamic var keyboardHeight: CGFloat {
         set {
             SIMLog.trace("\(newValue) => \(inputBar.frame.height)")
             
@@ -58,38 +62,23 @@ extension SIMChatViewController {
         }
     }
     /// 更新高度
-    private func onUpdateKeyboardHeight(height: CGFloat) {
-        UIView.animateWithDuration(0.25) {
-            self.keyboardHeight = height
+    public dynamic func setKeyboardHeight(height: CGFloat, animated: Bool = true) {
+        if !animated {
+            keyboardHeight = height
+        } else {
+            UIView.animateWithDuration(0.25) {
+                self.keyboardHeight = height
+            }
         }
     }
     
     /// 放弃
-    private dynamic func onResignKeyboard(sender: AnyObject) {
+    public dynamic func onResignKeyboard(sender: AnyObject) {
         if inputBar.isFirstResponder() {
             inputBar.resignFirstResponder()
         } else {
             view.endEditing(true)
         }
-    }
-    
-    ///
-    /// 工具栏显示
-    ///
-    /// :param: frame 接下来键盘的大小
-    ///
-    private dynamic func onKeyboardShow(frame: CGRect) {
-        SIMLog.debug(frame)
-        onUpdateKeyboardHeight(frame.height)
-    }
-    ///
-    /// 工具栏显示 
-    ///
-    /// :param: frame 接下来键盘的大小
-    ///
-    private dynamic func onKeyboardHidden(frame: CGRect) {
-        SIMLog.debug(frame)
-        onUpdateKeyboardHeight(frame.height)
     }
 }
 
@@ -98,24 +87,24 @@ extension SIMChatViewController {
 
 extension SIMChatViewController {
     /// 显示面板
-    private func onPanelShow() {
+    private func onShowPanel() {
         SIMLog.trace()
         
         let height = self.inputPanelView.frame.height
+        
         UIView.animateWithDuration(0.25) {
-            self.keyboardHeight = height
+            self.setKeyboardHeight(height, animated: false)
             self.inputPanelViewLayout?.top = -height
             self.inputPanelView.layoutIfNeeded()
             self.view.layoutIfNeeded()
         }
     }
     /// 隐藏面板
-    private func onPanelHide() {
+    private func onHidePanel() {
         SIMLog.trace()
+        
         UIView.animateWithDuration(0.25) {
-            if !self.inputBar.isFirstResponder() {
-                self.keyboardHeight = 0
-            }
+            self.setKeyboardHeight(self.systemKeyboardFrame.height, animated: false)
             self.inputPanelViewLayout?.top = 0
             self.inputPanelView.layoutIfNeeded()
             self.view.layoutIfNeeded()
@@ -281,7 +270,7 @@ extension SIMChatViewController: SIMChatInputBarDelegate {
         SIMLog.trace()
         // 第一次显示.
         if inputBar.selectedBarButtonItem == nil {
-            onPanelShow()
+            onShowPanel()
         }
         return true
     }
@@ -293,7 +282,7 @@ extension SIMChatViewController: SIMChatInputBarDelegate {
         SIMLog.trace()
         // 最后一次显示
         if inputBar.selectedBarButtonItem == nil {
-            onPanelHide()
+            onHidePanel()
         }
     }
     public func inputBarShouldReturn(inputBar: SIMChatInputBar) -> Bool {

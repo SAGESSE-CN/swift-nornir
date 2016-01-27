@@ -212,7 +212,7 @@ extension SIMChatInputBar  {
 
 // MARK: - Text View Delegate and Forward
 
-extension SIMChatInputBar : UITextViewDelegate {
+extension SIMChatInputBar: UITextViewDelegate {
     /// 将要编辑文本
     public func textViewShouldBeginEditing(textView: UITextView) -> Bool {
         guard delegate?.inputBarShouldBeginEditing?(self) ?? true else {
@@ -524,10 +524,10 @@ extension SIMChatInputBar  {
 extension SIMChatInputBar {
     /// 初始化
     private func build() {
-        
         backgroundColor = UIColor(argb: 0xFFECEDF1)
-        _lineView.backgroundColor = UIColor(argb: 0x4D000000)
         textView.delegate = self
+        
+        _lineView.backgroundColor = UIColor(argb: 0x4D000000)
         
         // 背景
         addSubview(backgroundView)

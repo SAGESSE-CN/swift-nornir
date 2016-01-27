@@ -44,6 +44,8 @@ public class SIMChatViewController: UIViewController {
     private var _inputBarLayout: SIMChatLayout?
     private var _inputPanelViewLayout: SIMChatLayout?
     
+    private var _lastKeyboardFrame: CGRect = CGRectZero
+    
     private lazy var _contentView = UITableView()
     private lazy var _inputPanelView = SIMChatInputPanel(frame: CGRectZero)
     
@@ -104,6 +106,14 @@ extension SIMChatViewController {
     /// 聊天背景
     ///
     public var backgroundView: UIImageView { return _backgroundView }
+    
+    ///
+    /// 系统当前的键盘大小
+    ///
+    public var systemKeyboardFrame: CGRect {
+        set { return _lastKeyboardFrame = newValue }
+        get { return _lastKeyboardFrame }
+    }
 }
 
 // MARK: - Life Cycle
@@ -116,14 +126,19 @@ extension SIMChatViewController {
         SIMLog.trace()
         
         // 背景
+        backgroundView.accessibilityLabel = "聊天背景"
         backgroundView.frame = view.bounds
         backgroundView.image = SIMChatImageManager.defaultBackground
         backgroundView.contentMode = .ScaleAspectFill
         backgroundView.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
         // 内容
+        contentView.accessibilityLabel = "聊天内容"
         contentView.backgroundColor = .clearColor()
         contentView.showsHorizontalScrollIndicator = false
         contentView.showsVerticalScrollIndicator = false
+        
+        inputBar.accessibilityLabel = "底部输入栏"
+        inputPanelView.accessibilityLabel = "底部输入面板"
         
         view.clipsToBounds = true
         
@@ -132,8 +147,8 @@ extension SIMChatViewController {
         
         view.addSubview(backgroundView)
         view.addSubview(contentView)
-        view.addSubview(inputPanelView)
         view.addSubview(inputBar)
+        view.addSubview(inputPanelView)
        
         // 添加布局
         _contentViewLayout = SIMChatLayout.make(contentView)
@@ -144,7 +159,6 @@ extension SIMChatViewController {
             .submit()
         
         _inputBarLayout = SIMChatLayout.make(inputBar)
-            //.height.equ(44)
             .top.gte(view).top
             .left.equ(view).left
             .right.equ(view).right
@@ -152,7 +166,6 @@ extension SIMChatViewController {
             .submit()
         
         _inputPanelViewLayout = SIMChatLayout.make(inputPanelView)
-            //.height.equ(253)
             .top.equ(view).bottom
             .left.equ(view).left
             .right.equ(view).right
@@ -162,9 +175,9 @@ extension SIMChatViewController {
             selector: "onInputBarChangeNtf:",
             name: SIMChatInputBarFrameDidChangeNotification)
         
-        // 更新键盘
+        // 初始化工作
         view.layoutIfNeeded()
-        keyboardHeight = 0
+        setKeyboardHeight(0, animated: false)
         
         _messageManager.prepare()
     }
