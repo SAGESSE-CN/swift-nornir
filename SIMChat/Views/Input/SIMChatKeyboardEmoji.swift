@@ -1,5 +1,5 @@
 //
-//  SIMChatKeyboardEmoji.swift
+//  SIMChatKeyboardFace.swift
 //  SIMChat
 //
 //  Created by sagesse on 9/20/15.
@@ -9,9 +9,9 @@
 import UIKit
 
 /// 自定义键盘-表情面板
-class SIMChatKeyboardEmoji: SIMView {
+class SIMChatKeyboardFace: SIMView {
     /// 初始化
-    convenience init(delegate: SIMChatKeyboardEmojiDelegate) {
+    convenience init(delegate: SIMChatKeyboardFaceDelegate) {
         self.init(frame: CGRectZero)
         self.delegate = delegate
     }
@@ -40,7 +40,7 @@ class SIMChatKeyboardEmoji: SIMView {
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.delaysContentTouches = false
         //collectionView.canCancelContentTouches = false
-        collectionView.registerClass(SIMChatKeyboardEmojiContentCell.self, forCellWithReuseIdentifier: "Cell")
+        collectionView.registerClass(SIMChatKeyboardFaceContentCell.self, forCellWithReuseIdentifier: "Cell")
         
         line.contentMode = .Top
         line.tintColor = UIColor(argb: 0xFFBDBDBD)
@@ -88,17 +88,17 @@ class SIMChatKeyboardEmoji: SIMView {
         return CGSizeMake(0, 216)
     }
     /// 代理.
-    weak var delegate: SIMChatKeyboardEmojiDelegate?
+    weak var delegate: SIMChatKeyboardFaceDelegate?
     
-    private lazy var emojiPreviewView = SIMChatKeyboardEmojiPreviewView(frame: CGRectMake(0, 0, 80, 80))
-    private lazy var emojiPreviewLastPoint = CGPointZero
+    private lazy var facePreviewView = SIMChatKeyboardFacePreviewView(frame: CGRectMake(0, 0, 80, 80))
+    private lazy var facePreviewLastPoint = CGPointZero
     
     private(set) lazy var pageControl = UIPageControl()
-    private(set) lazy var collectionView = UICollectionView(frame: CGRectZero, collectionViewLayout: SIMChatKeyboardEmojiContentLayout())
+    private(set) lazy var collectionView = UICollectionView(frame: CGRectZero, collectionViewLayout: SIMChatKeyboardFaceContentLayout())
     
     /// 生成表情列表
-    private(set) lazy var emojis: [String] = {
-        let emoji = { (x:UInt32) -> String in
+    private(set) lazy var faces: [String] = {
+        let face = { (x:UInt32) -> String in
             // 生成数字
             var idx = ((((0x808080F0 | (x & 0x3F000) >> 4) | (x & 0xFC0) << 10) | (x & 0x1C0000) << 18) | (x & 0x3F) << 24)
             // 生成字符串.
@@ -109,51 +109,51 @@ class SIMChatKeyboardEmoji: SIMView {
         var rs = [String]()
         for i:UInt32 in 0x1F600 ..< 0x1F64F {
             if i < 0x1F641 || i > 0x1F644 {
-                rs.append(emoji(i))
+                rs.append(face(i))
             }
         }
         for i:UInt32 in 0x1F680 ..< 0x1F6A4 {
-            rs.append(emoji(i))
+            rs.append(face(i))
         }
         for i:UInt32 in 0x1F6A5 ..< 0x1F6C5 {
-            rs.append(emoji(i))
+            rs.append(face(i))
         }
         return rs
     }()
 }
 
 // MARK: - UICollectionViewDelegate or UICollectionViewDataSource
-extension SIMChatKeyboardEmoji : UICollectionViewDelegate, UICollectionViewDataSource {
+extension SIMChatKeyboardFace : UICollectionViewDelegate, UICollectionViewDataSource {
     /// 滑动
     func scrollViewDidEndDecelerating(scrollView: UIScrollView) {
         pageControl.currentPage = Int((scrollView.contentOffset.x + scrollView.frame.width / 2.0) / scrollView.frame.width)
     }
     /// 页数
     func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return emojis.count + (emojis.count + 20 - 1) / 20
+        return faces.count + (faces.count + 20 - 1) / 20
     }
     /// 创建单元格
     func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         
-        let cell = collectionView.dequeueReusableCellWithReuseIdentifier("Cell", forIndexPath: indexPath) as! SIMChatKeyboardEmojiContentCell
+        let cell = collectionView.dequeueReusableCellWithReuseIdentifier("Cell", forIndexPath: indexPath) as! SIMChatKeyboardFaceContentCell
         let page = indexPath.row / 21
         let idx = indexPath.row - page
         var title: String?
         
-        if idx < self.emojis.count && (indexPath.row == 0 || (indexPath.row + 1) % 21 != 0) {
-            title = self.emojis[idx]
+        if idx < self.faces.count && (indexPath.row == 0 || (indexPath.row + 1) % 21 != 0) {
+            title = self.faces[idx]
         }
         // 更新
-        cell.emoji = title
+        cell.face = title
         
         return cell
     }
 }
 
 /// MAKR: - /// Type
-extension SIMChatKeyboardEmoji {
+extension SIMChatKeyboardFace {
     /// 单元格
-    private class SIMChatKeyboardEmojiContentCell : UICollectionViewCell {
+    private class SIMChatKeyboardFaceContentCell : UICollectionViewCell {
         /// 初始化
         override init(frame: CGRect) {
             super.init(frame: frame)
@@ -167,21 +167,21 @@ extension SIMChatKeyboardEmoji {
         /// 构建
         func build() {
             // config
-            emojiView.frame = self.bounds
-            emojiView.autoresizingMask = .FlexibleWidth | .FlexibleHeight
+            faceView.frame = self.bounds
+            faceView.autoresizingMask = .FlexibleWidth | .FlexibleHeight
             // add view
-            contentView.addSubview(emojiView)
+            contentView.addSubview(faceView)
         }
         /// 标题
-        dynamic var emoji: String? {
-            set { return self.emojiView.emoji = newValue ?? "\u{7F}" }
-            get { return self.emojiView.emoji }
+        dynamic var face: String? {
+            set { return self.faceView.face = newValue ?? "\u{7F}" }
+            get { return self.faceView.face }
         }
         
-        private(set) lazy var emojiView = SIMChatEmojiView(frame: CGRectZero)
+        private(set) lazy var faceView = SIMChatFaceView(frame: CGRectZero)
     }
     /// 内容的布局
-    private class SIMChatKeyboardEmojiContentLayout : UICollectionViewLayout {
+    private class SIMChatKeyboardFaceContentLayout : UICollectionViewLayout {
         
         var row = 3
         var column = 7
@@ -231,71 +231,71 @@ extension SIMChatKeyboardEmoji {
         }
     }
     /// 预览视图(类型1)
-    private class SIMChatKeyboardEmojiPreviewView : SIMImageView {
+    private class SIMChatKeyboardFacePreviewView : SIMImageView {
         /// 构建
         override func build() {
             super.build()
             
             // config
-            image = SIMChatImageManager.images_emoji_preview
+            image = SIMChatImageManager.images_face_preview
             contentMode = .ScaleAspectFit
             layer.anchorPoint = CGPointMake(1.0, 1.5)
             
-            emojiView.translatesAutoresizingMaskIntoConstraints = false
-            //emojiView.transform = CGAffineTransformMakeScale(1.2, 1.2)
+            faceView.translatesAutoresizingMaskIntoConstraints = false
+            //faceView.transform = CGAffineTransformMakeScale(1.2, 1.2)
             
             // add view
-            addSubview(emojiView)
+            addSubview(faceView)
             
             // add constraints
-            addConstraint(NSLayoutConstraintMake(emojiView, .CenterX, .Equal, self, .CenterX))
-            addConstraint(NSLayoutConstraintMake(emojiView, .CenterY, .Equal, self, .CenterY, -4))
+            addConstraint(NSLayoutConstraintMake(faceView, .CenterX, .Equal, self, .CenterX))
+            addConstraint(NSLayoutConstraintMake(faceView, .CenterY, .Equal, self, .CenterY, -4))
         }
         /// 标题
-        dynamic var emoji: String? {
-            set { return self.emojiView.emoji = newValue }
-            get { return self.emojiView.emoji }
+        dynamic var face: String? {
+            set { return self.faceView.face = newValue }
+            get { return self.faceView.face }
         }
         /// 将要有windows
         override func willMoveToWindow(newWindow: UIWindow?) {
             super.willMoveToWindow(newWindow)
             // 加点duang
             if newWindow != nil {
-                self.emojiView.transform = CGAffineTransformMakeScale(0.8, 0.8)
+                self.faceView.transform = CGAffineTransformMakeScale(0.8, 0.8)
                 UIView.animateWithDuration(0.125, animations: {
-                    self.emojiView.transform = CGAffineTransformMakeScale(1.6, 1.6)
+                    self.faceView.transform = CGAffineTransformMakeScale(1.6, 1.6)
                 }, completion: { b in
                     // :)
                     guard b else {
                         // 恢复
-                        self.emojiView.transform = CGAffineTransformMakeScale(1.2, 1.2)
+                        self.faceView.transform = CGAffineTransformMakeScale(1.2, 1.2)
                         return
                     }
                     // 继续动画
                     UIView.animateWithDuration(0.125) {
-                        self.emojiView.transform = CGAffineTransformMakeScale(1.2, 1.2)
+                        self.faceView.transform = CGAffineTransformMakeScale(1.2, 1.2)
                     }
                 })
             }
         }
         // :)
-        lazy var emojiView = SIMChatEmojiView(frame: CGRectZero)
+        lazy var faceView = SIMChatFaceView(frame: CGRectZero)
     }
 }
 
 // MARK: - Event
-extension SIMChatKeyboardEmoji {
+extension SIMChatKeyboardFace {
     /// 发送
     private dynamic func onSendPress(sender: AnyObject) {
-        delegate?.chatKeyboardEmojiDidReturn?(self)
+        delegate?.chatKeyboardFaceDidReturn?(self)
     }
     /// 点击表情
-    private dynamic func onEmojiSelected(sender: String?) {
+    private dynamic func onFaceSelected(sender: String?) {
         if let value = sender {
             if value == "\u{7F}" {
-                delegate?.chatKeyboardEmojiDidDelete?(self)
+                delegate?.chatKeyboardFaceDidDelete?(self)
             } else {
-                delegate?.chatKeyboardEmoji?(self, didSelectEmoji: value)
+                delegate?.chatKeyboardFace?(self, didSelectFace: value)
             }
         }
     }
@@ -303,8 +303,8 @@ extension SIMChatKeyboardEmoji {
     private dynamic func onItemPress(sender: UIGestureRecognizer) {
         let pt = sender.locationInView(collectionView)
         if let idx = collectionView.indexPathForItemAtPoint(pt) {
-            if let cell = collectionView.cellForItemAtIndexPath(idx) as? SIMChatKeyboardEmojiContentCell {
-                self.onEmojiSelected(cell.emoji)
+            if let cell = collectionView.cellForItemAtIndexPath(idx) as? SIMChatKeyboardFaceContentCell {
+                self.onFaceSelected(cell.face)
             }
         }
     }
@@ -314,45 +314,45 @@ extension SIMChatKeyboardEmoji {
         let pt1 = sender.locationInView(collectionView)
         let pt2 = sender.locationInView(window)
         
-        // 更新emoji
+        // 更新face
         if let idx = collectionView.indexPathForItemAtPoint(pt1) {
-            if let cell = collectionView.cellForItemAtIndexPath(idx) as? SIMChatKeyboardEmojiContentCell {
+            if let cell = collectionView.cellForItemAtIndexPath(idx) as? SIMChatKeyboardFaceContentCell {
                 let tpt = cell.convertPoint(CGPointMake(cell.bounds.width / 2, 0), toView: window)
-                emojiPreviewView.emoji = cell.emoji
-                emojiPreviewLastPoint = tpt
+                facePreviewView.face = cell.face
+                facePreviewLastPoint = tpt
             }
         }
         
         // 无论如何都更新
-        emojiPreviewView.transform = CGAffineTransformMakeTranslation(pt2.x, pt2.y - 16)
+        facePreviewView.transform = CGAffineTransformMakeTranslation(pt2.x, pt2.y - 16)
 //        // 超出边界? 随便
-//        emojiPreviewView.hidden = !CGRectContainsPoint(CGRectMake(0, 0, 1, collectionView.bounds.height - 32), CGPointMake(0, pt1.y - 16))
+//        facePreviewView.hidden = !CGRectContainsPoint(CGRectMake(0, 0, 1, collectionView.bounds.height - 32), CGPointMake(0, pt1.y - 16))
         
         if sender.state == .Began {
             // 添加
-            window?.addSubview(emojiPreviewView)
+            window?.addSubview(facePreviewView)
         } else if sender.state == .Ended || sender.state == .Cancelled {
             // 如果是正常结束
             if sender.state == .Ended {
                 // 超出了
                 if (pt1.y - 16) < 0 || (pt1.y - 16) > (collectionView.bounds.height - 32) {
-                    let pt = self.emojiPreviewLastPoint
+                    let pt = self.facePreviewLastPoint
                     // 动画结束
                     UIView.animateWithDuration(0.25, animations: {
-                        self.emojiPreviewView.transform = CGAffineTransformMakeTranslation(pt.x, pt.y)
+                        self.facePreviewView.transform = CGAffineTransformMakeTranslation(pt.x, pt.y)
                     }, completion: { b in
                         guard b else {
                             return
                         }
-                        self.emojiPreviewView.removeFromSuperview()
+                        self.facePreviewView.removeFromSuperview()
                     })
                     return
                 }
                 // ok
-                self.onEmojiSelected(emojiPreviewView.emoji)
+                self.onFaceSelected(facePreviewView.face)
             }
             // 删除
-            emojiPreviewView.removeFromSuperview()
+            facePreviewView.removeFromSuperview()
         }
     }
     /// 切换页面
@@ -362,10 +362,10 @@ extension SIMChatKeyboardEmoji {
 }
 
 /// 代理
-@objc protocol SIMChatKeyboardEmojiDelegate {
+@objc protocol SIMChatKeyboardFaceDelegate {
 
-    optional func chatKeyboardEmojiDidDelete(chatKeyboardEmoji: SIMChatKeyboardEmoji)
-    optional func chatKeyboardEmojiDidReturn(chatKeyboardEmoji: SIMChatKeyboardEmoji)
+    optional func chatKeyboardFaceDidDelete(chatKeyboardFace: SIMChatKeyboardFace)
+    optional func chatKeyboardFaceDidReturn(chatKeyboardFace: SIMChatKeyboardFace)
     
-    optional func chatKeyboardEmoji(chatKeyboardEmoji: SIMChatKeyboardEmoji, didSelectEmoji emoji: String)
+    optional func chatKeyboardFace(chatKeyboardFace: SIMChatKeyboardFace, didSelectFace face: String)
 }

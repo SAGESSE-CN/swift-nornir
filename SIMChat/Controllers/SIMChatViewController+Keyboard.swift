@@ -113,20 +113,20 @@ extension SIMChatViewController {
     }
 }
 
-//// MARK: - Extension Keyboard Emoji
-//extension SIMChatViewController : SIMChatKeyboardEmojiDelegate {
+//// MARK: - Extension Keyboard Face
+//extension SIMChatViewController : SIMChatKeyboardFaceDelegate {
 //    /// 选择了表情
-//    func chatKeyboardEmoji(chatKeyboardEmoji: SIMChatKeyboardEmoji, didSelectEmoji emoji: String) {
+//    func chatKeyboardFace(chatKeyboardFace: SIMChatKeyboardFace, didSelectFace face: String) {
 //        let src = self.textField.contentSize.height
 //        // = . =更新value
-//        self.textField.text = (self.textField.text ?? "") + emoji
+//        self.textField.text = (self.textField.text ?? "") + face
 //        // 更新contetnOffset, 如果需要的话..
 //        if src != self.textField.contentSize.height {
 //            self.textField.scrollViewToBottom()
 //        }
 //    }
 //    /// 选择了后退
-//    func chatKeyboardEmojiDidDelete(chatKeyboardEmoji: SIMChatKeyboardEmoji) {
+//    func chatKeyboardFaceDidDelete(chatKeyboardFace: SIMChatKeyboardFace) {
 //        let src = self.textField.contentSize.height
 //        var str = self.textField.text
 //        // ..
@@ -141,7 +141,7 @@ extension SIMChatViewController {
 //        }
 //    }
 //    /// 发送
-//    func chatKeyboardEmojiDidReturn(chatKeyboardEmoji: SIMChatKeyboardEmoji) {
+//    func chatKeyboardFaceDidReturn(chatKeyboardFace: SIMChatKeyboardFace) {
 //        self.chatTextFieldShouldReturn(self.textField)
 //    }
 //}

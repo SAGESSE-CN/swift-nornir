@@ -13,13 +13,13 @@ class SIMChatImageManager: NSObject {
     static var messageFail = UIImage(named: "simchat_message_fail")
     static var messageSurccess = UIImage(named: "simchat_message_succ")
 
-    static var images_emoji_delete_nor = UIImage(named: "simchat_button_delete_nor")
-    static var images_emoji_delete_press = UIImage(named: "simchat_button_delete_press")
+    static var images_face_delete_nor = UIImage(named: "simchat_button_delete_nor")
+    static var images_face_delete_press = UIImage(named: "simchat_button_delete_press")
     
     static var imageDownloadFail = UIImage(named: "simchat_images_fail")
     static var defaultImage = UIImage(named: "simchat_images_default")
     
-    static var images_emoji_preview = UIImage(named: "simchat_images_emoji_preview")
+    static var images_face_preview = UIImage(named: "simchat_images_face_preview")
     
 
     /// 默认聊天背景
@@ -35,7 +35,7 @@ class SIMChatImageManager: NSObject {
 //    static var inputItemImages: [SIMChatInputBarItemStyle : (n: UIImage?, h: UIImage?)] = [
 //        .Keyboard   : (n: UIImage(named: "chat_bottom_keyboard_nor"),   h: UIImage(named: "chat_bottom_keyboard_press")),
 //        .Voice      : (n: UIImage(named: "chat_bottom_voice_nor"),      h: UIImage(named: "chat_bottom_voice_press")),
-//        .Emoji      : (n: UIImage(named: "chat_bottom_smile_nor"),      h: UIImage(named: "chat_bottom_smile_press")),
+//        .Face      : (n: UIImage(named: "chat_bottom_smile_nor"),      h: UIImage(named: "chat_bottom_smile_press")),
 //        .Tool       : (n: UIImage(named: "chat_bottom_up_nor"),         h: UIImage(named: "chat_bottom_up_press"))
 //    ]
     

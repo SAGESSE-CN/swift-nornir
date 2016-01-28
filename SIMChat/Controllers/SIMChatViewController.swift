@@ -59,21 +59,18 @@ public class SIMChatViewController: UIViewController {
             SIMChatInputBaseAccessory("kb:audio", R("chat_bottom_voice_nor"), R("chat_bottom_voice_press"))
         ]
         bar.rightBarButtonItems = [
-            SIMChatInputBaseAccessory("kb:emoji", R("chat_bottom_smile_nor"), R("chat_bottom_smile_press")),
+            SIMChatInputBaseAccessory("kb:face", R("chat_bottom_smile_nor"), R("chat_bottom_smile_press")),
             SIMChatInputBaseAccessory("kb:tool", R("chat_bottom_up_nor"), R("chat_bottom_up_press"))
         ]
 //        bar.bottomBarButtonItems = [
-//            SIMChatInputBar.Accessory(),
-//            SIMChatInputBar.Accessory(),
-//            SIMChatInputBar.Accessory(),
-//            SIMChatInputBar.Accessory(),
-//            SIMChatInputBar.Accessory(),
-//            SIMChatInputBar.Accessory(),
-//            SIMChatInputBar.Accessory()
+//            SIMChatInputBaseAccessory("kb:audio", R("chat_bottom_voice_nor"), R("chat_bottom_voice_press")),
+//            SIMChatInputBaseAccessory("kb:face", R("chat_bottom_smile_nor"), R("chat_bottom_smile_press")),
+//            SIMChatInputBaseAccessory("kb:tool", R("chat_bottom_up_nor"), R("chat_bottom_up_press"))
 //        ]
         return bar
     }()
     
+    private var _forwarder: UIGestureRecognizerDelegateForwarder?
     private lazy var _backgroundView = UIImageView()
     
     private var _conversation: SIMChatConversationProtocol
@@ -129,18 +126,17 @@ extension SIMChatViewController {
         backgroundView.accessibilityLabel = "聊天背景"
         backgroundView.frame = view.bounds
         backgroundView.image = SIMChatImageManager.defaultBackground
-        backgroundView.contentMode = .ScaleAspectFill
+        backgroundView.contentMode = .ScaleToFill
         backgroundView.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
         // 内容
         contentView.accessibilityLabel = "聊天内容"
         contentView.backgroundColor = .clearColor()
         contentView.showsHorizontalScrollIndicator = false
         contentView.showsVerticalScrollIndicator = false
+        contentView.separatorStyle = .None
         
         inputBar.accessibilityLabel = "底部输入栏"
         inputPanelView.accessibilityLabel = "底部输入面板"
-        
-        view.clipsToBounds = true
         
         // add event
         contentView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: "onResignKeyboard:"))
@@ -188,6 +184,12 @@ extension SIMChatViewController {
         let center = NSNotificationCenter.defaultCenter()
         center.addObserver(self, selector: "onKeyboardShowNtf:", name: UIKeyboardWillShowNotification, object: nil)
         center.addObserver(self, selector: "onKeyboardHideNtf:", name: UIKeyboardWillHideNotification, object: nil)
+        
+        // 添加转发
+        if let recognizer = navigationController?.interactivePopGestureRecognizer {
+            _forwarder = UIGestureRecognizerDelegateForwarder(recognizer.delegate, to: [self])
+            recognizer.delegate = _forwarder
+        }
     }
     
     public override func viewWillDisappear(animated: Bool) {
@@ -199,6 +201,12 @@ extension SIMChatViewController {
         let center = NSNotificationCenter.defaultCenter()
         center.removeObserver(self, name: UIKeyboardWillShowNotification, object: nil)
         center.removeObserver(self, name: UIKeyboardWillHideNotification, object: nil)
+        
+        // 恢复原样
+        if let recognizer = navigationController?.interactivePopGestureRecognizer {
+            recognizer.delegate = _forwarder?.orign
+            _forwarder = nil
+        }
     }
     
     public override func viewDidLayoutSubviews() {
@@ -211,6 +219,15 @@ extension SIMChatViewController {
     }
 }
 
+extension SIMChatViewController: UIGestureRecognizerDelegate {
+    public func gestureRecognizer(gestureRecognizer: UIGestureRecognizer, shouldReceiveTouch touch: UITouch) -> Bool {
+        if gestureRecognizer is UIScreenEdgePanGestureRecognizer {
+            let pt = touch.locationInView(view)
+            return !inputBar.frame.contains(pt) && !inputPanelView.frame.contains(pt)
+        }
+        return true
+    }
+}
 
 ////    init(conversation: SIMChatConversation) {
 ////        super.init(nibName: nil, bundle: nil)

@@ -84,59 +84,59 @@ import UIKit
 ////            if self.contentLabel.attributedText?.hashValue != content.attributedText?.hashValue {
 ////                self.contentLabel.attributedText = content.attributedText
 ////                self.contentLabel.preferredMaxLayoutWidth = 0
-////                //self.makeEmojiViews()
+////                //self.makeFaceViews()
 ////            }
 //        }
 //    }
 //    
-//    private(set) lazy var emojiViews = [Int : SIMChatEmojiView]()
+//    private(set) lazy var faceViews = [Int : SIMChatFaceView]()
 //    private(set) lazy var contentLabel = SIMChatLabel(frame: CGRectZero)
 //}
 //
-//// MARK: - Emoji 
+//// MARK: - Face 
 //extension SIMChatMessageCellText {
 //    /// 生成表情视图
-//    private func makeEmojiViews() {
+//    private func makeFaceViews() {
 //        // 检查参数
 //        guard let text = self.contentLabel.attributedText where self.enabled  else {
 //            // 清除
-//            self.emojiViews.forEach {
+//            self.faceViews.forEach {
 //                $0.1.removeFromSuperview()
 //            }
-//            self.emojiViews.removeAll()
+//            self.faceViews.removeAll()
 //            // ok
 //            return
 //        }
 //        SIMLog.trace()
 //        // 先保存一份
-//        var tmp = self.emojiViews.values.reverse()
+//        var tmp = self.faceViews.values.reverse()
 //        // clean
-//        self.emojiViews.removeAll()
+//        self.faceViews.removeAll()
 //        // :)
 //        text.enumerateAttribute(NSAttachmentAttributeName, inRange: NSMakeRange(0, text.length), options: .LongestEffectiveRangeNotRequired) {
 //            at, r, s in
 //            // 检查类型
-//            guard let at = at as? SIMChatEmojiAttachment else {
+//            guard let at = at as? SIMChatFaceAttachment else {
 //                return
 //            }
-//            let v = tmp.first ?? SIMChatEmojiView()
+//            let v = tmp.first ?? SIMChatFaceView()
 //            // 清除
 //            if !tmp.isEmpty {
 //                tmp.removeFirst()
 //            }
 //            // config
-//            v.emoji = at.emoji
+//            v.face = at.face
 //            v.backgroundColor = UIColor.orangeColor()
 //            v.hidden = true
 //            // :)
-//            self.emojiViews[r.location] = v
+//            self.faceViews[r.location] = v
 //        }
 //        // 删除
 //        tmp.forEach {
 //            $0.removeFromSuperview()
 //        }
 //        // 添加
-//        self.emojiViews.forEach {
+//        self.faceViews.forEach {
 //            self.contentLabel.addSubview($0.1)
 //        }
 //    }
@@ -148,7 +148,7 @@ import UIKit
 //    /// 文本附加信息改变.
 //    private dynamic func onTextAttachmentChanged(sender: NSNotification) {
 //        // 检查参数
-//        guard let at = sender.object as? SIMChatEmojiAttachment where self.enabled else {
+//        guard let at = sender.object as? SIMChatFaceAttachment where self.enabled else {
 //            return
 //        }
 //        guard let text = self.contentLabel.attributedText where text.length != 0 else {
@@ -164,8 +164,8 @@ import UIKit
 //            return
 //        }
 //     
-//        // 调整emoji的内容
-//        if let v = self.emojiViews[index] {
+//        // 调整face的内容
+//        if let v = self.faceViews[index] {
 //            v.frame = CGRectMake(frame.origin.x, frame.origin.y - frame.size.height, frame.size.width, frame.size.height)
 //            v.hidden = false
 //        }

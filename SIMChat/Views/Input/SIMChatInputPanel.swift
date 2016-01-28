@@ -17,6 +17,8 @@ public class SIMChatInputPanel: UIView {
     public required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         build()
+        
+        //UIScreenEdgePanGestureRecognizer
     }
     
     /// 面板样式
@@ -49,7 +51,7 @@ public class SIMChatInputPanel: UIView {
 
 extension SIMChatInputPanel {
     public override func intrinsicContentSize() -> CGSize {
-        return CGSizeMake(0, 216)
+        return CGSizeMake(0, 253)
     }
 }
 
@@ -68,7 +70,7 @@ extension SIMChatInputPanel {
     /// 初始化
     private func build() {
         self.dynamicType.registerClass(Tool.self,  byIdentifier: "kb:tool")
-        self.dynamicType.registerClass(Emoji.self, byIdentifier: "kb:emoji")
+        self.dynamicType.registerClass(Face.self,  byIdentifier: "kb:face")
         self.dynamicType.registerClass(Audio.self, byIdentifier: "kb:audio")
     }
     /// 更新当前有输入面板
@@ -78,12 +80,15 @@ extension SIMChatInputPanel {
         }
         // 隐藏
         if let view = _inputPanel {
+            view.transform = CGAffineTransformIdentity
             UIView.animateWithDuration(0.25,
                 animations: {
                     view.transform = CGAffineTransformMakeTranslation(0, self.bounds.height)
                 },
                 completion: { b in
-                    view.transform = CGAffineTransformIdentity
+                    guard self._inputPanel != view else {
+                        return
+                    }
                     view.removeFromSuperview()
                 })
         }
@@ -91,6 +96,7 @@ extension SIMChatInputPanel {
         // 显示
         if let view = newValue {
             
+            view.transform = CGAffineTransformIdentity
             view.frame = bounds
             view.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
             

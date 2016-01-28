@@ -1,5 +1,5 @@
 //
-//  SIMChatEmojiView.swift
+//  SIMChatFaceView.swift
 //  SIMChat
 //
 //  Created by sagesse on 10/5/15.
@@ -11,20 +11,20 @@ import UIKit
 ///
 /// 表情视图
 ///
-class SIMChatEmojiView: SIMView {
+class SIMChatFaceView: SIMView {
     /// 最合适的大小
     override func intrinsicContentSize() -> CGSize {
         return CGSizeMake(36, 36)
     }
     /// 表情
-    var emoji: String? {
+    var face: String? {
         willSet {
             // 相同. 没什么好说的
-            guard emoji != newValue else {
+            guard face != newValue else {
                 return
             }
             // \u{7F}      Delete         UIButton
-            // \u{XX}      Emoji          UILabel
+            // \u{XX}      Face          UILabel
             // {TYPE:NAME} Custom Face    UIImageView
             if let em = newValue {
                 // 新的视图
@@ -34,8 +34,8 @@ class SIMChatEmojiView: SIMView {
                     let btn = showView as? UIButton ?? UIButton()
                     // :)
                     btn.frame = bounds
-                    btn.setImage(SIMChatImageManager.images_emoji_delete_nor, forState: .Normal)
-                    btn.setImage(SIMChatImageManager.images_emoji_delete_press, forState: .Highlighted)
+                    btn.setImage(SIMChatImageManager.images_face_delete_nor, forState: .Normal)
+                    btn.setImage(SIMChatImageManager.images_face_delete_press, forState: .Highlighted)
                     btn.autoresizingMask = .FlexibleWidth | .FlexibleHeight
                     // ok
                     view = btn

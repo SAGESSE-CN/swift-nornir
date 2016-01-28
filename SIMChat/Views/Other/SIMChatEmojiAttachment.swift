@@ -9,15 +9,15 @@
 import UIKit
 
 /// 附件:)
-class SIMChatEmojiAttachment: NSTextAttachment {
+class SIMChatFaceAttachment: NSTextAttachment {
     /// 初始化
-    init(emoji: String, attributedText: NSAttributedString) {
-        self.emoji = emoji
+    init(face: String, attributedText: NSAttributedString) {
+        self.face = face
         super.init(data: nil, ofType: nil)
     }
     /// 初始化
     required init?(coder aDecoder: NSCoder) {
-        self.emoji = "<Unknow>"
+        self.face = "<Unknow>"
         super.init(coder: aDecoder)
     }
     /// 请求图片
@@ -37,7 +37,7 @@ class SIMChatEmojiAttachment: NSTextAttachment {
         return CGRectMake(0, -lineFrag.height, 28, 28)
     }
     /// 表情
-    var emoji: String
+    var face: String
 }
 
 
