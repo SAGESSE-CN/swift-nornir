@@ -19,7 +19,7 @@ class SIMChatImageManager: NSObject {
     static var imageDownloadFail = UIImage(named: "simchat_images_fail")
     static var defaultImage = UIImage(named: "simchat_images_default")
     
-    static var images_face_preview = UIImage(named: "simchat_images_face_preview")
+    static var images_face_preview = UIImage(named: "simchat_images_emoji_preview")
     
 
     /// 默认聊天背景

@@ -15,6 +15,8 @@ import UIKit
 // +------------------+
 //                  
 
+// TODO: 内部设计有点混乱, 需要重构一下
+
 ///
 /// 聊天输入栏
 ///
@@ -195,6 +197,16 @@ extension SIMChatInputBar  {
         return false
     }
     
+    public override func canResignFirstResponder() -> Bool {
+        if _selectedAccessoryButton != nil {
+            return true
+        }
+        if _textViewIsFristResponder {
+            return true
+        }
+        return super.canResignFirstResponder()
+    }
+    
     public override func resignFirstResponder() -> Bool {
         if textView.isFirstResponder() {
         textView.resignFirstResponder()
@@ -203,6 +215,10 @@ extension SIMChatInputBar  {
         super.resignFirstResponder()
         
         return false
+    }
+    
+    public override func canBecomeFirstResponder() -> Bool {
+        return true
     }
     
     public override func becomeFirstResponder() -> Bool {
@@ -376,6 +392,20 @@ extension SIMChatInputBar  {
                 }
                 SIMChatNotificationCenter.postNotificationName(SIMChatInputBarFrameDidChangeNotification, object: superview)
             }
+        }
+        
+        override func canPerformAction(action: Selector, withSender sender: AnyObject?) -> Bool {
+            if SIMChatMenuController.sharedMenuController().isCustomMenu() {
+                return SIMChatMenuController.sharedMenuController().canPerformAction(action, withSender: sender)
+            }
+            return super.canPerformAction(action, withSender: sender)
+        }
+        
+        override func forwardingTargetForSelector(aSelector: Selector) -> AnyObject? {
+            if SIMChatMenuController.sharedMenuController().isCustomMenu() {
+                return SIMChatMenuController.sharedMenuController().forwardingTargetForSelector(aSelector)
+            }
+            return super.forwardingTargetForSelector(aSelector)
         }
         
         private var maxHeight: CGFloat = 93

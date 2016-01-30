@@ -113,6 +113,37 @@ extension SIMChatViewController {
     }
 }
 
+// MARK: - SIMChatInputPanelDelegate
+
+extension SIMChatViewController: SIMChatInputPanelDelegate {
+}
+
+// MARK: - SIMChatInputPanelDelegateFace
+
+extension SIMChatViewController: SIMChatInputPanelDelegateFace {
+    /// 选择表情
+    public func inputPanel(inputPanel: UIView, didSelectFace face: String) {
+        SIMLog.debug(face)
+        inputBar.text = (inputBar.text ?? "") + face
+        // TODO: 更新contentOffset
+    }
+    /// 退格
+    public func inputPanelShouldSelectBackspace(inputPanel: UIView) -> Bool {
+        SIMLog.debug()
+        guard let str = inputBar.text where !str.isEmpty else {
+            return false
+        }
+        inputBar.text = str.substringToIndex(str.endIndex.advancedBy(-1))
+        // TODO: 更新contentOffset
+        return true
+    }
+    /// 回车
+    public func inputPanelShouldReturn(inputPanel: UIView) -> Bool {
+        SIMLog.debug()
+        return true
+    }
+}
+
 //// MARK: - Extension Keyboard Face
 //extension SIMChatViewController : SIMChatKeyboardFaceDelegate {
 //    /// 选择了表情

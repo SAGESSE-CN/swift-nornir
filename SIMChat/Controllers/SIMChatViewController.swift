@@ -47,8 +47,11 @@ public class SIMChatViewController: UIViewController {
     private var _lastKeyboardFrame: CGRect = CGRectZero
     
     private lazy var _contentView = UITableView()
-    private lazy var _inputPanelView = SIMChatInputPanel(frame: CGRectZero)
-    
+    private lazy var _inputPanelView: SIMChatInputPanel = {
+        let view = SIMChatInputPanel(frame: CGRectZero)
+        view.delegate = self
+        return view
+    }()
     private lazy var _inputBar: SIMChatInputBar = {
         let bar = SIMChatInputBar(frame: CGRectZero)
         let R = { (name: String) -> UIImage? in
@@ -71,7 +74,15 @@ public class SIMChatViewController: UIViewController {
     }()
     
     private var _forwarder: UIGestureRecognizerDelegateForwarder?
-    private lazy var _backgroundView = UIImageView()
+    private lazy var _backgroundView: UIImageView = {
+        let view = UIImageView()
+        return view
+    }()
+    private lazy var _tapGestureRecognizer: UITapGestureRecognizer = {
+        let recognizer = UITapGestureRecognizer(target: self, action: "onResignKeyboard:")
+        recognizer.delegate = self
+        return recognizer
+    }()
     
     private var _conversation: SIMChatConversationProtocol
     private var _messageManager: MessageManager
@@ -139,7 +150,7 @@ extension SIMChatViewController {
         inputPanelView.accessibilityLabel = "底部输入面板"
         
         // add event
-        contentView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: "onResignKeyboard:"))
+        contentView.addGestureRecognizer(_tapGestureRecognizer)
         
         view.addSubview(backgroundView)
         view.addSubview(contentView)
@@ -221,6 +232,9 @@ extension SIMChatViewController {
 
 extension SIMChatViewController: UIGestureRecognizerDelegate {
     public func gestureRecognizer(gestureRecognizer: UIGestureRecognizer, shouldReceiveTouch touch: UITouch) -> Bool {
+        if gestureRecognizer == _tapGestureRecognizer {
+            return !UIMenuController.sharedMenuController().menuVisible
+        }
         if gestureRecognizer is UIScreenEdgePanGestureRecognizer {
             let pt = touch.locationInView(view)
             return !inputBar.frame.contains(pt) && !inputPanelView.frame.contains(pt)

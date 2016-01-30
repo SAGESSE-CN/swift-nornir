@@ -8,6 +8,21 @@
 
 import UIKit
 
+@objc public protocol SIMChatInputPanelDelegate: NSObjectProtocol {
+    
+    // willShow
+    // didShow
+    // willHide
+    // didHide
+//    optional func inputPanel(inputPanel: UIView, willShowForAccessory accessory: SIMChatInputAccessory)
+//    optional func inputPanel(inputPanel: UIView, didShowForAccessory accessory: SIMChatInputAccessory)
+//    optional func inputPanel(inputPanel: UIView, willHideForAccessory accessory: SIMChatInputAccessory)
+//    optional func inputPanel(inputPanel: UIView, didHideForAccessory accessory: SIMChatInputAccessory)
+    
+//    optional func inputPanelDidReturn(inputPanel: UIView)
+//    optional func inputPanelDidBackspace(inputPanel: UIView)
+}
+
 public class SIMChatInputPanel: UIView {
     
     public override init(frame: CGRect) {
@@ -20,6 +35,9 @@ public class SIMChatInputPanel: UIView {
         
         //UIScreenEdgePanGestureRecognizer
     }
+    
+    /// 代理.
+    public weak var delegate: SIMChatInputPanelDelegate?
     
     /// 面板样式
     public var selectedItem: SIMChatInputAccessory? {
@@ -99,6 +117,9 @@ extension SIMChatInputPanel {
             view.transform = CGAffineTransformIdentity
             view.frame = bounds
             view.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
+            if view.respondsToSelector("delegate") {
+                view.setValue(delegate, forKey: "delegate")
+            }
             
             addSubview(view)
             
@@ -109,3 +130,4 @@ extension SIMChatInputPanel {
         }
     }
 }
+
