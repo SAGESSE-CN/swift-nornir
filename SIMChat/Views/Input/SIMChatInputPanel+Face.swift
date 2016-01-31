@@ -10,6 +10,7 @@ import UIKit
 
 // TODO: 内部设计有点混乱/不太合理, 有时间需要重构一下
 // TODO: 暂未支持横屏
+// TODO: Face加载, 有效率问题
 
 @objc public protocol SIMChatInputPanelDelegateFace: SIMChatInputPanelDelegate {
     
@@ -21,6 +22,7 @@ import UIKit
 }
 
 extension SIMChatInputPanel {
+    
     public class Face: UIView {
         public override init(frame: CGRect) {
             super.init(frame: frame)
@@ -36,12 +38,23 @@ extension SIMChatInputPanel {
         private lazy var _tabBar: TabBar = {
             let view = TabBar()
             view.backgroundColor = UIColor(rgb: 0xF8F8F8)
+            view.delegate = self
+            view.dataSource = self
             return view
         }()
-        private lazy var _preview: Preview = {
-            let view = Preview()
+        private lazy var _preview: ClassicPreview = {
+            let view = ClassicPreview()
             view.frame = CGRectMake(0, 0, 80, 80)
             view.hidden = true
+            return view
+        }()
+        private lazy var _sendButton: UIButton = {
+            let view = UIButton(type: .System)
+            view.tintColor = UIColor.whiteColor()
+            view.contentEdgeInsets = UIEdgeInsetsMake(0, 16, 0, 16)
+            view.setTitle("发送", forState: .Normal)
+            view.setBackgroundImage(UIImage(named: "tabwithinpage_cursor"), forState: .Normal)
+            view.addTarget(self, action: "classicShouldSelectReturn:", forControlEvents: .TouchUpInside)
             return view
         }()
         private lazy var _pageControl: PageControl = {
@@ -49,6 +62,8 @@ extension SIMChatInputPanel {
             view.numberOfPages = 8
             view.pageIndicatorTintColor = UIColor.grayColor()
             view.currentPageIndicatorTintColor = UIColor.darkGrayColor()
+            view.hidesForSinglePage = true
+            view.userInteractionEnabled = false
             return view
         }()
         private lazy var _contentView: ContentView = {
@@ -66,8 +81,8 @@ extension SIMChatInputPanel {
         }()
         
         // face己经支持, 但聊天页面还没有支持, 暂不使用
-        //private lazy var _pages: [AnyObject] = Model.Classic.emojis().reverse() + Model.Classic.faces()
-        private lazy var _pages: [AnyObject] = Model.Classic.emojis()
+        private lazy var _pages: [AnyObject] = Model.Classic.emojis().reverse() + Model.Classic.faces()
+        //private lazy var _pages: [AnyObject] = Model.Classic.emojis()
         
         private struct Page {}
         private struct Model {}
@@ -75,7 +90,36 @@ extension SIMChatInputPanel {
 }
 
 extension SIMChatInputPanel.Face {
-    private class TabBar: UIScrollView {
+    private class TabBarItem: UICollectionViewCell {
+        
+        var image: UIImage? {
+            set { return imageView.image = newValue }
+            get { return imageView.image }
+        }
+        
+        lazy var imageView: UIImageView = {
+            let view = UIImageView()
+            view.frame = self.contentView.bounds
+            view.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
+            view.contentMode = .Center
+            self.contentView.addSubview(view)
+            return view
+        }()
+    }
+    private class TabBar: UICollectionView {
+        init() {
+            let layout = UICollectionViewFlowLayout()
+            layout.scrollDirection = .Horizontal
+            layout.sectionInset = UIEdgeInsetsZero
+            layout.minimumLineSpacing = 0
+            layout.minimumInteritemSpacing = 0
+            layout.itemSize = CGSizeMake(50, 37)
+            super.init(frame: CGRectZero, collectionViewLayout: layout)
+            registerClass(TabBarItem.self, forCellWithReuseIdentifier: "Item")
+        }
+        required init?(coder aDecoder: NSCoder) {
+            super.init(coder: aDecoder)
+        }
         override func intrinsicContentSize() -> CGSize {
             return CGSizeMake(bounds.width, 37)
         }
@@ -85,29 +129,7 @@ extension SIMChatInputPanel.Face {
             return CGSizeMake(bounds.width, 25)
         }
     }
-    private class ContentView: UICollectionView {
-        init() {
-            let layout = UICollectionViewFlowLayout()
-            layout.scrollDirection = .Horizontal
-            layout.sectionInset = UIEdgeInsetsZero
-            layout.minimumLineSpacing = 0
-            layout.minimumInteritemSpacing = 0
-            super.init(frame: CGRectZero, collectionViewLayout: layout)
-            
-            registerClass(UICollectionViewCell.self, forCellWithReuseIdentifier: "Unknow")
-        }
-        required init?(coder aDecoder: NSCoder) {
-            super.init(coder: aDecoder)
-        }
-        
-        override func registerClass(cellClass: AnyClass?, forCellWithReuseIdentifier identifier: String) {
-            super.registerClass(cellClass, forCellWithReuseIdentifier: identifier)
-            cellClasses[identifier] = cellClass
-        }
-        
-        private var cellClasses: [String: AnyClass] = [:]
-    }
-    private class Preview: UIView {
+    private class ClassicPreview: UIView {
         override init(frame: CGRect) {
             super.init(frame: frame)
             build()
@@ -118,8 +140,6 @@ extension SIMChatInputPanel.Face {
         }
         private func build() {
             layer.contents = SIMChatImageManager.images_face_preview?.CGImage
-            
-
         }
         
         var value: String? {
@@ -174,6 +194,28 @@ extension SIMChatInputPanel.Face {
             return view
         }()
     }
+    private class ContentView: UICollectionView {
+        init() {
+            let layout = UICollectionViewFlowLayout()
+            layout.scrollDirection = .Horizontal
+            layout.sectionInset = UIEdgeInsetsZero
+            layout.minimumLineSpacing = 0
+            layout.minimumInteritemSpacing = 0
+            super.init(frame: CGRectZero, collectionViewLayout: layout)
+            
+            registerClass(UICollectionViewCell.self, forCellWithReuseIdentifier: "Unknow")
+        }
+        required init?(coder aDecoder: NSCoder) {
+            super.init(coder: aDecoder)
+        }
+        
+        override func registerClass(cellClass: AnyClass?, forCellWithReuseIdentifier identifier: String) {
+            super.registerClass(cellClass, forCellWithReuseIdentifier: identifier)
+            cellClasses[identifier] = cellClass
+        }
+        
+        private var cellClasses: [String: AnyClass] = [:]
+    }
 }
 
 // MARK: - Content Page -> Classic
@@ -216,7 +258,7 @@ extension SIMChatInputPanel.Face.Page {
         var maximumLineCount: Int = 3
         
         var contentInset: UIEdgeInsets = UIEdgeInsetsMake(12, 10, 42, 10)
-        weak var preview: SIMChatInputPanel.Face.Preview?
+        weak var preview: SIMChatInputPanel.Face.ClassicPreview?
         
         override func layoutSubviews() {
             super.layoutSubviews()
@@ -503,6 +545,7 @@ extension SIMChatInputPanel.Face {
         addSubview(_contentView)
         addSubview(_pageControl)
         addSubview(_tabBar)
+        addSubview(_sendButton)
         addSubview(_preview)
         
         // add layout
@@ -526,15 +569,26 @@ extension SIMChatInputPanel.Face {
             .bottom.equ(self).bottom
             .submit()
         
+        SIMChatLayout.make(_sendButton)
+            .top.equ(_tabBar).top
+            .right.equ(_tabBar).right
+            .bottom.equ(_tabBar).bottom
+            .submit()
         
-        _pageControl.currentPage = 0
+        _pageControl.currentPage = 8
         _pageControl.numberOfPages = _pages.count
-        //dispatch_async(dispatch_get_main_queue()) {
-        //    self._contentView.reloadData()
-        //    dispatch_async(dispatch_get_main_queue()) {
-        //        self._contentView.scrollToItemAtIndexPath(NSIndexPath(forItem: 8, inSection: 0), atScrollPosition: .None, animated: false)
-        //    }
-        //}
+        
+        dispatch_async(dispatch_get_main_queue()) {
+            self._contentView.reloadData()
+            dispatch_async(dispatch_get_main_queue()) {
+                self._contentView.scrollToItemAtIndexPath(NSIndexPath(forItem: 8, inSection: 0), atScrollPosition: .None, animated: false)
+            }
+        }
+    }
+    public override func updateConstraints() {
+        super.updateConstraints()
+        
+        _tabBar.contentInset = UIEdgeInsetsMake(0, 0, 0, _sendButton.frame.width)
     }
 }
 
@@ -552,6 +606,10 @@ extension SIMChatInputPanel.Face: SIMChatInputPanelDelegateFaceOfClassic {
     @objc private func classicShouldSelectBackspace(classic: UIView) -> Bool {
         return delegate?.inputPanelShouldSelectBackspace?(self) ?? true
     }
+    /// 发送
+    @objc private func classicShouldSelectReturn(sender: AnyObject) {
+        delegate?.inputPanelShouldReturn?(self)
+    }
 }
 
 // MARK: - UICollectionViewDelegate or UICollectionViewDataSource
@@ -559,34 +617,61 @@ extension SIMChatInputPanel.Face: SIMChatInputPanelDelegateFaceOfClassic {
 extension SIMChatInputPanel.Face: UICollectionViewDelegateFlowLayout, UICollectionViewDataSource {
     
     public func scrollViewDidEndDecelerating(scrollView: UIScrollView) {
-        _pageControl.currentPage = Int((scrollView.contentOffset.x + scrollView.frame.width / 2.0) / scrollView.frame.width)
+        if scrollView == _contentView {
+            _pageControl.currentPage = Int((scrollView.contentOffset.x + scrollView.frame.width / 2.0) / scrollView.frame.width)
+        }
     }
     
     public func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return _pages.count
+        if collectionView == _contentView {
+            return _pages.count
+        }
+        if collectionView == _tabBar {
+            return 1
+        }
+        fatalError()
     }
     
     public func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAtIndexPath indexPath: NSIndexPath) -> CGSize {
-        return collectionView.bounds.size
+        if collectionView == _contentView {
+            return collectionView.bounds.size
+        }
+        if collectionView == _tabBar {
+            return CGSizeMake(50, collectionView.bounds.height)
+        }
+        fatalError()
     }
     
     public func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
-        let page = _pages[indexPath.item]
-        var identifier = NSStringFromClass(page.dynamicType)
-        if _contentView.cellClasses[identifier] == nil {
-            identifier = "Unknow"
+        if collectionView == _contentView {
+            let page = _pages[indexPath.item]
+            var identifier = NSStringFromClass(page.dynamicType)
+            if _contentView.cellClasses[identifier] == nil {
+                identifier = "Unknow"
+            }
+            return collectionView.dequeueReusableCellWithReuseIdentifier(identifier, forIndexPath: indexPath)
         }
-        return collectionView.dequeueReusableCellWithReuseIdentifier(identifier, forIndexPath: indexPath)
+        if collectionView == _tabBar {
+            return collectionView.dequeueReusableCellWithReuseIdentifier("Item", forIndexPath: indexPath)
+        }
+        fatalError()
     }
     
     public func collectionView(collectionView: UICollectionView, willDisplayCell cell: UICollectionViewCell, forItemAtIndexPath indexPath: NSIndexPath) {
-        if let cell = cell as? Page.Classic, page = _pages[indexPath.item] as? Model.Classic {
-            // 经典类型
-            cell.model = page
-            cell.preview = _preview
-            cell.delegate = self
+        if collectionView == _contentView {
+            if let cell = cell as? Page.Classic, page = _pages[indexPath.item] as? Model.Classic {
+                // 经典类型
+                cell.model = page
+                cell.preview = _preview
+                cell.delegate = self
+            }
+            cell.backgroundColor = collectionView.backgroundColor
+        } else if collectionView == _tabBar {
+            if let item = cell as? TabBarItem {
+                item.image = UIImage(named: "qvip_emoji_tab_classic_5_9_5")
+            }
+            cell.backgroundColor = UIColor(rgb: 0xe4e4e4)
         }
-        cell.backgroundColor = collectionView.backgroundColor
     }
 }
 

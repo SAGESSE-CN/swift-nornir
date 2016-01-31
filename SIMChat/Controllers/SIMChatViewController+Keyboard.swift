@@ -144,61 +144,20 @@ extension SIMChatViewController: SIMChatInputPanelDelegateFace {
     }
 }
 
-//// MARK: - Extension Keyboard Face
-//extension SIMChatViewController : SIMChatKeyboardFaceDelegate {
-//    /// 选择了表情
-//    func chatKeyboardFace(chatKeyboardFace: SIMChatKeyboardFace, didSelectFace face: String) {
-//        let src = self.textField.contentSize.height
-//        // = . =更新value
-//        self.textField.text = (self.textField.text ?? "") + face
-//        // 更新contetnOffset, 如果需要的话..
-//        if src != self.textField.contentSize.height {
-//            self.textField.scrollViewToBottom()
-//        }
-//    }
-//    /// 选择了后退
-//    func chatKeyboardFaceDidDelete(chatKeyboardFace: SIMChatKeyboardFace) {
-//        let src = self.textField.contentSize.height
-//        var str = self.textField.text
-//        // ..
-//        if str?.endIndex != str?.startIndex {
-//            str = str.substringToIndex(str.endIndex.advancedBy(-1))
-//        }
-//        // =. =更差value
-//        self.textField.text = str
-//        // 更新contetnOffset, 如果需要的话..
-//        if src != self.textField.contentSize.height {
-//            self.textField.scrollViewToBottom()
-//        }
-//    }
-//    /// 发送
-//    func chatKeyboardFaceDidReturn(chatKeyboardFace: SIMChatKeyboardFace) {
-//        self.chatTextFieldShouldReturn(self.textField)
-//    }
-//}
-//
-//// MARK: - Extension Keyboard Tool
-//extension SIMChatViewController : SIMChatKeyboardToolDataSource, SIMChatKeyboardToolDelegate {
-//    /// 需要扩展工具栏的数量
-//    func chatKeyboardTool(chatKeyboardTool: SIMChatKeyboardTool, numberOfItemsInSection section: Int) -> Int {
-//        return 0
-//    }
-//    /// item
-//    func chatKeyboardTool(chatKeyboardTool: SIMChatKeyboardTool, itemAtIndexPath indexPath: NSIndexPath) -> UIBarButtonItem? {
-//        return nil
-//    }
-//    /// 选中
-//    func chatKeyboardTool(chatKeyboardTool: SIMChatKeyboardTool, didSelectedItem item: UIBarButtonItem) {
-//        SIMLog.debug((item.title ?? "") + "(\(item.tag))")
-//        
-//        if item.tag == -1 {
-//            self.imagePickerForPhoto()
-//        } else if item.tag == -2 {
-//            self.imagePickerForCamera()
-//        }
-//    }
-//}
-//
+// MARK: - 
+extension SIMChatViewController: SIMChatInputPanelDelegateTool {
+    public func numberOfInputPanelToolItems(inputPanel: UIView) -> Int {
+        return 0
+    }
+    public func inputPanel(inputPanel: UIView, itemAtIndex index: Int) -> SIMChatInputAccessory? {
+        return nil//SIMChatInputToolAccessory("page:test", "测试", UIImage(named: "simchat_icons_location"))
+    }
+    
+    public func inputPanel(inputPanel: UIView, didSelectTool item: SIMChatInputAccessory) {
+        SIMLog.debug("\(item.accessoryIdentifier) => \(item.accessoryName)")
+    }
+}
+
 //// MARK: - Extension Keyboard Audio
 //extension SIMChatViewController : SIMChatKeyboardAudioDelegate {
 //    /// 开始音频输入

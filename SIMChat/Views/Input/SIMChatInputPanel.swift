@@ -87,6 +87,7 @@ extension SIMChatInputPanel {
 extension SIMChatInputPanel {
     /// 初始化
     private func build() {
+        
         self.dynamicType.registerClass(Tool.self,  byIdentifier: "kb:tool")
         self.dynamicType.registerClass(Face.self,  byIdentifier: "kb:face")
         self.dynamicType.registerClass(Audio.self, byIdentifier: "kb:audio")

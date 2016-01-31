@@ -156,7 +156,7 @@ extension SIMChatViewController {
         view.addSubview(contentView)
         view.addSubview(inputBar)
         view.addSubview(inputPanelView)
-       
+        
         // 添加布局
         _contentViewLayout = SIMChatLayout.make(contentView)
             .top.equ(view).top
@@ -233,7 +233,7 @@ extension SIMChatViewController {
 extension SIMChatViewController: UIGestureRecognizerDelegate {
     public func gestureRecognizer(gestureRecognizer: UIGestureRecognizer, shouldReceiveTouch touch: UITouch) -> Bool {
         if gestureRecognizer == _tapGestureRecognizer {
-            return !UIMenuController.sharedMenuController().menuVisible
+            return !SIMChatMenuController.sharedMenuController().isCustomMenu()
         }
         if gestureRecognizer is UIScreenEdgePanGestureRecognizer {
             let pt = touch.locationInView(view)

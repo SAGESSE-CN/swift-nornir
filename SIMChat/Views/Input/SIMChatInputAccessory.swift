@@ -17,7 +17,12 @@ import UIKit
     var accessoryIdentifier: String { get }
     
     var accessoryImage: UIImage? { get }
-    var accessorySelecteImage: UIImage? { get }
+    var accessorySelectImage: UIImage? { get }
+}
+
+@objc public protocol SIMChatInputAccessoryDelegate: NSObjectProtocol {
+    optional func accessoryShouldSelect(accessory: SIMChatInputAccessory) -> Bool
+    optional func accessoryDidSelect(accessory: SIMChatInputAccessory)
 }
 
 
@@ -28,12 +33,12 @@ public class SIMChatInputBaseAccessory: SIMChatInputAccessory {
         accessoryName = name
         
         accessoryImage = image
-        accessorySelecteImage = selectImage
+        accessorySelectImage = selectImage
     }
     
     @objc public var accessoryIdentifier: String
     @objc public var accessoryName: String?
     
     @objc public var accessoryImage: UIImage?
-    @objc public var accessorySelecteImage: UIImage?
+    @objc public var accessorySelectImage: UIImage?
 }

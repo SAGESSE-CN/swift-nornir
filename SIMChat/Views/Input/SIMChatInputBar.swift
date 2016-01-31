@@ -395,6 +395,7 @@ extension SIMChatInputBar  {
         }
         
         override func canPerformAction(action: Selector, withSender sender: AnyObject?) -> Bool {
+            // 如果是自定义菜单, 完全转发
             if SIMChatMenuController.sharedMenuController().isCustomMenu() {
                 return SIMChatMenuController.sharedMenuController().canPerformAction(action, withSender: sender)
             }
@@ -402,6 +403,7 @@ extension SIMChatInputBar  {
         }
         
         override func forwardingTargetForSelector(aSelector: Selector) -> AnyObject? {
+            // 如果是自定义菜单, 完全转发
             if SIMChatMenuController.sharedMenuController().isCustomMenu() {
                 return SIMChatMenuController.sharedMenuController().forwardingTargetForSelector(aSelector)
             }
@@ -431,11 +433,11 @@ extension SIMChatInputBar  {
                     return
                 }
                 if newValue {
-                    setImage(accessory?.accessorySelecteImage, forState: .Normal)
+                    setImage(accessory?.accessorySelectImage, forState: .Normal)
                     setImage(accessory?.accessoryImage, forState: .Highlighted)
                 } else {
                     setImage(accessory?.accessoryImage, forState: .Normal)
-                    setImage(accessory?.accessorySelecteImage, forState: .Highlighted)
+                    setImage(accessory?.accessorySelectImage, forState: .Highlighted)
                 }
                 _selected = newValue
             }
