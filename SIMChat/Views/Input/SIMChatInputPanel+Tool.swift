@@ -45,13 +45,6 @@ extension SIMChatInputPanel {
             view.registerClass(ContentCell.self, forCellWithReuseIdentifier: "Item")
             return view
         }()
-        
-        private lazy var _builtInTools: Array<SIMChatInputAccessory> = {
-            return [
-                SIMChatInputToolAccessory("page:photo", "相片", UIImage(named: "simchat_icons_pic")),
-                SIMChatInputToolAccessory("page:camera", "照相机", UIImage(named: "simchat_icons_camera"))
-            ]
-        }()
     }
 }
 
@@ -192,7 +185,7 @@ extension SIMChatInputPanel.Tool: UICollectionViewDataSource, UICollectionViewDe
     }
     
     public func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        let count = _builtInTools.count + (delegate?.numberOfInputPanelToolItems?(self) ?? 0)
+        let count = delegate?.numberOfInputPanelToolItems?(self) ?? 0
         let page = (count + (8 - 1)) / 8
         if _pageControl.numberOfPages != page {
             _pageControl.numberOfPages = page
@@ -205,13 +198,8 @@ extension SIMChatInputPanel.Tool: UICollectionViewDataSource, UICollectionViewDe
     }
     public func collectionView(collectionView: UICollectionView, willDisplayCell cell: UICollectionViewCell, forItemAtIndexPath indexPath: NSIndexPath) {
         if let cell = cell as? ContentCell {
-            if indexPath.row < _builtInTools.count {
-                cell.accessory = _builtInTools[indexPath.row]
-                cell.delegate = self
-            } else {
-                cell.accessory = delegate?.inputPanel?(self, itemAtIndex: indexPath.row - _builtInTools.count)
-                cell.delegate = self
-            }
+            cell.accessory = delegate?.inputPanel?(self, itemAtIndex: indexPath.row)
+            cell.delegate = self
         }
     }
 }

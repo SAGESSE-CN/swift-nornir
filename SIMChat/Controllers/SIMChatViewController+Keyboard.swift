@@ -147,10 +147,10 @@ extension SIMChatViewController: SIMChatInputPanelDelegateFace {
 // MARK: - 
 extension SIMChatViewController: SIMChatInputPanelDelegateTool {
     public func numberOfInputPanelToolItems(inputPanel: UIView) -> Int {
-        return 0
+        return inputPanelToolItems.count
     }
     public func inputPanel(inputPanel: UIView, itemAtIndex index: Int) -> SIMChatInputAccessory? {
-        return nil//SIMChatInputToolAccessory("page:test", "测试", UIImage(named: "simchat_icons_location"))
+        return inputPanelToolItems[index]
     }
     
     public func inputPanel(inputPanel: UIView, didSelectTool item: SIMChatInputAccessory) {

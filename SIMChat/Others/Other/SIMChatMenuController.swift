@@ -8,7 +8,9 @@
 
 import UIKit
 
-
+///
+/// 抽象一个菜单, 实际上还是使用UIMenuController
+///
 public class SIMChatMenuController: NSObject {
     public override init() {
         super.init()
@@ -40,7 +42,7 @@ extension SIMChatMenuController {
 
 // MARK: - Public Method 
 extension SIMChatMenuController {
-    /// 自定义菜单
+    /// 显示的是否为自定义菜单
     public func isCustomMenu() -> Bool {
         return target != nil
     }

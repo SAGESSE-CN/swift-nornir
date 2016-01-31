@@ -84,6 +84,34 @@ public class SIMChatViewController: UIViewController {
         return recognizer
     }()
     
+    private lazy var _inputPanelToolItems: [SIMChatInputAccessory] = {
+        let R = { (n:String) -> UIImage? in
+            SIMChatBundle.imageWithResource("InputPanel/\(n).png")
+        }
+        return [
+            SIMChatInputToolAccessory("page:voip", "网络电话", R("tool_voip")),
+            SIMChatInputToolAccessory("page:video", "视频电话", R("tool_video")),
+            SIMChatInputToolAccessory("page:video_s", "短视频", R("tool_video_short")),
+            SIMChatInputToolAccessory("page:favorite", "收藏", R("tool_favorite")),
+            SIMChatInputToolAccessory("page:red_pack", "发红包", R("tool_red_pack")),
+            SIMChatInputToolAccessory("page:transfer", "转帐", R("tool_transfer")),
+            SIMChatInputToolAccessory("page:shake", "抖一抖", R("tool_shake")),
+            SIMChatInputToolAccessory("page:file", "文件", R("tool_folder")),
+            SIMChatInputToolAccessory("page:camera", "照相机", R("tool_camera")),
+            SIMChatInputToolAccessory("page:pic", "相册", R("tool_pic")),
+            SIMChatInputToolAccessory("page:ptt", "录音", R("tool_ptt")),
+            SIMChatInputToolAccessory("page:music", "音乐", R("tool_music")),
+            SIMChatInputToolAccessory("page:location", "位置", R("tool_location")),
+            SIMChatInputToolAccessory("page:nameplate", "名片",   R("tool_share_nameplate")),
+            SIMChatInputToolAccessory("page:aa", "AA制", R("tool_aa_collection")),
+            SIMChatInputToolAccessory("page:gapp", "群应用", R("tool_group_app")),
+            SIMChatInputToolAccessory("page:gvote", "群投票", R("tool_group_vote")),
+            SIMChatInputToolAccessory("page:gvideo", "群视频", R("tool_group_video")),
+            SIMChatInputToolAccessory("page:gtopic", "群话题", R("tool_group_topic")),
+            SIMChatInputToolAccessory("page:gactivity", "群活动", R("tool_group_activity"))
+        ]
+    }()
+    
     private var _conversation: SIMChatConversationProtocol
     private var _messageManager: MessageManager
 }
@@ -114,6 +142,17 @@ extension SIMChatViewController {
     /// 聊天背景
     ///
     public var backgroundView: UIImageView { return _backgroundView }
+    
+}
+
+extension SIMChatViewController {
+    
+    ///
+    /// 输入面板
+    ///
+    public var inputPanelToolItems: Array<SIMChatInputAccessory> {
+        return _inputPanelToolItems
+    }
     
     ///
     /// 系统当前的键盘大小
