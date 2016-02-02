@@ -249,8 +249,10 @@ extension SIMChatInputPanel.Face.Page {
                 guard model !== oldValue else {
                     return
                 }
-                setNeedsDisplay()
                 gestureRecognizer.enabled = !(model?.value.isEmpty ?? true)
+                dispatch_async(dispatch_get_global_queue(0, 0)) {
+                    self.displayIfNeeded()
+                }
             }
         }
         
@@ -277,49 +279,77 @@ extension SIMChatInputPanel.Face.Page {
                 contentView.addSubview(backspaceButton)
             }
         }
-        override func drawRect(rect: CGRect) {
-            
+        
+        func drawInContext(ctx: CGContext?) {
             let size = itemSize
             let config = [
                 NSFontAttributeName: UIFont.systemFontOfSize(32)
             ]
-            
-            for row in 0 ..< maximumLineCount {
-                for col in 0 ..< maximumItemCount {
-                    let index = row * maximumItemCount + col
-                    guard index < model?.value.count else {
-                        continue
-                    }
-                    guard let value: NSString = model?.value[index] else {
-                        continue
-                    }
+            model?.value.enumerate().forEach {
+                let row = $0.index / maximumItemCount
+                let col = $0.index % maximumItemCount
+                
+                let value = $0.element as NSString
+                
+                if value.length <= 2 {
+                    var frame = CGRectZero
                     
-                    if value.length <= 2 {
-                        var frame = CGRectZero
-                        
-                        frame.origin.x = contentInset.left + CGFloat(col) * size.width
-                        frame.origin.y = contentInset.top + CGFloat(row) * size.height
-                        
-                        frame.size = value.sizeWithAttributes(config)
-                        frame.origin.x += (size.width - frame.size.width) / 2
-                        frame.origin.y += (size.height - frame.size.height) / 2
-                        
-                        value.drawInRect(frame, withAttributes: config)
-                    } else if value.hasPrefix("qq:") {
-                        guard let image = UIImage(named: "SIMChat.bundle/Face/\(value.substringFromIndex(3))") else {
-                            continue
-                        }
-                        var frame = CGRectZero
-                        
-                        frame.origin.x = contentInset.left + CGFloat(col) * size.width
-                        frame.origin.y = contentInset.top + CGFloat(row) * size.height
-                        
-                        frame.size = image.size
-                        frame.origin.x += (size.width - frame.size.width) / 2
-                        frame.origin.y += (size.height - frame.size.height) / 2
-                        
-                        image.drawInRect(frame)
+                    frame.origin.x = contentInset.left + CGFloat(col) * size.width
+                    frame.origin.y = contentInset.top + CGFloat(row) * size.height
+                    
+                    frame.size = value.sizeWithAttributes(config)
+                    frame.origin.x += (size.width - frame.size.width) / 2
+                    frame.origin.y += (size.height - frame.size.height) / 2
+                    
+                    value.drawInRect(frame, withAttributes: config)
+                } else if value.hasPrefix("qq:") {
+                    guard let image = SIMChatBundle.imageWithResource("Face/\(value.substringFromIndex(3)).png") else {
+                        return
                     }
+                    var frame = CGRectZero
+                    
+                    frame.origin.x = contentInset.left + CGFloat(col) * size.width
+                    frame.origin.y = contentInset.top + CGFloat(row) * size.height
+                    
+                    frame.size = image.size
+                    frame.origin.x += (size.width - frame.size.width) / 2
+                    frame.origin.y += (size.height - frame.size.height) / 2
+                    
+                    image.drawInRect(frame)
+                }
+            }
+        }
+        
+        func displayIfNeeded() {
+            guard let model = model else {
+                return
+            }
+            let o = UIDevice.currentDevice().orientation
+            let path = NSTemporaryDirectory() + "\(model.identifier)-\(o.rawValue)"
+            if NSFileManager.defaultManager().fileExistsAtPath(path) {
+                SIMLog.debug("hit cache: \(model.identifier) -> \(o.rawValue)")
+                let image = UIImage(contentsOfFile: path)
+                // update
+                dispatch_async(dispatch_get_main_queue()) {
+                    if self.model === model {
+                        self.layer.contents = image?.CGImage
+                    }
+                }
+            } else {
+                SIMLog.debug("make cache: \(model.identifier) -> \(o.rawValue)")
+                // make
+                UIGraphicsBeginImageContextWithOptions(bounds.size, false, UIScreen.mainScreen().scale)
+                drawInContext(UIGraphicsGetCurrentContext())
+                let image = UIGraphicsGetImageFromCurrentImageContext()
+                UIGraphicsEndImageContext()
+                // update
+                dispatch_async(dispatch_get_main_queue()) {
+                    if self.model === model {
+                        self.layer.contents = image?.CGImage
+                    }
+                }
+                if image != nil {
+                    UIImagePNGRepresentation(image)?.writeToFile(path, atomically: true)
                 }
             }
         }
@@ -422,6 +452,7 @@ extension SIMChatInputPanel.Face.Page {
                 frame.origin.y = pt.y - frame.height
                 preview.frame = frame
             }
+            //UIDevice.currentDevice().orientation.rawValue
         }
         /// 删除事件
         dynamic func onBackspacePress(sender: AnyObject) {
@@ -471,20 +502,22 @@ extension SIMChatInputPanel.Face.Page {
 extension SIMChatInputPanel.Face.Model {
     /// 经典类型
     private class Classic {
-        init(_ value: [String]) {
+        init(_ value: [String], identifier: String = NSUUID().UUIDString) {
             self.value = value
+            self.identifier = identifier
         }
         
-        var value: [String] = []
+        var value: Array<String>
+        var identifier: String
         
         static func faces() -> [Classic] {
-            let root = NSBundle.mainBundle().resourceURL
-            guard let url = root?.URLByAppendingPathComponent("SIMChat.bundle/Preferences/face.plist") else {
+            guard let path = SIMChatBundle.resourcePath("Preferences/face.plist") else {
                 fatalError("Must add \"SIMChat.bundle\" file")
             }
-            guard let dic = NSDictionary(contentsOfURL: url) else {
+            guard let dic = NSDictionary(contentsOfFile: path) else {
                 fatalError("file \"SIMChat.bundle/Preferences/face.plist\" load fail!")
             }
+            
             // 生成列表
             let emojis = dic
                 .sort { ($0.value as? Int) > ($1.value as? Int) }
@@ -496,7 +529,7 @@ extension SIMChatInputPanel.Face.Model {
             for i in 0 ..< (emojis.count + maxEle - 1) / maxEle {
                 let beg = i * maxEle
                 let end = min((i + 1) * maxEle, emojis.count)
-                let page = Classic(emojis[beg ..< end].map({ String(format: "qq:%03d", $0) }))
+                let page = Classic(emojis[beg ..< end].map({ String(format: "qq:%03d", $0) }), identifier: "inputpanel-face-\(i)")
                 pages.append(page)
             }
             return pages
@@ -528,7 +561,7 @@ extension SIMChatInputPanel.Face.Model {
             for i in 0 ..< (emojis.count + maxEle - 1) / maxEle {
                 let beg = i * maxEle
                 let end = min((i + 1) * maxEle, emojis.count)
-                let page = Classic(Array(emojis[beg ..< end]))
+                let page = Classic(Array(emojis[beg ..< end]), identifier: "inputpanel-emoji-\(i)")
                 pages.append(page)
             }
             return pages
@@ -665,7 +698,7 @@ extension SIMChatInputPanel.Face: UICollectionViewDelegateFlowLayout, UICollecti
                 cell.preview = _preview
                 cell.delegate = self
             }
-            cell.backgroundColor = collectionView.backgroundColor
+//            cell.backgroundColor = collectionView.backgroundColor
         } else if collectionView == _tabBar {
             if let item = cell as? TabBarItem {
                 item.image = UIImage(named: "qvip_emoji_tab_classic_5_9_5")

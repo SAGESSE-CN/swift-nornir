@@ -115,6 +115,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         
+        dispatch_async(dispatch_get_main_queue()) {
+            if let window = self.window {
+                let label = SIMChatFPSLabel(frame: CGRectMake(window.bounds.width - 55 - 8, 20, 55, 20))
+                label.autoresizingMask = [.FlexibleLeftMargin, .FlexibleBottomMargin]
+                window.addSubview(label)
+            }
+        }
+        
+        
         return true
     }
 
