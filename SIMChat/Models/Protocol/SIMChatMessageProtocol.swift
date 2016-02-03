@@ -70,7 +70,7 @@ extension SIMChatMessageProtocol {
     /// - parameter sender:     发送者信息
     /// - returns:  消息
     ///
-    static func messageWithContent(content: SIMChatContentProtocol, receiver: SIMChatUserProtocol, sender: SIMChatUserProtocol) -> SIMChatMessageProtocol {
+    public static func messageWithContent(content: SIMChatContentProtocol, receiver: SIMChatUserProtocol, sender: SIMChatUserProtocol) -> SIMChatMessageProtocol {
         return messageWithContent(content, receiver: receiver, sender: sender, identifier: NSUUID().UUIDString)
     }
 }
@@ -87,24 +87,24 @@ public struct SIMChatMessageOption: OptionSetType {
     }
     
     /// 无
-    static var None: SIMChatMessageOption {
+    public static var None: SIMChatMessageOption {
         return SIMChatMessageOption(rawValue: 0x0000)
     }
     /// 静音, 收到消息后不发出提示
-    static var Mute: SIMChatMessageOption {
+    public static var Mute: SIMChatMessageOption {
         return SIMChatMessageOption(rawValue: 0x0001)
     }
     /// 消息隐藏(透明的)
-    static var Hidden: SIMChatMessageOption {
+    public static var Hidden: SIMChatMessageOption {
         return SIMChatMessageOption(rawValue: 0x0002)
     }
 
     /// 名片强制显示, 默认是自动选项
-    static var ContactShow: SIMChatMessageOption {
+    public static var ContactShow: SIMChatMessageOption {
         return SIMChatMessageOption(rawValue: 0x0100)
     }
     /// 名片强制隐藏, 默认是自动选项
-    static var ContactHidden: SIMChatMessageOption {
+    public static var ContactHidden: SIMChatMessageOption {
         return SIMChatMessageOption(rawValue: 0x0200)
     }
 }

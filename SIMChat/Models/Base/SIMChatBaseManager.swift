@@ -12,6 +12,7 @@ import Foundation
 /// 管理器
 ///
 public class SIMChatBaseManager: SIMChatManagerProtocol {
+    public init() {}
     
     /// 当前登录的用户.
     public var user: SIMChatUserProtocol?

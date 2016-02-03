@@ -90,12 +90,12 @@ extension SIMChatViewController {
     private func onShowPanel() {
         SIMLog.trace()
         
-        let height = self.inputPanelView.frame.height
+        let height = self.inputPanelContainer.frame.height
         
         UIView.animateWithDuration(0.25) {
             self.setKeyboardHeight(height, animated: false)
-            self.inputPanelViewLayout?.top = -height
-            self.inputPanelView.layoutIfNeeded()
+            self.inputPanelContainerLayout?.top = -height
+            self.inputPanelContainer.layoutIfNeeded()
             self.view.layoutIfNeeded()
         }
     }
@@ -105,58 +105,90 @@ extension SIMChatViewController {
         
         UIView.animateWithDuration(0.25) {
             self.setKeyboardHeight(self.systemKeyboardFrame.height, animated: false)
-            self.inputPanelViewLayout?.top = 0
-            self.inputPanelView.layoutIfNeeded()
+            self.inputPanelContainerLayout?.top = 0
+            self.inputPanelContainer.layoutIfNeeded()
             self.view.layoutIfNeeded()
         }
-        inputPanelView.selectedItem = nil
+        inputPanelContainer.currentInputItem = nil
     }
 }
 
 // MARK: - SIMChatInputPanelDelegate
 
-extension SIMChatViewController: SIMChatInputPanelDelegate {
-}
+//// MARK: - SIMChatInputPanelDelegateFace
+//
+//extension SIMChatViewController: SIMChatInputPanelDelegateFace {
+//    /// 选择表情
+//    public func inputPanel(inputPanel: UIView, didSelectFace face: String) {
+//        SIMLog.debug(face)
+//        inputBar.text = (inputBar.text ?? "") + face
+//        // TODO: 更新contentOffset
+//    }
+//    /// 退格
+//    public func inputPanelShouldSelectBackspace(inputPanel: UIView) -> Bool {
+//        SIMLog.debug()
+//        guard let str = inputBar.text where !str.isEmpty else {
+//            return false
+//        }
+//        inputBar.text = str.substringToIndex(str.endIndex.advancedBy(-1))
+//        // TODO: 更新contentOffset
+//        return true
+//    }
+//    /// 回车
+//    public func inputPanelShouldReturn(inputPanel: UIView) -> Bool {
+//        SIMLog.debug()
+//        return true
+//    }
+//}
 
-// MARK: - SIMChatInputPanelDelegateFace
-
-extension SIMChatViewController: SIMChatInputPanelDelegateFace {
-    /// 选择表情
-    public func inputPanel(inputPanel: UIView, didSelectFace face: String) {
-        SIMLog.debug(face)
-        inputBar.text = (inputBar.text ?? "") + face
-        // TODO: 更新contentOffset
-    }
-    /// 退格
-    public func inputPanelShouldSelectBackspace(inputPanel: UIView) -> Bool {
-        SIMLog.debug()
-        guard let str = inputBar.text where !str.isEmpty else {
-            return false
-        }
-        inputBar.text = str.substringToIndex(str.endIndex.advancedBy(-1))
-        // TODO: 更新contentOffset
-        return true
-    }
-    /// 回车
-    public func inputPanelShouldReturn(inputPanel: UIView) -> Bool {
-        SIMLog.debug()
-        return true
-    }
-}
-
-// MARK: - 
-extension SIMChatViewController: SIMChatInputPanelDelegateTool {
-    public func numberOfInputPanelToolItems(inputPanel: UIView) -> Int {
+///
+/// 工具箱相关的一些操作
+///
+extension SIMChatViewController: SIMChatInputPanelToolBoxDelegate {
+    ///
+    /// 获取工具箱中的工具数量
+    ///
+    public func numberOfItemsInInputPanelToolBox(inputPanel: UIView) -> Int {
         return inputPanelToolItems.count
     }
-    public func inputPanel(inputPanel: UIView, itemAtIndex index: Int) -> SIMChatInputAccessory? {
+    ///
+    /// 获取工具箱中的每一个工具
+    ///
+    public func inputPanel(inputPanel: UIView, toolBoxItemAtIndex index: Int) -> SIMChatInputItem? {
         return inputPanelToolItems[index]
     }
     
-    public func inputPanel(inputPanel: UIView, didSelectTool item: SIMChatInputAccessory) {
-        SIMLog.debug("\(item.accessoryIdentifier) => \(item.accessoryName)")
+    ///
+    /// 将要选择工具, 返回false表示拦截接下来的操作
+    ///
+    public func inputPanel(inputPanel: UIView, shouldSelectToolBoxItem item: SIMChatInputItem) -> Bool {
+        return true
     }
+    ///
+    /// 选择工具
+    ///
+    public func inputPanel(inputPanel: UIView, didSelectToolBoxItem item: SIMChatInputItem) {
+        SIMLog.debug("\(item.itemIdentifier) => \(item.itemName)")
+    }
+    
 }
+
+//extension SIMChatViewController: SIMChatInputPanelAudioDelegate {
+//    public func inputPanelShouldStartRecord(inputPanel: UIView) -> SIMChatRequest<Void>? {
+//        SIMLog.trace()
+//        return SIMChatRequest.request { v in
+//            dispatch_after(dispatch_time(DISPATCH_TIME_FOREVER, Int64(NSEC_PER_SEC * 1)), dispatch_get_main_queue()) {
+//                v.success()
+//            }
+//        }
+//    }
+//    public func inputPanelDidStartRecord(inputPanel: UIView) {
+//        SIMLog.trace()
+//    }
+//    public func inputPanelDidStopRecord(inputPanel: UIView) {
+//        SIMLog.trace()
+//    }
+//}
 
 //// MARK: - Extension Keyboard Audio
 //extension SIMChatViewController : SIMChatKeyboardAudioDelegate {
@@ -256,7 +288,7 @@ extension SIMChatViewController: SIMChatInputPanelDelegateTool {
 
 extension SIMChatViewController: SIMChatInputBarDelegate {
     
-    public func inputBar(inputBar: SIMChatInputBar, shouldSelectItem item: SIMChatInputAccessory) -> Bool {
+    public func inputBar(inputBar: SIMChatInputBar, shouldSelectItem item: SIMChatInputItem) -> Bool {
         SIMLog.trace()
         // 第一次显示.
         if inputBar.selectedBarButtonItem == nil {
@@ -264,11 +296,11 @@ extension SIMChatViewController: SIMChatInputBarDelegate {
         }
         return true
     }
-    public func inputBar(inputBar: SIMChatInputBar, didSelectItem item: SIMChatInputAccessory) {
+    public func inputBar(inputBar: SIMChatInputBar, didSelectItem item: SIMChatInputItem) {
         SIMLog.trace()
-        inputPanelView.selectedItem = item
+        inputPanelContainer.currentInputItem = item
     }
-    public func inputBar(inputBar: SIMChatInputBar, didDeselectItem item: SIMChatInputAccessory) {
+    public func inputBar(inputBar: SIMChatInputBar, didDeselectItem item: SIMChatInputItem) {
         SIMLog.trace()
         // 最后一次显示
         if inputBar.selectedBarButtonItem == nil {

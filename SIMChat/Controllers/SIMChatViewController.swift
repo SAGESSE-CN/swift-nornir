@@ -42,13 +42,16 @@ public class SIMChatViewController: UIViewController {
     
     private var _contentViewLayout: SIMChatLayout?
     private var _inputBarLayout: SIMChatLayout?
-    private var _inputPanelViewLayout: SIMChatLayout?
+    private var _inputPanelContainerLayout: SIMChatLayout?
     
     private var _lastKeyboardFrame: CGRect = CGRectZero
     
-    private lazy var _contentView = UITableView()
-    private lazy var _inputPanelView: SIMChatInputPanel = {
-        let view = SIMChatInputPanel(frame: CGRectZero)
+    private lazy var _contentView: UITableView = {
+        let view = UITableView()
+        return view
+    }()
+    private lazy var _inputPanelContainer: SIMChatInputPanelContainer = {
+        let view = SIMChatInputPanelContainer(frame: CGRectZero)
         view.delegate = self
         return view
     }()
@@ -59,16 +62,16 @@ public class SIMChatViewController: UIViewController {
         }
         bar.delegate = self
         bar.leftBarButtonItems = [
-            SIMChatInputBaseAccessory("kb:audio", R("chat_bottom_voice_nor"), R("chat_bottom_voice_press"))
+            SIMChatInputPanelAudioView.inputPanelItem()
         ]
         bar.rightBarButtonItems = [
-            SIMChatInputBaseAccessory("kb:face", R("chat_bottom_smile_nor"), R("chat_bottom_smile_press")),
-            SIMChatInputBaseAccessory("kb:tool", R("chat_bottom_up_nor"), R("chat_bottom_up_press"))
+            SIMChatInputPanelEmoticonView.inputPanelItem(),
+            SIMChatInputPanelToolBoxView.inputPanelItem()
         ]
 //        bar.bottomBarButtonItems = [
-//            SIMChatInputBaseAccessory("kb:audio", R("chat_bottom_voice_nor"), R("chat_bottom_voice_press")),
-//            SIMChatInputBaseAccessory("kb:face", R("chat_bottom_smile_nor"), R("chat_bottom_smile_press")),
-//            SIMChatInputBaseAccessory("kb:tool", R("chat_bottom_up_nor"), R("chat_bottom_up_press"))
+//            SIMChatInputPanelAudioView.inputPanelItem(),
+//            SIMChatInputPanelEmoticonView.inputPanelItem(),
+//            SIMChatInputPanelToolBoxView.inputPanelItem()
 //        ]
         return bar
     }()
@@ -84,31 +87,31 @@ public class SIMChatViewController: UIViewController {
         return recognizer
     }()
     
-    private lazy var _inputPanelToolItems: [SIMChatInputAccessory] = {
+    private lazy var _inputPanelToolItems: [SIMChatInputItem] = {
         let R = { (n:String) -> UIImage? in
             SIMChatBundle.imageWithResource("InputPanel/\(n).png")
         }
         return [
-            SIMChatInputToolAccessory("page:voip", "网络电话", R("tool_voip")),
-            SIMChatInputToolAccessory("page:video", "视频电话", R("tool_video")),
-            SIMChatInputToolAccessory("page:video_s", "短视频", R("tool_video_short")),
-            SIMChatInputToolAccessory("page:favorite", "收藏", R("tool_favorite")),
-            SIMChatInputToolAccessory("page:red_pack", "发红包", R("tool_red_pack")),
-            SIMChatInputToolAccessory("page:transfer", "转帐", R("tool_transfer")),
-            SIMChatInputToolAccessory("page:shake", "抖一抖", R("tool_shake")),
-            SIMChatInputToolAccessory("page:file", "文件", R("tool_folder")),
-            SIMChatInputToolAccessory("page:camera", "照相机", R("tool_camera")),
-            SIMChatInputToolAccessory("page:pic", "相册", R("tool_pic")),
-            SIMChatInputToolAccessory("page:ptt", "录音", R("tool_ptt")),
-            SIMChatInputToolAccessory("page:music", "音乐", R("tool_music")),
-            SIMChatInputToolAccessory("page:location", "位置", R("tool_location")),
-            SIMChatInputToolAccessory("page:nameplate", "名片",   R("tool_share_nameplate")),
-            SIMChatInputToolAccessory("page:aa", "AA制", R("tool_aa_collection")),
-            SIMChatInputToolAccessory("page:gapp", "群应用", R("tool_group_app")),
-            SIMChatInputToolAccessory("page:gvote", "群投票", R("tool_group_vote")),
-            SIMChatInputToolAccessory("page:gvideo", "群视频", R("tool_group_video")),
-            SIMChatInputToolAccessory("page:gtopic", "群话题", R("tool_group_topic")),
-            SIMChatInputToolAccessory("page:gactivity", "群活动", R("tool_group_activity"))
+            SIMChatInputToolBoxItem("page:voip", "网络电话", R("tool_voip")),
+            SIMChatInputToolBoxItem("page:video", "视频电话", R("tool_video")),
+            SIMChatInputToolBoxItem("page:video_s", "短视频", R("tool_video_short")),
+            SIMChatInputToolBoxItem("page:favorite", "收藏", R("tool_favorite")),
+            SIMChatInputToolBoxItem("page:red_pack", "发红包", R("tool_red_pack")),
+            SIMChatInputToolBoxItem("page:transfer", "转帐", R("tool_transfer")),
+            SIMChatInputToolBoxItem("page:shake", "抖一抖", R("tool_shake")),
+            SIMChatInputToolBoxItem("page:file", "文件", R("tool_folder")),
+            SIMChatInputToolBoxItem("page:camera", "照相机", R("tool_camera")),
+            SIMChatInputToolBoxItem("page:pic", "相册", R("tool_pic")),
+            SIMChatInputToolBoxItem("page:ptt", "录音", R("tool_ptt")),
+            SIMChatInputToolBoxItem("page:music", "音乐", R("tool_music")),
+            SIMChatInputToolBoxItem("page:location", "位置", R("tool_location")),
+            SIMChatInputToolBoxItem("page:nameplate", "名片",   R("tool_share_nameplate")),
+            SIMChatInputToolBoxItem("page:aa", "AA制", R("tool_aa_collection")),
+            SIMChatInputToolBoxItem("page:gapp", "群应用", R("tool_group_app")),
+            SIMChatInputToolBoxItem("page:gvote", "群投票", R("tool_group_vote")),
+            SIMChatInputToolBoxItem("page:gvideo", "群视频", R("tool_group_video")),
+            SIMChatInputToolBoxItem("page:gtopic", "群话题", R("tool_group_topic")),
+            SIMChatInputToolBoxItem("page:gactivity", "群活动", R("tool_group_activity"))
         ]
     }()
     
@@ -136,8 +139,8 @@ extension SIMChatViewController {
     ///
     /// 输入面板(选择表情之类的)
     ///
-    public var inputPanelView: SIMChatInputPanel { return _inputPanelView }
-    public var inputPanelViewLayout: SIMChatLayout? { return _inputPanelViewLayout }
+    public var inputPanelContainer: SIMChatInputPanelContainer { return _inputPanelContainer }
+    public var inputPanelContainerLayout: SIMChatLayout? { return _inputPanelContainerLayout }
     ///
     /// 聊天背景
     ///
@@ -150,7 +153,7 @@ extension SIMChatViewController {
     ///
     /// 输入面板
     ///
-    public var inputPanelToolItems: Array<SIMChatInputAccessory> {
+    public var inputPanelToolItems: Array<SIMChatInputItem> {
         return _inputPanelToolItems
     }
     
@@ -186,7 +189,7 @@ extension SIMChatViewController {
         contentView.separatorStyle = .None
         
         inputBar.accessibilityLabel = "底部输入栏"
-        inputPanelView.accessibilityLabel = "底部输入面板"
+        inputPanelContainer.accessibilityLabel = "底部输入面板"
         
         // add event
         contentView.addGestureRecognizer(_tapGestureRecognizer)
@@ -194,7 +197,7 @@ extension SIMChatViewController {
         view.addSubview(backgroundView)
         view.addSubview(contentView)
         view.addSubview(inputBar)
-        view.addSubview(inputPanelView)
+        view.addSubview(inputPanelContainer)
         
         // 添加布局
         _contentViewLayout = SIMChatLayout.make(contentView)
@@ -211,7 +214,7 @@ extension SIMChatViewController {
             .bottom.equ(view).bottom
             .submit()
         
-        _inputPanelViewLayout = SIMChatLayout.make(inputPanelView)
+        _inputPanelContainerLayout = SIMChatLayout.make(inputPanelContainer)
             .top.equ(view).bottom
             .left.equ(view).left
             .right.equ(view).right
@@ -276,7 +279,7 @@ extension SIMChatViewController: UIGestureRecognizerDelegate {
         }
         if gestureRecognizer is UIScreenEdgePanGestureRecognizer {
             let pt = touch.locationInView(view)
-            return !inputBar.frame.contains(pt) && !inputPanelView.frame.contains(pt)
+            return !inputBar.frame.contains(pt) && !inputPanelContainer.frame.contains(pt)
         }
         return true
     }

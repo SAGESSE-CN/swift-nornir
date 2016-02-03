@@ -56,7 +56,7 @@ public class SIMChatBaseConversation: SIMChatConversationProtocol {
     }
     
     /// 所有的消息
-    /*private*/ var messages: Array<SIMChatMessageProtocol> = []
+    public var messages: Array<SIMChatMessageProtocol> = []
 }
 
 // MARK: - Util
