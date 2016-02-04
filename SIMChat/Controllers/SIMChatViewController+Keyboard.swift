@@ -173,6 +173,58 @@ extension SIMChatViewController: SIMChatInputPanelToolBoxDelegate {
     
 }
 
+///
+/// 表情面板相关的一些操作
+///
+extension SIMChatViewController: SIMChatInputPanelEmoticonViewDelegate {
+    ///
+    /// 获取表情组数量
+    ///
+    public func numberOfGroupsInInputPanelEmoticon(inputPanel: UIView) -> Int {
+        return 0
+    }
+    ///
+    /// 获取一个表情组
+    ///
+    public func inputPanel(inputPanel: UIView, emoticonGroupAtIndex index: Int) -> SIMChatEmoticonGroup? {
+        return nil
+    }
+    ///
+    /// 将要选择表情, 返回false拦截该处理
+    ///
+    public func inputPanel(inputPanel: UIView, shouldSelectEmoticon emoticon: SIMChatEmoticon) -> Bool {
+        return true
+    }
+    ///
+    /// 选择了表情
+    ///
+    public func inputPanel(inputPanel: UIView, didSelectEmoticon emoticon: SIMChatEmoticon) {
+        SIMLog.debug("\(emoticon.code)")
+        inputBar.text = (inputBar.text ?? "") + emoticon.code
+        // TODO: 更新contentOffset
+    }
+    ///
+    /// 点击了返回, 返回false拦截该处理
+    ///
+    public func inputPanelShouldReturn(inputPanel: UIView) -> Bool {
+        SIMLog.trace()
+        inputBar.text = nil
+        return true
+    }
+    ///
+    /// 点击了退格, 返回false拦截该处理
+    ///
+    public func inputPanelShouldSelectBackspace(inputPanel: UIView) -> Bool {
+        SIMLog.trace()
+        guard let str = inputBar.text where !str.isEmpty else {
+            return false
+        }
+        inputBar.text = str.substringToIndex(str.endIndex.advancedBy(-1))
+        // TODO: 更新contentOffset
+        return true
+    }
+}
+
 //extension SIMChatViewController: SIMChatInputPanelAudioDelegate {
 //    public func inputPanelShouldStartRecord(inputPanel: UIView) -> SIMChatRequest<Void>? {
 //        SIMLog.trace()

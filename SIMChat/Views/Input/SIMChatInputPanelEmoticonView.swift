@@ -44,16 +44,6 @@ public protocol SIMChatEmoticonGroup: class {
     var emoticons: Array<SIMChatEmoticon> { get }
 }
 
-//@objc public protocol SIMChatInputPanelDelegateFace: SIMChatInputPanelDelegate {
-//    
-//    optional func inputPanel(inputPanel: UIView, shouldSelectFace face: String) -> Bool
-//    optional func inputPanel(inputPanel: UIView, didSelectFace face: String)
-//    
-//    optional func inputPanelShouldReturn(inputPanel: UIView) -> Bool
-//    optional func inputPanelShouldSelectBackspace(inputPanel: UIView) -> Bool
-//}
-
-
 ///
 /// 表情面板代理
 ///
@@ -66,6 +56,23 @@ internal protocol SIMChatInputPanelEmoticonViewDelegate: SIMChatInputPanelDelega
     /// 获取一个表情组
     ///
     func inputPanel(inputPanel: UIView, emoticonGroupAtIndex index: Int) -> SIMChatEmoticonGroup?
+    
+    ///
+    /// 将要选择表情, 返回false拦截该处理
+    ///
+    func inputPanel(inputPanel: UIView, shouldSelectEmoticon emoticon: SIMChatEmoticon) -> Bool
+    ///
+    /// 选择了表情
+    ///
+    func inputPanel(inputPanel: UIView, didSelectEmoticon emoticon: SIMChatEmoticon)
+    ///
+    /// 点击了返回, 返回false拦截该处理
+    ///
+    func inputPanelShouldReturn(inputPanel: UIView) -> Bool
+    ///
+    /// 点击了退格, 返回false拦截该处理
+    ///
+    func inputPanelShouldSelectBackspace(inputPanel: UIView) -> Bool
 }
 
 ///
@@ -99,7 +106,6 @@ internal class SIMChatInputPanelEmoticonView: UIView, SIMChatInputPanelProtocol 
         addSubview(_preview)
         
         // add layout
-        
         SIMChatLayout.make(_contentView)
             .top.equ(self).top
             .left.equ(self).left
@@ -124,9 +130,6 @@ internal class SIMChatInputPanelEmoticonView: UIView, SIMChatInputPanelProtocol 
             .right.equ(_tabBar).right
             .bottom.equ(_tabBar).bottom
             .submit()
-        
-//        _pageControl.currentPage = 8
-//        _pageControl.numberOfPages = _pages.count
         
         dispatch_async(dispatch_get_main_queue()) {
             dispatch_async(dispatch_get_main_queue()) {
@@ -160,15 +163,14 @@ internal class SIMChatInputPanelEmoticonView: UIView, SIMChatInputPanelProtocol 
         view.contentEdgeInsets = UIEdgeInsetsMake(0, 16, 0, 16)
         view.setTitle("发送", forState: .Normal)
         view.setBackgroundImage(UIImage(named: "tabwithinpage_cursor"), forState: .Normal)
-        view.addTarget(self, action: "classicShouldSelectReturn:", forControlEvents: .TouchUpInside)
+        view.addTarget(self, action: "onReturnPress:", forControlEvents: .TouchUpInside)
         return view
     }()
     private lazy var _pageControl: SIMChatInputPanelPageControl = {
         let view = SIMChatInputPanelPageControl()
         view.delegate = self
-//        view.numberOfPages = 20
-//        view.pageIndicatorTintColor = UIColor.grayColor()
-//        view.currentPageIndicatorTintColor = UIColor.darkGrayColor()
+        view.pageIndicatorTintColor = UIColor.grayColor()
+        view.currentPageIndicatorTintColor = UIColor.darkGrayColor()
 //        view.hidesForSinglePage = true
         view.userInteractionEnabled = false
         return view
@@ -196,9 +198,6 @@ internal class SIMChatInputPanelEmoticonView: UIView, SIMChatInputPanelProtocol 
     private lazy var _builtInGroups: [SIMChatEmoticonGroup] = [
         SIMChatEmoticonGroupOfClassic()
     ]
-    
-//    private lazy var _pages: [AnyObject] = Model.Classic.emojis().reverse() + Model.Classic.faces()
-    //private lazy var _pages: [AnyObject] = Model.Classic.emojis()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -411,43 +410,41 @@ internal class SIMChatInputPanelEmoticonPreview: UIView {
         layer.contents = SIMChatImageManager.images_face_preview?.CGImage
     }
     
-    var value: String? {
+    var value: SIMChatEmoticon? {
         didSet {
-            guard value != oldValue else {
+            guard value !== oldValue else {
                 return
             }
-            if let value: NSString = value {
-                if value.length <= 2 {
-                    label.text = value as String
-                    label.frame = bounds
-                    label.sizeToFit()
-                    label.frame = CGRectMake(
-                        (bounds.width - label.bounds.width) / 2,
-                        (bounds.height - label.bounds.height) / 2 - 4,
-                        label.bounds.width,
-                        label.bounds.height)
-                    if label.superview != self {
-                        addSubview(label)
-                    }
-                    imageView.removeFromSuperview()
-                } else if value.hasPrefix("qq:") {
-                    guard let image = UIImage(named: "SIMChat.bundle/Face/\(value.substringFromIndex(3))") else {
-                        return
-                    }
-                    imageView.image = image
-                    imageView.frame = CGRectMake(
-                        (bounds.width - image.size.width) / 2,
-                        (bounds.height - image.size.height) / 2 - 4,
-                        image.size.width,
-                        image.size.height)
-                    if imageView.superview != self {
-                        addSubview(imageView)
-                    }
-                    label.removeFromSuperview()
+            guard let value = self.value else {
+                return
+            }
+            
+            if let png = value.png where !png.isEmpty {
+                guard let image = SIMChatBundle.imageWithResource("Emoticons/\(png)") else {
+                    return
                 }
-                
-            } else {
+                imageView.image = image
+                imageView.frame = CGRectMake(
+                    (bounds.width - image.size.width) / 2,
+                    (bounds.height - image.size.height) / 2 - 4,
+                    image.size.width,
+                    image.size.height)
+                if imageView.superview != self {
+                    addSubview(imageView)
+                }
                 label.removeFromSuperview()
+            } else {
+                label.text = value.code as String
+                label.frame = bounds
+                label.sizeToFit()
+                label.frame = CGRectMake(
+                    (bounds.width - label.bounds.width) / 2,
+                    (bounds.height - label.bounds.height) / 2 - 4,
+                    label.bounds.width,
+                    label.bounds.height)
+                if label.superview != self {
+                    addSubview(label)
+                }
                 imageView.removeFromSuperview()
             }
         }
@@ -495,27 +492,14 @@ internal class SIMChatInputPanelEmoticonCell: UICollectionViewCell, UIGestureRec
         contentView.addGestureRecognizer(tap)
         contentView.addGestureRecognizer(gestureRecognizer)
     }
-//
-//        /// 代理
-//        weak var delegate: SIMChatInputPanelDelegateFaceOfClassic?
-//        /// 对应的模型
-//        var model: SIMChatInputPanelContainer.Face.Model.Classic? {
-//            didSet {
-//                guard model !== oldValue else {
-//                    return
-//                }
-//                gestureRecognizer.enabled = !(model?.value.isEmpty ?? true)
-//                dispatch_async(dispatch_get_global_queue(0, 0)) {
-//                    self.displayIfNeeded()
-//                }
-//            }
-//        }
-//        
+    
+    /// 代理
+    weak var preview: SIMChatInputPanelEmoticonPreview?
+    weak var delegate: SIMChatInputPanelEmoticonCellDelegate?
+    
     var maximumItemCount: Int = 7
     var maximumLineCount: Int = 3
     var contentInset: UIEdgeInsets = UIEdgeInsetsMake(12, 10, 42, 10)
-    
-//        weak var preview: SIMChatInputPanelContainer.Face.ClassicPreview?
     
     /// 布局发生改变
     override func layoutSubviews() {
@@ -580,143 +564,114 @@ internal class SIMChatInputPanelEmoticonCell: UICollectionViewCell, UIGestureRec
         
         return UIGraphicsGetImageFromCurrentImageContext()
     }
-//
-//        func displayIfNeeded() {
-//            guard let model = model else {
-//                return
-//            }
-//            let o = UIDevice.currentDevice().orientation
-//            let path = NSTemporaryDirectory() + "\(model.identifier)-\(o.rawValue)"
-//            if NSFileManager.defaultManager().fileExistsAtPath(path) {
-//                SIMLog.debug("hit cache: \(model.identifier) -> \(o.rawValue)")
-//                let image = UIImage(contentsOfFile: path)
-//                // update
-//                dispatch_async(dispatch_get_main_queue()) {
-//                    if self.model === model {
-//                        self.layer.contents = image?.CGImage
-//                    }
-//                }
-//            } else {
-//                SIMLog.debug("make cache: \(model.identifier) -> \(o.rawValue)")
-//                // update
-//                dispatch_async(dispatch_get_main_queue()) {
-//                    if self.model === model {
-//                        self.layer.contents = image?.CGImage
-//                    }
-//                }
-//                if image != nil {
-//                    UIImagePNGRepresentation(image)?.writeToFile(path, atomically: true)
-//                }
-//            }
-//        }
-//        
-//        func indexAtPoint(pt: CGPoint) -> Int? {
-//            let x = pt.x - contentInset.left
-//            let y = pt.y - contentInset.right
-//            let width = bounds.width - contentInset.left - contentInset.right
-//            let height = bounds.height - contentInset.top - contentInset.bottom
-//            let size = itemSize
-//            guard x >= 0 && x <= width && y >= 0 && y <= height else {
-//                return nil
-//            }
-//            let row = Int(y / size.height)
-//            let column = Int(x / size.width)
-//            return row * maximumItemCount + column
-//        }
-//        
-        /// 点击事件
-        dynamic func onItemPress(sender: UITapGestureRecognizer) {
-//            guard sender.state == .Ended else {
-//                return
-//            }
-//            guard let index = indexAtPoint(sender.locationInView(self)) where index < model?.value.count else {
-//                return
-//            }
-//            guard let item = model?.value[index] else {
-//                return
-//            }
-//            SIMLog.trace("index: \(index), value: \(item)")
-//            if delegate?.classic?(self, shouldSelectItem: item) ?? true {
-//                delegate?.classic?(self, didSelectItem: item)
-//            }
+    
+    // 计算index
+    func indexAtPoint(pt: CGPoint) -> Int? {
+        let x = pt.x - contentInset.left
+        let y = pt.y - contentInset.right
+        let width = bounds.width - contentInset.left - contentInset.right
+        let height = bounds.height - contentInset.top - contentInset.bottom
+        let size = itemSize
+        guard x >= 0 && x <= width && y >= 0 && y <= height else {
+            return nil
         }
-        /// 长按事件
-        dynamic func onItemLongPress(sender: UILongPressGestureRecognizer) {
-//            guard let preview = self.preview else {
-//                return
-//            }
-//            let pt = sender.locationInView(self)
-//            // 开始的时候, 计算一下选择的是那一个.
-//            if sender.state == .Began {
-//                guard let index = indexAtPoint(pt) where index < model?.value.count else {
-//                    return
-//                }
-//                guard let item = model?.value[index] else {
-//                    return
-//                }
-//                
-//                let size = itemSize
-//                let row = index / maximumItemCount
-//                let column = index % maximumItemCount
-//                
-//                SIMLog.trace("index: \(index), value: \(item)")
-//                
-//                selectedPoint = CGPointMake(
-//                    contentInset.left + CGFloat(column) * size.width,
-//                    contentInset.top + CGFloat(row) * size.height)
-//                
-//                preview.value = model?.value[index]
-//                preview.hidden = false
-//            }
-//            /// 事件结束的时候检查区域
-//            if sender.state == .Ended || sender.state == .Cancelled || sender.state == .Failed {
-//                guard let selected = selectedPoint else {
-//                    return
-//                }
-//                guard let item = preview.value, let index = model?.value.indexOf(item) else {
-//                    preview.hidden = true
-//                    return
-//                }
-//                
-//                // 计算距离, sqr(x^2 + y^2)
-//                let distance = fabs(sqrt(pow(preview.frame.midX - selected.x, 2) + pow(preview.frame.maxY - selected.y, 2)))
-//                let size = itemSize
-//                
-//                SIMLog.trace("index: \(index), value: \(item), distance: \(Int(distance))")
-//                // 只有正常结束的时候少有效
-//                if sender.state == .Ended && CGRectMake(selected.x, selected.y, size.width, size.height).contains(pt) {
-//                    if delegate?.classic?(self, shouldSelectItem: item) ?? true {
-//                        delegate?.classic?(self, didSelectItem: item)
-//                    }
-//                }
-//                
-//                UIView.animateWithDuration(0.25 * max(Double(distance / 100), 1),
-//                    animations: {
-//                        var frame = preview.frame
-//                        frame.origin.x = (selected.x + size.width / 2) - frame.width / 2
-//                        frame.origin.y = (selected.y + 12) - frame.height
-//                        preview.frame = frame
-//                    },
-//                    completion: { b in
-//                        preview.hidden = true
-//                    })
-//                selectedPoint = nil
-//            }
-//            if selectedPoint != nil {
-//                var frame = preview.frame
-//                frame.origin.x = pt.x - frame.width / 2
-//                frame.origin.y = pt.y - frame.height
-//                preview.frame = frame
-//            }
-//            //UIDevice.currentDevice().orientation.rawValue
+        let row = Int(y / size.height)
+        let column = Int(x / size.width)
+        return row * maximumItemCount + column
+    }
+    
+    /// 点击事件
+    dynamic func onItemPress(sender: UITapGestureRecognizer) {
+        guard sender.state == .Ended else {
+            return
         }
-        /// 删除事件
-        dynamic func onBackspacePress(sender: AnyObject) {
-//            SIMLog.trace()
-//            if delegate?.classicShouldSelectBackspace?(self) ?? true {
-//                delegate?.classicDidSelectBackspace?(self)
-//            }
+        guard let index = indexAtPoint(sender.locationInView(self)) where index < page?.emoticons.count else {
+            return
         }
+        guard let item = page?.emoticons[index] else {
+            return
+        }
+        SIMLog.trace("index: \(index), value: \(item.code)")
+        if delegate?.emoticonCell(self, shouldSelectItem: item) ?? true {
+            delegate?.emoticonCell(self, didSelectItem: item)
+        }
+    }
+    /// 长按事件
+    dynamic func onItemLongPress(sender: UILongPressGestureRecognizer) {
+        guard let preview = self.preview else {
+            return
+        }
+        let pt = sender.locationInView(self)
+        // 开始的时候, 计算一下选择的是那一个.
+        if sender.state == .Began {
+            guard let index = indexAtPoint(pt) where index < page?.emoticons.count else {
+                return
+            }
+            guard let item = page?.emoticons[index] else {
+                return
+            }
+            
+            let size = itemSize
+            let row = index / maximumItemCount
+            let column = index % maximumItemCount
+            
+            SIMLog.trace("index: \(index), value: \(item.code)")
+            
+            selectedPoint = CGPointMake(
+                contentInset.left + CGFloat(column) * size.width,
+                contentInset.top + CGFloat(row) * size.height)
+            
+            preview.value = item
+            preview.hidden = false
+        }
+        /// 事件结束的时候检查区域
+        if sender.state == .Ended || sender.state == .Cancelled || sender.state == .Failed {
+            guard let selected = selectedPoint else {
+                return
+            }
+            guard let item = preview.value, let index = page?.emoticons.indexOf({ $0.code == item.code }) else {
+                preview.hidden = true
+                return
+            }
+            
+            // 计算距离, sqr(x^2 + y^2)
+            let distance = fabs(sqrt(pow(preview.frame.midX - selected.x, 2) + pow(preview.frame.maxY - selected.y, 2)))
+            let size = itemSize
+            
+            SIMLog.trace("index: \(index), value: \(item.code), distance: \(Int(distance))")
+            // 只有正常结束的时候少有效
+            if sender.state == .Ended && CGRectMake(selected.x, selected.y, size.width, size.height).contains(pt) {
+                if delegate?.emoticonCell(self, shouldSelectItem: item) ?? true {
+                    delegate?.emoticonCell(self, didSelectItem: item)
+                }
+            }
+            
+            UIView.animateWithDuration(0.25 * max(Double(distance / 100), 1),
+                animations: {
+                    var frame = preview.frame
+                    frame.origin.x = (selected.x + size.width / 2) - frame.width / 2
+                    frame.origin.y = (selected.y + 12) - frame.height
+                    preview.frame = frame
+                },
+                completion: { b in
+                    preview.hidden = true
+            })
+            selectedPoint = nil
+        }
+        if selectedPoint != nil {
+            var frame = preview.frame
+            frame.origin.x = pt.x - frame.width / 2
+            frame.origin.y = pt.y - frame.height
+            preview.frame = frame
+        }
+    }
+    /// 删除事件
+    dynamic func onBackspacePress(sender: AnyObject) {
+        SIMLog.trace()
+        if delegate?.emoticonCellShouldSelectBackspace(self) ?? true {
+            delegate?.emoticonCellDidSelectBackspace(self)
+        }
+    }
     
     @objc override func gestureRecognizerShouldBegin(gestureRecognizer: UIGestureRecognizer) -> Bool {
         let pt = gestureRecognizer.locationInView(contentView)
@@ -730,7 +685,7 @@ internal class SIMChatInputPanelEmoticonCell: UICollectionViewCell, UIGestureRec
         }
         return !backspaceButton.frame.contains(pt)
     }
-
+    
     var selectedPoint: CGPoint?
     var itemSize: CGSize {
         let width = bounds.width - contentInset.left - contentInset.right
@@ -759,6 +714,18 @@ internal class SIMChatInputPanelEmoticonCell: UICollectionViewCell, UIGestureRec
         super.init(coder: aDecoder)
         build()
     }
+}
+
+///
+/// 表情面板中的每一个表情视图代理
+///
+internal protocol SIMChatInputPanelEmoticonCellDelegate: class {
+    
+    func emoticonCell(emoticonCell: UIView, shouldSelectItem item: SIMChatEmoticon) -> Bool
+    func emoticonCell(emoticonCell: UIView, didSelectItem item: SIMChatEmoticon)
+    
+    func emoticonCellShouldSelectBackspace(emoticonCell: UIView) -> Bool
+    func emoticonCellDidSelectBackspace(emoticonCell: UIView)
 }
 
 ///
@@ -812,142 +779,33 @@ internal class SIMChatInputPanelEmoticonPage {
     lazy var emoticons: Array<SIMChatEmoticon> = []
 }
 
-//internal class SIMChatInputPanelEmoticonView
+extension SIMChatInputPanelEmoticonView {
+    /// 点击返回
+    dynamic func onReturnPress(sender: AnyObject) {
+        if (delegate as? SIMChatInputPanelEmoticonViewDelegate)?.inputPanelShouldReturn(self) ?? true {
+            // nothing
+        }
+    }
+}
 
-//extension SIMChatInputPanelContainer.Face {
-//    private class ContentView: UICollectionView {
-//        init() {
-//            let layout = UICollectionViewFlowLayout()
-//            layout.scrollDirection = .Horizontal
-//            layout.sectionInset = UIEdgeInsetsZero
-//            layout.minimumLineSpacing = 0
-//            layout.minimumInteritemSpacing = 0
-//            super.init(frame: CGRectZero, collectionViewLayout: layout)
-//            
-//            registerClass(UICollectionViewCell.self, forCellWithReuseIdentifier: "Unknow")
-//        }
-//        required init?(coder aDecoder: NSCoder) {
-//            super.init(coder: aDecoder)
-//        }
-//        
-//        override func registerClass(cellClass: AnyClass?, forCellWithReuseIdentifier identifier: String) {
-//            super.registerClass(cellClass, forCellWithReuseIdentifier: identifier)
-//            cellClasses[identifier] = cellClass
-//        }
-//        
-//        private var cellClasses: [String: AnyClass] = [:]
-//    }
-//}
-//
-//// MARK: - Content Page -> Classic
-//
-//extension SIMChatInputPanelContainer.Face.Page {
-//    /// 经典类型
-//    private class Classic: UICollectionViewCell, UIGestureRecognizerDelegate {
-//    }
-//}
-//
-//// MARK: - Content Model
-//extension SIMChatInputPanelContainer.Face.Model {
-//    /// 经典类型
-//    private class Classic {
-//        init(_ value: [String], identifier: String = NSUUID().UUIDString) {
-//            self.value = value
-//            self.identifier = identifier
-//        }
-//        
-//        var value: Array<String>
-//        var identifier: String
-//        
-//        static func faces() -> [Classic] {
-//            guard let path = SIMChatBundle.resourcePath("Preferences/face.plist") else {
-//                fatalError("Must add \"SIMChat.bundle\" file")
-//            }
-//            guard let dic = NSDictionary(contentsOfFile: path) else {
-//                fatalError("file \"SIMChat.bundle/Preferences/face.plist\" load fail!")
-//            }
-//            
-//            // 生成列表
-//            let emojis = dic
-//                .sort { ($0.value as? Int) > ($1.value as? Int) }
-//                .map { Int($0.key as! String)! }
-//            
-//            // 生成page
-//            var pages = [Classic]()
-//            let maxEle = (3 * 7) - 1
-//            for i in 0 ..< (emojis.count + maxEle - 1) / maxEle {
-//                let beg = i * maxEle
-//                let end = min((i + 1) * maxEle, emojis.count)
-//                let page = Classic(emojis[beg ..< end].map({ String(format: "qq:%03d", $0) }), identifier: "inputpanel-face-\(i)")
-//                pages.append(page)
-//            }
-//            return pages
-//        }
-//        
-//        static func emojis() -> [Classic] {
-//            // 生成emoij函数
-//            let emoji = { (x:UInt32) -> String in
-//                var idx = ((((0x808080F0 | (x & 0x3F000) >> 4) | (x & 0xFC0) << 10) | (x & 0x1C0000) << 18) | (x & 0x3F) << 24)
-//                return withUnsafePointer(&idx) {
-//                    return NSString(bytes: $0, length: sizeof(idx.dynamicType), encoding: NSUTF8StringEncoding) as! String
-//                }
-//            }
-//            var emojis = [String]()
-//            for i:UInt32 in 0x1F600 ..< 0x1F64F {
-//                if i < 0x1F641 || i > 0x1F644 {
-//                    emojis.append(emoji(i))
-//                }
-//            }
-//            for i:UInt32 in 0x1F680 ..< 0x1F6A4 {
-//                emojis.append(emoji(i))
-//            }
-//            for i:UInt32 in 0x1F6A5 ..< 0x1F6C5 {
-//                emojis.append(emoji(i))
-//            }
-//            
-//            var pages = [Classic]()
-//            let maxEle = (3 * 7) - 1
-//            for i in 0 ..< (emojis.count + maxEle - 1) / maxEle {
-//                let beg = i * maxEle
-//                let end = min((i + 1) * maxEle, emojis.count)
-//                let page = Classic(Array(emojis[beg ..< end]), identifier: "inputpanel-emoji-\(i)")
-//                pages.append(page)
-//            }
-//            return pages
-//        }
-//    }
-//}
-//
-//// MARK: - Private Method
-//
-//extension SIMChatInputPanelContainer.Face {
-//    public override func updateConstraints() {
-//        super.updateConstraints()
-//        
-//        _tabBar.contentInset = UIEdgeInsetsMake(0, 0, 0, _sendButton.frame.width)
-//    }
-//}
-//
-////// MARK: - SIMChatInputPanelDelegateFaceOfClassic
-////
-////extension SIMChatInputPanelContainer.Face: SIMChatInputPanelDelegateFaceOfClassic {
-////    /// 选择
-////    @objc private func classic(classic: UIView, shouldSelectItem item: String) -> Bool {
-////        return delegate?.inputPanel?(self, shouldSelectFace: item) ?? true
-////    }
-////    @objc private func classic(classic: UIView, didSelectItem item: String) {
-////        delegate?.inputPanel?(self, didSelectFace: item)
-////    }
-////    /// 删除
-////    @objc private func classicShouldSelectBackspace(classic: UIView) -> Bool {
-////        return delegate?.inputPanelShouldSelectBackspace?(self) ?? true
-////    }
-////    /// 发送
-////    @objc private func classicShouldSelectReturn(sender: AnyObject) {
-////        delegate?.inputPanelShouldReturn?(self)
-////    }
-////}
-//
+extension SIMChatInputPanelEmoticonView: SIMChatInputPanelEmoticonCellDelegate {
+    /// 将要选择表情
+    func emoticonCell(emoticonCell: UIView, shouldSelectItem item: SIMChatEmoticon) -> Bool {
+        return (delegate as? SIMChatInputPanelEmoticonViewDelegate)?.inputPanel(self, shouldSelectEmoticon: item) ?? true
+    }
+    /// 选择了表情
+    func emoticonCell(emoticonCell: UIView, didSelectItem item: SIMChatEmoticon) {
+        (delegate as? SIMChatInputPanelEmoticonViewDelegate)?.inputPanel(self, didSelectEmoticon: item)
+    }
+    /// 将要退格
+    func emoticonCellShouldSelectBackspace(emoticonCell: UIView) -> Bool {
+        return (delegate as? SIMChatInputPanelEmoticonViewDelegate)?.inputPanelShouldSelectBackspace(self) ?? true
+    }
+    /// 退格
+    func emoticonCellDidSelectBackspace(emoticonCell: UIView) {
+        // nothing
+    }
+}
 
 extension SIMChatInputPanelEmoticonView: SIMChatInputPanelPageControlDelegate {
     
@@ -1061,6 +919,8 @@ extension SIMChatInputPanelEmoticonView: UICollectionViewDataSource, UICollectio
         }
         if let cell = cell as? SIMChatInputPanelEmoticonCell {
             cell.page = _pages[group.identifier]?[indexPath.row]
+            cell.preview = _preview
+            cell.delegate = self
         }
 //        if indexPath.section < _builtInGroups.count {
 //            _currentGroup = _builtInGroups[indexPath.section]
@@ -1086,18 +946,6 @@ extension SIMChatInputPanelEmoticonView: UICollectionViewDataSource, UICollectio
     }
 }
 
-//
-//// MARK: - Internal Delegate
-//
-//@objc private protocol SIMChatInputPanelDelegateFaceOfClassic: NSObjectProtocol {
-//    
-//    optional func classic(classic: UIView, shouldSelectItem item: String) -> Bool
-//    optional func classic(classic: UIView, didSelectItem item: String)
-//    
-//    optional func classicShouldSelectBackspace(classic: UIView) -> Bool
-//    optional func classicDidSelectBackspace(classic: UIView)
-//}
-//
 
 ///
 /// 经典类型的表情
