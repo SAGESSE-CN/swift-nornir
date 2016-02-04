@@ -37,8 +37,6 @@ internal class SIMChatInputPanelAudioView: UIView, SIMChatInputPanelProtocol {
         build()
     }
     
-//    weak var delegate: SIMChatInputPanelAudioDelegate?
-    
     private lazy var _contentView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .Horizontal

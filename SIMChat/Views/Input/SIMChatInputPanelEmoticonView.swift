@@ -37,6 +37,14 @@ public protocol SIMChatEmoticonGroup: class {
     /// 唯一id
     ///
     var identifier: String { get }
+    ///
+    /// 图标
+    ///
+    var image: UIImage? { get }
+    ///
+    /// 组名
+    ///
+    var name: String? { get }
     
     ///
     /// 该组表情所有的表情
@@ -147,8 +155,8 @@ internal class SIMChatInputPanelEmoticonView: UIView, SIMChatInputPanelProtocol 
     private lazy var _tabBar: SIMChatInputPanelTabBar = {
         let view = SIMChatInputPanelTabBar()
         view.backgroundColor = UIColor(rgb: 0xF8F8F8)
-//        view.delegate = self
-//        view.dataSource = self
+        view.delegate = self
+        view.dataSource = self
         return view
     }()
     private lazy var _preview: SIMChatInputPanelEmoticonPreview = {
@@ -222,7 +230,7 @@ internal class SIMChatInputPanelTabBar: UICollectionView {
         layout.minimumInteritemSpacing = 0
         layout.itemSize = CGSizeMake(50, 37)
         super.init(frame: CGRectZero, collectionViewLayout: layout)
-        registerClass(SIMChatInputPanelTabBarItem.self, forCellWithReuseIdentifier: "Item")
+        registerClass(SIMChatInputPanelTabBarCell.self, forCellWithReuseIdentifier: "Item")
     }
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -235,17 +243,13 @@ internal class SIMChatInputPanelTabBar: UICollectionView {
 ///
 /// 底部菜单项
 ///
-internal class SIMChatInputPanelTabBarItem: UICollectionViewCell {
-    var image: UIImage? {
-        set { return imageView.image = newValue }
-        get { return imageView.image }
-    }
-    
-    lazy var imageView: UIImageView = {
-        let view = UIImageView()
+internal class SIMChatInputPanelTabBarCell: UICollectionViewCell {
+    lazy var button: UIButton = {
+        let view = UIButton()
         view.frame = self.contentView.bounds
         view.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
-        view.contentMode = .Center
+        view.userInteractionEnabled = false
+        //view.contentMode = .Center
         self.contentView.addSubview(view)
         return view
     }()
@@ -522,6 +526,9 @@ internal class SIMChatInputPanelEmoticonCell: UICollectionViewCell, UIGestureRec
     
     // 绘制为图片
     @inline(__always) func drawToImage() -> UIImage? {
+        guard let page = self.page else {
+            return nil
+        }
         UIGraphicsBeginImageContextWithOptions(bounds.size, false, UIScreen.mainScreen().scale)
         defer { UIGraphicsEndImageContext() }
         
@@ -529,7 +536,10 @@ internal class SIMChatInputPanelEmoticonCell: UICollectionViewCell, UIGestureRec
         let config = [
             NSFontAttributeName: UIFont.systemFontOfSize(32)
         ]
-        page?.emoticons.enumerate().forEach {
+        page.emoticons.enumerate().forEach {
+            guard page === self.page else {
+                return
+            }
             let row = $0.index / maximumItemCount
             let col = $0.index % maximumItemCount
             
@@ -561,7 +571,9 @@ internal class SIMChatInputPanelEmoticonCell: UICollectionViewCell, UIGestureRec
                 value.drawInRect(frame, withAttributes: config)
             }
         }
-        
+        guard page === self.page else {
+            return nil
+        }
         return UIGraphicsGetImageFromCurrentImageContext()
     }
     
@@ -852,6 +864,9 @@ extension SIMChatInputPanelEmoticonView: UICollectionViewDataSource, UICollectio
     }
     
     func scrollViewDidEndDecelerating(scrollView: UIScrollView) {
+        if scrollView is SIMChatInputPanelTabBar {
+            return
+        }
         
         if let indexPath = _contentView.indexPathsForVisibleItems().first {
             let page = Int(round(scrollView.contentOffset.x / scrollView.frame.width))
@@ -873,44 +888,35 @@ extension SIMChatInputPanelEmoticonView: UICollectionViewDataSource, UICollectio
     }
     
     func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        if collectionView is SIMChatInputPanelTabBar {
+            return 1
+        }
         guard let group = groupAtIndex(section) else {
             return 0
         }
-        defer {
-            _pageControl.tag = section
-            _pageControl.reloadData()
-        }
-        return _pages[group.identifier]?.count ?? {
+        let count = _pages[group.identifier]?.count ?? {
             // 转化为page
             let pages = SIMChatInputPanelEmoticonPage.makeWithGroup(group)
             _pages[group.identifier] = pages
             return pages.count
         }()
+        _pageControl.tag = section
+        _pageControl.reloadData()
+        return count
     }
     
     func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAtIndexPath indexPath: NSIndexPath) -> CGSize {
-        if collectionView == _contentView {
-            return collectionView.bounds.size
-        }
-        if collectionView == _tabBar {
+        if collectionView is SIMChatInputPanelTabBar {
             return CGSizeMake(50, collectionView.bounds.height)
         }
-        fatalError()
+        return collectionView.bounds.size
     }
     
     func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
-//        if collectionView == _contentView {
-//            let page = _pages[indexPath.item]
-//            var identifier = NSStringFromClass(page.dynamicType)
-//            if _contentView.cellClasses[identifier] == nil {
-//                identifier = "Unknow"
-//            }
-            return collectionView.dequeueReusableCellWithReuseIdentifier("Emoticon", forIndexPath: indexPath)
-//        }
-//        if collectionView == _tabBar {
-//            return collectionView.dequeueReusableCellWithReuseIdentifier("Item", forIndexPath: indexPath)
-//        }
-//        fatalError()
+        if collectionView is SIMChatInputPanelTabBar {
+            return collectionView.dequeueReusableCellWithReuseIdentifier("Item", forIndexPath: indexPath)
+        }
+        return collectionView.dequeueReusableCellWithReuseIdentifier("Emoticon", forIndexPath: indexPath)
     }
     
     func collectionView(collectionView: UICollectionView, willDisplayCell cell: UICollectionViewCell, forItemAtIndexPath indexPath: NSIndexPath) {
@@ -922,27 +928,11 @@ extension SIMChatInputPanelEmoticonView: UICollectionViewDataSource, UICollectio
             cell.preview = _preview
             cell.delegate = self
         }
-//        if indexPath.section < _builtInGroups.count {
-//            _currentGroup = _builtInGroups[indexPath.section]
-//        } else {
-//            let index = indexPath.section - _builtInGroups.count
-//            _currentGroup = (delegate as? SIMChatInputPanelEmoticonViewDelegate)?.inputPanel(self, emoticonGroupAtIndex: index)
-//        }
-        
-//        if collectionView == _contentView {
-//            if let cell = cell as? Page.Classic, page = _pages[indexPath.item] as? Model.Classic {
-//                // 经典类型
-//                cell.model = page
-//                cell.preview = _preview
-////                cell.delegate = self
-//            }
-////            cell.backgroundColor = collectionView.backgroundColor
-//        } else if collectionView == _tabBar {
-//            if let item = cell as? TabBarItem {
-//                item.image = UIImage(named: "qvip_emoji_tab_classic_5_9_5")
-//            }
-//            cell.backgroundColor = UIColor(rgb: 0xe4e4e4)
-//        }
+        if let cell = cell as? SIMChatInputPanelTabBarCell {
+            cell.button.setTitle(group.name, forState: .Normal)
+            cell.button.setImage(group.image, forState: .Normal)
+            cell.backgroundColor = UIColor(rgb: 0xe4e4e4)
+        }
     }
 }
 
@@ -1015,10 +1005,15 @@ internal class SIMChatEmoticonGroupOfClassic: SIMChatEmoticonGroup {
         self.faces = faces
         self.emojis = emojis
         self.emoticons = emoticons
+        
         self.identifier = NSUUID().UUIDString
+        self.image = UIImage(named: "qvip_emoji_tab_classic_5_9_5")
     }
     
     var identifier: String
+    var image: UIImage?
+    var name: String?
+    
     /// 该组表情所有的表情
     var emoticons: Array<SIMChatEmoticon>
     var emojis: Array<SIMChatEmoticon>
