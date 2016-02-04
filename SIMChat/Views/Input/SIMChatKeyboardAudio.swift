@@ -900,7 +900,7 @@ extension SIMChatKeyboardAudio : SIMChatKeyboardAudioViewDelegate {
     func chatKeyboardAudioViewDidStartRecord() {
         SIMLog.trace()
         self.am.delegate = self
-        self.am.record(self.am.dynamicType.defaultRecordFile)
+        //self.am.record(self.am.dynamicType.defaultRecordFile)
     }
     /// 停止
     func chatKeyboardAudioViewDidStop() {

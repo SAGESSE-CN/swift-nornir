@@ -80,7 +80,7 @@ internal protocol SIMChatInputPanelEmoticonViewDelegate: SIMChatInputPanelDelega
     ///
     /// 点击了退格, 返回false拦截该处理
     ///
-    func inputPanelShouldSelectBackspace(inputPanel: UIView) -> Bool
+    func inputPanelShouldBackspace(inputPanel: UIView) -> Bool
 }
 
 ///
@@ -143,6 +143,7 @@ internal class SIMChatInputPanelEmoticonView: UIView, SIMChatInputPanelProtocol 
             dispatch_async(dispatch_get_main_queue()) {
                 if let group = self._builtInGroups.first as? SIMChatEmoticonGroupOfClassic {
                     let idx = NSIndexPath(forItem: group.defaultPage, inSection: 0)
+                    self._pageControl.reloadData()
                     self._pageControl.currentPage = NSIndexPath(forItem: 0, inSection: 1)
                     self._contentView.scrollToItemAtIndexPath(idx,
                         atScrollPosition: .None,
@@ -680,8 +681,8 @@ internal class SIMChatInputPanelEmoticonCell: UICollectionViewCell, UIGestureRec
     /// 删除事件
     dynamic func onBackspacePress(sender: AnyObject) {
         SIMLog.trace()
-        if delegate?.emoticonCellShouldSelectBackspace(self) ?? true {
-            delegate?.emoticonCellDidSelectBackspace(self)
+        if delegate?.emoticonCellShouldBackspace(self) ?? true {
+            delegate?.emoticonCellDidBackspace(self)
         }
     }
     
@@ -736,8 +737,8 @@ internal protocol SIMChatInputPanelEmoticonCellDelegate: class {
     func emoticonCell(emoticonCell: UIView, shouldSelectItem item: SIMChatEmoticon) -> Bool
     func emoticonCell(emoticonCell: UIView, didSelectItem item: SIMChatEmoticon)
     
-    func emoticonCellShouldSelectBackspace(emoticonCell: UIView) -> Bool
-    func emoticonCellDidSelectBackspace(emoticonCell: UIView)
+    func emoticonCellShouldBackspace(emoticonCell: UIView) -> Bool
+    func emoticonCellDidBackspace(emoticonCell: UIView)
 }
 
 ///
@@ -810,11 +811,11 @@ extension SIMChatInputPanelEmoticonView: SIMChatInputPanelEmoticonCellDelegate {
         (delegate as? SIMChatInputPanelEmoticonViewDelegate)?.inputPanel(self, didSelectEmoticon: item)
     }
     /// 将要退格
-    func emoticonCellShouldSelectBackspace(emoticonCell: UIView) -> Bool {
-        return (delegate as? SIMChatInputPanelEmoticonViewDelegate)?.inputPanelShouldSelectBackspace(self) ?? true
+    func emoticonCellShouldBackspace(emoticonCell: UIView) -> Bool {
+        return (delegate as? SIMChatInputPanelEmoticonViewDelegate)?.inputPanelShouldBackspace(self) ?? true
     }
     /// 退格
-    func emoticonCellDidSelectBackspace(emoticonCell: UIView) {
+    func emoticonCellDidBackspace(emoticonCell: UIView) {
         // nothing
     }
 }

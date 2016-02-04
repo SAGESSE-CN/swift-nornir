@@ -108,62 +108,133 @@ class SIMChatAudioManager: NSObject {
             
         }
     }
+    
+    /// 准备播放
+    func prepareToPlay() -> SIMChatRequest<Void> {
+        let url = self.dynamicType.defaultRecordFile
+        return SIMChatRequest.request { e in
+            do {
+                
+                // create
+                self.player = try AVAudioPlayer(contentsOfURL: url)
+                self.player?.delegate = self
+                self.player?.meteringEnabled = true
+                // config
+                try AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback)
+                try AVAudioSession.sharedInstance().setActive(true)
+                // prepare 
+                if !(self.player?.prepareToPlay() ?? false) {
+                    self.player = nil
+                    throw NSError(domain: "requeset player prepare fail!", code: -2, userInfo: nil)
+                }
+                e.success()
+            } catch let error as NSError  {
+                e.failure(error)
+            }
+        }
+    }
+    
+    /// 准备录音
+    func prepareToRecord() -> SIMChatRequest<Void> {
+        let url = self.dynamicType.defaultRecordFile
+        return SIMChatRequest.request { e in
+            // 首先请求录音权限
+            AVAudioSession.sharedInstance().requestRecordPermission { hasPermission in
+                do {
+                    // 检查有没有权限
+                    guard hasPermission else {
+                        throw NSError(domain: "requeset record permission fail!", code: -1, userInfo: nil)
+                    }
+                    let _ = try? NSFileManager.defaultManager().removeItemAtURL(url)
+                    try AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryRecord)
+                    try AVAudioSession.sharedInstance().setActive(true)
+                    
+                    self.recorder = try AVAudioRecorder(URL: url, settings: self.recordSettings)
+                    self.recorder?.delegate = self
+                    self.recorder?.meteringEnabled = true
+                    
+                    // prepare
+                    if !(self.recorder?.prepareToRecord() ?? false) {
+                        self.recorder = nil
+                        throw NSError(domain: "requeset record prepare fail!", code: -2, userInfo: nil)
+                    }
+                    
+                    e.success()
+                } catch let error as NSError  {
+                    e.failure(error)
+                }
+            }
+        }
+    }
+    
+    func play() {
+        SIMLog.trace()
+        let url = self.dynamicType.defaultRecordFile
+        // start
+        self.player?.play()
+        // 己经启动
+        self.delegate?.chatAudioManagerDidStartPlay?(self, param: url)
+        // 通知
+        SIMChatNotificationCenter.postNotificationName(SIMChatAudioManagerDidPlayNotification, object: url)
+    }
+    
     ///
     /// 录音
     ///
-    func record(url: NSURL) {
+    func record() {
         SIMLog.trace()
-        // 一定要先停止.
-        self.stop()
-        // 允许录音? 问过之后才请求权限
-        if !(self.delegate?.chatAudioManagerWillStartRecord?(self, param: url) ?? true) {
-            // 不允许.
-            return
-        }
-        // 通知:)
-        SIMChatNotificationCenter.postNotificationName(SIMChatAudioManagerWillRecordNotification, object: url)
-        // :)
-        self.recordStarted = true
-        // 请求录音权限
-        AVAudioSession.sharedInstance().requestRecordPermission { hasPermission in
-            do {
-                // 己经取消了该请求?
-                if !self.recordStarted {
-                    return
-                }
-                // 请求失败
-                if !hasPermission {
-                    throw NSError(domain: "requeset record permission fail!", code: -1, userInfo: nil)
-                }
-                // clean
-                let _ = try? NSFileManager.defaultManager().removeItemAtURL(url)
-                // config
-                try AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryRecord)
-                try AVAudioSession.sharedInstance().setActive(true)
-                // create
-                self.recorder = try AVAudioRecorder(URL: url, settings: self.recordSettings)
-                self.recorder?.delegate = self
-                self.recorder?.meteringEnabled = true
-                // prepare 
-                if !(self.recorder?.prepareToRecord() ?? false) {
-                    self.recorder = nil
-                    throw NSError(domain: "requeset record prepare fail!", code: -2, userInfo: nil)
-                }
+        let url = self.dynamicType.defaultRecordFile
+//        // 一定要先停止.
+//        self.stop()
+//        // 允许录音? 问过之后才请求权限
+//        if !(self.delegate?.chatAudioManagerWillStartRecord?(self, param: url) ?? true) {
+//            // 不允许.
+//            return
+//        }
+//        // 通知:)
+//        SIMChatNotificationCenter.postNotificationName(SIMChatAudioManagerWillRecordNotification, object: url)
+//        // :)
+//        self.recordStarted = true
+//        // 请求录音权限
+//        AVAudioSession.sharedInstance().requestRecordPermission { hasPermission in
+//            do {
+//                // 己经取消了该请求?
+//                if !self.recordStarted {
+//                    return
+//                }
+//                // 请求失败
+//                if !hasPermission {
+//                    throw NSError(domain: "requeset record permission fail!", code: -1, userInfo: nil)
+//                }
+//                // clean
+//                let _ = try? NSFileManager.defaultManager().removeItemAtURL(url)
+//                // config
+//                try AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryRecord)
+//                try AVAudioSession.sharedInstance().setActive(true)
+//                // create
+//                self.recorder = try AVAudioRecorder(URL: url, settings: self.recordSettings)
+//                self.recorder?.delegate = self
+//                self.recorder?.meteringEnabled = true
+//                // prepare 
+//                if !(self.recorder?.prepareToRecord() ?? false) {
+//                    self.recorder = nil
+//                    throw NSError(domain: "requeset record prepare fail!", code: -2, userInfo: nil)
+//                }
                 // start
                 self.recorder?.record()
                 // 己经启动了录音.
                 self.delegate?.chatAudioManagerDidStartRecord?(self, param: url)
                 // 通知用户
                 SIMChatNotificationCenter.postNotificationName(SIMChatAudioManagerWillRecordNotification, object: url)
-                
-            } catch let error as NSError  {
-                
-                SIMLog.error(error)
-                // 回调
-                self.delegate?.chatAudioManagerRecordFail?(self, error: error)
-                
-            }
-        }
+//                
+//            } catch let error as NSError  {
+//                
+//                SIMLog.error(error)
+//                // 回调
+//                self.delegate?.chatAudioManagerRecordFail?(self, error: error)
+//                
+//            }
+//        }
     }
     ///
     /// 停止

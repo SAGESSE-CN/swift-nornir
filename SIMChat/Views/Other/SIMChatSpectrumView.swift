@@ -53,6 +53,13 @@ class SIMChatSpectrumView: SIMView {
     /// 代理
     weak var delegate: SIMChatSpectrumViewDelegate?
     
+    override func willMoveToWindow(newWindow: UIWindow?) {
+        super.willMoveToWindow(newWindow)
+        if newWindow == nil && isAnimating() {
+            stopAnimating()
+        }
+    }
+    
     /// 启动
     func startAnimating() {
         // 如果不为空, skip
@@ -66,8 +73,12 @@ class SIMChatSpectrumView: SIMView {
     }
     /// 停止
     func stopAnimating() {
-        self.timer?.invalidate()
-        self.timer = nil
+        guard timer != nil else {
+            return
+        }
+        
+        timer?.invalidate()
+        timer = nil
         
         // 清0
         CATransaction.begin()

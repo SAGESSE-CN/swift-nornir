@@ -68,11 +68,11 @@ public class SIMChatViewController: UIViewController {
             SIMChatInputPanelEmoticonView.inputPanelItem(),
             SIMChatInputPanelToolBoxView.inputPanelItem()
         ]
-//        bar.bottomBarButtonItems = [
-//            SIMChatInputPanelAudioView.inputPanelItem(),
-//            SIMChatInputPanelEmoticonView.inputPanelItem(),
-//            SIMChatInputPanelToolBoxView.inputPanelItem()
-//        ]
+        // bar.bottomBarButtonItems = [
+        //     SIMChatInputPanelAudioView.inputPanelItem(),
+        //     SIMChatInputPanelEmoticonView.inputPanelItem(),
+        //     SIMChatInputPanelToolBoxView.inputPanelItem()
+        // ]
         return bar
     }()
     
