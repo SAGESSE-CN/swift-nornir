@@ -9,7 +9,7 @@
 import UIKit
 
 ///
-/// 附件协议
+/// 输入选项
 ///
 @objc public protocol SIMChatInputItem {
     
@@ -20,12 +20,13 @@ import UIKit
     var itemSelectImage: UIImage? { get }
 }
 
+///
+/// 输入选项代理
+///
 public protocol SIMChatInputItemDelegate: class {
-    
     func itemShouldSelect(item: SIMChatInputItem) -> Bool
     func itemDidSelect(item: SIMChatInputItem)
 }
-
 
 public class SIMChatInputBaseItem: SIMChatInputItem {
     

@@ -513,6 +513,9 @@ internal class SIMChatInputBarButton: UIButton {
     private weak var delegate: SIMChatInputBarButtonDelegate?
 }
 
+///
+/// 自定义单元格
+///
 internal class SIMChatInputBarCell: UICollectionViewCell {
     lazy var button: SIMChatInputBarButton = {
         let button = SIMChatInputBarButton()
@@ -755,6 +758,4 @@ internal class SIMChatInputBarListEmbedView: UIView {
 internal protocol SIMChatInputBarButtonDelegate: class {
     func inputBarButtonDidSelect(inputBarButton: SIMChatInputBarButton)
 }
-
-// MARK: - Notification
 

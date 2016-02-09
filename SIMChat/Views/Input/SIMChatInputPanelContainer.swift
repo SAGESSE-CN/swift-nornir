@@ -2,8 +2,8 @@
 //  SIMChatInputPanelContainer.swift
 //  SIMChat
 //
-//  Created by sagesse on 1/22/16.
-//  Copyright © 2016 Sagesse. All rights reserved.
+//  Created by sagesse on 2/9/16.
+//  Copyright © 2016 sagesse. All rights reserved.
 //
 
 import UIKit
@@ -12,6 +12,19 @@ import UIKit
 /// 输入面板的容器类
 ///
 public class SIMChatInputPanelContainer: UIView {
+    
+    public override func intrinsicContentSize() -> CGSize {
+        super.intrinsicContentSize()
+        return CGSizeMake(0, 253)
+    }
+    
+    ///
+    /// 注册面板
+    ///
+    public static func registerClass(cls: SIMChatInputPanelProtocol.Type, byItem item: SIMChatInputItem) {
+        SIMLog.debug("\(item.itemIdentifier) => \(NSStringFromClass(cls))")
+        _subpanelClasses[item.itemIdentifier] = cls
+    }
     
     ///
     /// 当前显示的选项
@@ -94,27 +107,7 @@ public class SIMChatInputPanelContainer: UIView {
             }
         }
     }
-    private lazy var _allPanels: NSCache = NSCache()
-}
-
-// MARK: - Life Cycle
-
-extension SIMChatInputPanelContainer {
-    public override func intrinsicContentSize() -> CGSize {
-        super.intrinsicContentSize()
-        return CGSizeMake(0, 253)
-    }
-}
-
-// MARK: - Public Method
-extension SIMChatInputPanelContainer {
-    ///
-    /// 注册面板
-    ///
-    public static func registerClass(cls: SIMChatInputPanelProtocol.Type, byItem item: SIMChatInputItem) {
-        SIMLog.debug("\(item.itemIdentifier) => \(NSStringFromClass(cls))")
-        _subpanelClasses[item.itemIdentifier] = cls
-    }
     
+    private lazy var _allPanels: NSCache = NSCache()
     private static var _subpanelClasses: Dictionary<String, SIMChatInputPanelProtocol.Type> = [:]
 }

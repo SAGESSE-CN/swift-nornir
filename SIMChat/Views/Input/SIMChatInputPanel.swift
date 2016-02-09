@@ -27,8 +27,8 @@ public protocol SIMChatInputPanelProtocol: class {
 }
 
 ///
-///
 /// 输入面板代理
 ///
 public protocol SIMChatInputPanelDelegate: class {
 }
+
