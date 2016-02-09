@@ -140,6 +140,7 @@ internal class SIMChatInputPanelEmoticonView: UIView, SIMChatInputPanelProtocol 
             .submit()
         
         dispatch_async(dispatch_get_main_queue()) {
+            self._contentView.reloadData()
             dispatch_async(dispatch_get_main_queue()) {
                 if let group = self._builtInGroups.first as? SIMChatEmoticonGroupOfClassic {
                     let idx = NSIndexPath(forItem: group.defaultPage, inSection: 0)
@@ -429,8 +430,7 @@ internal class SIMChatInputPanelEmoticonPreview: UIView {
                     return
                 }
                 imageView.image = image
-                imageView.frame = CGRectMake(
-                    (bounds.width - image.size.width) / 2,
+                imageView.frame = CGRectMake((bounds.width - image.size.width) / 2,
                     (bounds.height - image.size.height) / 2 - 4,
                     image.size.width,
                     image.size.height)

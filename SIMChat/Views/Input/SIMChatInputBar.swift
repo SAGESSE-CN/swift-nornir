@@ -87,15 +87,27 @@ public class SIMChatInputBar: UIView {
             // TODO: 未实现的开关
         }
     }
+    /// 编辑状态
+    public var editing: Bool {
+        set { return _textView.editing = newValue }
+        get { return _textView.editing }
+    }
     
     /// 内容
     public var text: String? {
         set { return textView.text = newValue }
         get { return textView.text }
     }
+    /// 内容
+    public var attributedText: NSAttributedString? {
+        set { return textView.attributedText = newValue }
+        get { return textView.attributedText }
+    }
+
+    
     /// 当前选择的选项
     public var selectedBarButtonItem: SIMChatInputItem? {
-        return _selectedAccessoryButton?.item
+        return _selectedBarButton?.item
         
     }
     /// 代理
@@ -134,7 +146,7 @@ public class SIMChatInputBar: UIView {
     }
     
     public override func isFirstResponder() -> Bool {
-        if _selectedAccessoryButton != nil {
+        if _selectedBarButton != nil {
             return true
         }
         if _textViewIsFristResponder {
@@ -144,7 +156,7 @@ public class SIMChatInputBar: UIView {
     }
     
     public override func canResignFirstResponder() -> Bool {
-        if _selectedAccessoryButton != nil {
+        if _selectedBarButton != nil {
             return true
         }
         if _textViewIsFristResponder {
@@ -157,7 +169,7 @@ public class SIMChatInputBar: UIView {
         if textView.isFirstResponder() {
         textView.resignFirstResponder()
         }
-        accessoryButtonDidDeselect()
+        barButtonDidDeselect()
         super.resignFirstResponder()
         
         return false
@@ -216,9 +228,9 @@ public class SIMChatInputBar: UIView {
     /// 不使用系统的, 因为系统的isFristResponder更新速度太慢了
     private var _textViewIsFristResponder: Bool = false
     private var _bottomBarButtonItems: [SIMChatInputItem]?
-    private var _selectedAccessoryButton: SIMChatInputBarButton? {
+    private var _selectedBarButton: SIMChatInputBarButton? {
         didSet {
-            guard _selectedAccessoryButton != oldValue else {
+            guard _selectedBarButton != oldValue else {
                 return
             }
             oldValue?.selected = false
@@ -233,7 +245,7 @@ public class SIMChatInputBar: UIView {
                 
                 btn.layer.addAnimation(ani, forKey: "deselect")
             }
-            _selectedAccessoryButton?.selected = true
+            _selectedBarButton?.selected = true
         }
     }
     
@@ -277,9 +289,63 @@ public class SIMChatInputBar: UIView {
     optional func inputBar(inputBar: SIMChatInputBar, didDeselectItem item: SIMChatInputItem)
 }
 
-// MARK: - Text View Delegate and Forward
 
-extension SIMChatInputBar: UITextViewDelegate {
+extension SIMChatInputBar: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UITextViewDelegate, UIKeyInput {
+    
+    // MARK: UITextInputTraits & Forward
+    
+    public var autocapitalizationType: UITextAutocapitalizationType {
+        set { return textView.autocapitalizationType = newValue }
+        get { return textView.autocapitalizationType }
+    }
+    public var autocorrectionType: UITextAutocorrectionType {
+        set { return textView.autocorrectionType = newValue }
+        get { return textView.autocorrectionType }
+    }
+    public var spellCheckingType: UITextSpellCheckingType {
+        set { return textView.spellCheckingType = newValue }
+        get { return textView.spellCheckingType }
+    }
+    public var keyboardType: UIKeyboardType {
+        set { return textView.keyboardType = newValue }
+        get { return textView.keyboardType }
+    }
+    public var keyboardAppearance: UIKeyboardAppearance {
+        set { return textView.keyboardAppearance = newValue }
+        get { return textView.keyboardAppearance }
+    }
+    public var returnKeyType: UIReturnKeyType {
+        set { return textView.returnKeyType = newValue }
+        get { return textView.returnKeyType }
+    }
+    public var enablesReturnKeyAutomatically: Bool {
+        set { return textView.enablesReturnKeyAutomatically = newValue }
+        get { return textView.enablesReturnKeyAutomatically }
+    }
+    public var secureTextEntry: Bool {
+        get { return textView.secureTextEntry }
+    }
+    
+    // MARK: UIKeyInput
+    
+    public func hasText() -> Bool {
+        return textView.hasText()
+    }
+    public func insertText(text: String) {
+        textView.insertText(text)
+    }
+    public func insertAttributedText(attributedText: NSAttributedString) {
+        textView.insertAttributedText(attributedText)
+    }
+    public func deleteBackward() {
+        textView.deleteBackward()
+    }
+    public func clearText() {
+        return textView.clearText()
+    }
+    
+    // MARK: UITextViewDelegate & Forward
+    
     /// 将要编辑文本
     public func textViewShouldBeginEditing(textView: UITextView) -> Bool {
         guard delegate?.inputBarShouldBeginEditing?(self) ?? true else {
@@ -291,7 +357,7 @@ extension SIMChatInputBar: UITextViewDelegate {
     /// 己经开始编辑了
     public func textViewDidBeginEditing(textView: UITextView) {
         delegate?.inputBarDidBeginEditing?(self)
-        accessoryButtonDidDeselect()
+        barButtonDidDeselect()
     }
     /// 将要结束
     public func textViewShouldEndEditing(textView: UITextView) -> Bool {
@@ -321,6 +387,7 @@ extension SIMChatInputBar: UITextViewDelegate {
         
         return true
     }
+    
     /// 文本己经改变.
     public func textViewDidChange(textView: UITextView) {
         delegate?.inputBarDidChange?(self)
@@ -330,60 +397,7 @@ extension SIMChatInputBar: UITextViewDelegate {
         delegate?.inputBarDidChangeSelection?(self)
     }
     
-    /// 滚动到最后
-    func scrollViewToBottom() {
-        SIMLog.trace()
-        // TODO: 未实现的滚动
-//        let ch = textView.contentSize.height
-//        let bh = textView.bounds.height
-//        let py = textView.contentOffset.y
-//        if ch - bh > py {
-//            textView.setContentOffset(CGPointMake(0, ch - bh), animated: true)
-//        }
-    }
-}
-
-// MARK: - SIMChatInputItemViewDelegate
-
-extension SIMChatInputBar: SIMChatInputBarButtonDelegate {
-    /// 选择这个选项
-    func inputBarButtonDidSelect(inputBarButton: SIMChatInputBarButton) {
-        guard let accessory = inputBarButton.item where _selectedAccessoryButton != inputBarButton else {
-            return
-        }
-        if delegate?.inputBar?(self, shouldSelectItem: accessory) ?? true {
-            if let accessory = inputBarButton.item {
-                delegate?.inputBar?(self, willDeselectItem: accessory)
-            }
-            
-            let oldValue = _selectedAccessoryButton
-            _selectedAccessoryButton = inputBarButton
-            
-            if textView.isFirstResponder() {
-                textView.resignFirstResponder()
-            }
-            
-            if let accessory = oldValue?.item {
-                delegate?.inputBar?(self, didDeselectItem: accessory)
-            }
-            delegate?.inputBar?(self, didSelectItem: accessory)
-        }
-    }
-    /// 取消选择
-    private func accessoryButtonDidDeselect() {
-        guard let accessoryButton = _selectedAccessoryButton else {
-            return
-        }
-        _selectedAccessoryButton = nil
-        if let accessory = accessoryButton.item {
-            delegate?.inputBar?(self, didDeselectItem: accessory)
-        }
-    }
-}
-
-// MARK: - UICollectionViewDelegate & UICollectionViewDelegate
-
-extension SIMChatInputBar: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+    // MARK: UICollectionViewDelegate & UICollectionViewDelegate
     
     public func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return bottomBarButtonItems?.count ?? 0
@@ -411,6 +425,44 @@ extension SIMChatInputBar: UICollectionViewDataSource, UICollectionViewDelegateF
         }
         cell.button.delegate = self
         cell.button.item = item
+    }
+}
+
+// MARK: - SIMChatInputItemViewDelegate
+
+extension SIMChatInputBar: SIMChatInputBarButtonDelegate {
+    /// 选择这个选项
+    func inputBarButtonDidSelect(inputBarButton: SIMChatInputBarButton) {
+        guard let accessory = inputBarButton.item where _selectedBarButton != inputBarButton else {
+            return
+        }
+        if delegate?.inputBar?(self, shouldSelectItem: accessory) ?? true {
+            if let accessory = inputBarButton.item {
+                delegate?.inputBar?(self, willDeselectItem: accessory)
+            }
+            
+            let oldValue = _selectedBarButton
+            _selectedBarButton = inputBarButton
+            
+            if textView.isFirstResponder() {
+                textView.resignFirstResponder()
+            }
+            
+            if let accessory = oldValue?.item {
+                delegate?.inputBar?(self, didDeselectItem: accessory)
+            }
+            delegate?.inputBar?(self, didSelectItem: accessory)
+        }
+    }
+    /// 取消选择
+    private func barButtonDidDeselect() {
+        guard let barButton = _selectedBarButton else {
+            return
+        }
+        _selectedBarButton = nil
+        if let accessory = barButton.item {
+            delegate?.inputBar?(self, didDeselectItem: accessory)
+        }
     }
 }
 
@@ -476,6 +528,80 @@ internal class SIMChatInputBarCell: UICollectionViewCell {
 ///
 internal class SIMChatInputBarTextView: UITextView {
     
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+        build()
+    }
+    override init(frame: CGRect, textContainer: NSTextContainer?) {
+        super.init(frame: frame, textContainer: textContainer)
+        build()
+    }
+    deinit {
+        SIMLog.trace()
+    }
+    
+    @inline(__always) private func build() {
+        SIMLog.trace()
+        addSubview(_caretView)
+    }
+    
+    @inline(__always) private func updateCaretView() {
+        _caretView.frame = caretRectForPosition(selectedTextRange?.start ?? UITextPosition())
+    }
+    
+    override func insertText(text: String) {
+        super.insertText(text)
+        updateCaretView()
+    }
+    override func insertAttributedText(attributedText: NSAttributedString) {
+        super.insertAttributedText(attributedText)
+        updateCaretView()
+    }
+    override func deleteBackward() {
+        super.deleteBackward()
+        updateCaretView()
+    }
+    override func clearText() {
+        super.clearText()
+        updateCaretView()
+    }
+    
+    override func willMoveToWindow(newWindow: UIWindow?) {
+        if newWindow != nil {
+            updateCaretView()
+        }
+        super.willMoveToWindow(newWindow)
+    }
+    
+    override func becomeFirstResponder() -> Bool {
+        let b = super.becomeFirstResponder()
+        if b {
+            _isFirstResponder = true
+        }
+        return b
+    }
+    
+    override func resignFirstResponder() -> Bool {
+        let b = super.resignFirstResponder()
+        if b {
+            updateCaretView()
+            _isFirstResponder = false
+        }
+        return b
+    }
+    
+    
+    var maxHeight: CGFloat = 93
+    var editing: Bool = false {
+        didSet {
+            if editing {
+                _caretView.hidden = _isFirstResponder
+            } else {
+                _caretView.hidden = true
+            }
+        }
+    }
+    
     override var contentSize: CGSize {
         didSet {
             guard oldValue != contentSize && (oldValue.height <= maxHeight || contentSize.height <= maxHeight) else {
@@ -519,7 +645,20 @@ internal class SIMChatInputBarTextView: UITextView {
         return super.forwardingTargetForSelector(aSelector)
     }
     
-    var maxHeight: CGFloat = 93
+    var _isFirstResponder: Bool = false {
+        didSet {
+            editing = !(!editing)
+        }
+    }
+    
+    lazy var _caretView: UIView = {
+        let view = UIView()
+        view.layer.cornerRadius = 1
+        view.clipsToBounds = true
+        view.backgroundColor = UIColor.purpleColor()
+        view.hidden = true
+        return view
+    }()
 }
 
 ///

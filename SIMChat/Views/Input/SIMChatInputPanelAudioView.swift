@@ -287,7 +287,6 @@ extension SIMChatInputPanelAudioView: UICollectionViewDataSource, UICollectionVi
         insertSubview(view, belowSubview: _operatorView)
         
         view.alpha = 0
-        view.reloadData()
         
         UIView.animateWithDuration(0.25) {
             view.alpha = 1
@@ -741,28 +740,6 @@ internal class SIMChatInputPanelAudioViewPreview: UIView, SIMChatSpectrumViewDel
     
     weak var panel: UIView?
     weak var delegate: SIMChatInputPanelAudioViewDelegate?
-    
-    func reloadData() {
-//        guard let panel = self.panel else {
-//            return
-//        }
-//        guard let request = delegate?.inputPanelShouldStartPlay(panel) else {
-//            return
-//        }
-//        
-//        // 等待
-//        self._state = .Waiting
-//        
-//        request.response {
-//            if let error = $0.error {
-//                // 出错了.
-//                self._state = .Error(error)
-//            } else {
-//                // 播放中
-//                self._state = .Playing
-//            }
-//        }
-    }
     
     var _state: SIMChatInputPanelAudioView.PlayState = .None {
         didSet {

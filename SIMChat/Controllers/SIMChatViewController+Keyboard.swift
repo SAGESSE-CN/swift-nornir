@@ -77,22 +77,23 @@ extension SIMChatViewController: SIMChatInputBarDelegate, SIMChatInputPanelToolB
     }
     public func inputBar(inputBar: SIMChatInputBar, didSelectItem item: SIMChatInputItem) {
         SIMLog.trace()
+        inputBar.editing = (item.itemIdentifier == "kb:emoticon")
         inputPanelContainer.currentInputItem = item
     }
     public func inputBar(inputBar: SIMChatInputBar, didDeselectItem item: SIMChatInputItem) {
         SIMLog.trace()
         // 最后一次显示
         if inputBar.selectedBarButtonItem == nil {
+            inputBar.editing = false
             onHidePanel()
         }
     }
     public func inputBarShouldReturn(inputBar: SIMChatInputBar) -> Bool {
         // 发送.
         //sendMessageForText(self.textField.text ?? "")
-        inputBar.text = nil
+        inputBar.clearText()
         return false
     }
-    
     
     // MARK: - SIMChatInputPanelEmoticonViewDelegate
     
@@ -119,26 +120,43 @@ extension SIMChatViewController: SIMChatInputBarDelegate, SIMChatInputPanelToolB
     ///
     public func inputPanel(inputPanel: UIView, didSelectEmoticon emoticon: SIMChatEmoticon) {
         SIMLog.debug("\(emoticon.code)")
-        inputBar.text = (inputBar.text ?? "") + emoticon.code
+        if let png = emoticon.png where !png.isEmpty {
+            // 表情
+            let attachment = NSTextAttachment()
+            attachment.image = SIMChatBundle.imageWithResource("Emoticons/\(png)")
+            attachment.bounds = CGRectMake(0, -4, 20, 20)
+            inputBar.insertAttributedText(NSAttributedString(attachment: attachment))
+        } else {
+            // emoji & text
+            inputBar.insertText(emoticon.code)
+        }
         // TODO: 更新contentOffset
     }
     ///
     /// 点击了返回, 返回false拦截该处理
     ///
     public func inputPanelShouldReturn(inputPanel: UIView) -> Bool {
-        SIMLog.trace()
-        inputBar.text = nil
+        SIMLog.debug()
+        inputBar.clearText()
         return true
     }
     ///
     /// 点击了退格, 返回false拦截该处理
     ///
     public func inputPanelShouldBackspace(inputPanel: UIView) -> Bool {
-        SIMLog.trace()
-        guard let str = inputBar.text where !str.isEmpty else {
+        SIMLog.debug()
+        guard inputBar.hasText() else {
             return false
         }
-        inputBar.text = str.substringToIndex(str.endIndex.advancedBy(-1))
+        inputBar.deleteBackward()
+//        let mas = NSMutableAttributedString(attributedString: inputBar.attributedText ?? NSAttributedString())
+//        guard mas.length > 0 else {
+//            return false
+//        }
+//        let str = mas.string
+//        let xx = str.substringFromIndex(str.endIndex.advancedBy(-1)) as NSString
+//        mas.deleteCharactersInRange(NSMakeRange(mas.length - xx.length, xx.length))
+//        inputBar.attributedText = mas
         // TODO: 更新contentOffset
         return true
     }
