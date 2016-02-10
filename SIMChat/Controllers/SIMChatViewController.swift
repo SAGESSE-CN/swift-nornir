@@ -87,7 +87,7 @@ public class SIMChatViewController: UIViewController {
         return recognizer
     }()
     
-    private lazy var _inputPanelToolItems: [SIMChatInputItem] = {
+    private lazy var _inputPanelToolItems: [SIMChatInputItemProtocol] = {
         let R = { (n:String) -> UIImage? in
             SIMChatBundle.imageWithResource("InputPanel/\(n).png")
         }
@@ -153,7 +153,7 @@ extension SIMChatViewController {
     ///
     /// 输入面板
     ///
-    public var inputPanelToolItems: Array<SIMChatInputItem> {
+    public var inputPanelToolItems: Array<SIMChatInputItemProtocol> {
         return _inputPanelToolItems
     }
     

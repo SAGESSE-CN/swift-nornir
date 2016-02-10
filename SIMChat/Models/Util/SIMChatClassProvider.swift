@@ -20,13 +20,13 @@ public class SIMChatClassProvider {
         message = SIMChatBaseMessage.self
         conversation = SIMChatBaseConversation.self
         
-        unknowCell = SIMChatBaseCell.Unknow.self
+        unknowCell = SIMChatBaseMessageUnknowCell.self
         cells = [
-            NSStringFromClass(SIMChatBaseContent.Text.self):    SIMChatBaseCell.Text.self,
-            NSStringFromClass(SIMChatBaseContent.Tips.self):    SIMChatBaseCell.Tips.self,
-            NSStringFromClass(SIMChatBaseContent.Date.self):    SIMChatBaseCell.Date.self,
-            NSStringFromClass(SIMChatBaseContent.Audio.self):   SIMChatBaseCell.Audio.self,
-            NSStringFromClass(SIMChatBaseContent.Image.self):   SIMChatBaseCell.Image.self
+            NSStringFromClass(SIMChatBaseMessageTextContent.self):    SIMChatBaseMessageTextCell.self,
+            NSStringFromClass(SIMChatBaseMessageTipsContent.self):    SIMChatBaseMessageTipsCell.self,
+            NSStringFromClass(SIMChatBaseMessageDateContent.self):    SIMChatBaseMessageDateCell.self,
+            NSStringFromClass(SIMChatBaseMessageAudioContent.self):   SIMChatBaseMessageAudioCell.self,
+            NSStringFromClass(SIMChatBaseMessageImageContent.self):   SIMChatBaseMessageImageCell.self
         ]
     }
     
@@ -46,11 +46,11 @@ public class SIMChatClassProvider {
     ///
     /// 显示未知内容时使用的类型
     ///
-    public var unknowCell: SIMChatCellProtocol.Type
+    public var unknowCell: SIMChatMessageCellProtocol.Type
     ///
     /// 显示内容时使用的类型
     ///
-    public private(set) var cells: Dictionary<String, SIMChatCellProtocol.Type> = [:]
+    public private(set) var cells: Dictionary<String, SIMChatMessageCellProtocol.Type> = [:]
 }
 
 // MARK: - Register
@@ -59,13 +59,13 @@ extension SIMChatClassProvider {
     ///
     /// 注册显示内容时使用的类型
     ///
-    public func registerCell(contentType: SIMChatContentProtocol.Type, viewType: SIMChatCellProtocol.Type) {
+    public func registerCell(contentType: SIMChatMessageContentProtocol.Type, viewType: SIMChatMessageCellProtocol.Type) {
         return cells[NSStringFromClass(contentType)] = viewType
     }
     ///
     /// 获取显示内容时使用的类型, 如果没有注册返回unknowCell
     ///
-    public func cell(contentType: SIMChatContentProtocol.Type) -> SIMChatCellProtocol.Type {
+    public func cell(contentType: SIMChatMessageContentProtocol.Type) -> SIMChatMessageCellProtocol.Type {
         return cells[NSStringFromClass(contentType)] ?? unknowCell
     }
 }

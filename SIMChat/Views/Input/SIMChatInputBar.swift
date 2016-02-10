@@ -106,7 +106,7 @@ public class SIMChatInputBar: UIView {
 
     
     /// 当前选择的选项
-    public var selectedBarButtonItem: SIMChatInputItem? {
+    public var selectedBarButtonItem: SIMChatInputItemProtocol? {
         return _selectedBarButton?.item
         
     }
@@ -124,17 +124,17 @@ public class SIMChatInputBar: UIView {
     /// 背景
     public var backgroundView: UIView { return _backgroundView }
     /// 左侧菜单项
-    public var leftBarButtonItems: [SIMChatInputItem]? {
+    public var leftBarButtonItems: [SIMChatInputItemProtocol]? {
         set { return _leftBarButtonItemsView.items = newValue }
         get { return _leftBarButtonItemsView.items }
     }
     /// 右侧菜单项
-    public var rightBarButtonItems: [SIMChatInputItem]? {
+    public var rightBarButtonItems: [SIMChatInputItemProtocol]? {
         set { return _rightBarButtonItemsView.items = newValue }
         get { return _rightBarButtonItemsView.items }
     }
     /// 底部菜单项
-    public var bottomBarButtonItems: [SIMChatInputItem]? {
+    public var bottomBarButtonItems: [SIMChatInputItemProtocol]? {
         set {
             _bottomBarButtonItems = newValue
             _bottomBarButtonItemsView.hidden = newValue?.isEmpty ?? true
@@ -227,7 +227,7 @@ public class SIMChatInputBar: UIView {
     
     /// 不使用系统的, 因为系统的isFristResponder更新速度太慢了
     private var _textViewIsFristResponder: Bool = false
-    private var _bottomBarButtonItems: [SIMChatInputItem]?
+    private var _bottomBarButtonItems: [SIMChatInputItemProtocol]?
     private var _selectedBarButton: SIMChatInputBarButton? {
         didSet {
             guard _selectedBarButton != oldValue else {
@@ -282,11 +282,11 @@ public class SIMChatInputBar: UIView {
     optional func inputBarDidChange(inputBar: SIMChatInputBar)
     optional func inputBarDidChangeSelection(inputBar: SIMChatInputBar)
     
-    optional func inputBar(inputBar: SIMChatInputBar, shouldSelectItem item: SIMChatInputItem) -> Bool
-    optional func inputBar(inputBar: SIMChatInputBar, didSelectItem item: SIMChatInputItem)
+    optional func inputBar(inputBar: SIMChatInputBar, shouldSelectItem item: SIMChatInputItemProtocol) -> Bool
+    optional func inputBar(inputBar: SIMChatInputBar, didSelectItem item: SIMChatInputItemProtocol)
     
-    optional func inputBar(inputBar: SIMChatInputBar, willDeselectItem item: SIMChatInputItem)
-    optional func inputBar(inputBar: SIMChatInputBar, didDeselectItem item: SIMChatInputItem)
+    optional func inputBar(inputBar: SIMChatInputBar, willDeselectItem item: SIMChatInputItemProtocol)
+    optional func inputBar(inputBar: SIMChatInputBar, didDeselectItem item: SIMChatInputItemProtocol)
 }
 
 
@@ -428,7 +428,7 @@ extension SIMChatInputBar: UICollectionViewDataSource, UICollectionViewDelegateF
     }
 }
 
-// MARK: - SIMChatInputItemViewDelegate
+// MARK: - SIMChatInputItemProtocolViewDelegate
 
 extension SIMChatInputBar: SIMChatInputBarButtonDelegate {
     /// 选择这个选项
@@ -502,7 +502,7 @@ internal class SIMChatInputBarButton: UIButton {
             return _selected
         }
     }
-    private var item: SIMChatInputItem? {
+    private var item: SIMChatInputItemProtocol? {
         didSet {
             _selected = true
             selected = false
@@ -744,7 +744,7 @@ internal class SIMChatInputBarListEmbedView: UIView {
         
         weak var delegate: SIMChatInputBarButtonDelegate?
         var buttons: [SIMChatInputBarButton] = []
-        var items: [SIMChatInputItem]? {
+        var items: [SIMChatInputItemProtocol]? {
             didSet {
                 reloadData()
                 guard items?.count != oldValue?.count else {

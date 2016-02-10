@@ -9,7 +9,7 @@
 import UIKit
 import SIMChat
 
-class Unknow: SIMChatContentProtocol {
+class Unknow: SIMChatMessageContentProtocol {
 }
 
 class ExChatConversation: SIMChatBaseConversation {
@@ -23,7 +23,7 @@ class ExChatConversation: SIMChatBaseConversation {
             let o = (i % 2 == 0) ? receiver : sender!
             let s = (i % 2 == 0) ? sender!  : receiver 
             if true {
-                let c = SIMChatBaseContent.Text(content: "this is a tips\nThis is a very long long long long long long long long the tips")
+                let c = SIMChatBaseMessageTextContent(content: "this is a tips\nThis is a very long long long long long long long long the tips")
                 let m = SIMChatBaseMessage.messageWithContent(c, receiver: o, sender: s)
                 m.option = [.ContactShow]
                 m.isSelf = (i % 2 == 0)
@@ -31,7 +31,7 @@ class ExChatConversation: SIMChatBaseConversation {
                 messages.append(m)
             }
             if true {
-                let c = SIMChatBaseContent.Image(remote: path, size: CGSizeMake(640, 480))
+                let c = SIMChatBaseMessageImageContent(remote: path, size: CGSizeMake(640, 480))
                 let m = SIMChatBaseMessage.messageWithContent(c, receiver: o, sender: s)
                 m.option = [.ContactShow]
                 m.isSelf = (i % 2 == 0)
@@ -39,7 +39,7 @@ class ExChatConversation: SIMChatBaseConversation {
                 messages.append(m)
             }
             if true {
-                let c = SIMChatBaseContent.Audio(remote: path, duration: 6.2 * Double(i + 1))
+                let c = SIMChatBaseMessageAudioContent(remote: path, duration: 6.2 * Double(i + 1))
                 let m = SIMChatBaseMessage.messageWithContent(c, receiver: o, sender: s)
                 m.option = [.ContactShow]
                 m.isSelf = (i % 2 == 0)
@@ -47,11 +47,11 @@ class ExChatConversation: SIMChatBaseConversation {
                 messages.append(m)
             }
             if true {
-                let c = SIMChatBaseContent.Date(content: NSDate())
+                let c = SIMChatBaseMessageDateContent(content: NSDate())
                 messages.append(SIMChatBaseMessage.messageWithContent(c, receiver: o, sender: s))
             }
             if true {
-                let c = SIMChatBaseContent.Tips(content: "this is a tips\nThis is a very long long long long long long long long the tips")
+                let c = SIMChatBaseMessageTipsContent(content: "this is a tips\nThis is a very long long long long long long long long the tips")
                 messages.append(SIMChatBaseMessage.messageWithContent(c, receiver: o, sender: s))
             }
             if true {

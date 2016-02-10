@@ -67,7 +67,7 @@ extension SIMChatViewController: SIMChatInputBarDelegate, SIMChatInputPanelToolB
     
     // MARK: - SIMChatInputBarDelegate
     
-    public func inputBar(inputBar: SIMChatInputBar, shouldSelectItem item: SIMChatInputItem) -> Bool {
+    public func inputBar(inputBar: SIMChatInputBar, shouldSelectItem item: SIMChatInputItemProtocol) -> Bool {
         SIMLog.trace()
         // 第一次显示.
         if inputBar.selectedBarButtonItem == nil {
@@ -75,12 +75,12 @@ extension SIMChatViewController: SIMChatInputBarDelegate, SIMChatInputPanelToolB
         }
         return true
     }
-    public func inputBar(inputBar: SIMChatInputBar, didSelectItem item: SIMChatInputItem) {
+    public func inputBar(inputBar: SIMChatInputBar, didSelectItem item: SIMChatInputItemProtocol) {
         SIMLog.trace()
         inputBar.editing = (item.itemIdentifier == "kb:emoticon")
         inputPanelContainer.currentInputItem = item
     }
-    public func inputBar(inputBar: SIMChatInputBar, didDeselectItem item: SIMChatInputItem) {
+    public func inputBar(inputBar: SIMChatInputBar, didDeselectItem item: SIMChatInputItemProtocol) {
         SIMLog.trace()
         // 最后一次显示
         if inputBar.selectedBarButtonItem == nil {
@@ -90,6 +90,7 @@ extension SIMChatViewController: SIMChatInputBarDelegate, SIMChatInputPanelToolB
     }
     public func inputBarShouldReturn(inputBar: SIMChatInputBar) -> Bool {
         // 发送.
+        SIMLog.debug(inputBar.text)
         //sendMessageForText(self.textField.text ?? "")
         inputBar.clearText()
         return false
@@ -120,17 +121,16 @@ extension SIMChatViewController: SIMChatInputBarDelegate, SIMChatInputPanelToolB
     ///
     public func inputPanel(inputPanel: UIView, didSelectEmoticon emoticon: SIMChatEmoticon) {
         SIMLog.debug("\(emoticon.code)")
-        if let png = emoticon.png where !png.isEmpty {
+        if emoticon.type == 0 {
             // 表情
             let attachment = NSTextAttachment()
-            attachment.image = SIMChatBundle.imageWithResource("Emoticons/\(png)")
+            attachment.image = emoticon.png
             attachment.bounds = CGRectMake(0, -4, 20, 20)
             inputBar.insertAttributedText(NSAttributedString(attachment: attachment))
         } else {
             // emoji & text
             inputBar.insertText(emoticon.code)
         }
-        // TODO: 更新contentOffset
     }
     ///
     /// 点击了返回, 返回false拦截该处理
@@ -149,15 +149,6 @@ extension SIMChatViewController: SIMChatInputBarDelegate, SIMChatInputPanelToolB
             return false
         }
         inputBar.deleteBackward()
-//        let mas = NSMutableAttributedString(attributedString: inputBar.attributedText ?? NSAttributedString())
-//        guard mas.length > 0 else {
-//            return false
-//        }
-//        let str = mas.string
-//        let xx = str.substringFromIndex(str.endIndex.advancedBy(-1)) as NSString
-//        mas.deleteCharactersInRange(NSMakeRange(mas.length - xx.length, xx.length))
-//        inputBar.attributedText = mas
-        // TODO: 更新contentOffset
         return true
     }
     
@@ -172,20 +163,20 @@ extension SIMChatViewController: SIMChatInputBarDelegate, SIMChatInputPanelToolB
     ///
     /// 获取工具箱中的每一个工具
     ///
-    public func inputPanel(inputPanel: UIView, toolBoxItemAtIndex index: Int) -> SIMChatInputItem? {
+    public func inputPanel(inputPanel: UIView, toolBoxItemAtIndex index: Int) -> SIMChatInputItemProtocol? {
         return inputPanelToolItems[index]
     }
     
     ///
     /// 将要选择工具, 返回false表示拦截接下来的操作
     ///
-    public func inputPanel(inputPanel: UIView, shouldSelectToolBoxItem item: SIMChatInputItem) -> Bool {
+    public func inputPanel(inputPanel: UIView, shouldSelectToolBoxItem item: SIMChatInputItemProtocol) -> Bool {
         return true
     }
     ///
     /// 选择工具
     ///
-    public func inputPanel(inputPanel: UIView, didSelectToolBoxItem item: SIMChatInputItem) {
+    public func inputPanel(inputPanel: UIView, didSelectToolBoxItem item: SIMChatInputItemProtocol) {
         SIMLog.debug("\(item.itemIdentifier) => \(item.itemName)")
     }
     

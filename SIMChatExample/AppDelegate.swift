@@ -116,6 +116,69 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
+//        
+//        let ems: [SIMChatBaseEmoticon]? = (NSArray(contentsOfFile: "/Users/sagesse/Desktop/emoji.plist") as? Array<NSDictionary>)?.flatMap{
+//            let em = SIMChatBaseEmoticon()
+//            em.setValuesForKeysWithDictionary($0 as! [String : AnyObject])
+//            return em
+//        }
+//        
+//        let s = "😂😱😭😘😳😒😏😄😔😍😉☺😜😁😝😰😓😚😌😊💪👊👍☝👏✌👎🙏👌👈👉👆👇👀👃👄👂🍚🍝🍜🍙🍧🍣🎂🍞🍔🍳🍟🍺🍻🍸☕🍎🍊🍓🍉💊🚬🎄🌹🎉🌴💝🎀🎈🐚💍💣👑🔔⭐✨💨💦🔥🏆💰💤⚡👣💩💉♨📫🔑🔒✈🚄🚗🚤🚲🐎🚀🚌⛵👩👨👧👦🐵🐙🐷💀🐤🐨🐮🐔🐸👻🐛🐠🐶🐯👼🐧🐳🐭👒👗💄👠👢🌂👜👙👕👟☁☀☔🌙⛄⭕❌❔❕☎📷📱📠💻🎥🎤🔫💿💓♣🀄〽🎰🚥🚧🎸💈🛀🚽🏠⛪🏦🏥🏨🏧🏪🚹🚺".characters
+//        let a: Array<Dictionary<String, AnyObject>>?  = s.flatMap { s in
+//            if let idx = ems?.indexOf({
+//                return $0.name?.characters.contains(s) ?? false
+//            }) {
+//                return ems![idx].toDictionary()
+//            }
+//            print(s)
+//            return nil
+//        }
+//
+//        print(s.count)
+//        print(a?.count)
+        
+        //ems?.filter {
+//            if let n = $0.name?.characters.first {
+//                return s.contains(n)
+//            }
+//            return false
+//        }.flatMap {
+//            return $0.toDictionary()
+//        }
+        
+        
+//
+//        let arr = NSArray(contentsOfFile: "/Users/sagesse/Projects/swift-chat/SIMChat/Supporting Files/SIMChat.bundle/Emoticons/emoticons.plist") as? Array<NSDictionary>
+        
+//        let a: Array<Dictionary<String, AnyObject>>? = arr?.flatMap {
+//            
+//            let em = SIMChatBaseEmoticon()
+//            
+//            let dv = { (v: String?) -> String? in
+//                if let str = v as? NSString where str.hasPrefix("[") && str.hasSuffix("]") {
+//                    return str.substringWithRange(NSMakeRange(1, str.length - 2))
+//                }
+//                return v
+//            }
+//            
+//            em.name = dv($0["chs"] as? String)
+//            em.code = "/" + dv($0["chs"] as? String)!
+//            em.image = $0["png"] as? String
+//            em.image_gif = $0["gif"] as? String
+//            
+//            return em.toDictionary()
+////            var u: UInt32 = 0
+////            NSScanner(string: v).scanHexInt(&u)
+////            
+////            let x = String(Character(UnicodeScalar(u)))
+////            
+////            if let idx = ems?.indexOf({
+////                return $0.name == x
+////            }) {
+////                return ems![idx].toDictionary()
+////            }
+//        }
+//        (a as! NSArray).writeToFile("/Users/sagesse/Desktop/Info.plist", atomically: true)
         
         dispatch_async(dispatch_get_main_queue()) {
             if let window = self.window {

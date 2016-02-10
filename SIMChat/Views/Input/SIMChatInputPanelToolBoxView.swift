@@ -13,7 +13,7 @@ import UIKit
 ///
 /// 每一个工具
 ///
-public class SIMChatInputToolBoxItem: SIMChatInputItem {
+public class SIMChatInputToolBoxItem: SIMChatInputItemProtocol {
     
     public init(_ identifier: String, _ name: String, _ image: UIImage?, _ selectImage: UIImage? = nil) {
         itemIdentifier = identifier
@@ -41,11 +41,11 @@ internal class SIMChatInputPanelToolBoxView: UIView, SIMChatInputPanelProtocol {
         return self.init()
     }
     /// 获取对应的Item
-    static func inputPanelItem() -> SIMChatInputItem {
+    static func inputPanelItem() -> SIMChatInputItemProtocol {
         let R = { (name: String) -> UIImage? in
             return UIImage(named: name)
         }
-        let item = SIMChatInputBaseItem("kb:toolbox", R("chat_bottom_up_nor"), R("chat_bottom_up_press"))
+        let item = SIMChatBaseInputItem("kb:toolbox", R("chat_bottom_up_nor"), R("chat_bottom_up_press"))
         SIMChatInputPanelContainer.registerClass(self.self, byItem: item)
         return item
     }
@@ -111,11 +111,11 @@ internal protocol SIMChatInputPanelToolBoxDelegate: SIMChatInputPanelDelegate {
     ///
     /// 将要选择工具, 返回false表示拦截接下来的操作
     ///
-    func inputPanel(inputPanel: UIView, shouldSelectToolBoxItem item: SIMChatInputItem) -> Bool
+    func inputPanel(inputPanel: UIView, shouldSelectToolBoxItem item: SIMChatInputItemProtocol) -> Bool
     ///
     /// 选择工具
     ///
-    func inputPanel(inputPanel: UIView, didSelectToolBoxItem item: SIMChatInputItem)
+    func inputPanel(inputPanel: UIView, didSelectToolBoxItem item: SIMChatInputItemProtocol)
     
     ///
     /// 获取工具箱中的工具数量
@@ -124,7 +124,7 @@ internal protocol SIMChatInputPanelToolBoxDelegate: SIMChatInputPanelDelegate {
     ///
     /// 获取工具箱中的每一个工具
     ///
-    func inputPanel(inputPanel: UIView, toolBoxItemAtIndex index: Int) -> SIMChatInputItem?
+    func inputPanel(inputPanel: UIView, toolBoxItemAtIndex index: Int) -> SIMChatInputItemProtocol?
 }
 
 ///
@@ -167,14 +167,14 @@ internal class SIMChatInputPanelToolBoxCell: UICollectionViewCell {
     }
     
     /// 关联的item
-    var item: SIMChatInputItem? {
+    var item: SIMChatInputItemProtocol? {
         willSet {
             titleLabel.text = newValue?.itemName
             contentView2.setBackgroundImage(newValue?.itemImage, forState: .Normal)
         }
     }
     /// item代理
-    weak var delegate: SIMChatInputItemDelegate?
+    weak var delegate: SIMChatInputItemProtocolDelegate?
     
     /// 选择了该择
     dynamic func onItemPress(sender: AnyObject) {
@@ -267,15 +267,15 @@ extension SIMChatInputPanelToolBoxView: UICollectionViewDataSource, UICollection
     }
 }
 
-// MARK: - SIMChatInputItemDelegate
+// MARK: - SIMChatInputItemProtocolDelegate
 
-extension SIMChatInputPanelToolBoxView: SIMChatInputItemDelegate {
+extension SIMChatInputPanelToolBoxView: SIMChatInputItemProtocolDelegate {
     /// 将要选择选项
-    func itemShouldSelect(item: SIMChatInputItem) -> Bool {
+    func itemShouldSelect(item: SIMChatInputItemProtocol) -> Bool {
         return (delegate as? SIMChatInputPanelToolBoxDelegate)?.inputPanel(self, shouldSelectToolBoxItem: item) ?? true
     }
     /// 选择了选项
-    func itemDidSelect(item: SIMChatInputItem) {
+    func itemDidSelect(item: SIMChatInputItemProtocol) {
         (delegate as? SIMChatInputPanelToolBoxDelegate)?.inputPanel(self, didSelectToolBoxItem: item)
     }
 }

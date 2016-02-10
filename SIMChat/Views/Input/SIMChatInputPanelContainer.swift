@@ -21,7 +21,7 @@ public class SIMChatInputPanelContainer: UIView {
     ///
     /// 注册面板
     ///
-    public static func registerClass(cls: SIMChatInputPanelProtocol.Type, byItem item: SIMChatInputItem) {
+    public static func registerClass(cls: SIMChatInputPanelProtocol.Type, byItem item: SIMChatInputItemProtocol) {
         SIMLog.debug("\(item.itemIdentifier) => \(NSStringFromClass(cls))")
         _subpanelClasses[item.itemIdentifier] = cls
     }
@@ -29,7 +29,7 @@ public class SIMChatInputPanelContainer: UIView {
     ///
     /// 当前显示的选项
     ///
-    public var currentInputItem: SIMChatInputItem? {
+    public var currentInputItem: SIMChatInputItemProtocol? {
         set { return _currentInputItem = newValue }
         get { return _currentInputItem }
     }
@@ -45,7 +45,7 @@ public class SIMChatInputPanelContainer: UIView {
     ///
     public weak var delegate: SIMChatInputPanelDelegate?
     
-    private var _currentInputItem: SIMChatInputItem? {
+    private var _currentInputItem: SIMChatInputItemProtocol? {
         didSet {
             guard oldValue !== _currentInputItem else {
                 return

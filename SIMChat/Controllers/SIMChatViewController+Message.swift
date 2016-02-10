@@ -37,16 +37,17 @@ extension SIMChatViewController {
 extension SIMChatViewController.MessageManager: UITableViewDataSource {
     /// some prepare
     func prepare() {
+        guard let manager = self.manager else {
+            fatalError("Must provider manager")
+        }
+        
+        // regitster unknow cell
+        contentView?.registerClass(manager.classProvider.unknowCell, forCellReuseIdentifier: "SIMChat.Unknow")
+        SIMLog.debug("SIMChat.AnyObject => \(NSStringFromClass(manager.classProvider.unknowCell))")
         // reigster cell class
-        manager?.classProvider.cells.forEach {
+        manager.classProvider.cells.forEach {
             self.contentView?.registerClass($0.1, forCellReuseIdentifier: $0.0)
             SIMLog.debug("\($0.0) => \(NSStringFromClass($0.1))")
-        }
-        // regitster unknow cell
-        if let unknowCls = manager?.classProvider.unknowCell as? AnyClass {
-            contentView?.registerClass(unknowCls, forCellReuseIdentifier: "SIMChat.Unknow")
-        } else {
-            fatalError("Must provider unknow cell class")
         }
         dispatch_async(dispatch_get_main_queue()) {
             self.conversation.loadHistoryMessages(200).response { [weak self] in
@@ -74,7 +75,7 @@ extension SIMChatViewController.MessageManager: UITableViewDataSource {
         let message = allMessages[indexPath.row]
         let identifier = reuseIndentifierWithMessage(message)
         return tableView.fd_heightForCellWithIdentifier(identifier, cacheByKey: message.identifier) {
-            if let mcell = $0 as? SIMChatCellProtocol where message != mcell.message {
+            if let mcell = $0 as? SIMChatMessageCellProtocol where message != mcell.message {
                 // configuation
                 mcell.conversation = self.conversation
                 mcell.message = message
@@ -101,7 +102,7 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate {
         cell.backgroundColor = .clearColor()
         
         let message = allMessages[indexPath.row]
-        if let mcell = cell as? SIMChatCellProtocol where message != mcell.message {
+        if let mcell = cell as? SIMChatMessageCellProtocol where message != mcell.message {
             // custom configuation
             mcell.conversation = self.conversation
             mcell.message = message
@@ -127,33 +128,33 @@ extension SIMChatViewController.MessageManager: SIMChatConversationDelegate {
 
 extension SIMChatViewController.MessageManager: SIMChatCellEventDelegate {
     /// 回复用户
-    func cellEvent(cell: SIMChatCellProtocol, replyUser user: SIMChatUserProtocol) {
+    func cellEvent(cell: SIMChatMessageCellProtocol, replyUser user: SIMChatUserProtocol) {
         SIMLog.debug(user.identifier)
     }
     /// 显示用户信息
-    func cellEvent(cell: SIMChatCellProtocol, showProfile user: SIMChatUserProtocol) {
+    func cellEvent(cell: SIMChatMessageCellProtocol, showProfile user: SIMChatUserProtocol) {
         SIMLog.debug(user.identifier)
     }
     
     /// 复制消息
-    func cellEvent(cell: SIMChatCellProtocol, copyMessage message: SIMChatMessageProtocol) {
+    func cellEvent(cell: SIMChatMessageCellProtocol, copyMessage message: SIMChatMessageProtocol) {
         SIMLog.debug(message.identifier)
     }
     /// 删除消息
-    func cellEvent(cell: SIMChatCellProtocol, removeMessage message: SIMChatMessageProtocol) {
+    func cellEvent(cell: SIMChatMessageCellProtocol, removeMessage message: SIMChatMessageProtocol) {
         SIMLog.debug(message.identifier)
     }
     /// 撤回消息
-    func cellEvent(cell: SIMChatCellProtocol, revocationMessage message: SIMChatMessageProtocol) {
+    func cellEvent(cell: SIMChatMessageCellProtocol, revocationMessage message: SIMChatMessageProtocol) {
         SIMLog.debug(message.identifier)
     }
     
     /// 点
-    func cellEvent(cell: SIMChatCellProtocol, clickMessage message: SIMChatMessageProtocol) {
+    func cellEvent(cell: SIMChatMessageCellProtocol, clickMessage message: SIMChatMessageProtocol) {
         SIMLog.debug(message.identifier)
     }
     /// 重试(发送/上传/下载)
-    func cellEvent(cell: SIMChatCellProtocol, retryMessage message: SIMChatMessageProtocol) {
+    func cellEvent(cell: SIMChatMessageCellProtocol, retryMessage message: SIMChatMessageProtocol) {
         SIMLog.debug(message.identifier)
     }
 }

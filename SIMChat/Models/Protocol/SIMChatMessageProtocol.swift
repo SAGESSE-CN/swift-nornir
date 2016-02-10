@@ -27,7 +27,7 @@ public protocol SIMChatMessageProtocol: class {
     ///
     /// 消息内容
     ///
-    var content: SIMChatContentProtocol { get }
+    var content: SIMChatMessageContentProtocol { get }
     
     ///
     /// 消息发生时间(发送/接收)
@@ -55,7 +55,7 @@ public protocol SIMChatMessageProtocol: class {
     /// - parameter sender:     发送者信息
     /// - returns:  消息
     ///
-    static func messageWithContent(content: SIMChatContentProtocol, receiver: SIMChatUserProtocol, sender: SIMChatUserProtocol, identifier: String) -> SIMChatMessageProtocol
+    static func messageWithContent(content: SIMChatMessageContentProtocol, receiver: SIMChatUserProtocol, sender: SIMChatUserProtocol, identifier: String) -> SIMChatMessageProtocol
 }
 
 // MARK: - Convenience
@@ -70,7 +70,7 @@ extension SIMChatMessageProtocol {
     /// - parameter sender:     发送者信息
     /// - returns:  消息
     ///
-    public static func messageWithContent(content: SIMChatContentProtocol, receiver: SIMChatUserProtocol, sender: SIMChatUserProtocol) -> SIMChatMessageProtocol {
+    public static func messageWithContent(content: SIMChatMessageContentProtocol, receiver: SIMChatUserProtocol, sender: SIMChatUserProtocol) -> SIMChatMessageProtocol {
         return messageWithContent(content, receiver: receiver, sender: sender, identifier: NSUUID().UUIDString)
     }
 }

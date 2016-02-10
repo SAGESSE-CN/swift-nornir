@@ -9,48 +9,7 @@
 import UIKit
 
 // TODO: 暂未支持横屏
-
-///
-/// 表情
-///
-public protocol SIMChatEmoticon: class {
-    ///
-    /// 表情码
-    ///
-    var code: String { get }
-    ///
-    /// 关联的静态图
-    ///
-    var png: String? { get }
-    ///
-    /// 关联的动态图
-    ///
-    var gif: String? { get }
-}
-
-///
-/// 一组表情
-///
-public protocol SIMChatEmoticonGroup: class {
-    
-    ///
-    /// 唯一id
-    ///
-    var identifier: String { get }
-    ///
-    /// 图标
-    ///
-    var image: UIImage? { get }
-    ///
-    /// 组名
-    ///
-    var name: String? { get }
-    
-    ///
-    /// 该组表情所有的表情
-    ///
-    var emoticons: Array<SIMChatEmoticon> { get }
-}
+// TODO: tabbar显示未正常
 
 ///
 /// 表情面板代理
@@ -94,11 +53,11 @@ internal class SIMChatInputPanelEmoticonView: UIView, SIMChatInputPanelProtocol 
         return self.init()
     }
     /// 获取对应的Item
-    static func inputPanelItem() -> SIMChatInputItem {
+    static func inputPanelItem() -> SIMChatInputItemProtocol {
         let R = { (name: String) -> UIImage? in
             return UIImage(named: name)
         }
-        let item = SIMChatInputBaseItem("kb:emoticon", R("chat_bottom_smile_nor"), R("chat_bottom_smile_press"))
+        let item = SIMChatBaseInputItem("kb:emoticon", R("chat_bottom_smile_nor"), R("chat_bottom_smile_press"))
         SIMChatInputPanelContainer.registerClass(self.self, byItem: item)
         return item
     }
@@ -141,15 +100,36 @@ internal class SIMChatInputPanelEmoticonView: UIView, SIMChatInputPanelProtocol 
         
         dispatch_async(dispatch_get_main_queue()) {
             self._contentView.reloadData()
+            guard !self._builtInGroups.isEmpty else {
+                return
+            }
             dispatch_async(dispatch_get_main_queue()) {
-                if let group = self._builtInGroups.first as? SIMChatEmoticonGroupOfClassic {
-                    let idx = NSIndexPath(forItem: group.defaultPage, inSection: 0)
-                    self._pageControl.reloadData()
-                    self._pageControl.currentPage = NSIndexPath(forItem: 0, inSection: 1)
-                    self._contentView.scrollToItemAtIndexPath(idx,
-                        atScrollPosition: .None,
-                        animated: false)
+                // 查找默认显示的
+                let idx = (0 ..< self._contentView.numberOfSections()).indexOf {
+                    return self.groupAtIndex($0)?.isDefault ?? false
+                } ?? 0
+                // 检查有没有子组
+                var sidx = 0
+                var spidx = 0
+                if let group = self.groupAtIndex(idx), subgroups = group.groups where !subgroups.isEmpty {
+                    var flag = false
+                    for sg in subgroups {
+                        if sg.isDefault {
+                            flag = true
+                            break
+                        }
+                        sidx += self._pages["\(group.identifier)+\(sg.identifier)"]?.count ?? 0
+                        spidx += 1
+                    }
+                    sidx = flag ? sidx : 0
                 }
+                
+                self._pageControl.tag = idx
+                self._pageControl.reloadData()
+                self._pageControl.currentPage = NSIndexPath(forItem: 0, inSection: spidx)
+                self._contentView.scrollToItemAtIndexPath(NSIndexPath(forItem: sidx, inSection: idx),
+                    atScrollPosition: .None,
+                    animated: false)
             }
         }
     }
@@ -205,9 +185,8 @@ internal class SIMChatInputPanelEmoticonView: UIView, SIMChatInputPanelProtocol 
     }()
     
     private var _pages: Dictionary<String, Array<SIMChatInputPanelEmoticonPage>> = [:]
-    private lazy var _builtInGroups: [SIMChatEmoticonGroup] = [
-        SIMChatEmoticonGroupOfClassic()
-    ]
+    private var _lastIndexPath: NSIndexPath?
+    private lazy var _builtInGroups: Array<SIMChatEmoticonGroup> = SIMChatBaseEmoticonGroup.loadGroupWithBuiltIn()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -425,8 +404,8 @@ internal class SIMChatInputPanelEmoticonPreview: UIView {
                 return
             }
             
-            if let png = value.png where !png.isEmpty {
-                guard let image = SIMChatBundle.imageWithResource("Emoticons/\(png)") else {
+            if value.type == 0 {
+                guard let image = value.png else {
                     return
                 }
                 imageView.image = image
@@ -544,8 +523,8 @@ internal class SIMChatInputPanelEmoticonCell: UICollectionViewCell, UIGestureRec
             let row = $0.index / maximumItemCount
             let col = $0.index % maximumItemCount
             
-            if let png = $0.element.png where !png.isEmpty {
-                guard let image = SIMChatBundle.imageWithResource("Emoticons/\(png)") else {
+            if $0.element.type == 0 {
+                guard let image = $0.element.png else {
                     return
                 }
                 var frame = CGRectZero
@@ -749,28 +728,10 @@ internal class SIMChatInputPanelEmoticonPage {
     /// 把Group转为Page
     ///
     static func makeWithGroup(group: SIMChatEmoticonGroup) -> Array<SIMChatInputPanelEmoticonPage> {
-        if let group = group as? SIMChatEmoticonGroupOfClassic {
-            return makeWithGroup(group)
-        }
         return makeWithEmoticons(group.emoticons).map {
             $0.group = group
             return $0
         }
-    }
-    ///
-    /// 把Group转为Page(特化)
-    ///
-    static func makeWithGroup(group: SIMChatEmoticonGroupOfClassic) -> Array<SIMChatInputPanelEmoticonPage>  {
-        let p1: [SIMChatInputPanelEmoticonPage] = makeWithEmoticons(group.emojis).map {
-            $0.group = group
-            return $0
-        }.reverse()
-        let p2: [SIMChatInputPanelEmoticonPage] = makeWithEmoticons(group.faces).map {
-            $0.group = group
-            return $0
-        }
-        group.defaultPage = p1.count
-        return p1 + p2
     }
     ///
     /// 使用表情
@@ -792,16 +753,25 @@ internal class SIMChatInputPanelEmoticonPage {
     lazy var emoticons: Array<SIMChatEmoticon> = []
 }
 
-extension SIMChatInputPanelEmoticonView {
+extension SIMChatInputPanelEmoticonView: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, SIMChatInputPanelPageControlDelegate, SIMChatInputPanelEmoticonCellDelegate {
+    
     /// 点击返回
     dynamic func onReturnPress(sender: AnyObject) {
         if (delegate as? SIMChatInputPanelEmoticonViewDelegate)?.inputPanelShouldReturn(self) ?? true {
             // nothing
         }
     }
-}
-
-extension SIMChatInputPanelEmoticonView: SIMChatInputPanelEmoticonCellDelegate {
+    
+    /// 获取一组表情
+    @inline(__always) func groupAtIndex(index: Int) -> SIMChatEmoticonGroup? {
+        if index < _builtInGroups.count {
+            return _builtInGroups[index]
+        }
+        return (delegate as? SIMChatInputPanelEmoticonViewDelegate)?.inputPanel(self, emoticonGroupAtIndex: index - _builtInGroups.count)
+    }
+    
+    // MARK: SIMChatInputPanelEmoticonCellDelegate
+    
     /// 将要选择表情
     func emoticonCell(emoticonCell: UIView, shouldSelectItem item: SIMChatEmoticon) -> Bool {
         return (delegate as? SIMChatInputPanelEmoticonViewDelegate)?.inputPanel(self, shouldSelectEmoticon: item) ?? true
@@ -818,70 +788,71 @@ extension SIMChatInputPanelEmoticonView: SIMChatInputPanelEmoticonCellDelegate {
     func emoticonCellDidBackspace(emoticonCell: UIView) {
         // nothing
     }
-}
-
-extension SIMChatInputPanelEmoticonView: SIMChatInputPanelPageControlDelegate {
     
+    // MARK: SIMChatInputPanelPageControlDelegate
+    
+    /// 子组数量
     func numberOfSectionsInPageControl(pageControl: SIMChatInputPanelPageControl) -> Int {
-        if groupAtIndex(pageControl.tag) is SIMChatEmoticonGroupOfClassic {
-            return 2
-        }
-        return 1
+        let v = max(groupAtIndex(pageControl.tag)?.groups?.count ?? 0, 1)
+        return v
     }
     
+    /// 每组的数量
     func pageControl(pageControl: SIMChatInputPanelPageControl, numberOfPagesInSection section: Int) -> Int {
         guard let group = groupAtIndex(pageControl.tag) else {
             return 0
         }
-        if let classic = group as? SIMChatEmoticonGroupOfClassic {
-            if section == 0 {
-                return classic.defaultPage
+        // 存在子组
+        if section < group.groups?.count {
+            if let sg = group.groups?[section] {
+                return _pages["\(group.identifier)+\(sg.identifier)"]?.count ?? 0
             }
-            let count = _pages[group.identifier]?.count ?? 0
-            return count - classic.defaultPage
         }
         return _pages[group.identifier]?.count ?? 0
     }
     
+    /// 每组的图标
     func pageControl(pageControl: SIMChatInputPanelPageControl, imageOfSection section: Int) -> UIImage? {
-        if section == 0 {
-            return UIImage(named: "qvip_emoji_pagecontrol_emoji")
+        guard let group = groupAtIndex(pageControl.tag) where section < group.groups?.count else {
+            return nil
         }
-        if section == 1 {
-            return UIImage(named: "qvip_emoji_pagecontrol_qq")
-        }
-        return nil
-    }
-}
-
-extension SIMChatInputPanelEmoticonView: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
-    
-    /// 获取一组表情
-    @inline(__always) func groupAtIndex(index: Int) -> SIMChatEmoticonGroup? {
-        if index < _builtInGroups.count {
-            return _builtInGroups[index]
-        }
-        return (delegate as? SIMChatInputPanelEmoticonViewDelegate)?.inputPanel(self, emoticonGroupAtIndex: index - _builtInGroups.count)
+        return group.groups?[section].icon
     }
     
-    func scrollViewDidEndDecelerating(scrollView: UIScrollView) {
+    // MARK: UIScrollViewDelegate
+    
+    func scrollViewDidScroll(scrollView: UIScrollView) {
         if scrollView is SIMChatInputPanelTabBar {
             return
         }
         
-        if let indexPath = _contentView.indexPathsForVisibleItems().first {
-            let page = Int(round(scrollView.contentOffset.x / scrollView.frame.width))
-            if let group = groupAtIndex(indexPath.section) as? SIMChatEmoticonGroupOfClassic {
-                if page < group.defaultPage {
-                    _pageControl.currentPage = NSIndexPath(forItem: page, inSection: 0)
-                } else {
-                    _pageControl.currentPage = NSIndexPath(forItem: page - group.defaultPage, inSection: 1)
-                }
-            } else {
-                _pageControl.currentPage = NSIndexPath(forItem: page, inSection: 0)
+        let pt = CGPointMake(scrollView.contentOffset.x + scrollView.frame.width / 2, scrollView.contentOffset.y)
+        if let indexPath = _contentView.indexPathForItemAtPoint(pt) where _lastIndexPath?.item != indexPath.item || _lastIndexPath?.section != indexPath.section {
+            let page = indexPath.item
+            if _pageControl.tag != indexPath.section {
+                _pageControl.tag = indexPath.section
+                _pageControl.reloadData()
             }
+            var idx = page
+            var pidx = 0
+            if let group = groupAtIndex(indexPath.section), subgroups = group.groups {
+                for sg in subgroups {
+                    let count = _pages["\(group.identifier)+\(sg.identifier)"]?.count ?? 0
+                    if idx < count {
+                        break
+                    }
+                    idx -= count
+                    pidx += 1
+                }
+            }
+            SIMLog.debug("\(indexPath.row) => \(indexPath.section) | \(idx) => \(pidx)")
+            
+            _pageControl.currentPage = NSIndexPath(forItem: idx, inSection: pidx)
+            _lastIndexPath = indexPath
         }
     }
+    
+    // MARK: UICollectionViewDataSource
     
     func numberOfSectionsInCollectionView(collectionView: UICollectionView) -> Int {
         let count = (delegate as? SIMChatInputPanelEmoticonViewDelegate)?.numberOfGroupsInInputPanelEmoticon(self) ?? 0
@@ -896,21 +867,28 @@ extension SIMChatInputPanelEmoticonView: UICollectionViewDataSource, UICollectio
             return 0
         }
         let count = _pages[group.identifier]?.count ?? {
+            // 存在子组
+            if let subgroups = group.groups where !subgroups.isEmpty {
+                var pages: Array<SIMChatInputPanelEmoticonPage> = []
+                subgroups.forEach {
+                    // 转化为page
+                    var ps = SIMChatInputPanelEmoticonPage.makeWithGroup($0)
+                    if pages.isEmpty && group.isDefault && !$0.isDefault {
+                        // 如果是第一个, 反转
+                        ps = ps.reverse()
+                    }
+                    _pages["\(group.identifier)+\($0.identifier)"] = ps
+                    pages.appendContentsOf(ps)
+                }
+                _pages[group.identifier] = pages
+                return pages.count
+            }
             // 转化为page
             let pages = SIMChatInputPanelEmoticonPage.makeWithGroup(group)
             _pages[group.identifier] = pages
             return pages.count
         }()
-        _pageControl.tag = section
-        _pageControl.reloadData()
         return count
-    }
-    
-    func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAtIndexPath indexPath: NSIndexPath) -> CGSize {
-        if collectionView is SIMChatInputPanelTabBar {
-            return CGSizeMake(50, collectionView.bounds.height)
-        }
-        return collectionView.bounds.size
     }
     
     func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
@@ -918,6 +896,15 @@ extension SIMChatInputPanelEmoticonView: UICollectionViewDataSource, UICollectio
             return collectionView.dequeueReusableCellWithReuseIdentifier("Item", forIndexPath: indexPath)
         }
         return collectionView.dequeueReusableCellWithReuseIdentifier("Emoticon", forIndexPath: indexPath)
+    }
+    
+    // MARK: UICollectionViewDelegateFlowLayout
+    
+    func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAtIndexPath indexPath: NSIndexPath) -> CGSize {
+        if collectionView is SIMChatInputPanelTabBar {
+            return CGSizeMake(50, collectionView.bounds.height)
+        }
+        return collectionView.bounds.size
     }
     
     func collectionView(collectionView: UICollectionView, willDisplayCell cell: UICollectionViewCell, forItemAtIndexPath indexPath: NSIndexPath) {
@@ -931,96 +918,8 @@ extension SIMChatInputPanelEmoticonView: UICollectionViewDataSource, UICollectio
         }
         if let cell = cell as? SIMChatInputPanelTabBarCell {
             cell.button.setTitle(group.name, forState: .Normal)
-            cell.button.setImage(group.image, forState: .Normal)
+            cell.button.setImage(group.icon, forState: .Normal)
             cell.backgroundColor = UIColor(rgb: 0xe4e4e4)
         }
     }
 }
-
-
-///
-/// 经典类型的表情
-///
-internal class SIMChatEmoticonGroupOfClassic: SIMChatEmoticonGroup {
-    class Classic: SIMChatEmoticon {
-        init(id: String) {
-            self.code = id
-            self.png = String(format: "Default/%03d.png", Int(id) ?? 0)
-        }
-        init(code: String) {
-            self.code = code
-        }
-        var code: String
-        var png: String?
-        var gif: String?
-    }
-    /// 创建组
-    init() {
-        guard let path = SIMChatBundle.resourcePath("Preferences/face.plist") else {
-            fatalError("Must add \"SIMChat.bundle\" file")
-        }
-        guard let dic1 = NSDictionary(contentsOfFile: path) else {
-            fatalError("file \"SIMChat.bundle/Preferences/face.plist\" load fail!")
-        }
-        
-        // 生成列表
-        var faces = Array<SIMChatEmoticon>()
-        var emojis = Array<SIMChatEmoticon>()
-        var emoticons = Array<SIMChatEmoticon>()
-        
-        // 生成emoij
-        let emoji = { (x:UInt32) -> SIMChatEmoticon in
-            var idx = ((((0x808080F0 | (x & 0x3F000) >> 4) | (x & 0xFC0) << 10) | (x & 0x1C0000) << 18) | (x & 0x3F) << 24)
-            return withUnsafePointer(&idx) {
-                let str = NSString(
-                    bytes: $0,
-                    length: sizeof(idx.dynamicType),
-                    encoding: NSUTF8StringEncoding) as! String
-                return Classic(code: str)
-            }
-        }
-        for i:UInt32 in 0x1F600 ..< 0x1F64F where i < 0x1F641 || i > 0x1F644 {
-            let e = emoji(i)
-            emojis.append(e)
-            emoticons.append(e)
-        }
-        for i:UInt32 in 0x1F680 ..< 0x1F6A4 {
-            let e = emoji(i)
-            emojis.append(e)
-            emoticons.append(e)
-        }
-        for i:UInt32 in 0x1F6A5 ..< 0x1F6C5 {
-            let e = emoji(i)
-            emojis.append(e)
-            emoticons.append(e)
-        }
-        
-        // 生成face
-        dic1.sort { ($0.value as? Int) > ($1.value as? Int) }
-            .map { Classic(id: $0.key as! String) }
-            .forEach {
-                faces.append($0)
-                emoticons.append($0)
-            }
-        
-        self.faces = faces
-        self.emojis = emojis
-        self.emoticons = emoticons
-        
-        self.identifier = NSUUID().UUIDString
-        self.image = UIImage(named: "qvip_emoji_tab_classic_5_9_5")
-    }
-    
-    var identifier: String
-    var image: UIImage?
-    var name: String?
-    
-    /// 该组表情所有的表情
-    var emoticons: Array<SIMChatEmoticon>
-    var emojis: Array<SIMChatEmoticon>
-    var faces: Array<SIMChatEmoticon>
-    
-    /// 默认停留的页面
-    var defaultPage: Int = 0
-}
-

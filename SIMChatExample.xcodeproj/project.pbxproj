@@ -62,7 +62,7 @@
 
 /* Begin PBXFileReference section */
 		0C0DD6A11C60B65D00AEC8C4 /* SIMChatExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SIMChatExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		0C0DD6A41C60B65D00AEC8C4 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		0C0DD6A41C60B65D00AEC8C4 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; wrapsLines = 0; };
 		0C0DD6A61C60B65D00AEC8C4 /* ExConversationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExConversationViewController.swift; sourceTree = "<group>"; };
 		0C0DD6A91C60B65D00AEC8C4 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		0C0DD6AB1C60B65D00AEC8C4 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
