@@ -159,4 +159,6 @@ extension NSTimer {
     }
 }
 
-
+public func dispatch_after_at_now(interval: NSTimeInterval, _ queue: dispatch_queue_t, _ block: dispatch_block_t) {
+    return dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(interval * NSTimeInterval(NSEC_PER_SEC))), queue, block)
+}

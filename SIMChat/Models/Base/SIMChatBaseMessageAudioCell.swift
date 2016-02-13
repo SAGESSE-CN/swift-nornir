@@ -53,9 +53,19 @@ public class SIMChatBaseMessageAudioCell: SIMChatBaseMessageBubbleCell {
                 leftConstraints2.append(c)
             }
         }
-        
-        initEvent()
     }
+    
+    public override func initEvents() {
+        super.initEvents()
+        // add kvo
+        SIMChatNotificationCenter.addObserver(self, selector: "audioDidStop:", name: SIMChatAudioManagerWillStopNotification)
+        SIMChatNotificationCenter.addObserver(self, selector: "audioDidStop:", name: SIMChatAudioManagerWillRecordNotification)
+        SIMChatNotificationCenter.addObserver(self, selector: "audioDidPlay:", name: SIMChatAudioManagerWillPlayNotification)
+        
+        SIMChatNotificationCenter.addObserver(self, selector: "audioWillLoad:", name: SIMChatAudioManagerWillLoadNotification)
+        SIMChatNotificationCenter.addObserver(self, selector: "audioDidLoad:", name: SIMChatAudioManagerDidLoadNotification)
+    }
+    
     /// 显示类型
     public override var style: Style {
         didSet {
@@ -92,23 +102,28 @@ public class SIMChatBaseMessageAudioCell: SIMChatBaseMessageBubbleCell {
     /// 消息内容
     public override var message: SIMChatMessageProtocol? {
         didSet {
-            if let content = message?.content as? SIMChatBaseMessageAudioContent {
-                titleLabel.text = { duration in
-                    if duration < 60 {
-                        return String(format: "%d''", Int(duration % 60))
-                    }
-                    return String(format: "%d'%02d''", Int(duration / 60), Int(duration % 60))
-                    }(content.duration)
-                
-                // 下载
-                // 播放
-                // 停止
-                
-                // 播放中.
-                //                    if content.playing {
-                //                        animationView.startAnimating()
-                //                    }
+            guard let content = message?.content as? SIMChatBaseMessageAudioContent else {
+                return
             }
+        
+            // 播放中.
+            if content.playing {
+                animationView.startAnimating()
+            } else {
+                animationView.stopAnimating()
+            }
+            
+            // 有改变
+            guard message !== oldValue else {
+                return
+            }
+            
+            titleLabel.text = { duration in
+                if duration < 60 {
+                    return String(format: "%d''", Int(duration % 60))
+                }
+                return String(format: "%d'%02d''", Int(duration / 60), Int(duration % 60))
+            }(content.duration)
         }
     }
     
@@ -123,48 +138,68 @@ public class SIMChatBaseMessageAudioCell: SIMChatBaseMessageBubbleCell {
 // MARK: - Event
 
 extension SIMChatBaseMessageAudioCell {
-    ///
-    private func initEvent() {
-        // add kvo
-        SIMChatNotificationCenter.addObserver(self, selector: "onAudioDidStop:", name: SIMChatAudioManagerWillStopNotification)
-        SIMChatNotificationCenter.addObserver(self, selector: "onAudioDidStop:", name: SIMChatAudioManagerWillRecordNotification)
-        SIMChatNotificationCenter.addObserver(self, selector: "onAudioDidPlay:", name: SIMChatAudioManagerWillPlayNotification)
-        
-        SIMChatNotificationCenter.addObserver(self, selector: "onAudioWillLoad:", name: SIMChatAudioManagerWillLoadNotification)
-        SIMChatNotificationCenter.addObserver(self, selector: "onAudioDidLoad:", name: SIMChatAudioManagerDidLoadNotification)
+    
+    override func bubbleDidPress(sender: UITapGestureRecognizer) {
+        guard let message = message where sender.state == .Ended else {
+            return
+        }
+        // 播放消息.
+        manager?.mediaProvider.playWithMessage(message)
+        super.bubbleDidPress(sender)
     }
+    
     /// 音频开始播放
-    func onAudioDidPlay(sender: NSNotification) {
-        //        // 为空说明不需要做何处理
-        //        guard let content = self.message?.content as? SIMChatMessageContentAudio else {
-        //            return
-        //        }
+    internal func audioDidPlay(sender: NSNotification) {
+        guard sender.object === message else {
+            return
+        }
+        guard let content = message?.content as? SIMChatBaseMessageAudioContent else {
+            return
+        }
+        SIMLog.debug()
+        
+        content.playing = true
+        content.played = true
+        
         //        // 只在是本消息的事件才处理
         //        if content.url.storaged && *content.url === sender.object {
         //            self.animationView.startAnimating()
         //        }
+        
+        animationView.startAnimating()
     }
     /// 音频停止播放
-    func onAudioDidStop(sender: NSNotification) {
-        //        // 不管是谁. 停了再说
-        //        if let ctx = message?.content as? SIMChatMessageContentAudio {
-        //            ctx.playing = false
-        //        }
-        //        if self.animationView.isAnimating() {
-        //            self.animationView.stopAnimating()
-        //        }
+    internal func audioDidStop(sender: NSNotification) {
+        SIMLog.trace()
+        // 不管是谁. 停了再说
+        if let ctx = message?.content as? SIMChatBaseMessageAudioContent {
+            ctx.playing = false
+        }
+        if animationView.isAnimating() {
+            animationView.stopAnimating()
+        }
     }
     /// 音频加载开始
-    func onAudioWillLoad(sender: NSNotification) {
-        //        if enabled && sender.object === self.message {
-        //            SIMLog.trace()
-        //            // TODO: no changed
-        ////            self.message?.status = .Receiving
-        //            self.onMessageStateChanged(nil)
-        //        }
+    internal func audioWillLoad(sender: NSNotification) {
+        guard sender.object === message else {
+            return
+        }
+        SIMLog.debug()
+        
+        message?.status = .Receiving
     }
     /// 音频加载完成
-    func onAudioDidLoad(sender: NSNotification) {
+    internal func audioDidLoad(sender: NSNotification) {
+        guard sender.object === message else {
+            return
+        }
+        
+        SIMLog.debug()
+        
+        // 成功和失败
+        message?.status = .Received
+        // message?.status = .Error
+        
         //        // 必须是音频
         //        guard let ctx = self.message?.content as? SIMChatMessageContentAudio else {
         //            return

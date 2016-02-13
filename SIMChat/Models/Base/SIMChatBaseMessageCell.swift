@@ -13,8 +13,8 @@ import UIKit
 ///
 public class SIMChatBaseMessageBaseCell: UITableViewCell, SIMChatMessageCellProtocol {
     public var message: SIMChatMessageProtocol?
-    public var conversation: SIMChatConversationProtocol?
-    public weak var eventDelegate: SIMChatCellEventDelegate?
+    public weak var conversation: SIMChatConversationProtocol?
+    public weak var delegate: protocol<SIMChatMessageCellDelegate, SIMChatMessageCellMenuDelegate>?
 }
 
 ///
@@ -32,7 +32,10 @@ public class SIMChatBaseMessageBubbleCell: UITableViewCell, SIMChatMessageCellPr
     public override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         
-        _bubbleMenuItems = [UIMenuItem(title: "删除", action: "messageDelete:")]
+        _bubbleMenuItems = [
+            UIMenuItem(title: "删除", action: "_removeMessage:"),
+            UIMenuItem(title: "撤销", action: "_revocationMessage:")
+        ]
         
         // TODO: 有性能问题, 需要重新实现
         
@@ -103,8 +106,6 @@ public class SIMChatBaseMessageBubbleCell: UITableViewCell, SIMChatMessageCellPr
         
         // add kvos
         addObserver(self, forKeyPath: "visitCardView.hidden", options: .New, context: nil)
-        
-        initEvent()
     }
     /// 销毁
     deinit {
@@ -124,7 +125,8 @@ public class SIMChatBaseMessageBubbleCell: UITableViewCell, SIMChatMessageCellPr
     /// 关联的内容
     public var message: SIMChatMessageProtocol? {
         didSet {
-            guard let m = message else {
+            messageUpdate()
+            guard let m = message where m != oldValue else {
                 return
             }
             // 气泡方向
@@ -145,7 +147,6 @@ public class SIMChatBaseMessageBubbleCell: UITableViewCell, SIMChatMessageCellPr
                 }
             }
             userUpdate()
-            messageUpdate()
         }
     }
     /// 更新类型.
@@ -170,6 +171,36 @@ public class SIMChatBaseMessageBubbleCell: UITableViewCell, SIMChatMessageCellPr
         }
     }
     
+    public override func willMoveToWindow(newWindow: UIWindow?) {
+        if window == nil || newWindow != nil {
+            let _ = _initEvents
+        }
+        super.willMoveToWindow(newWindow)
+    }
+    
+    /// 初始化事件
+    public func initEvents() {
+        SIMLog.trace()
+        
+        SIMChatNotificationCenter.addObserver(self, selector: "userInfoDidChange:", name: SIMChatUserInfoDidChangeNotification)
+        SIMChatNotificationCenter.addObserver(self, selector: "statusDidChange:", name: SIMChatMessageStatusChangedNotification)
+        
+        stateView.addTarget(self, action: "statusDidPressRetry:", forControlEvents: .TouchUpInside)
+        
+        _bubbleGRP.delegate = self
+        _bubbleGRLP.delegate = self
+        _portraitGRP.delegate = self
+        _portraitGRLP.delegate = self
+
+        // add events
+        bubbleView.addGestureRecognizer(_bubbleGRP)
+        bubbleView.addGestureRecognizer(_bubbleGRLP)
+        portraitView.addGestureRecognizer(_portraitGRP)
+        portraitView.addGestureRecognizer(_portraitGRLP)
+    }
+    
+    private lazy var _initEvents: Void = self.initEvents()
+    
     private lazy var _bubbleMenuItems: Array<UIMenuItem> = []
     
     /// 自动调整
@@ -184,8 +215,15 @@ public class SIMChatBaseMessageBubbleCell: UITableViewCell, SIMChatMessageCellPr
     private(set) lazy var portraitView = SIMChatPortraitView(frame: CGRectZero)
     private(set) lazy var visitCardView = SIMChatVisitCardView(frame: CGRectZero)
     
-    public var conversation: SIMChatConversationProtocol?
-    public weak var eventDelegate: SIMChatCellEventDelegate?
+    public weak var conversation: SIMChatConversationProtocol?
+    public weak var delegate: protocol<SIMChatMessageCellDelegate, SIMChatMessageCellMenuDelegate>?
+    
+    
+    private lazy var _bubbleGRP: UIGestureRecognizer = UITapGestureRecognizer(target: self, action: "bubbleDidPress:")
+    private lazy var _bubbleGRLP: UIGestureRecognizer = UILongPressGestureRecognizer(target: self, action: "bubbleDidLongPress:")
+    
+    private lazy var _portraitGRP: UIGestureRecognizer = UITapGestureRecognizer(target: self, action: "portraitDidPress:")
+    private lazy var _portraitGRLP: UIGestureRecognizer = UILongPressGestureRecognizer(target: self, action: "portraitDidLongPress:")
 }
 
 
@@ -197,24 +235,6 @@ extension SIMChatBaseMessageBubbleCell {
     /// 气泡长按的菜单项
     public var bubbleMenuItems: Array<UIMenuItem> { return _bubbleMenuItems }
     
-    /// 初始化事件
-    private func initEvent() {
-        
-        SIMChatNotificationCenter.addObserver(self,
-            selector: "onUserInfoDidChange:",
-            name: SIMChatUserInfoDidChangeNotification)
-        SIMChatNotificationCenter.addObserver(self,
-            selector: "onMessageStatusDidChange:",
-            name: SIMChatMessageStatusChangedNotification)
-
-        // add events
-        bubbleView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: "onPressOfBubble:"))
-        bubbleView.addGestureRecognizer(UILongPressGestureRecognizer(target: self, action: "onLongPressOfBubble:"))
-        portraitView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: "onPressOfPortrait:"))
-        portraitView.addGestureRecognizer(UILongPressGestureRecognizer(target: self, action: "onLongPressOfPortrait:"))
-        
-        stateView.addTarget(self, action: "onPressOfStatusRetry:", forControlEvents: .TouchUpInside)
-    }
     /// 检查是否允许获取焦点
     public override func canBecomeFirstResponder() -> Bool {
         return true
@@ -237,84 +257,53 @@ extension SIMChatBaseMessageBubbleCell {
         }
         return nil
     }
-    /// 气泡点击事件
-    private dynamic func onPressOfBubble(sender: UITapGestureRecognizer) {
-        guard let message = message where sender.state == .Ended else {
-            return
+    
+    /// 控制手势状态
+    public override func gestureRecognizerShouldBegin(gestureRecognizer: UIGestureRecognizer) -> Bool {
+        if let user = portraitView.user where portraitView.bounds.contains(gestureRecognizer.locationInView(portraitView)) {
+            if gestureRecognizer == _portraitGRP {
+                return delegate?.cellEvent(self, shouldPressUser: user) ?? true
+            } else if gestureRecognizer == _portraitGRLP {
+                return delegate?.cellEvent(self, shouldLongPressUser: user) ?? true
+            }
         }
-        eventDelegate?.cellEvent(self, clickMessage: message)
-    }
-    /// 气泡长按事件
-    private dynamic func onLongPressOfBubble(sender: UILongPressGestureRecognizer) {
-        guard sender.state == .Began && !bubbleMenuItems.isEmpty else {
-            return
+        if let message = message where bubbleView.bounds.contains(gestureRecognizer.locationInView(bubbleView)) {
+            if gestureRecognizer == _bubbleGRP {
+                return delegate?.cellEvent(self, shouldPressMessage: message) ?? true
+            } else if gestureRecognizer == _bubbleGRLP {
+                return delegate?.cellEvent(self, shouldLongPressMessage: message) ?? true
+            }
         }
-        
-        SIMLog.trace()
-        
-        // 准备菜单
-        let mu = SIMChatMenuController.sharedMenuController()
-        let responder = window?.findFirstResponder()
-        
-        // 检查第一响应者, 如果为空或者是cell, 重新激活
-        if responder == nil || responder is SIMChatBaseMessageBubbleCell {
-            becomeFirstResponder()
-        }
-        
-        mu.menuItems = bubbleMenuItems
-        mu.showMenu(self, withRect: bubbleView.frame, inView: self)
-    }
-    /// 状态
-    private dynamic func onPressOfStatusRetry(sender: AnyObject) {
-        guard let message = message else {
-            return
-        }
-        eventDelegate?.cellEvent(self, retryMessage: message)
-    }
-    /// 头像点击事件
-    private dynamic func onPressOfPortrait(sender: UITapGestureRecognizer) {
-        guard let user = portraitView.user where sender.state == .Ended else {
-            return
-        }
-        eventDelegate?.cellEvent(self, showProfile: user)
-    }
-    /// 头像长按事件
-    private dynamic func onLongPressOfPortrait(sender: UILongPressGestureRecognizer) {
-        guard let user = portraitView.user where sender.state == .Began else {
-            return
-        }
-        eventDelegate?.cellEvent(self, replyUser: user)
+        return super.gestureRecognizerShouldBegin(gestureRecognizer)
     }
     
-    /// 消息状态改变通知
-    private dynamic func onMessageStatusDidChange(sender: NSNotification) {
-        guard let message = sender.object as? SIMChatMessageProtocol where message == self.message else {
+    
+    private dynamic func _copyMessage(sender: AnyObject) {
+        guard let message = message else {
             return
         }
-        messageUpdate()
+        if delegate?.cellMenu(self, shouldCopyMessage: message) ?? true {
+            delegate?.cellMenu(self, didCopyMessage: message)
+        }
     }
-    /// 用户信息改变通知
-    private dynamic func onUserInfoDidChange(sender: NSNotification) {
-        guard let user = sender.object as? SIMChatUserProtocol where user == portraitView.user else {
+    private dynamic func _removeMessage(sender: AnyObject) {
+        guard let message = message else {
             return
         }
-        userUpdate()
+        if delegate?.cellMenu(self, shouldRemoveMessage: message) ?? true {
+            delegate?.cellMenu(self, didRemoveMessage: message)
+        }
+    }
+    private dynamic func _revocationMessage(sender: AnyObject) {
+        guard let message = message else {
+            return
+        }
+        if delegate?.cellMenu(self, shouldRevocationMessage: message) ?? true {
+             delegate?.cellMenu(self, didRevocationMessage: message)
+        }
     }
     
-    /// 复制消息
-    private dynamic func messageCopy(sender: AnyObject) {
-        guard let message = message else {
-            return
-        }
-        eventDelegate?.cellEvent(self, copyMessage: message)
-    }
-    /// 删除消息
-    private dynamic func messageDelete(sender: AnyObject) {
-        guard let message = message else {
-            return
-        }
-        eventDelegate?.cellEvent(self, removeMessage: message)
-    }
+    
     /// 更新消息
     private func messageUpdate() {
         guard let message = message where superview != nil else {
@@ -341,6 +330,51 @@ extension SIMChatBaseMessageBubbleCell {
         }
         portraitView.user = message?.sender
         visitCardView.user = message?.sender
+    }
+    
+    internal dynamic func bubbleDidPress(sender: UITapGestureRecognizer) {
+        guard let message = message where sender.state == .Ended else {
+            return
+        }
+        delegate?.cellEvent(self, didPressMessage: message)
+    }
+    internal dynamic func bubbleDidLongPress(sender: UILongPressGestureRecognizer) {
+        guard let message = message where sender.state == .Began else {
+            return
+        }
+        delegate?.cellEvent(self, didLongPressMessage: message)
+    }
+    internal dynamic func portraitDidPress(sender: UITapGestureRecognizer) {
+        guard let user = portraitView.user where sender.state == .Ended else {
+            return
+        }
+        delegate?.cellEvent(self, didPressUser: user)
+    }
+    internal dynamic func portraitDidLongPress(sender: UILongPressGestureRecognizer) {
+        guard let user = portraitView.user where sender.state == .Began else {
+            return
+        }
+        delegate?.cellEvent(self, didLongPressUser: user)
+    }
+    internal dynamic func statusDidPressRetry(sender: AnyObject) {
+        guard let message = message else {
+            return
+        }
+        if delegate?.cellMenu(self, shouldRetryMessage: message) ?? true {
+            delegate?.cellMenu(self, didRetryMessage: message)
+        }
+    }
+    internal dynamic func statusDidChange(sender: NSNotification) {
+        guard let message = sender.object as? SIMChatMessageProtocol where message == self.message else {
+            return
+        }
+        messageUpdate()
+    }
+    internal dynamic func userInfoDidChange(sender: NSNotification) {
+        guard let user = sender.object as? SIMChatUserProtocol where user == portraitView.user else {
+            return
+        }
+        userUpdate()
     }
 }
 

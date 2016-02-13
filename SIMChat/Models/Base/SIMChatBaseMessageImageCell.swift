@@ -42,7 +42,11 @@ public class SIMChatBaseMessageImageCell: SIMChatBaseMessageBubbleCell {
     /// 消息内容
     public override var message: SIMChatMessageProtocol? {
         didSet {
-            if let message = message, content = message.content as? SIMChatBaseMessageImageContent {
+            guard let message = message where message != oldValue else {
+                return
+            }
+            
+            if let content = message.content as? SIMChatBaseMessageImageContent {
                 let width = max(content.size.width, 32)
                 let height = max(content.size.height, 1)
                 let scale = min(min(135, width) / width, min(135, height) / height)
@@ -56,7 +60,7 @@ public class SIMChatBaseMessageImageCell: SIMChatBaseMessageBubbleCell {
                 
                 previewImageView.image = UIImage(named: "simchat_images_default")
                 // 下载缩略图
-                conversation?.manager?.fileProvider.download(content.thumbnail)
+                manager?.fileProvider.download(content.thumbnail)
                     .response { [weak self] in
                         guard message == self?.message else {
                             return

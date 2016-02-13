@@ -118,7 +118,7 @@ internal class SIMChatInputPanelEmoticonView: UIView, SIMChatInputPanelProtocol 
                             flag = true
                             break
                         }
-                        sidx += self._pages["\(group.identifier)+\(sg.identifier)"]?.count ?? 0
+                        sidx += self._pages["\(group.identifier) => \(sg.identifier)"]?.count ?? 0
                         spidx += 1
                     }
                     sidx = flag ? sidx : 0
@@ -805,7 +805,7 @@ extension SIMChatInputPanelEmoticonView: UICollectionViewDataSource, UICollectio
         // 存在子组
         if section < group.groups?.count {
             if let sg = group.groups?[section] {
-                return _pages["\(group.identifier)+\(sg.identifier)"]?.count ?? 0
+                return _pages["\(group.identifier) => \(sg.identifier)"]?.count ?? 0
             }
         }
         return _pages[group.identifier]?.count ?? 0
@@ -837,7 +837,7 @@ extension SIMChatInputPanelEmoticonView: UICollectionViewDataSource, UICollectio
             var pidx = 0
             if let group = groupAtIndex(indexPath.section), subgroups = group.groups {
                 for sg in subgroups {
-                    let count = _pages["\(group.identifier)+\(sg.identifier)"]?.count ?? 0
+                    let count = _pages["\(group.identifier) => \(sg.identifier)"]?.count ?? 0
                     if idx < count {
                         break
                     }
@@ -877,7 +877,7 @@ extension SIMChatInputPanelEmoticonView: UICollectionViewDataSource, UICollectio
                         // 如果是第一个, 反转
                         ps = ps.reverse()
                     }
-                    _pages["\(group.identifier)+\($0.identifier)"] = ps
+                    _pages["\(group.identifier) => \($0.identifier)"] = ps
                     pages.appendContentsOf(ps)
                 }
                 _pages[group.identifier] = pages

@@ -75,7 +75,7 @@ extension SIMChatViewController.MessageManager: UITableViewDataSource {
         let message = allMessages[indexPath.row]
         let identifier = reuseIndentifierWithMessage(message)
         return tableView.fd_heightForCellWithIdentifier(identifier, cacheByKey: message.identifier) {
-            if let mcell = $0 as? SIMChatMessageCellProtocol where message != mcell.message {
+            if let mcell = $0 as? SIMChatMessageCellProtocol {
                 // configuation
                 mcell.conversation = self.conversation
                 mcell.message = message
@@ -106,12 +106,16 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate {
             // custom configuation
             mcell.conversation = self.conversation
             mcell.message = message
-            mcell.eventDelegate = self
+            mcell.delegate = self
         }
     }
 }
 
-extension SIMChatViewController.MessageManager: SIMChatConversationDelegate {
+// MARK: - Cell Event Delegate
+
+extension SIMChatViewController.MessageManager: SIMChatMessageCellDelegate, SIMChatMessageCellMenuDelegate, SIMChatConversationDelegate  {
+    
+    // MARK: SIMChatConversationDelegate
     
     func conversation(conversation: SIMChatConversationProtocol, didReciveMessage message: SIMChatMessageProtocol) {
     }
@@ -120,42 +124,148 @@ extension SIMChatViewController.MessageManager: SIMChatConversationDelegate {
     }
     
     func conversation(conversation: SIMChatConversationProtocol, didUpdateMessage message: SIMChatMessageProtocol) {
+    }
+    
+    // MARK: SIMChatMessageCellDelegate
+    
+    // 点击消息
+    func cellEvent(cell: SIMChatMessageCellProtocol, shouldPressMessage message: SIMChatMessageProtocol) -> Bool {
+        return true
+    }
+    func cellEvent(cell: SIMChatMessageCellProtocol, didPressMessage message: SIMChatMessageProtocol) {
+        SIMLog.debug(message.identifier)
+    }
+    
+    // 长按消息
+    func cellEvent(cell: SIMChatMessageCellProtocol, shouldLongPressMessage message: SIMChatMessageProtocol) -> Bool {
+        return true
+    }
+    func cellEvent(cell: SIMChatMessageCellProtocol, didLongPressMessage message: SIMChatMessageProtocol) {
+        guard let cell = cell as? SIMChatBaseMessageBubbleCell else {
+            return
+        }
+        SIMLog.debug(message.identifier)
         
+        // 准备菜单
+        let mu = SIMChatMenuController.sharedMenuController()
+        let responder = cell.window?.findFirstResponder()
+        
+        // 检查第一响应者, 如果为空或者是cell, 重新激活
+        if responder == nil || responder is SIMChatBaseMessageBubbleCell {
+            cell.becomeFirstResponder()
+        }
+        
+        mu.menuItems = cell.bubbleMenuItems
+        mu.showMenu(cell, withRect: cell.bubbleView.frame, inView: cell)
     }
-}
-
-// MARK: - Cell Event Delegate
-
-extension SIMChatViewController.MessageManager: SIMChatCellEventDelegate {
-    /// 回复用户
-    func cellEvent(cell: SIMChatMessageCellProtocol, replyUser user: SIMChatUserProtocol) {
-        SIMLog.debug(user.identifier)
+    
+    // 点击用户
+    func cellEvent(cell: SIMChatMessageCellProtocol, shouldPressUser user: SIMChatUserProtocol) -> Bool {
+        return true
     }
-    /// 显示用户信息
-    func cellEvent(cell: SIMChatMessageCellProtocol, showProfile user: SIMChatUserProtocol) {
+    func cellEvent(cell: SIMChatMessageCellProtocol, didPressUser user: SIMChatUserProtocol) {
         SIMLog.debug(user.identifier)
     }
     
-    /// 复制消息
-    func cellEvent(cell: SIMChatMessageCellProtocol, copyMessage message: SIMChatMessageProtocol) {
-        SIMLog.debug(message.identifier)
+    // 长按用户
+    func cellEvent(cell: SIMChatMessageCellProtocol, shouldLongPressUser user: SIMChatUserProtocol) -> Bool {
+        return true
     }
-    /// 删除消息
-    func cellEvent(cell: SIMChatMessageCellProtocol, removeMessage message: SIMChatMessageProtocol) {
-        SIMLog.debug(message.identifier)
+    func cellEvent(cell: SIMChatMessageCellProtocol, didLongPressUser user: SIMChatUserProtocol) {
+        SIMLog.debug(user.identifier)
     }
-    /// 撤回消息
-    func cellEvent(cell: SIMChatMessageCellProtocol, revocationMessage message: SIMChatMessageProtocol) {
+    
+    // MARK: SIMChatMessageCellMenuDelegate
+    
+    // 复制
+    func cellMenu(cell: SIMChatMessageCellProtocol, shouldCopyMessage message: SIMChatMessageProtocol) -> Bool {
+        return true
+    }
+    func cellMenu(cell: SIMChatMessageCellProtocol, didCopyMessage message: SIMChatMessageProtocol) {
         SIMLog.debug(message.identifier)
     }
     
-    /// 点
-    func cellEvent(cell: SIMChatMessageCellProtocol, clickMessage message: SIMChatMessageProtocol) {
+    // 删除
+    func cellMenu(cell: SIMChatMessageCellProtocol, shouldRemoveMessage message: SIMChatMessageProtocol) -> Bool {
+        return true
+    }
+    func cellMenu(cell: SIMChatMessageCellProtocol, didRemoveMessage message: SIMChatMessageProtocol) {
         SIMLog.debug(message.identifier)
     }
+    
     /// 重试(发送/上传/下载)
-    func cellEvent(cell: SIMChatMessageCellProtocol, retryMessage message: SIMChatMessageProtocol) {
+    func cellMenu(cell: SIMChatMessageCellProtocol, shouldRetryMessage message: SIMChatMessageProtocol) -> Bool {
+        return true
+    }
+    func cellMenu(cell: SIMChatMessageCellProtocol, didRetryMessage message: SIMChatMessageProtocol) {
         SIMLog.debug(message.identifier)
+    }
+    
+    // 撤销
+    func cellMenu(cell: SIMChatMessageCellProtocol, shouldRevocationMessage message: SIMChatMessageProtocol) -> Bool {
+        return true
+    }
+    func cellMenu(cell: SIMChatMessageCellProtocol, didRevocationMessage message: SIMChatMessageProtocol) {
+        SIMLog.debug(message.identifier)
+    }
+    
+    // MARK: Message Operator
+    
+    ///
+    /// 批量插入消息
+    ///
+    /// - parameter ms:       消息集合
+    /// - parameter index:    如果为index < 0, 插入点为count + index + 1
+    ///
+    func insertMessages(ms: Array<SIMChatMessageProtocol>, atIndex index: Int) {
+    }
+    
+    ///
+    /// 追加消息
+    ///
+    func appendMessage(m: SIMChatMessageProtocol) {
+        SIMLog.trace()
+        
+        let isSelf = m.isSelf
+        let isLasted = (contentView?.indexPathsForVisibleRows?.last?.row ?? 0) + 1 == (contentView?.numberOfRowsInSection(0) ?? 0 )
+        
+        insertMessages([m], atIndex: -1)
+//
+        SIMLog.debug("self: \(isSelf) lasted: \(isLasted)")
+//
+//        // 如果发送者是自己, 转到最后一行
+//        // 如果发送者是其他人, 并且当前行在最后一行, 转到最后一行
+//        if isSelf || isLasted {
+//            // 如果不是正在发送更新为己读
+//            if m.status != .Sending {
+//                self.conversation.readMessage(m, nil, nil)
+//            }
+//            // ok, 更新
+//            dispatch_async(dispatch_get_main_queue()) {
+//                let cnt = self.tableView.numberOfRowsInSection(0)
+//                let idx = NSIndexPath(forRow: cnt - 1, inSection: 0)
+//                
+//                self.tableView.scrollToRowAtIndexPath(idx, atScrollPosition: .Bottom, animated: true)
+//            }
+//        } else {
+//            // 更新未读数量
+//        }
+    }
+    
+    ///
+    /// 发送消息
+    ///
+    func sendMessage(content: SIMChatMessageContentProtocol) {
+        guard let sender = conversation.sender, manager = manager else {
+            return
+        }
+        SIMLog.trace()
+        
+        let message = manager.classProvider.message.messageWithContent(content,
+            receiver: conversation.receiver,
+            sender: sender)
+        
+        appendMessage(message)
     }
 }
 

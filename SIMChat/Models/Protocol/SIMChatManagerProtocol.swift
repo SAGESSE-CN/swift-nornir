@@ -36,6 +36,10 @@ public protocol SIMChatManagerProtocol: class {
     /// 文件提供者
     ///
     var fileProvider: SIMChatFileProvider { get }
+    ///
+    /// 媒体播放提供者
+    ///
+    var mediaProvider: SIMChatMediaProvider { get }
     
     
     // MARK: User Method

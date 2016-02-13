@@ -52,7 +52,11 @@ public class SIMChatBaseMessageTextCell: SIMChatBaseMessageBubbleCell {
     /// 消息内容
     public override var message: SIMChatMessageProtocol? {
         didSet {
-            if let content = message?.content as? SIMChatBaseMessageTextContent {
+            guard let message = message where message != oldValue else {
+                return
+            }
+            
+            if let content = message.content as? SIMChatBaseMessageTextContent {
                 self.contentLabel.text = content.content
             }
         }
@@ -60,7 +64,7 @@ public class SIMChatBaseMessageTextCell: SIMChatBaseMessageBubbleCell {
     private lazy var contentLabel = SIMChatLabel(frame: CGRectZero)
     
     private lazy var _bubbleMenuItems: Array<UIMenuItem> = [
-        UIMenuItem(title: "复制", action: "messageCopy:")
+        UIMenuItem(title: "复制", action: "_copyMessage:")
     ]
 }
 

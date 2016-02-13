@@ -167,6 +167,16 @@ class SIMChatAudioManager: NSObject {
         }
     }
     
+    func playWithMessage(message: SIMChatMessageProtocol) {
+        SIMLog.debug("\(message.identifier)")
+        
+        SIMChatNotificationCenter.postNotificationName(SIMChatAudioManagerWillLoadNotification, object: message)
+        SIMChatNotificationCenter.postNotificationName(SIMChatAudioManagerDidLoadNotification, object: message)
+        
+        SIMChatNotificationCenter.postNotificationName(SIMChatAudioManagerWillPlayNotification, object: message)
+        SIMChatNotificationCenter.postNotificationName(SIMChatAudioManagerDidPlayNotification, object: message)
+    }
+    
     func play() {
         SIMLog.trace()
         let url = self.dynamicType.defaultRecordFile

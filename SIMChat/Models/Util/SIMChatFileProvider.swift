@@ -32,6 +32,10 @@ public class SIMChatFileProvider {
                         op.failure(NSError(domain: "Load Image Fail", code: -1, userInfo: nil))
                     }
                 }
+            case "chat-audio":
+                dispatch_after_at_now(1, dispatch_get_main_queue()) {
+                    op.success("test")
+                }
             default:
                 // 应该请求网络.
                 op.failure(NSError(domain: "Unknow scheme", code: -1, userInfo: nil))

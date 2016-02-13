@@ -16,38 +16,70 @@ public protocol SIMChatMessageCellProtocol: class {
     /// 关联的消息
     ///
     var message: SIMChatMessageProtocol? { set get }
+    
+    ///
+    /// 关联的管理器
+    ///
+    weak var manager: SIMChatManagerProtocol? { get }
     ///
     /// 关联的会话.
     ///
-    var conversation: SIMChatConversationProtocol? { set get }
+    weak var conversation: SIMChatConversationProtocol? { set get }
     
     ///
-    /// 关联的事件
+    /// 代理
     ///
-    weak var eventDelegate: SIMChatCellEventDelegate? { set get }
+    weak var delegate: protocol<SIMChatMessageCellDelegate, SIMChatMessageCellMenuDelegate>? { set get }
+}
+
+extension SIMChatMessageCellProtocol {
+    ///
+    /// 关联的管理器
+    ///
+    public weak var manager: SIMChatManagerProtocol? { return conversation?.manager }
 }
 
 ///
 /// 事件代理
 ///
-public protocol SIMChatCellEventDelegate: class {
+public protocol SIMChatMessageCellDelegate: class {
     
-    // TODO: 这设计存在不合理的地方, 需要重新设计
+    // 点击消息
+    func cellEvent(cell: SIMChatMessageCellProtocol, shouldPressMessage message: SIMChatMessageProtocol) -> Bool
+    func cellEvent(cell: SIMChatMessageCellProtocol, didPressMessage message: SIMChatMessageProtocol)
     
-    /// 回复用户
-    func cellEvent(cell: SIMChatMessageCellProtocol, replyUser user: SIMChatUserProtocol)
-    /// 显示用户信息
-    func cellEvent(cell: SIMChatMessageCellProtocol, showProfile user: SIMChatUserProtocol)
+    // 长按消息
+    func cellEvent(cell: SIMChatMessageCellProtocol, shouldLongPressMessage message: SIMChatMessageProtocol) -> Bool
+    func cellEvent(cell: SIMChatMessageCellProtocol, didLongPressMessage message: SIMChatMessageProtocol)
     
-    /// 复制消息
-    func cellEvent(cell: SIMChatMessageCellProtocol, copyMessage message: SIMChatMessageProtocol)
-    /// 删除消息
-    func cellEvent(cell: SIMChatMessageCellProtocol, removeMessage message: SIMChatMessageProtocol)
-    /// 撤回消息(未支持)
-    //func cellEvent(cell: SIMChatMessageCellProtocol, revocationMessage message: SIMChatMessageProtocol)
+    // 点击用户
+    func cellEvent(cell: SIMChatMessageCellProtocol, shouldPressUser user: SIMChatUserProtocol) -> Bool
+    func cellEvent(cell: SIMChatMessageCellProtocol, didPressUser user: SIMChatUserProtocol)
     
-    /// 点击消息
-    func cellEvent(cell: SIMChatMessageCellProtocol, clickMessage message: SIMChatMessageProtocol)
-    /// 重试(发送/上传/下载)
-    func cellEvent(cell: SIMChatMessageCellProtocol, retryMessage message: SIMChatMessageProtocol)
+    // 长按用户
+    func cellEvent(cell: SIMChatMessageCellProtocol, shouldLongPressUser user: SIMChatUserProtocol) -> Bool
+    func cellEvent(cell: SIMChatMessageCellProtocol, didLongPressUser user: SIMChatUserProtocol)
 }
+
+///
+/// 菜单代理
+///
+public protocol SIMChatMessageCellMenuDelegate: class {
+    
+    // 复制
+    func cellMenu(cell: SIMChatMessageCellProtocol, shouldCopyMessage message: SIMChatMessageProtocol) -> Bool
+    func cellMenu(cell: SIMChatMessageCellProtocol, didCopyMessage message: SIMChatMessageProtocol)
+    
+    // 删除
+    func cellMenu(cell: SIMChatMessageCellProtocol, shouldRemoveMessage message: SIMChatMessageProtocol) -> Bool
+    func cellMenu(cell: SIMChatMessageCellProtocol, didRemoveMessage message: SIMChatMessageProtocol)
+    
+    /// 重试(发送/上传/下载)
+    func cellMenu(cell: SIMChatMessageCellProtocol, shouldRetryMessage message: SIMChatMessageProtocol) -> Bool
+    func cellMenu(cell: SIMChatMessageCellProtocol, didRetryMessage message: SIMChatMessageProtocol)
+    
+    // 撤销
+    func cellMenu(cell: SIMChatMessageCellProtocol, shouldRevocationMessage message: SIMChatMessageProtocol) -> Bool
+    func cellMenu(cell: SIMChatMessageCellProtocol, didRevocationMessage message: SIMChatMessageProtocol)
+}
+

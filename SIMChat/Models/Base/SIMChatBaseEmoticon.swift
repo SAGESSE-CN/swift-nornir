@@ -43,31 +43,31 @@ public class SIMChatBaseEmoticon: NSObject, SIMChatEmoticon {
         return SIMChatBundle.imageWithResource("Emoticons/\(identifier)/\(image)")
     }
 
-    public func toDictionary() -> Dictionary<String, AnyObject> {
-        let keys = self.dynamicType._keys ?? {
-            var keys: Array<String> = []
-            for v in Mirror(reflecting: self).children {
-                guard let name = v.label else {
-                    continue
-                }
-                if name == "group" {
-                    continue
-                }
-                keys.append(name)
-            }
-            self.dynamicType._keys = keys
-            return keys
-        }()
-        var dic: Dictionary<String, AnyObject> = [:]
-        keys.forEach {
-            guard let value = valueForKey($0) else {
-                return
-            }
-            dic[$0] = value
-        }
-        return dic
-    }
-    
-    private static var _keys: Array<String>?
+//    public func toDictionary() -> Dictionary<String, AnyObject> {
+//        let keys = self.dynamicType._keys ?? {
+//            var keys: Array<String> = []
+//            for v in Mirror(reflecting: self).children {
+//                guard let name = v.label else {
+//                    continue
+//                }
+//                if name == "group" {
+//                    continue
+//                }
+//                keys.append(name)
+//            }
+//            self.dynamicType._keys = keys
+//            return keys
+//        }()
+//        var dic: Dictionary<String, AnyObject> = [:]
+//        keys.forEach {
+//            guard let value = valueForKey($0) else {
+//                return
+//            }
+//            dic[$0] = value
+//        }
+//        return dic
+//    }
+//    
+//    private static var _keys: Array<String>?
 }
 

@@ -278,11 +278,9 @@ extension SIMChatInputPanelToolBoxView: SIMChatInputItemProtocolDelegate {
     func itemDidSelect(item: SIMChatInputItemProtocol) {
         (delegate as? SIMChatInputPanelToolBoxDelegate)?.inputPanel(self, didSelectToolBoxItem: item)
     }
-}
+    
+    // MARK: Event
 
-// MARK: - Event
-
-extension SIMChatInputPanelToolBoxView {
     /// 切换页面
     func onPageChanged(sender: UIPageControl) {
         _contentView.setContentOffset(CGPointMake(_contentView.bounds.width * CGFloat(sender.currentPage), 0), animated: true)

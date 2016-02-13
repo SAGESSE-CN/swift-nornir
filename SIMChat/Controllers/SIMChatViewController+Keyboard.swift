@@ -90,8 +90,9 @@ extension SIMChatViewController: SIMChatInputBarDelegate, SIMChatInputPanelToolB
     }
     public func inputBarShouldReturn(inputBar: SIMChatInputBar) -> Bool {
         // 发送.
-        SIMLog.debug(inputBar.text)
-        //sendMessageForText(self.textField.text ?? "")
+        if let text = inputBar.text where !text.isEmpty {
+            messageManager.sendMessage(SIMChatBaseMessageTextContent(content: inputBar.text!))
+        }
         inputBar.clearText()
         return false
     }
@@ -136,9 +137,7 @@ extension SIMChatViewController: SIMChatInputBarDelegate, SIMChatInputPanelToolB
     /// 点击了返回, 返回false拦截该处理
     ///
     public func inputPanelShouldReturn(inputPanel: UIView) -> Bool {
-        SIMLog.debug()
-        inputBar.clearText()
-        return true
+        return inputBarShouldReturn(inputBar)
     }
     ///
     /// 点击了退格, 返回false拦截该处理

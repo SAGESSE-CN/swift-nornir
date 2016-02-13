@@ -117,6 +117,8 @@ public class SIMChatViewController: UIViewController {
     
     private var _conversation: SIMChatConversationProtocol
     private var _messageManager: MessageManager
+    
+    internal var messageManager: MessageManager { return _messageManager }
 }
 
 // MARK: - Public Propertys
