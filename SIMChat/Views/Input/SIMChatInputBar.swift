@@ -539,12 +539,8 @@ internal class SIMChatInputBarTextView: UITextView {
         super.init(frame: frame, textContainer: textContainer)
         build()
     }
-    deinit {
-        SIMLog.trace()
-    }
     
     @inline(__always) private func build() {
-        SIMLog.trace()
         addSubview(_caretView)
     }
     

@@ -13,7 +13,7 @@ import Foundation
 ///
 public class SIMChatUserProvider {
     /// 初始化
-    public init(_ manager: SIMChatManagerProtocol) {
+    public init(manager: SIMChatManagerProtocol) {
         self.users = [:]
         self.manager = manager
     }

@@ -39,8 +39,11 @@ public class SIMChatBaseMessageDateCell: SIMChatBaseMessageBaseCell {
     /// 关联的消息
     public override var message: SIMChatMessageProtocol? {
         didSet {
-            if let content = message?.content as? SIMChatBaseMessageDateContent {
-                titleLabel.text = "\(content.content)"
+            guard let message = message where message !== oldValue else {
+                return
+            }
+            if message.content is SIMChatBaseMessageDateContent {
+                titleLabel.text = "\(message.date)"
             }
         }
     }

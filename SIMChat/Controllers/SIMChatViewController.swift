@@ -61,18 +61,21 @@ public class SIMChatViewController: UIViewController {
             return UIImage(named: name)
         }
         bar.delegate = self
-        bar.leftBarButtonItems = [
-            SIMChatInputPanelAudioView.inputPanelItem()
-        ]
-        bar.rightBarButtonItems = [
-            SIMChatInputPanelEmoticonView.inputPanelItem(),
-            SIMChatInputPanelToolBoxView.inputPanelItem()
-        ]
-        // bar.bottomBarButtonItems = [
-        //     SIMChatInputPanelAudioView.inputPanelItem(),
-        //     SIMChatInputPanelEmoticonView.inputPanelItem(),
-        //     SIMChatInputPanelToolBoxView.inputPanelItem()
-        // ]
+//        bar.leftBarButtonItems = [
+//            SIMChatInputPanelAudioView.inputPanelItem()
+//        ]
+//        bar.rightBarButtonItems = [
+//            SIMChatInputPanelEmoticonView.inputPanelItem(),
+//            SIMChatInputPanelToolBoxView.inputPanelItem()
+//        ]
+         bar.bottomBarButtonItems = [
+             SIMChatInputPanelAudioView.inputPanelItem(),
+             SIMChatInputPanelAudioView.inputPanelItem(),
+             SIMChatInputPanelEmoticonView.inputPanelItem(),
+             SIMChatInputPanelEmoticonView.inputPanelItem(),
+             SIMChatInputPanelToolBoxView.inputPanelItem(),
+             SIMChatInputPanelToolBoxView.inputPanelItem()
+         ]
         return bar
     }()
     
@@ -187,7 +190,7 @@ extension SIMChatViewController {
         contentView.accessibilityLabel = "聊天内容"
         contentView.backgroundColor = .clearColor()
         contentView.showsHorizontalScrollIndicator = false
-        contentView.showsVerticalScrollIndicator = false
+        //contentView.showsVerticalScrollIndicator = false
         contentView.separatorStyle = .None
         
         inputBar.accessibilityLabel = "底部输入栏"
@@ -271,6 +274,7 @@ extension SIMChatViewController {
         var edg = contentView.contentInset
         edg.top = topLayoutGuide.length + -(contentViewLayout?.top ?? 0)
         contentView.contentInset = edg
+        contentView.scrollIndicatorInsets = contentView.contentInset
     }
 }
 

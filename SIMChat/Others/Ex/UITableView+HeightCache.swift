@@ -206,8 +206,8 @@ extension UITableView {
     }
     
     // some key
-    private static var fd_keyedHeightCacheKey = unsafeAddressOf("fd_keyedHeightCacheKey")
-    private static var fd_templateReusableCellForIdentifierKey = unsafeAddressOf("fd_templateReusableCellForIdentifierKey")
+    private static let fd_keyedHeightCacheKey = unsafeAddressOf("fd_keyedHeightCacheKey")
+    private static let fd_templateReusableCellForIdentifierKey = unsafeAddressOf("fd_templateReusableCellForIdentifierKey")
 }
 
 extension UITableViewCell {

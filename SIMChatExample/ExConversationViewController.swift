@@ -62,6 +62,7 @@ class ExConversationViewController: UITableViewController {
         m.login(s).response { _ in
             // 登录完成
             let cv = self.m.conversation(o) as! ExChatConversation
+            
             cv.makeTestData()
             
             let cc = ExChatViewController(conversation: cv)

@@ -91,9 +91,11 @@ extension SIMChatViewController: SIMChatInputBarDelegate, SIMChatInputPanelToolB
     public func inputBarShouldReturn(inputBar: SIMChatInputBar) -> Bool {
         // 发送.
         if let text = inputBar.text where !text.isEmpty {
-            messageManager.sendMessage(SIMChatBaseMessageTextContent(content: inputBar.text!))
+            inputBar.clearText()
+            dispatch_async(dispatch_get_main_queue()) {
+                self.messageManager.sendMessage(SIMChatBaseMessageTextContent(content: text))
+            }
         }
-        inputBar.clearText()
         return false
     }
     
@@ -206,6 +208,7 @@ extension SIMChatViewController: SIMChatInputBarDelegate, SIMChatInputPanelToolB
             var edg = contentView.contentInset
             edg.top = topLayoutGuide.length + newValue + inputBar.frame.height
             contentView.contentInset = edg
+            contentView.scrollIndicatorInsets = edg
             
             // 必须同时更新
             contentViewLayout?.top = -(newValue + inputBar.frame.height)

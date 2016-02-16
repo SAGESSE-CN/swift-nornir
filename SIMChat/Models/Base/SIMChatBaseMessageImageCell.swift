@@ -42,31 +42,31 @@ public class SIMChatBaseMessageImageCell: SIMChatBaseMessageBubbleCell {
     /// 消息内容
     public override var message: SIMChatMessageProtocol? {
         didSet {
-            guard let message = message where message != oldValue else {
+            guard let message = message, content = message.content as? SIMChatBaseMessageImageContent where message != oldValue else {
                 return
             }
             
-            if let content = message.content as? SIMChatBaseMessageImageContent {
-                let width = max(content.size.width, 32)
-                let height = max(content.size.height, 1)
-                let scale = min(min(135, width) / width, min(135, height) / height)
-                
-                previewImageViewLayout?.width = width * scale
-                previewImageViewLayout?.height = height * scale
-                
-                guard superview != nil else {
-                    return
-                }
-                
-                previewImageView.image = UIImage(named: "simchat_images_default")
-                // 下载缩略图
-                manager?.fileProvider.download(content.thumbnail)
-                    .response { [weak self] in
-                        guard message == self?.message else {
-                            return
-                        }
-                        self?.previewImageView.image = $0.value as? UIImage
-                }
+            SIMLog.trace()
+            
+            let width = max(content.size.width, 32)
+            let height = max(content.size.height, 1)
+            let scale = min(min(135, width) / width, min(135, height) / height)
+            
+            previewImageViewLayout?.width = width * scale
+            previewImageViewLayout?.height = height * scale
+            
+            guard superview != nil else {
+                return
+            }
+            
+            previewImageView.image = UIImage(named: "simchat_images_default")
+            // 下载缩略图
+            manager?.fileProvider.download(content.thumbnail)
+                .response { [weak self] in
+                    guard message == self?.message else {
+                        return
+                    }
+                    self?.previewImageView.image = $0.value as? UIImage
             }
         }
     }

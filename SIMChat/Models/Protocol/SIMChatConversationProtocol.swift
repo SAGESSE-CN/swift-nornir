@@ -22,7 +22,7 @@ public protocol SIMChatConversationProtocol: class {
     ///
     /// 发送都信息
     ///
-    var sender: SIMChatUserProtocol? { get }
+    var sender: SIMChatUserProtocol { get }
     
     // MARK: Util
     

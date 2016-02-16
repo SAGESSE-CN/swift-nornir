@@ -32,8 +32,11 @@ public class SIMChatBaseConversation: SIMChatConversationProtocol {
     ///
     /// 发送都信息
     ///
-    public var sender: SIMChatUserProtocol? {
-        return manager?.user
+    public var sender: SIMChatUserProtocol {
+        guard let user = manager?.user else {
+            fatalError("Must login")
+        }
+        return user
     }
     
     /// 相关的管理器

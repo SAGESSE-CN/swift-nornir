@@ -118,6 +118,8 @@ public class SIMChatBaseMessageAudioCell: SIMChatBaseMessageBubbleCell {
                 return
             }
             
+            SIMLog.trace()
+            
             titleLabel.text = { duration in
                 if duration < 60 {
                     return String(format: "%d''", Int(duration % 60))
@@ -138,15 +140,6 @@ public class SIMChatBaseMessageAudioCell: SIMChatBaseMessageBubbleCell {
 // MARK: - Event
 
 extension SIMChatBaseMessageAudioCell {
-    
-    override func bubbleDidPress(sender: UITapGestureRecognizer) {
-        guard let message = message where sender.state == .Ended else {
-            return
-        }
-        // 播放消息.
-        manager?.mediaProvider.playWithMessage(message)
-        super.bubbleDidPress(sender)
-    }
     
     /// 音频开始播放
     internal func audioDidPlay(sender: NSNotification) {

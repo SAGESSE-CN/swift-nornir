@@ -19,9 +19,9 @@ class ExChatConversation: SIMChatBaseConversation {
         
         let path = NSBundle.mainBundle().pathForResource("t1", ofType: "jpg")!
         
-        for i in 0 ..< 20 {
-            let o = (i % 2 == 0) ? receiver : sender!
-            let s = (i % 2 == 0) ? sender!  : receiver 
+        for i in 0 ..< 2 {
+            let o = (i % 2 == 0) ? receiver : sender
+            let s = (i % 2 == 0) ? sender   : receiver
             if true {
                 let c = SIMChatBaseMessageTextContent(content: "this is a tips\nThis is a very long long long long long long long long the tips")
                 let m = SIMChatBaseMessage.messageWithContent(c, receiver: o, sender: s)
@@ -47,7 +47,7 @@ class ExChatConversation: SIMChatBaseConversation {
                 messages.append(m)
             }
             if true {
-                let c = SIMChatBaseMessageDateContent(content: NSDate())
+                let c = SIMChatBaseMessageDateContent()
                 messages.append(SIMChatBaseMessage.messageWithContent(c, receiver: o, sender: s))
             }
             if true {

@@ -10,15 +10,11 @@ import Foundation
 
 
 ///
-/// 日期信息
+/// 日期信息(抽象的)
 ///
 public class SIMChatBaseMessageDateContent: SIMChatMessageContentProtocol {
     ///
     /// 初始化
     ///
-    public init(content: NSDate) {
-        self.content = content
-    }
-    /// 内容
-    public let content: NSDate
+    public init() {}
 }

@@ -17,11 +17,11 @@ public class SIMChatBaseManager: SIMChatManagerProtocol {
     /// 当前登录的用户.
     public var user: SIMChatUserProtocol?
     
-    /// 用户信息提供者
-    public lazy var userProvider: SIMChatUserProvider =  SIMChatUserProvider(self)
-    
     /// 文件提供者
     public lazy var fileProvider: SIMChatFileProvider = SIMChatFileProvider()
+    
+    /// 用户信息提供者
+    public lazy var userProvider: SIMChatUserProvider =  SIMChatUserProvider(manager: self)
     /// 媒体播放提供者
     public lazy var mediaProvider: SIMChatMediaProvider = SIMChatMediaProvider(fileProvider: self.fileProvider)
     
@@ -84,7 +84,6 @@ extension SIMChatBaseManager {
     ///
     public func conversation(receiver: SIMChatUserProtocol) -> SIMChatConversationProtocol {
         SIMLog.trace()
-        
         return conversations[receiver.identifier] ?? {
             let conversation = classProvider.conversation.conversation(receiver, manager: self)
             conversations[receiver.identifier] = conversation
@@ -98,7 +97,6 @@ extension SIMChatBaseManager {
     ///
     public func removeConversationWithReceiver(receiver: SIMChatUserProtocol) {
         SIMLog.trace()
-        
         if let index = conversations.indexOf({ receiver == $1.receiver }) {
             conversations.removeAtIndex(index)
         }
