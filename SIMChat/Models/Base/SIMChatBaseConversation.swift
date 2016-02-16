@@ -93,8 +93,10 @@ extension SIMChatBaseConversation {
         last: SIMChatMessageProtocol?,
         count: Int) -> SIMChatRequest<Array<SIMChatMessageProtocol>> {
             SIMLog.trace()
-            return SIMChatRequest.request {
-                $0.success(self.messages)
+            return SIMChatRequest.request { op in
+                dispatch_after_at_now(1, dispatch_get_main_queue()) {
+                    op.success(self.messages)
+                }
             }
     }
     ///

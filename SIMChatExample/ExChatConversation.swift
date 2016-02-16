@@ -19,7 +19,7 @@ class ExChatConversation: SIMChatBaseConversation {
         
         let path = NSBundle.mainBundle().pathForResource("t1", ofType: "jpg")!
         
-        for i in 0 ..< 2 {
+        for i in 0 ..< 1 {
             let o = (i % 2 == 0) ? receiver : sender
             let s = (i % 2 == 0) ? sender   : receiver
             if true {

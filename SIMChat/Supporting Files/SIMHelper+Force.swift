@@ -11,7 +11,7 @@ import UIKit
 
 extension NSObject {
     /// 自省
-    func scheck() {
+    public func scheck() {
         
         var ivarcnt: UInt32 = 0
         var propertycnt: UInt32 = 0
@@ -53,10 +53,10 @@ extension NSObject {
 }
 
 extension UIView {
-    func scheckView() {
+    public func scheckView() {
         print(valueForKey("recursiveDescription") as! NSString)
     }
-    func viewController() -> UIViewController? {
+    public func viewController() -> UIViewController? {
         var sv: UIView? = self
         while sv != nil {
             if sv?.nextResponder()?.isKindOfClass(UIViewController.self) ?? false {
