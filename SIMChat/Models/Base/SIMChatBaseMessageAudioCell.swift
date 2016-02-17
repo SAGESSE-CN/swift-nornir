@@ -117,9 +117,6 @@ public class SIMChatBaseMessageAudioCell: SIMChatBaseMessageBubbleCell {
             guard message !== oldValue else {
                 return
             }
-            
-            SIMLog.trace()
-            
             titleLabel.text = { duration in
                 if duration < 60 {
                     return String(format: "%d''", Int(duration % 60))

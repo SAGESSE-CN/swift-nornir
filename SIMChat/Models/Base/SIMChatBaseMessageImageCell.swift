@@ -45,9 +45,6 @@ public class SIMChatBaseMessageImageCell: SIMChatBaseMessageBubbleCell {
             guard let message = message, content = message.content as? SIMChatBaseMessageImageContent where message != oldValue else {
                 return
             }
-            
-            SIMLog.trace()
-            
             let width = max(content.size.width, 32)
             let height = max(content.size.height, 1)
             let scale = min(min(135, width) / width, min(135, height) / height)

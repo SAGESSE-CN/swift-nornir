@@ -110,16 +110,21 @@ extension SIMChatViewController.MessageManager: UITableViewDataSource {
 }
 
 extension SIMChatViewController.MessageManager: UITableViewDelegate {
+    
+    
+    @objc func scrollViewDidScroll(scrollView: UIScrollView) {
+//        SIMLog.debug("offset: \(scrollView.contentOffset)")
+    }
     /// 开始拖动
     @objc func scrollViewWillBeginDragging(scrollView: UIScrollView) {
 //        SIMLog.trace()
 //        scrollView.window?.endEditing(true)
-        SIMLog.debug("offset: \(scrollView.contentOffset)")
+//        SIMLog.debug("offset: \(scrollView.contentOffset)")
     }
     @objc func scrollViewWillEndDragging(scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
-        SIMLog.debug("offset: \(scrollView.contentOffset)")
-        SIMLog.debug("startOffsetY: \(scrollView.valueForKey("_startOffsetY"))")
-        SIMLog.debug("lastUpdateOffsetY: \(scrollView.valueForKey("_lastUpdateOffsetY"))")
+//        SIMLog.debug("offset: \(scrollView.contentOffset)")
+//        SIMLog.debug("startOffsetY: \(scrollView.valueForKey("_startOffsetY"))")
+//        SIMLog.debug("lastUpdateOffsetY: \(scrollView.valueForKey("_lastUpdateOffsetY"))")
     }
     /// 结束拖动
     @objc func scrollViewDidEndDragging(scrollView: UIScrollView, willDecelerate decelerate: Bool) {
@@ -137,16 +142,22 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate {
             return
         }
         if scrollView.contentInset.top + scrollView.contentOffset.y <= header.frame.height {
-            dispatch_async(dispatch_get_main_queue()) {
-                self._loadHistoryMessages()
-            }
+            _loadHistoryMessages()
         }
+    }
+    /// 移到头部
+    @objc func scrollViewDidScrollToTop(scrollView: UIScrollView) {
+        guard contentView?.tableHeaderView != nil && !isLoading else {
+            return
+        }
+        _loadHistoryMessages()
     }
     
     /// 绑定
     @objc func tableView(tableView: UITableView, willDisplayCell cell: UITableViewCell, forRowAtIndexPath indexPath: NSIndexPath) {
         // default configuation
         cell.selectionStyle = .None
+        //cell.backgroundColor = indexPath.row <= 1 ? .orangeColor() : .clearColor()
         cell.backgroundColor = .clearColor()
         cell.clipsToBounds = true
         
@@ -374,27 +385,20 @@ extension SIMChatViewController.MessageManager: SIMChatMessageCellDelegate, SIMC
             allMessages.insert($0.element, atIndex: min($0.index + position, allMessages.count))
         }
         
-        // 在更新之前先获取到从contentOffset到visibles.first.top的偏移量
-        let offset = !reoffset ? CGFloat(0) :  {
-            // 获取origin
-            let originContentOffset = tableView.contentOffset
-            let firstCellFrame = tableView.rectForRowAtIndexPath(visibles![0])
-            
-//            // 禁止动画, 更新到top(会导致减速事件停止)
-//            UIView.performWithoutAnimation {
-//                tableView.scrollToRowAtIndexPath(visibles![0], atScrollPosition: .Top, animated: false)
+        // 在更新之前先获取到从contentOffset到第一个显示的单元格的偏移
+        let oldContentOffset = tableView.contentOffset
+        let firstVisibleCellFrame = reoffset ? tableView.rectForRowAtIndexPath(visibles![0]) : CGRectZero
+        
+//        var tx = CGFloat(0)
+//            if true {
+//            let sy = tableView.valueForKey("_startOffsetY") as? CGFloat ?? 0
+//            let uy = tableView.valueForKey("_lastUpdateOffsetY") as? CGFloat ?? 0
+//                tx = oldContentOffset.y - sy
+//            SIMLog.debug(sy)
+//            SIMLog.debug(uy)
+//            SIMLog.debug(tx)
+//                //SIMLog.debug(tableView.valueForKey("_pagingSpringPull"))
 //            }
-//            // 获取top
-//            let t = tableView.contentOffset //: CGPointMake(0, -self.tableView.contentInset.top * 2)
-            
-            let distance = originContentOffset.y - firstCellFrame.origin.y
-            // ..
-            SIMLog.debug("ogigin content offset: \(originContentOffset)")
-            SIMLog.debug("first cell frame: \(firstCellFrame)")
-            SIMLog.debug("content offset to first cell distance: \(distance)")
-            // ok
-            return distance//CGPointMake(o.x - r.minX, o.y - r.minY)
-        }()
         
         // 禁止动画, 更新
         UIView.performWithoutAnimation {
@@ -412,63 +416,40 @@ extension SIMChatViewController.MessageManager: SIMChatMessageCellDelegate, SIMC
             if visibles!.count != 0 {
                 idx = NSIndexPath(forRow: visibles![0].row + newMessages.count - dels.count, inSection: 0)
             }
-            let oldFirstCellFrame = tableView.rectForRowAtIndexPath(idx)
-            let newContentOffset = CGPointMake(0, oldFirstCellFrame.origin.y + offset)
+            let distance = oldContentOffset.y - firstVisibleCellFrame.origin.y
+            let oldFirstVisibleCellFrame = tableView.rectForRowAtIndexPath(idx)
+            let newContentOffset = CGPointMake(0, oldFirstVisibleCellFrame.minY + distance)
+            let addedContentSize = CGSizeMake(tableView.frame.width, oldFirstVisibleCellFrame.minY - firstVisibleCellFrame.minY)
             
+            let hx = tableView.panGestureRecognizer.translationInView(tableView)
+            
+            SIMLog.debug("old content offset: \(oldContentOffset)")
+            SIMLog.debug("first visible cell frame: \(firstVisibleCellFrame)")
+            SIMLog.debug("content offset to first cell distance: \(distance)")
+            SIMLog.debug("old first visible cell frame: \(oldFirstVisibleCellFrame)")
+            SIMLog.debug("added content size: \(addedContentSize)")
             SIMLog.debug("new content offset: \(newContentOffset)")
-            SIMLog.debug("old first cell frame: \(oldFirstCellFrame)")
-            //SIMLog.debug("content offset to first cell distance: \(distance)")
+            SIMLog.debug("tableView: dragging(\(tableView.dragging)), decelerating(\(tableView.decelerating)), tracking(\(tableView.tracking))")
             
-            //SIMLog.debug(r)
+            //SIMLog.debug("startOffsetY: \(tableView.valueForKey("_startOffsetY"))")
+            //SIMLog.debug("lastUpdateOffsetY: \(tableView.valueForKey("_lastUpdateOffsetY"))")
             
-            // 更新到Top
-//            UIView.performWithoutAnimation     {
-//                tableView.scrollToRowAtIndexPath(idx, atScrollPosition: .Top, animated: false)
-//            }
-//            // 获取top位置
-//            let t = tableView.contentOffset
-            // 更新contentOffset
-            //tableView.setContentOffset(CGPointMake(t.x, t.y + offset.y), animated: false)
+            let sy = tableView.valueForKey("_startOffsetY") as? CGFloat ?? 0
+            let uy = tableView.valueForKey("_lastUpdateOffsetY") as? CGFloat ?? 0
+            
+            SIMLog.debug("table pan translation: \(hx)")
+            SIMLog.debug("offset to start offset: \(oldContentOffset.y - sy) => \(uy - sy)")
+            
+            tableView.setValue(newContentOffset.y + hx.y, forKey: "_startOffsetY")
+            tableView.setValue(newContentOffset.y + hx.y, forKey: "_lastUpdateOffsetY")
+            
             tableView.setContentOffset(newContentOffset, animated: false)
-//
-////            // 如果。
-////            if small && animated {
-////                self.tableView.setContentOffset(CGPointMake(t.x, t.y + offset.y + self.tableView.contentInset.top), animated: false)
-////                UIView.animateWithDuration(0.25) {
-////                    self.tableView.setContentOffset(CGPointMake(t.x, t.y + offset.y), animated: false)
-////                }
-////            }
-//            
-//            SIMLog.debug("index: \(idx.row)")
-//            SIMLog.debug("offset: \(offset)")
-//            SIMLog.debug("content offset: \(t)")
-//            SIMLog.debug("add content height: \(t.y - offset.y)")
-//            SIMLog.debug("new content offset: \(tableView.contentOffset)")
-//            
-//            let hx = t.y - offset.y
-//            let sy = (tableView.valueForKey("_startOffsetY") as? CGFloat) ?? 0
-//            let uy = (tableView.valueForKey("_lastUpdateOffsetY") as? CGFloat) ?? 0
-//            let xxx = uy - sy
-//            
-//            SIMLog.debug("startOffsetY: \(sy)")
-//            SIMLog.debug("lastUpdateOffsetY: \(uy)")
-//            SIMLog.debug("d: \(xxx)")
-//            
-//            //tableView.setValue(sy + hx, forKey: "_startOffsetY")
-//            //tableView.setValue(uy + hx, forKey: "_lastUpdateOffsetY")
-////            tableView.setValue(tableView.contentSize.height, forKey: "_startOffsetY")
-////            tableView.setValue(tableView.contentSize.height, forKey: "_lastUpdateOffsetY")
-//            
-//            if let v = tableView.valueForKey("autoscrollContentOffset") {
-//                tableView.setValue(v, forKey: "autoscrollContentOffset")
-//            }
             
-        } else {
-//            tableView.setValue(tableView.contentSize.height, forKey: "_startOffsetY")
-//            tableView.setValue(tableView.contentSize.height, forKey: "_lastUpdateOffsetY")
+            // tableView.valueForKey("_updatePanGesture")
             
-//            [SCheck]: UIScrollView.method: autoscrollContentOffset => {CGPoint=dd}16@0:8
-//            [SCheck]: UIScrollView.method: setAutoscrollContentOffset: => v32@0:8{CGPoint=dd}16
+            SIMLog.debug("apply content offset: \(tableView.contentOffset)")
+            SIMLog.debug("startOffsetY: \(tableView.valueForKey("_startOffsetY"))")
+            SIMLog.debug("lastUpdateOffsetY: \(tableView.valueForKey("_lastUpdateOffsetY"))")
         }
     }
     
@@ -509,16 +490,15 @@ extension SIMChatViewController.MessageManager: SIMChatMessageCellDelegate, SIMC
     /// 加载历史消息
     ///
     private func _loadHistoryMessages() {
+        guard !isLoading else {
+            return
+        }
         SIMLog.trace()
         let isFirstLoad = allMessages.isEmpty
         
         self.isLoading = true
         self.conversation.loadHistoryMessages(200).response { [weak self] in
-            self?.isLoading = false
-            guard let tableView = self?.contentView else {
-                return
-            }
-            if let allMessages = $0.value {
+            if let allMessages = $0.value, tableView = self?.contentView {
                 
                 if self?.allMessages.count > 200 {
                     UIView.performWithoutAnimation {
@@ -529,6 +509,12 @@ extension SIMChatViewController.MessageManager: SIMChatMessageCellDelegate, SIMC
                 }
                 
                 self?._insertMessages(allMessages, atIndex: 0)
+                
+//                let ca = CATransition()
+//                ca.type = kCATransitionFade
+//                ca.subtype = kCATransitionFromTop
+//                ca.duration = 0.1
+//                tableView.layer.addAnimation(ca, forKey: "ca")
                 
                 // 第一次加载
                 if isFirstLoad {
@@ -545,6 +531,7 @@ extension SIMChatViewController.MessageManager: SIMChatMessageCellDelegate, SIMC
                     }
                 }
             }
+            self?.isLoading = false
         }
     }
     

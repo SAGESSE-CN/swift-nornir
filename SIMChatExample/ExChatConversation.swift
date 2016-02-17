@@ -14,6 +14,145 @@ class Unknow: SIMChatMessageContentProtocol {
 
 class ExChatConversation: SIMChatBaseConversation {
 
+    override func loadHistoryMessages(last: SIMChatMessageProtocol?, count: Int) -> SIMChatRequest<Array<SIMChatMessageProtocol>> {
+            return SIMChatRequest.request { op in
+                dispatch_after_at_now(0.5, dispatch_get_main_queue()) {
+                    op.success(self.makeRandHistory())
+                }
+            }
+    }
+    
+    
+    static let ttv = [
+        "class",
+        "deinit",
+        "enum",
+        "extension",
+        "func",
+        "import",
+        "init",
+        "let",
+        "protocol",
+        "static",
+        "struct",
+        "subscript",
+        "typealias",
+        "var",
+        
+        "break",
+        "case","continue",
+        "default",
+        "do",
+        "else",
+        "fallthrough",
+        "if",
+        "in",
+        "for",
+        "return",
+        "switch",
+        "where",
+        "while",
+        
+        "as",
+        "dynamicType",
+        "is",
+        "new",
+        "super",
+        "self",
+        "Self",
+        "Type",
+        "__COLUMN__",
+        "__FILE__",
+        "__FUNCTION__",
+        "__LINE__",
+        
+        "associativity",
+        "didSet",
+        "get",
+        "infix",
+        "inout",
+        "left",
+        "mutating",
+        "none",
+        "nonmutating",
+        "operator",
+        "override",
+        "postfix",
+        "precedence",
+        "prefix",
+        "rightset",
+        "unowned",
+        "unowned(safe)",
+        "unowned(unsafe)",
+        "weak",
+        "willSet"
+    ]
+    
+    func makeRandText() -> String {
+        var str = ""
+        let r = (rand() % 50) + 1
+        let count = self.dynamicType.ttv.count
+        for _ in 0 ..< r {
+            let x = self.dynamicType.ttv[Int(rand()) % count]
+            if str.isEmpty {
+                str = x
+            } else {
+                str.appendContentsOf(" \(x)")
+            }
+        }
+        return str
+    }
+    func makeRandHistory() -> Array<SIMChatMessageProtocol> {
+        var rs: Array<SIMChatMessageProtocol> = []
+        
+        let path = NSBundle.mainBundle().pathForResource("t1", ofType: "jpg")!
+        
+        while rs.count < 10 {
+            let r = rand()
+            
+            let o = (r % 2 == 0) ? receiver : sender
+            let s = (r % 2 == 0) ? sender   : receiver
+            if (rand() % 10) < 6 {
+                let c = SIMChatBaseMessageTextContent(content: makeRandText())
+                let m = SIMChatBaseMessage.messageWithContent(c, receiver: o, sender: s)
+                m.option = [.ContactShow]
+                m.isSelf = (r % 2 == 0)
+                m.status = .Sending
+                rs.append(m)
+            }
+            if (rand() % 10) == 2 {
+                let c = SIMChatBaseMessageImageContent(remote: path, size: CGSizeMake(640, 480))
+                let m = SIMChatBaseMessage.messageWithContent(c, receiver: o, sender: s)
+                m.option = [.ContactShow]
+                m.isSelf = (r % 2 == 0)
+                m.status = .Receiving
+                rs.append(m)
+            }
+            if (rand() % 10) < 2 {
+                let c = SIMChatBaseMessageAudioContent(remote: path, duration: 6.2 * Double((r % 3600) + 1))
+                let m = SIMChatBaseMessage.messageWithContent(c, receiver: o, sender: s)
+                m.option = [.ContactShow]
+                m.isSelf = (r % 2 == 0)
+                m.status = .Error
+                rs.append(m)
+            }
+            if (rand() % 50) < 1 {
+                let c = SIMChatBaseMessageDateContent()
+                rs.append(SIMChatBaseMessage.messageWithContent(c, receiver: o, sender: s))
+            }
+            if (rand() % 10) < 3 {
+                let c = SIMChatBaseMessageTipsContent(content: "this is a tips\nThis is a very long long long long long long long long the tips")
+                rs.append(SIMChatBaseMessage.messageWithContent(c, receiver: o, sender: s))
+            }
+            if (rand() % 20) == 0  {
+                let c = Unknow()
+                rs.append(SIMChatBaseMessage.messageWithContent(c, receiver: o, sender: s))
+            }
+        }
+        
+        return rs
+    }
+    
     
     func makeTestData() {
         

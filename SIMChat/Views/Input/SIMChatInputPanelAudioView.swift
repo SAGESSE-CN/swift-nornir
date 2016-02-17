@@ -186,6 +186,7 @@ internal class SIMChatInputPanelAudioView: UIView, SIMChatInputPanelProtocol {
         view.delegate = self
         view.dataSource = self
         view.pagingEnabled = true
+        view.scrollsToTop = false
         view.allowsSelection = false
         view.delaysContentTouches = false
         view.showsVerticalScrollIndicator = false

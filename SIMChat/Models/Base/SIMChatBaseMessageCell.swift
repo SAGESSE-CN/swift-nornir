@@ -180,7 +180,7 @@ public class SIMChatBaseMessageBubbleCell: UITableViewCell, SIMChatMessageCellPr
     
     /// 初始化事件
     public func initEvents() {
-        SIMLog.trace()
+//        SIMLog.trace()
         
         SIMChatNotificationCenter.addObserver(self, selector: "userInfoDidChange:", name: SIMChatUserInfoDidChangeNotification)
         SIMChatNotificationCenter.addObserver(self, selector: "statusDidChange:", name: SIMChatMessageStatusChangedNotification)

@@ -196,6 +196,7 @@ public class SIMChatInputBar: UIView {
     private lazy var _textView: SIMChatInputBarTextView = {
         let view = SIMChatInputBarTextView()
         view.font = UIFont.systemFontOfSize(16)
+        view.scrollsToTop = false
         view.returnKeyType = .Send
         view.backgroundColor = UIColor.clearColor()
         view.scrollIndicatorInsets = UIEdgeInsetsMake(2, 0, 2, 0)
@@ -220,6 +221,7 @@ public class SIMChatInputBar: UIView {
         view.delegate = self
         view.dataSource = self
         view.backgroundColor = UIColor.clearColor()
+        view.scrollsToTop = false
         return view
     }()
     

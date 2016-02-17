@@ -86,6 +86,7 @@ internal class SIMChatInputPanelToolBoxView: UIView, SIMChatInputPanelProtocol {
         let view = UICollectionView(frame: self.bounds, collectionViewLayout: layout)
         view.delegate = self
         view.dataSource = self
+        view.scrollsToTop = false
         view.pagingEnabled = true
         view.delaysContentTouches = false
         view.showsVerticalScrollIndicator = false

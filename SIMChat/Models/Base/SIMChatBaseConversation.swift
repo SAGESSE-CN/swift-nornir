@@ -60,11 +60,9 @@ public class SIMChatBaseConversation: SIMChatConversationProtocol {
     
     /// 所有的消息
     public var messages: Array<SIMChatMessageProtocol> = []
-}
-
-// MARK: - Util
-
-extension SIMChatBaseConversation {
+    
+    // MARK - Util
+    
     ///
     /// 最新的一条消息, 如果为nil则没有
     ///
@@ -77,11 +75,9 @@ extension SIMChatBaseConversation {
     public var unreadCount: Int {
         return messages.count
     }
-}
-
-// MARK: - Message
-
-extension SIMChatBaseConversation {
+    
+    // MARK - Message
+    
     ///
     /// 加载(历史)消息
     ///
@@ -93,10 +89,8 @@ extension SIMChatBaseConversation {
         last: SIMChatMessageProtocol?,
         count: Int) -> SIMChatRequest<Array<SIMChatMessageProtocol>> {
             SIMLog.trace()
-            return SIMChatRequest.request { op in
-                dispatch_after_at_now(1, dispatch_get_main_queue()) {
-                    op.success(self.messages)
-                }
+            return SIMChatRequest.request { 
+                $0.success(self.messages)
             }
     }
     ///
@@ -138,11 +132,9 @@ extension SIMChatBaseConversation {
             $0.success()
         }
     }
-}
-
-// MARK: - Message Of Remote
-
-extension SIMChatBaseConversation {
+    
+    // MARK: Message Of Remote
+    
     ///
     /// 服务端要求更新消息
     ///

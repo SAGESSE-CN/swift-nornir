@@ -139,6 +139,7 @@ internal class SIMChatInputPanelEmoticonView: UIView, SIMChatInputPanelProtocol 
         view.backgroundColor = UIColor(rgb: 0xF8F8F8)
         view.delegate = self
         view.dataSource = self
+        view.scrollsToTop = false
         return view
     }()
     private lazy var _preview: SIMChatInputPanelEmoticonPreview = {
@@ -177,6 +178,7 @@ internal class SIMChatInputPanelEmoticonView: UIView, SIMChatInputPanelProtocol 
         view.pagingEnabled = true
         view.dataSource = self
         view.delegate = self
+        view.scrollsToTop = false
         view.backgroundColor = UIColor.whiteColor()
         
         view.registerClass(SIMChatInputPanelEmoticonCell.self, forCellWithReuseIdentifier: "Emoticon")

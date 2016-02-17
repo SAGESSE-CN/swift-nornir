@@ -190,6 +190,7 @@ extension SIMChatViewController {
         contentView.accessibilityLabel = "聊天内容"
         contentView.backgroundColor = .clearColor()
         contentView.showsHorizontalScrollIndicator = false
+        contentView.scrollsToTop = true
         //contentView.showsVerticalScrollIndicator = false
         contentView.separatorStyle = .None
         
