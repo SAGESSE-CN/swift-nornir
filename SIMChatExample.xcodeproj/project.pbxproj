@@ -19,6 +19,7 @@
 		0C6B41571C61D74A00085B66 /* ExChatConversation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C6B41561C61D74A00085B66 /* ExChatConversation.swift */; };
 		0C6B41591C61DA7E00085B66 /* t1.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 0C6B41581C61DA7E00085B66 /* t1.jpg */; };
 		0C6B415D1C61DC7500085B66 /* SIMChat.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0C6B415C1C61DC7500085B66 /* SIMChat.xcassets */; };
+		0C7C93841C761AC100E7DC5C /* README.md in Sources */ = {isa = PBXBuildFile; fileRef = 0C7C93831C761AC100E7DC5C /* README.md */; };
 		0CE522881C63341800EB284D /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0CE522871C63341800EB284D /* AudioToolbox.framework */; };
 /* End PBXBuildFile section */
 
@@ -74,7 +75,7 @@
 		0C6B41561C61D74A00085B66 /* ExChatConversation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExChatConversation.swift; sourceTree = "<group>"; };
 		0C6B41581C61DA7E00085B66 /* t1.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = t1.jpg; sourceTree = "<group>"; };
 		0C6B415C1C61DC7500085B66 /* SIMChat.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = SIMChat.xcassets; sourceTree = "<group>"; };
-		0C7448561C736215009CF6A7 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		0C7C93831C761AC100E7DC5C /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = SOURCE_ROOT; };
 		0CE522861C63341800EB284D /* SIMChatExample.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = SIMChatExample.entitlements; sourceTree = "<group>"; };
 		0CE522871C63341800EB284D /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
@@ -123,8 +124,8 @@
 				0C6B415C1C61DC7500085B66 /* SIMChat.xcassets */,
 				0C0DD6AB1C60B65D00AEC8C4 /* Assets.xcassets */,
 				0C0DD6AD1C60B65D00AEC8C4 /* LaunchScreen.storyboard */,
-				0C7448561C736215009CF6A7 /* README.md */,
 				0CE522861C63341800EB284D /* SIMChatExample.entitlements */,
+				0C7C93831C761AC100E7DC5C /* README.md */,
 				0C0DD6B01C60B65D00AEC8C4 /* Info.plist */,
 			);
 			path = SIMChatExample;
@@ -236,6 +237,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0C7C93841C761AC100E7DC5C /* README.md in Sources */,
 				0C0DD6A71C60B65D00AEC8C4 /* ExConversationViewController.swift in Sources */,
 				0C0DD6A51C60B65D00AEC8C4 /* AppDelegate.swift in Sources */,
 				0C6B41551C61D6E300085B66 /* ExChatManager.swift in Sources */,
