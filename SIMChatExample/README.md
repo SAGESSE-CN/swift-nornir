@@ -7,44 +7,50 @@
 		)](http://mit-license.org)
 
 # TODO
-* [ ] **重构(折腾中...)**
-* [ ] **显示GIF聊天图片, 图文并排(CoreText)**
 * **输入栏**
-* [X] **显示自定义表情**
-* [ ] **禁言支持**
-* [ ] **话题**
-* [X] **左侧菜单项, 设置`SIMChatInputBar.leftBarButtonItems`**
-* [X] **右侧菜单项, 设置`SIMChatInputBar.rightBarButtonItems`**
-* [X] **底部菜单项, 设置`SIMChatInputBar.bottomBarButtonItems`**
+* [X] **支持自定义表情**
+* [ ] **支持禁言**
+* [ ] **支持话题**
+* [X] **支持左侧菜单项, 设置`SIMChatInputBar.leftBarButtonItems`**
+* [X] **支持右侧菜单项, 设置`SIMChatInputBar.rightBarButtonItems`**
+* [X] **支持底部菜单项, 设置`SIMChatInputBar.bottomBarButtonItems`**
 * [X] **自动高度适应, 如果需要获得改变事件监听`SIMChatInputBarFrameDidChangeNotification`**
 * **输入面板**
-* [X] **自定义, 调用`SIMChatInputPanel.registerClass:byIdentifier:`进行注册**
-* [X] **表情->系统, 内置支持QQ表情和Emoji表情, 如需添加其他, 在配置文件`emoticons.plist`中按格式添加即可**
-* [X] **表情->自定义, 在`SIMChatInputPanelEmoticonViewDelegate`中的`inputPanel:emoticonGroupAtIndex:`返回表情组即可. 注意:这里还要改**
-* [X] **语音->对讲**
-* [ ] **语音->变声**
-* [ ] **语音->录音**
-* [ ] **图片**
-* [ ] **视频**
-* [X] **工具->自定义菜单项, 在`SIMChatInputPanelToolBoxDelegate`中的`inputPanel:itemAtIndex:`返回对应的菜单项即可**
+* [X] **内置表情, 提供QQ表情和Emoji表情, 如需添加其他, 在配置文件`emoticons.plist`中按格式添加即可**
+* [X] **支持扩展内置表情, 使用`SIMChatInputPanel.registerClass:byIdentifier:`进行注册**
+* [X] **支持自定义, 在`SIMChatInputPanelEmoticonViewDelegate``inputPanel:emoticonGroupAtIndex:`返回表情组即可. 注意:这里还要改**
+* [X] **支持对讲**
+* [ ] **支持变声**
+* [ ] **支持录音**
+* [ ] **支持(内嵌)选择图片**
+* [ ] **支持(内嵌)录制视频**
+* [X] **支持自定义工具项, 在`SIMChatInputPanelToolBoxDelegate``inputPanel:itemAtIndex:`返回对应的工具信息**
 
-* [ ] **优化UITableView(20%)**
-* [X] **多图选择**
-* [ ] **多图片预览**
-* [ ] **横屏支持**
-* [ ] **消息重新排序**
-* [ ] **图片预览, 键盘隐藏bug**
-* [ ] **拖动时插入消息**
-* [ ] **效率问题(拖动)**
-* [ ] **音频压缩(转换)**
-* [ ] **选择相机后消息下移**
-* [ ] **完善消息删除**
+* **消息**
+* [X] **支持下拉加载更多**
+* [X] **支持删除功能**
+* [X] **支持撤回功能**
 * [ ] **完善消息气泡**
 * [ ] **添加消息更新(重新发送, 发送完成)**
-* [ ] **下拉加载更多, 20%**
-* [ ] **发送地址**
-* [ ] **发送文件**
-* [ ] **发送视频**
-* [ ] **发送音乐**
+* [X] **支持发送文本消息**
+* [ ] **支持发送图片消息**
+* [ ] **支持发送地址消息**
+* [ ] **支持发送文件消息**
+* [ ] **支持发送视频消息**
+* [ ] **支持发送音乐消息**
 
-* [ ] **示例**
+* [ ] **支持图文并排(CoreText)**
+* [ ] **支持GIF图片**
+* [ ] **支持音频压缩(转换)**
+* [ ] **优化UITableView(20%)**
+
+* [X] **多图选择**
+* [ ] **多图片预览**
+* [ ] **消息重新排序**
+
+* [ ] **BUG: 图片预览, 键盘隐藏bug, 未验证**
+* [ ] **BUG: 选择相机后消息下移**
+
+* [ ] **重构(折腾中...) - 50%**
+* [ ] **横屏支持 - 0%**
+* [ ] **示例 - 0%**
