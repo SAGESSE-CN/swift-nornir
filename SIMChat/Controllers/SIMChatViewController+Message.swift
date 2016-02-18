@@ -514,7 +514,6 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
         var removeIndexPaths: Array<NSIndexPath> = []
         var removeIndexPathsL: Array<NSIndexPath> = [] // Left
         var removeIndexPathsR: Array<NSIndexPath> = [] // Right
-        var removeIndexPathsF: Array<NSIndexPath> = [] // Fade
       
         indexs.forEach {
             
@@ -536,7 +535,11 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
                         let idx = NSIndexPath(forRow: $0 - 1, inSection: 0)
                         allMessages.removeAtIndex($0 - 1)
                         removeIndexPaths.append(idx)
-                        removeIndexPathsF.append(idx)
+                        if message.isSelf {
+                            removeIndexPathsR.append(idx)
+                        } else {
+                            removeIndexPathsL.append(idx)
+                        }
                     } else {
                         // 并下一条消息并不是时间, 保留. 并更新
                         let idx = NSIndexPath(forRow: $0 - 1, inSection: 0)
@@ -548,7 +551,11 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
                     let idx = NSIndexPath(forRow: $0 - 1, inSection: 0)
                     allMessages.removeAtIndex($0 - 1)
                     removeIndexPaths.append(idx)
-                    removeIndexPathsF.append(idx)
+                    if message.isSelf {
+                        removeIndexPathsR.append(idx)
+                    } else {
+                        removeIndexPathsL.append(idx)
+                    }
                 }
             } else if let pm = prev {
                 // 如果上一条消息不是时间
@@ -579,14 +586,37 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
             }
         }
         
-        tableView.beginUpdates()
-        tableView.deleteRowsAtIndexPaths(removeIndexPathsL, withRowAnimation: .Left)
-        tableView.deleteRowsAtIndexPaths(removeIndexPathsR, withRowAnimation: .Right)
-        tableView.deleteRowsAtIndexPaths(removeIndexPathsF, withRowAnimation: .Fade)
-        tableView.reloadRowsAtIndexPaths(reloadIndexPathsL, withRowAnimation: .Left)
-        tableView.reloadRowsAtIndexPaths(reloadIndexPathsR, withRowAnimation: .Right)
-        tableView.reloadRowsAtIndexPaths(reloadIndexPathsF, withRowAnimation: .Fade)
-        tableView.endUpdates()
+        if animated {
+            let cellsL = removeIndexPathsL.flatMap { tableView.cellForRowAtIndexPath($0) }
+            let cellsR = removeIndexPathsR.flatMap { tableView.cellForRowAtIndexPath($0) }
+            // 自定义删除动画
+            UIView.animateWithDuration(0.25,
+                animations: {
+                    cellsL.forEach { $0.frame.origin = CGPointMake(-$0.frame.width, $0.frame.minY) }
+                    cellsR.forEach { $0.frame.origin = CGPointMake(+$0.frame.width, $0.frame.minY) }
+                },
+                completion: { b in
+                    // 必须要隐藏, 否则系统动画会暴露
+                    cellsL.forEach { $0.hidden = true }
+                    cellsR.forEach { $0.hidden = true }
+                    // 使用系统的更新
+                    tableView.beginUpdates()
+                    tableView.deleteRowsAtIndexPaths(removeIndexPathsL, withRowAnimation: .Top)
+                    tableView.deleteRowsAtIndexPaths(removeIndexPathsR, withRowAnimation: .Top)
+                    tableView.reloadRowsAtIndexPaths(reloadIndexPathsL, withRowAnimation: .Left)
+                    tableView.reloadRowsAtIndexPaths(reloadIndexPathsR, withRowAnimation: .Right)
+                    tableView.reloadRowsAtIndexPaths(reloadIndexPathsF, withRowAnimation: .Fade)
+                    tableView.endUpdates()
+            })
+        } else {
+            UIView.performWithoutAnimation {
+                tableView.beginUpdates()
+                tableView.deleteRowsAtIndexPaths(removeIndexPaths,  withRowAnimation: .None)
+                tableView.reloadRowsAtIndexPaths(reloadIndexPathsL, withRowAnimation: .None)
+                tableView.reloadRowsAtIndexPaths(reloadIndexPathsR, withRowAnimation: .None)
+                tableView.endUpdates()
+            }
+        }
     }
     
     
