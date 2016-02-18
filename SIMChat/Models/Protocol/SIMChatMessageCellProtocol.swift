@@ -79,7 +79,7 @@ public protocol SIMChatMessageCellMenuDelegate: class {
     func cellMenu(cell: SIMChatMessageCellProtocol, didRetryMessage message: SIMChatMessageProtocol)
     
     // 撤销
-    func cellMenu(cell: SIMChatMessageCellProtocol, shouldRevocationMessage message: SIMChatMessageProtocol) -> Bool
-    func cellMenu(cell: SIMChatMessageCellProtocol, didRevocationMessage message: SIMChatMessageProtocol)
+    func cellMenu(cell: SIMChatMessageCellProtocol, shouldRevokeMessage message: SIMChatMessageProtocol) -> Bool
+    func cellMenu(cell: SIMChatMessageCellProtocol, didRevokeMessage message: SIMChatMessageProtocol)
 }
 

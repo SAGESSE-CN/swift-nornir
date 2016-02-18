@@ -34,6 +34,10 @@ public protocol SIMChatConversationProtocol: class {
     /// 未读消息数量, 为0则没有
     ///
     var unreadCount: Int { get }
+    ///
+    /// 所有消息都己经加载
+    ///
+    var allMessagesIsLoaded: Bool { get }
     
     // MARK: Other
     

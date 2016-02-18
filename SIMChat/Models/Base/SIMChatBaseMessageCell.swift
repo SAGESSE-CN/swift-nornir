@@ -15,6 +15,11 @@ public class SIMChatBaseMessageBaseCell: UITableViewCell, SIMChatMessageCellProt
     public var message: SIMChatMessageProtocol?
     public weak var conversation: SIMChatConversationProtocol?
     public weak var delegate: protocol<SIMChatMessageCellDelegate, SIMChatMessageCellMenuDelegate>?
+    
+    /// 时间线
+    public var showTimeLine: Bool {
+        return false
+    }
 }
 
 ///
@@ -34,7 +39,7 @@ public class SIMChatBaseMessageBubbleCell: UITableViewCell, SIMChatMessageCellPr
         
         _bubbleMenuItems = [
             UIMenuItem(title: "删除", action: "_removeMessage:"),
-            UIMenuItem(title: "撤销", action: "_revocationMessage:")
+            UIMenuItem(title: "撤销", action: "_revokeMessage:")
         ]
         
         // TODO: 有性能问题, 需要重新实现
@@ -170,6 +175,10 @@ public class SIMChatBaseMessageBubbleCell: UITableViewCell, SIMChatMessageCellPr
             setNeedsLayout()
         }
     }
+    /// 显示时间线
+    public var showTimeLine: Bool {
+        return true
+    }
     
     public override func willMoveToWindow(newWindow: UIWindow?) {
         if window == nil || newWindow != nil {
@@ -294,12 +303,12 @@ extension SIMChatBaseMessageBubbleCell {
             delegate?.cellMenu(self, didRemoveMessage: message)
         }
     }
-    private dynamic func _revocationMessage(sender: AnyObject) {
+    private dynamic func _revokeMessage(sender: AnyObject) {
         guard let message = message else {
             return
         }
-        if delegate?.cellMenu(self, shouldRevocationMessage: message) ?? true {
-             delegate?.cellMenu(self, didRevocationMessage: message)
+        if delegate?.cellMenu(self, shouldRevokeMessage: message) ?? true {
+             delegate?.cellMenu(self, didRevokeMessage: message)
         }
     }
     

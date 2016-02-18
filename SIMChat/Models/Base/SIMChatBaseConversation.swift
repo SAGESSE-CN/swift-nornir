@@ -75,6 +75,12 @@ public class SIMChatBaseConversation: SIMChatConversationProtocol {
     public var unreadCount: Int {
         return messages.count
     }
+    ///
+    /// 所有消息都己经加载
+    ///
+    public var allMessagesIsLoaded: Bool {
+        return false
+    }
     
     // MARK - Message
     

@@ -13,11 +13,22 @@ class Unknow: SIMChatMessageContentProtocol {
 }
 
 class ExChatConversation: SIMChatBaseConversation {
+    
+    /// 所有消息都己经加载
+    override var allMessagesIsLoaded: Bool {
+        return messages.count > 200
+    }
 
     override func loadHistoryMessages(last: SIMChatMessageProtocol?, count: Int) -> SIMChatRequest<Array<SIMChatMessageProtocol>> {
             return SIMChatRequest.request { op in
                 dispatch_after_at_now(0.5, dispatch_get_main_queue()) {
-                    op.success(self.makeRandHistory())
+//                    if rand() % 3 == 0 {
+//                        op.failure(NSError(domain: "", code: 0, userInfo: nil))
+//                        return
+//                    }
+                    let ms = self.makeRandHistory()
+                    self.messages.appendContentsOf(ms)
+                    op.success(ms)
                 }
             }
     }
@@ -102,6 +113,7 @@ class ExChatConversation: SIMChatBaseConversation {
         }
         return str
     }
+    var i: NSTimeInterval = 0
     func makeRandHistory() -> Array<SIMChatMessageProtocol> {
         var rs: Array<SIMChatMessageProtocol> = []
         
@@ -109,6 +121,8 @@ class ExChatConversation: SIMChatBaseConversation {
         
         while rs.count < 10 {
             let r = rand()
+            
+            i += 5
             
             let o = (r % 2 == 0) ? receiver : sender
             let s = (r % 2 == 0) ? sender   : receiver
@@ -118,6 +132,7 @@ class ExChatConversation: SIMChatBaseConversation {
                 m.option = [.ContactShow]
                 m.isSelf = (r % 2 == 0)
                 m.status = .Sending
+                m.date = NSDate(timeIntervalSinceNow: i + 0)
                 rs.append(m)
             }
             if (rand() % 10) == 2 {
@@ -126,6 +141,7 @@ class ExChatConversation: SIMChatBaseConversation {
                 m.option = [.ContactShow]
                 m.isSelf = (r % 2 == 0)
                 m.status = .Receiving
+                m.date = NSDate(timeIntervalSinceNow: i + 1)
                 rs.append(m)
             }
             if (rand() % 10) < 2 {
@@ -134,73 +150,26 @@ class ExChatConversation: SIMChatBaseConversation {
                 m.option = [.ContactShow]
                 m.isSelf = (r % 2 == 0)
                 m.status = .Error
+                m.date = NSDate(timeIntervalSinceNow: i + 2)
                 rs.append(m)
-            }
-            if (rand() % 50) < 1 {
-                let c = SIMChatBaseMessageDateContent()
-                rs.append(SIMChatBaseMessage.messageWithContent(c, receiver: o, sender: s))
             }
             if (rand() % 10) < 3 {
                 let c = SIMChatBaseMessageTipsContent(content: "this is a tips\nThis is a very long long long long long long long long the tips")
-                rs.append(SIMChatBaseMessage.messageWithContent(c, receiver: o, sender: s))
+                let m = SIMChatBaseMessage.messageWithContent(c, receiver: o, sender: s)
+                m.option = [.TimeLineHidden]
+                m.date = NSDate(timeIntervalSinceNow: i + 3)
+                rs.append(m)
             }
             if (rand() % 20) == 0  {
                 let c = Unknow()
-                rs.append(SIMChatBaseMessage.messageWithContent(c, receiver: o, sender: s))
+                let m = SIMChatBaseMessage.messageWithContent(c, receiver: o, sender: s)
+                m.option = [.TimeLineHidden]
+                m.date = NSDate(timeIntervalSinceNow: i + 4)
+                rs.append(m)
             }
         }
-        
         return rs
     }
-    
-    
-    func makeTestData() {
-        
-        let path = NSBundle.mainBundle().pathForResource("t1", ofType: "jpg")!
-        
-        for i in 0 ..< 1 {
-            let o = (i % 2 == 0) ? receiver : sender
-            let s = (i % 2 == 0) ? sender   : receiver
-            if true {
-                let c = SIMChatBaseMessageTextContent(content: "this is a tips\nThis is a very long long long long long long long long the tips")
-                let m = SIMChatBaseMessage.messageWithContent(c, receiver: o, sender: s)
-                m.option = [.ContactShow]
-                m.isSelf = (i % 2 == 0)
-                m.status = .Sending
-                messages.append(m)
-            }
-            if true {
-                let c = SIMChatBaseMessageImageContent(remote: path, size: CGSizeMake(640, 480))
-                let m = SIMChatBaseMessage.messageWithContent(c, receiver: o, sender: s)
-                m.option = [.ContactShow]
-                m.isSelf = (i % 2 == 0)
-                m.status = .Receiving
-                messages.append(m)
-            }
-            if true {
-                let c = SIMChatBaseMessageAudioContent(remote: path, duration: 6.2 * Double(i + 1))
-                let m = SIMChatBaseMessage.messageWithContent(c, receiver: o, sender: s)
-                m.option = [.ContactShow]
-                m.isSelf = (i % 2 == 0)
-                m.status = .Error
-                messages.append(m)
-            }
-            if true {
-                let c = SIMChatBaseMessageDateContent()
-                messages.append(SIMChatBaseMessage.messageWithContent(c, receiver: o, sender: s))
-            }
-            if true {
-                let c = SIMChatBaseMessageTipsContent(content: "this is a tips\nThis is a very long long long long long long long long the tips")
-                messages.append(SIMChatBaseMessage.messageWithContent(c, receiver: o, sender: s))
-            }
-            if true {
-                let c = Unknow()
-                messages.append(SIMChatBaseMessage.messageWithContent(c, receiver: o, sender: s))
-            }
-        }
-    }
-    
-    var allLoaded = false
 }
 
 //extension SDChatConversation {

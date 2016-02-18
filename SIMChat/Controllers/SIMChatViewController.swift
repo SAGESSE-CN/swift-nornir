@@ -272,6 +272,7 @@ extension SIMChatViewController {
         super.viewDidLayoutSubviews()
     
         // 更新inset, 否则tableView显示区域错误
+        // TODO: 转屏之后这里好像有bug
         var edg = contentView.contentInset
         edg.top = topLayoutGuide.length + -(contentViewLayout?.top ?? 0)
         contentView.contentInset = edg

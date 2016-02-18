@@ -73,6 +73,13 @@ extension SIMChatMessageProtocol {
     public static func messageWithContent(content: SIMChatMessageContentProtocol, receiver: SIMChatUserProtocol, sender: SIMChatUserProtocol) -> SIMChatMessageProtocol {
         return messageWithContent(content, receiver: receiver, sender: sender, identifier: NSUUID().UUIDString)
     }
+    
+    ///
+    /// 显示时间线
+    ///
+    public var showsTimeLine: Bool {
+        return !option.contains(.TimeLineHidden)
+    }
 }
 
 // MARK: - Message Other Type
@@ -98,7 +105,7 @@ public struct SIMChatMessageOption: OptionSetType {
     public static var Hidden: SIMChatMessageOption {
         return SIMChatMessageOption(rawValue: 0x0002)
     }
-
+    
     /// 名片强制显示, 默认是自动选项
     public static var ContactShow: SIMChatMessageOption {
         return SIMChatMessageOption(rawValue: 0x0100)
@@ -106,6 +113,10 @@ public struct SIMChatMessageOption: OptionSetType {
     /// 名片强制隐藏, 默认是自动选项
     public static var ContactHidden: SIMChatMessageOption {
         return SIMChatMessageOption(rawValue: 0x0200)
+    }
+    /// 隐藏时间线
+    public static var TimeLineHidden: SIMChatMessageOption {
+        return SIMChatMessageOption(rawValue: 0x0400)
     }
 }
 
