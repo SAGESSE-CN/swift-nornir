@@ -26,7 +26,7 @@ extension SIMChatViewController {
         /// 快速映射
         private var _fastMap: Dictionary<String, String> = [:]
         
-        var durationInterval: NSTimeInterval = 5
+        var durationInterval: NSTimeInterval = 10
         
         lazy var header: UIView = {
             let view = UIView(frame: CGRectMake(0, 0, 320, 44))
@@ -104,6 +104,89 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
             return ds
         }()
     }
+    
+    /// 存在timeline
+    private func _hasTimeLine(prev: SIMChatMessageProtocol?, _ next: SIMChatMessageProtocol?) -> Bool {
+        return prev?.content is SIMChatBaseMessageTimeLineContent
+            || next?.content is SIMChatBaseMessageTimeLineContent
+    }
+    
+    /// 需要生成timeline
+    private func _needMakeTimeLine(prev: SIMChatMessageProtocol?, _ next: SIMChatMessageProtocol?) -> Bool {
+        // next必须存在并且要可以显示timeline
+        guard let next = next where next.showsTimeLine else {
+            return false
+        }
+        // next是时间, 表示己经创建
+        if next.content is SIMChatBaseMessageTimeLineContent {
+            return false
+        }
+        // prev可以不存在, 但如果存在就必须符合条件
+        guard let prev = prev else {
+            return true
+        }
+        // 如果上一个消息是时间, 表示己经创建过了.
+        if prev.content is SIMChatBaseMessageTimeLineContent {
+            return false
+        }
+        // 如果上一个不允许显示时间, 那就必须显示
+        guard prev.showsTimeLine else {
+            return true
+        }
+        // 都符合就检查时间
+        return fabs(prev.date.timeIntervalSinceDate(next.date)) >= durationInterval
+    }
+    
+    /// 需要移除
+    private func _needRemoveTimeLine(prev: SIMChatMessageProtocol?, _ next: SIMChatMessageProtocol?) -> Bool {
+        // 两个都是timeline
+        if next?.content is SIMChatBaseMessageTimeLineContent
+            && prev?.content is SIMChatBaseMessageTimeLineContent {
+            return true
+        }
+        // 两个都不是timeline
+        if !(next?.content is SIMChatBaseMessageTimeLineContent)
+            && !(prev?.content is SIMChatBaseMessageTimeLineContent) {
+            return false
+        }
+        // 必须要有创建才有删除
+        if let _ = prev?.content as? SIMChatBaseMessageTimeLineContent {
+            guard let nextMessage = next else {
+                // 没有下一条了, 需要删除
+                return true
+            }
+            if !nextMessage.showsTimeLine {
+                // 不允许显示timeline
+                return true
+            }
+        }
+        if let _ = next?.content as? SIMChatBaseMessageTimeLineContent {
+            guard let prevMessage = prev else {
+                // 这是第一条
+                return false
+            }
+            if !prevMessage.showsTimeLine {
+                // 上一条消息不允许显示timeline, 那么这个就可以直接显示
+                return false
+            }
+        }
+        guard let next = next, prev = prev else {
+            return false
+        }
+        // 计算
+        return fabs(prev.date.timeIntervalSinceDate(next.date)) < durationInterval
+    }
+    
+    /// 生成timeline
+    private func _makeTimeLine(frontMessage: SIMChatMessageProtocol?, _ backMessage: SIMChatMessageProtocol?) -> SIMChatMessageProtocol {
+        let content = SIMChatBaseMessageTimeLineContent(frontMessage: frontMessage, backMessage: backMessage)
+        let messageClass = manager.classProvider.message
+        let message = messageClass.messageWithContent(content,
+            receiver: conversation.receiver,
+            sender: conversation.sender)
+        return message
+    }
+    
     
     // MARK: UITableViewDataSource
     
@@ -317,83 +400,6 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
     
     // MARK: Message Operator
     
-    private func _needMakeTimeLine(prev: SIMChatMessageProtocol?, _ next: SIMChatMessageProtocol?) -> Bool {
-        // next必须存在并且要可以显示timeline
-        guard let next = next where next.showsTimeLine else {
-            return false
-        }
-        // next是时间, 表示己经创建
-        if next.content is SIMChatBaseMessageTimeLineContent {
-            return false
-        }
-        // prev可以不存在, 但如果存在就必须符合条件
-        guard let prev = prev else {
-            return true
-        }
-        // 如果上一个消息是时间, 表示己经创建过了.
-        if prev.content is SIMChatBaseMessageTimeLineContent {
-            return false
-        }
-        // 如果上一个不允许显示时间, 那就必须显示
-        guard prev.showsTimeLine else {
-            return true
-        }
-        // 都符合就检查时间
-        return fabs(prev.date.timeIntervalSinceDate(next.date)) >= durationInterval
-    }
-    
-    private func _needHasTimeLine(prev: SIMChatMessageProtocol?, _ next: SIMChatMessageProtocol?) -> Bool {
-        return prev?.content is SIMChatBaseMessageTimeLineContent
-            || next?.content is SIMChatBaseMessageTimeLineContent
-    }
-    
-    private func _needRemoveTimeLine(prev: SIMChatMessageProtocol?, _ next: SIMChatMessageProtocol?) -> Bool {
-        // 两个都是timeline
-        if next?.content is SIMChatBaseMessageTimeLineContent
-            && prev?.content is SIMChatBaseMessageTimeLineContent {
-            return true
-        }
-        // 两个都不是timeline
-        if !(next?.content is SIMChatBaseMessageTimeLineContent)
-            && !(prev?.content is SIMChatBaseMessageTimeLineContent) {
-            return false
-        }
-        // 必须要有创建才有删除
-        if let _ = prev?.content as? SIMChatBaseMessageTimeLineContent {
-            guard let nextMessage = next else {
-                // 没有下一条了, 需要删除
-                return true
-            }
-            if !nextMessage.showsTimeLine {
-                // 不允许显示timeline
-                return true
-            }
-        }
-        if let _ = next?.content as? SIMChatBaseMessageTimeLineContent {
-            guard let prevMessage = prev else {
-                // 这是第一条
-                return false
-            }
-            if !prevMessage.showsTimeLine {
-                // 上一条消息不允许显示timeline, 那么这个就可以直接显示
-                return false
-            }
-        }
-        guard let next = next, prev = prev else {
-            return false
-        }
-        // 计算
-        return fabs(prev.date.timeIntervalSinceDate(next.date)) < durationInterval
-    }
-    
-    private func _makeTimeLine(frontMessage: SIMChatMessageProtocol?, _ backMessage: SIMChatMessageProtocol?) -> SIMChatMessageProtocol {
-        let content = SIMChatBaseMessageTimeLineContent(frontMessage: frontMessage, backMessage: backMessage)
-        let messageClass = manager.classProvider.message
-        let message = messageClass.messageWithContent(content,
-            receiver: conversation.receiver,
-            sender: conversation.sender)
-        return message
-    }
     
     ///
     /// 批量插入消息
@@ -476,7 +482,7 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
                 if visibleIndexPaths?[0].row == position {
                     visibleIndexPaths?.removeAtIndex(0)
                 }
-            } else if _needHasTimeLine(prevMessage, nextMessage) {
+            } else if _hasTimeLine(prevMessage, nextMessage) {
                 // 需要更新
                 if let content = nextMessage.content as? SIMChatBaseMessageTimeLineContent {
                     content.frontMessage = prevMessage
@@ -484,27 +490,6 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
                     reloadIndexPaths.append(NSIndexPath(forRow: position, inSection: 0))
                 }
             }
-            
-            
-//            if fabs(f.date.timeIntervalSinceDate(l.date)) > durationInterval {
-//                // 太远了
-//                if !(l.content is SIMChatBaseMessageTimeLineContent) {
-//                    newMessages.append(_makeTimeLine(f, l))
-//                    
-//                    SIMLog.debug("add date at \(position)")
-//                }
-//            } else {
-//                // 太近了
-//                if l.content is SIMChatBaseMessageTimeLineContent {
-//                    removeIndexPaths.append(NSIndexPath(forRow: position, inSection: 0))
-//                    allMessages.removeAtIndex(position)
-//                    // 删除是谁?
-//                    if visibleIndexPaths?[0].row == position {
-//                        visibleIndexPaths?.removeAtIndex(0)
-//                    }
-//                    SIMLog.debug("remove date at \(position)")
-//                }
-//            }
         }
         
         /// 如果并没有任何新消息(即全部是隐藏消息), 直接终止函数
@@ -636,32 +621,43 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
         }
         SIMLog.trace("reload indexs: \(indexs)")
         
+        var insertIndexPaths: Array<NSIndexPath> = []
         var reloadIndexPaths: Array<NSIndexPath> = []
         var removeIndexPaths: Array<NSIndexPath> = []
         
+        
         indexs.forEach {
+            
             let prev: SIMChatMessageProtocol? = ($0 - 1 < allMessages.count && $0 > 0) ? allMessages[$0 - 1] : nil
             let message = allMessages[$0]
+            let next: SIMChatMessageProtocol? = ($0 + 1 < allMessages.count) ? allMessages[$0 + 1] : nil
             
-            let indexPath = NSIndexPath(forRow: $0, inSection: 0)
             // 一定要重新计算高度
             tableView.fd_invalidateHeightForKey(message.identifier)
-            if let prevMessage = prev where prevMessage.content is SIMChatBaseMessageTimeLineContent {
-                // 如果上一个消息是时间
-                if message.content is SIMChatBaseMessageTimeLineContent || !message.showsTimeLine {
-                    // 当前也是时间, 删除
-                    // 当前不允许显示时间, 删除
-                    // 当前
-                } else {
-                    // 更新.
-                    prevMessage.date = message.date
-                }
+            
+            if _needMakeTimeLine(message, next) {
+                // 添加到下面
+                let idx = $0 + 1
+                SIMLog.debug("add time line at \($0 + 1)")
+                allMessages.insert(_makeTimeLine(message, next), atIndex: idx)
+                insertIndexPaths.append(NSIndexPath(forRow: $0, inSection: 0))
+            }
+            if _needRemoveTimeLine(prev, message) {
+                // 需要删除, 优先删除上面的
+                let idx = $0 - 1
+                SIMLog.debug("remove time line at \(idx)")
+                allMessages.removeAtIndex(idx)
+                removeIndexPaths.append(NSIndexPath(forRow: $0 - 1, inSection: 0))
             }
             
-            reloadIndexPaths.append(indexPath)
+            reloadIndexPaths.append(NSIndexPath(forRow: $0, inSection: 0))
         }
         
+        tableView.beginUpdates()
         tableView.reloadRowsAtIndexPaths(reloadIndexPaths, withRowAnimation: .Fade)
+        tableView.insertRowsAtIndexPaths(insertIndexPaths, withRowAnimation: .Fade)
+        tableView.deleteRowsAtIndexPaths(removeIndexPaths, withRowAnimation: .Fade)
+        tableView.endUpdates()
     }
     
     ///
@@ -691,9 +687,9 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
         let reloadMessage = { (message: SIMChatMessageProtocol, idx: NSIndexPath) in
             // 检查更新方向
             if message.isSelf {
-                reloadIndexPathsL.append(idx)
-            } else {
                 reloadIndexPathsR.append(idx)
+            } else {
+                reloadIndexPathsL.append(idx)
             }
         }
         let removeMessage = { (message: SIMChatMessageProtocol, idx: NSIndexPath) in
@@ -729,7 +725,7 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
                 SIMLog.debug("remove time line at \($0 - 1)")
                 allMessages.removeAtIndex($0 - 1)
                 removeMessage(message, NSIndexPath(forRow: $0 - 1, inSection: 0))
-            } else if _needHasTimeLine(prev, next) {
+            } else if _hasTimeLine(prev, next) {
                 // 需要更新
                 if let content = prev?.content as? SIMChatBaseMessageTimeLineContent {
                     let idx = NSIndexPath(forRow: $0 - 1, inSection: 0)
