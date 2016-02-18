@@ -36,8 +36,18 @@ public class SIMChatBaseMessageTipsCell: SIMChatBaseMessageBaseCell {
     /// 关联的消息
     public override var message: SIMChatMessageProtocol? {
         didSet {
-            if let content = message?.content as? SIMChatBaseMessageTipsContent {
+            guard let message = message where message !== oldValue else {
+                return
+            }
+            
+            if let content = message.content as? SIMChatBaseMessageTipsContent {
                 titleLabel.text = content.content
+            } else {
+                if message.status.isDestroyed() {
+                    titleLabel.text = "消息己销毁"
+                } else if message.status.isRevoked() {
+                    titleLabel.text = "消息己撤回"
+                }
             }
         }
     }

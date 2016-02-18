@@ -12,14 +12,14 @@
 		0C0DD6391C60B4A900AEC8C4 /* SIMChatViewController+Message.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C0DD5C51C60B4A900AEC8C4 /* SIMChatViewController+Message.swift */; };
 		0C0DD63A1C60B4A900AEC8C4 /* SIMChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C0DD5C61C60B4A900AEC8C4 /* SIMChatViewController.swift */; };
 		0C0DD63B1C60B4A900AEC8C4 /* SIMChatBaseMessageAudioCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C0DD5C91C60B4A900AEC8C4 /* SIMChatBaseMessageAudioCell.swift */; };
-		0C0DD63C1C60B4A900AEC8C4 /* SIMChatBaseMessageDateCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C0DD5CA1C60B4A900AEC8C4 /* SIMChatBaseMessageDateCell.swift */; };
+		0C0DD63C1C60B4A900AEC8C4 /* SIMChatBaseMessageTimeLineCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C0DD5CA1C60B4A900AEC8C4 /* SIMChatBaseMessageTimeLineCell.swift */; };
 		0C0DD63D1C60B4A900AEC8C4 /* SIMChatBaseMessageImageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C0DD5CB1C60B4A900AEC8C4 /* SIMChatBaseMessageImageCell.swift */; };
 		0C0DD63E1C60B4A900AEC8C4 /* SIMChatBaseMessageTextCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C0DD5CC1C60B4A900AEC8C4 /* SIMChatBaseMessageTextCell.swift */; };
 		0C0DD63F1C60B4A900AEC8C4 /* SIMChatBaseMessageTipsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C0DD5CD1C60B4A900AEC8C4 /* SIMChatBaseMessageTipsCell.swift */; };
 		0C0DD6401C60B4A900AEC8C4 /* SIMChatBaseMessageUnknowCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C0DD5CE1C60B4A900AEC8C4 /* SIMChatBaseMessageUnknowCell.swift */; };
 		0C0DD6411C60B4A900AEC8C4 /* SIMChatBaseMessageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C0DD5CF1C60B4A900AEC8C4 /* SIMChatBaseMessageCell.swift */; };
 		0C0DD6421C60B4A900AEC8C4 /* SIMChatBaseMessageAudioContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C0DD5D01C60B4A900AEC8C4 /* SIMChatBaseMessageAudioContent.swift */; };
-		0C0DD6431C60B4A900AEC8C4 /* SIMChatBaseMessageDateContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C0DD5D11C60B4A900AEC8C4 /* SIMChatBaseMessageDateContent.swift */; };
+		0C0DD6431C60B4A900AEC8C4 /* SIMChatBaseMessageTimeLineContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C0DD5D11C60B4A900AEC8C4 /* SIMChatBaseMessageTimeLineContent.swift */; };
 		0C0DD6441C60B4A900AEC8C4 /* SIMChatBaseMessageImageContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C0DD5D21C60B4A900AEC8C4 /* SIMChatBaseMessageImageContent.swift */; };
 		0C0DD6451C60B4A900AEC8C4 /* SIMChatBaseMessageTextContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C0DD5D31C60B4A900AEC8C4 /* SIMChatBaseMessageTextContent.swift */; };
 		0C0DD6461C60B4A900AEC8C4 /* SIMChatBaseMessageTipsContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C0DD5D41C60B4A900AEC8C4 /* SIMChatBaseMessageTipsContent.swift */; };
@@ -116,14 +116,14 @@
 		0C0DD5C51C60B4A900AEC8C4 /* SIMChatViewController+Message.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SIMChatViewController+Message.swift"; sourceTree = "<group>"; wrapsLines = 0; };
 		0C0DD5C61C60B4A900AEC8C4 /* SIMChatViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SIMChatViewController.swift; sourceTree = "<group>"; };
 		0C0DD5C91C60B4A900AEC8C4 /* SIMChatBaseMessageAudioCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SIMChatBaseMessageAudioCell.swift; sourceTree = "<group>"; wrapsLines = 0; };
-		0C0DD5CA1C60B4A900AEC8C4 /* SIMChatBaseMessageDateCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SIMChatBaseMessageDateCell.swift; sourceTree = "<group>"; };
+		0C0DD5CA1C60B4A900AEC8C4 /* SIMChatBaseMessageTimeLineCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SIMChatBaseMessageTimeLineCell.swift; sourceTree = "<group>"; };
 		0C0DD5CB1C60B4A900AEC8C4 /* SIMChatBaseMessageImageCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SIMChatBaseMessageImageCell.swift; sourceTree = "<group>"; };
 		0C0DD5CC1C60B4A900AEC8C4 /* SIMChatBaseMessageTextCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SIMChatBaseMessageTextCell.swift; sourceTree = "<group>"; };
 		0C0DD5CD1C60B4A900AEC8C4 /* SIMChatBaseMessageTipsCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SIMChatBaseMessageTipsCell.swift; sourceTree = "<group>"; };
 		0C0DD5CE1C60B4A900AEC8C4 /* SIMChatBaseMessageUnknowCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SIMChatBaseMessageUnknowCell.swift; sourceTree = "<group>"; };
 		0C0DD5CF1C60B4A900AEC8C4 /* SIMChatBaseMessageCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SIMChatBaseMessageCell.swift; sourceTree = "<group>"; wrapsLines = 0; };
 		0C0DD5D01C60B4A900AEC8C4 /* SIMChatBaseMessageAudioContent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SIMChatBaseMessageAudioContent.swift; sourceTree = "<group>"; };
-		0C0DD5D11C60B4A900AEC8C4 /* SIMChatBaseMessageDateContent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SIMChatBaseMessageDateContent.swift; sourceTree = "<group>"; };
+		0C0DD5D11C60B4A900AEC8C4 /* SIMChatBaseMessageTimeLineContent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SIMChatBaseMessageTimeLineContent.swift; sourceTree = "<group>"; };
 		0C0DD5D21C60B4A900AEC8C4 /* SIMChatBaseMessageImageContent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SIMChatBaseMessageImageContent.swift; sourceTree = "<group>"; };
 		0C0DD5D31C60B4A900AEC8C4 /* SIMChatBaseMessageTextContent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SIMChatBaseMessageTextContent.swift; sourceTree = "<group>"; };
 		0C0DD5D41C60B4A900AEC8C4 /* SIMChatBaseMessageTipsContent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SIMChatBaseMessageTipsContent.swift; sourceTree = "<group>"; };
@@ -293,8 +293,8 @@
 				0C0DD5CF1C60B4A900AEC8C4 /* SIMChatBaseMessageCell.swift */,
 				0C0DD5C91C60B4A900AEC8C4 /* SIMChatBaseMessageAudioCell.swift */,
 				0C0DD5D01C60B4A900AEC8C4 /* SIMChatBaseMessageAudioContent.swift */,
-				0C0DD5CA1C60B4A900AEC8C4 /* SIMChatBaseMessageDateCell.swift */,
-				0C0DD5D11C60B4A900AEC8C4 /* SIMChatBaseMessageDateContent.swift */,
+				0C0DD5CA1C60B4A900AEC8C4 /* SIMChatBaseMessageTimeLineCell.swift */,
+				0C0DD5D11C60B4A900AEC8C4 /* SIMChatBaseMessageTimeLineContent.swift */,
 				0C0DD5CB1C60B4A900AEC8C4 /* SIMChatBaseMessageImageCell.swift */,
 				0C0DD5D21C60B4A900AEC8C4 /* SIMChatBaseMessageImageContent.swift */,
 				0C0DD5CC1C60B4A900AEC8C4 /* SIMChatBaseMessageTextCell.swift */,
@@ -636,7 +636,7 @@
 				0C0DD6861C60B4A900AEC8C4 /* SIMChatInputItemProtocol.swift in Sources */,
 				0C0DD6621C60B4A900AEC8C4 /* SIMChatAudioManager.swift in Sources */,
 				0C0DD6901C60B4A900AEC8C4 /* SIMChatLabel.swift in Sources */,
-				0C0DD6431C60B4A900AEC8C4 /* SIMChatBaseMessageDateContent.swift in Sources */,
+				0C0DD6431C60B4A900AEC8C4 /* SIMChatBaseMessageTimeLineContent.swift in Sources */,
 				0C0DD6551C60B4A900AEC8C4 /* SIMChatRequest.swift in Sources */,
 				0C0DD6851C60B4A900AEC8C4 /* SIMChatMessageCell+Image.swift in Sources */,
 				0C0DD66A1C60B4A900AEC8C4 /* SIMChatPhotoBrowser.swift in Sources */,
@@ -661,7 +661,7 @@
 				0C0DD6451C60B4A900AEC8C4 /* SIMChatBaseMessageTextContent.swift in Sources */,
 				0C0DD65F1C60B4A900AEC8C4 /* UIResponder+FirstResponder.swift in Sources */,
 				0C0DD6651C60B4A900AEC8C4 /* SIMChatBundle.swift in Sources */,
-				0C0DD63C1C60B4A900AEC8C4 /* SIMChatBaseMessageDateCell.swift in Sources */,
+				0C0DD63C1C60B4A900AEC8C4 /* SIMChatBaseMessageTimeLineCell.swift in Sources */,
 				0C4404841C61E4D800C18004 /* SIMChatInputPanelProtocol.swift in Sources */,
 				0C0DD6681C60B4A900AEC8C4 /* SIMChatNotificationCenter.swift in Sources */,
 				0C0DD6561C60B4A900AEC8C4 /* SIMChatResult.swift in Sources */,

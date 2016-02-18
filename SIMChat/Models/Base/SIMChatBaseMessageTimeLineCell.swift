@@ -1,5 +1,5 @@
 //
-//  SIMChatBaseCell+Date.swift
+//  SIMChatBaseMessageTimeLineCell.swift
 //  SIMChat
 //
 //  Created by sagesse on 1/20/16.
@@ -11,7 +11,7 @@ import UIKit
 ///
 /// 日期信息
 ///
-public class SIMChatBaseMessageDateCell: SIMChatBaseMessageBaseCell {
+public class SIMChatBaseMessageTimeLineCell: SIMChatBaseMessageBaseCell {
     
     public required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -42,8 +42,8 @@ public class SIMChatBaseMessageDateCell: SIMChatBaseMessageBaseCell {
             guard let message = message where message !== oldValue else {
                 return
             }
-            if message.content is SIMChatBaseMessageDateContent {
-                titleLabel.text = "\(message.date)"
+            if let content = message.content as? SIMChatBaseMessageTimeLineContent {
+                titleLabel.text = "\(content.backMessage?.date ?? message.date)"
             }
         }
     }

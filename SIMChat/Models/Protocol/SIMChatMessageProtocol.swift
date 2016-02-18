@@ -78,6 +78,11 @@ extension SIMChatMessageProtocol {
     /// 显示时间线
     ///
     public var showsTimeLine: Bool {
+        // 撤回的消息不显示timeline
+        if status == .Revoked || status == .Destroyed {
+            return false
+        }
+        // 检查选项
         return !option.contains(.TimeLineHidden)
     }
 }
@@ -150,9 +155,24 @@ public enum SIMChatMessageStatus: Int {
     /// S: 对方己销毁, 包含己读/己播放<br>
     /// R: 消息己销毁, 包含己读/己播放
     case Destroyed
+    /// S: 对方己撤回, 包含己读/己播放<br>
+    /// R: 消息己撤回, 包含己读/己播放
+    case Revoked
     /// S: 发送错误(图片/音频/视频)<br>
     /// R: 接收错误(图片/音频/视频)
     case Error
+    
+    public func isUnknow()     -> Bool { return self == .Unknow }
+    public func isSending()    -> Bool { return self == .Sending  }
+    public func isSent()       -> Bool { return self == .Sent  }
+    public func isUnread()     -> Bool { return self == .Unread  }
+    public func isReceiving()  -> Bool { return self == .Receiving  }
+    public func isReceived()   -> Bool { return self == .Received  }
+    public func isRead()       -> Bool { return self == .Read  }
+    public func isPlayed()     -> Bool { return self == .Played  }
+    public func isDestroyed()  -> Bool { return self == .Destroyed  }
+    public func isRevoked()    -> Bool { return self == .Revoked  }
+    public func isError()      -> Bool { return self == .Error  }
 }
 
 // MARK: - Message compare
