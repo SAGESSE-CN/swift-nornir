@@ -98,6 +98,19 @@ class ExChatConversation: SIMChatBaseConversation {
         "weak",
         "willSet"
     ]
+    static let txx = [
+        "Unknow",
+        "Sending",
+        "Sent",
+        "Unread",
+        "Receiving",
+        "Received",
+        "Read",
+        "Played",
+        "Destroyed",
+        "Revoked",
+        "Error"
+    ]
     
     func makeRandText() -> String {
         var str = ""
@@ -114,56 +127,74 @@ class ExChatConversation: SIMChatBaseConversation {
         return str
     }
     var i: NSTimeInterval = 0
+   
+    
+    
     func makeRandHistory() -> Array<SIMChatMessageProtocol> {
         var rs: Array<SIMChatMessageProtocol> = []
         
         let path = NSBundle.mainBundle().pathForResource("t1", ofType: "jpg")!
         
-        while rs.count < 10 {
-            let r = rand()
+        for r in 0 ..< (2 * 11) {
+        //while rs.count < 10 {
+            //let r = rand()
             
-            i += 5
+            i += 999
             
+            let status = SIMChatMessageStatus(rawValue: r / 2) ?? .Error
             let o = (r % 2 == 0) ? receiver : sender
             let s = (r % 2 == 0) ? sender   : receiver
-            if (rand() % 10) < 6 {
+            
+            // 添加一个提示
+            if r % 2 == 0 {
+                let c = SIMChatBaseMessageTipsContent(content: "Message Example: \(self.dynamicType.txx[status.rawValue])")
+                let m = SIMChatBaseMessage.messageWithContent(c, receiver: o, sender: s)
+                //m.option = [.TimeLineHidden]
+                m.date = NSDate(timeIntervalSinceNow: i + 3)
+                m.status = status
+                rs.append(m)
+            }
+            
+            if true || (rand() % 10) < 6 {
                 let c = SIMChatBaseMessageTextContent(content: makeRandText())
                 let m = SIMChatBaseMessage.messageWithContent(c, receiver: o, sender: s)
                 m.option = [.ContactShow]
                 m.isSelf = (r % 2 == 0)
-                m.status = .Sending
+                m.status = status
                 m.date = NSDate(timeIntervalSinceNow: i + 0)
                 rs.append(m)
             }
-            if (rand() % 10) == 2 {
+            if true || (rand() % 10) == 2 {
                 let c = SIMChatBaseMessageImageContent(remote: path, size: CGSizeMake(640, 480))
                 let m = SIMChatBaseMessage.messageWithContent(c, receiver: o, sender: s)
                 m.option = [.ContactShow]
                 m.isSelf = (r % 2 == 0)
-                m.status = .Receiving
+                m.status = status
                 m.date = NSDate(timeIntervalSinceNow: i + 1)
                 rs.append(m)
             }
-            if (rand() % 10) < 2 {
+            if true || (rand() % 10) < 2 {
                 let c = SIMChatBaseMessageAudioContent(remote: path, duration: 6.2 * Double((r % 3600) + 1))
                 let m = SIMChatBaseMessage.messageWithContent(c, receiver: o, sender: s)
                 m.option = [.ContactShow]
                 m.isSelf = (r % 2 == 0)
-                m.status = .Error
+                m.status = status
                 m.date = NSDate(timeIntervalSinceNow: i + 2)
                 rs.append(m)
             }
-            if (rand() % 10) < 3 {
+            if true || (rand() % 10) < 3 {
                 let c = SIMChatBaseMessageTipsContent(content: "this is a tips\nThis is a very long long long long long long long long the tips")
                 let m = SIMChatBaseMessage.messageWithContent(c, receiver: o, sender: s)
                 m.option = [.TimeLineHidden]
                 m.date = NSDate(timeIntervalSinceNow: i + 3)
+                m.status = status
                 rs.append(m)
             }
-            if (rand() % 20) == 0  {
+            if true || (rand() % 20) == 0  {
                 let c = Unknow()
                 let m = SIMChatBaseMessage.messageWithContent(c, receiver: o, sender: s)
                 m.option = [.TimeLineHidden]
+                m.status = status
                 m.date = NSDate(timeIntervalSinceNow: i + 4)
                 rs.append(m)
             }

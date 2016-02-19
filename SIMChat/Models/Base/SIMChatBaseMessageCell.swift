@@ -106,14 +106,12 @@ public class SIMChatBaseMessageBubbleCell: UITableViewCell, SIMChatMessageCellPr
         addConstraints(NSLayoutConstraintMake("V:|-(==8)-[p(40)]-(>=7@850)-|", views: vs, metrics: ms))
         
         addConstraints(NSLayoutConstraintMake("V:|-(==8)-[c(16)]-(==2@pv1)-[b]-7-|", views: vs, metrics: ms))
-        addConstraints(NSLayoutConstraintMake("V:|-(10@pv0)-[b(>=p)]", views: vs, metrics: ms))
+        addConstraints(NSLayoutConstraintMake("V:|-(3@pv0)-[b(>=p)]", views: vs, metrics: ms))
         //addConstraints(NSLayoutConstraintMake("V:|-(mv0@pv0)-[b(>=p)]", views: vs, metrics: ms))
         addConstraints(NSLayoutConstraintMake("H:[b]-(4@ph0)-[s]-(4@ph1)-[b]", views: vs, metrics: ms))
         //addConstraints(NSLayoutConstraintMake("V:[s]-18-|", views: vs, metrics: ms))
         
-        SIMChatLayout.make(stateView)
-            .bottom.equ(bubbleView).bottom(4)
-            .submit()
+        SIMChatLayout.make(stateView).bottom.equ(bubbleView).bottom(5).submit()
         
         // get constraints
         contentView.constraints.forEach {

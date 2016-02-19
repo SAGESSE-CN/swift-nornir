@@ -162,7 +162,7 @@ public class SIMChatInputBar: UIView {
         if _textViewIsFristResponder {
             return true
         }
-        return super.canResignFirstResponder()
+        return false
     }
     
     public override func resignFirstResponder() -> Bool {

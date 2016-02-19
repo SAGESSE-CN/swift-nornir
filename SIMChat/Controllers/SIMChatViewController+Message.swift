@@ -12,17 +12,15 @@ import UIKit
 extension SIMChatViewController {
     class MessageManager: NSObject {
         init(conversation: SIMChatConversationProtocol) {
-            self.allMessages = []
-            self.conversation = conversation
+            _allMessages = []
+            _conversation = conversation
             super.init()
-            self.conversation.delegate = self
+            _conversation.delegate = self
         }
         
-        private var allMessages: Array<SIMChatMessageProtocol>
-        private var conversation: SIMChatConversationProtocol
-        
-        private var isLoading: Bool = false
-        
+        private var _allMessages: Array<SIMChatMessageProtocol>
+        private var _conversation: SIMChatConversationProtocol
+        private var _isLoading: Bool = false
         /// 快速映射
         private var _fastMap: Dictionary<String, String> = [:]
         
@@ -47,18 +45,17 @@ extension SIMChatViewController {
             didSet {
                 oldValue?.delegate = nil
                 oldValue?.dataSource = nil
-                //oldValue?.alpha = 1
                 oldValue?.tableHeaderView = nil
                 
                 contentView?.delegate = self
                 contentView?.dataSource = self
-                //contentView?.alpha = 0
+                //contentView?.keyboardDismissMode = .OnDrag //.Interactive
                 contentView?.tableHeaderView = header
             }
         }
         
         private var manager: SIMChatManagerProtocol {
-            guard let manager = conversation.manager else {
+            guard let manager = _conversation.manager else {
                 fatalError("Must provider manager")
             }
             return manager
@@ -105,39 +102,41 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
         }()
     }
     
-    /// 存在timeline
+    ///
+    /// 检查是否存在timeline
+    ///
     private func _hasTimeLine(prev: SIMChatMessageProtocol?, _ next: SIMChatMessageProtocol?) -> Bool {
         return prev?.content is SIMChatBaseMessageTimeLineContent
             || next?.content is SIMChatBaseMessageTimeLineContent
     }
     
-    /// 需要生成timeline
+    ///
+    /// 检查是否需要生成timeline
+    ///
     private func _needMakeTimeLine(prev: SIMChatMessageProtocol?, _ next: SIMChatMessageProtocol?) -> Bool {
-        // next必须存在并且要可以显示timeline
-        guard let next = next where next.showsTimeLine else {
+        // 如果存在timeline就不需要添加
+        if _hasTimeLine(prev, next) {
             return false
         }
-        // next是时间, 表示己经创建
-        if next.content is SIMChatBaseMessageTimeLineContent {
+        // next必须存在并且要可以显示timeline
+        guard let next = next where next.showsTimeLine else {
             return false
         }
         // prev可以不存在, 但如果存在就必须符合条件
         guard let prev = prev else {
             return true
         }
-        // 如果上一个消息是时间, 表示己经创建过了.
-        if prev.content is SIMChatBaseMessageTimeLineContent {
-            return false
-        }
         // 如果上一个不允许显示时间, 那就必须显示
-        guard prev.showsTimeLine else {
+        if !prev.showsTimeLine {
             return true
         }
         // 都符合就检查时间
         return fabs(prev.date.timeIntervalSinceDate(next.date)) >= durationInterval
     }
     
-    /// 需要移除
+    ///
+    /// 检查是否需要移除timeline
+    ///
     private func _needRemoveTimeLine(prev: SIMChatMessageProtocol?, _ next: SIMChatMessageProtocol?) -> Bool {
         // 两个都是timeline
         if next?.content is SIMChatBaseMessageTimeLineContent
@@ -150,7 +149,7 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
             return false
         }
         // 必须要有创建才有删除
-        if let _ = prev?.content as? SIMChatBaseMessageTimeLineContent {
+        if let content = prev?.content as? SIMChatBaseMessageTimeLineContent {
             guard let nextMessage = next else {
                 // 没有下一条了, 需要删除
                 return true
@@ -158,6 +157,10 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
             if !nextMessage.showsTimeLine {
                 // 不允许显示timeline
                 return true
+            }
+            if !(content.frontMessage?.showsTimeLine ?? true) {
+                // 上上一个不允许显示
+                return false
             }
         }
         if let _ = next?.content as? SIMChatBaseMessageTimeLineContent {
@@ -177,38 +180,56 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
         return fabs(prev.date.timeIntervalSinceDate(next.date)) < durationInterval
     }
     
+    ///
+    /// 检查是否需要更新
+    ///
+    private func _needUpdateTimeLine(frontMessage: SIMChatMessageProtocol?, _ backMessage: SIMChatMessageProtocol?) -> Bool {
+        // 如果没有timeline, 就谈不上更新了
+        if !_hasTimeLine(frontMessage, backMessage) {
+            return false
+        }
+        // 后一条消息改变了
+        if let content = frontMessage?.content as? SIMChatBaseMessageTimeLineContent {
+            return content.backMessage !== backMessage
+        }
+        // 前一条消息改变了
+        if let content = backMessage?.content as? SIMChatBaseMessageTimeLineContent {
+            return content.frontMessage !== frontMessage
+        }
+        return false
+    }
+    
     /// 生成timeline
     private func _makeTimeLine(frontMessage: SIMChatMessageProtocol?, _ backMessage: SIMChatMessageProtocol?) -> SIMChatMessageProtocol {
         let content = SIMChatBaseMessageTimeLineContent(frontMessage: frontMessage, backMessage: backMessage)
         let messageClass = manager.classProvider.message
         let message = messageClass.messageWithContent(content,
-            receiver: conversation.receiver,
-            sender: conversation.sender)
+            receiver: _conversation.receiver,
+            sender: _conversation.sender)
         return message
     }
-    
     
     // MARK: UITableViewDataSource
     
     /// 消息数量
     @objc func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return allMessages.count
+        return _allMessages.count
     }
     /// 计算高度
     @objc func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
-        let message = allMessages[indexPath.row]
+        let message = _allMessages[indexPath.row]
         let identifier = reuseIndentifierWithMessage(message)
         return tableView.fd_heightForCellWithIdentifier(identifier, cacheByKey: message.identifier) {
             if let mcell = $0 as? SIMChatMessageCellProtocol {
                 // configuation
-                mcell.conversation = self.conversation
+                mcell.conversation = self._conversation
                 mcell.message = message
             }
         }
     }
     /// 创建
     @objc func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let identifier = reuseIndentifierWithMessage(allMessages[indexPath.row])
+        let identifier = reuseIndentifierWithMessage(_allMessages[indexPath.row])
         let cell = tableView.dequeueReusableCellWithIdentifier(identifier, forIndexPath: indexPath)
         
         // default configuation
@@ -249,7 +270,7 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
     @objc func scrollViewDidEndDecelerating(scrollView: UIScrollView) {
         //SIMLog.trace(scrollView.contentOffset)
         // 允许加载更多并且没有正在加载
-        guard contentView?.tableHeaderView != nil && !isLoading else {
+        guard contentView?.tableHeaderView != nil && !_isLoading else {
             return
         }
         if scrollView.contentInset.top + scrollView.contentOffset.y <= header.frame.height {
@@ -258,7 +279,7 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
     }
     /// 移到头部
     @objc func scrollViewDidScrollToTop(scrollView: UIScrollView) {
-        guard contentView?.tableHeaderView != nil && !isLoading else {
+        guard contentView?.tableHeaderView != nil && !_isLoading else {
             return
         }
         _loadHistoryMessages()
@@ -269,10 +290,10 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
     /// 绑定
     @objc func tableView(tableView: UITableView, willDisplayCell cell: UITableViewCell, forRowAtIndexPath indexPath: NSIndexPath) {
         
-        let message = allMessages[indexPath.row]
+        let message = _allMessages[indexPath.row]
         if let mcell = cell as? SIMChatMessageCellProtocol {
             // custom configuation
-            mcell.conversation = self.conversation
+            mcell.conversation = self._conversation
             mcell.message = message
             mcell.delegate = self
         }
@@ -280,13 +301,22 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
 
     // MARK: SIMChatConversationDelegate
     
+    /// 接收到消息
     func conversation(conversation: SIMChatConversationProtocol, didReciveMessage message: SIMChatMessageProtocol) {
+        SIMLog.debug()
+        _appendMessages([message], animated: true)
     }
     
+    /// 删除消息请求
     func conversation(conversation: SIMChatConversationProtocol, didRemoveMessage message: SIMChatMessageProtocol) {
+        SIMLog.debug()
+        _removeMessages([message], animated: true)
     }
     
+    /// 更新消息请求
     func conversation(conversation: SIMChatConversationProtocol, didUpdateMessage message: SIMChatMessageProtocol) {
+        SIMLog.debug()
+        _reloadMessages([message], animated: true)
     }
     
     // MARK: SIMChatMessageCellDelegate
@@ -363,17 +393,14 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
     // 删除
     func cellMenu(cell: SIMChatMessageCellProtocol, didRemoveMessage message: SIMChatMessageProtocol) {
         SIMLog.debug(message.identifier)
-        // 真正的删除消息
-        conversation.removeMessage(message).response {
-            do {
-                if let error = $0.error {
-                    throw error
-                }
-                // 删除消息(更新UI)
-                self._removeMessages([message], animated: true)
-            } catch let error as NSError {
+        _conversation.removeMessage(message).response { [weak self] in
+            // 检查操作状态
+            if let error = $0.error {
                 SIMLog.error(error)
+                return
             }
+            // 更新ui
+            self?._removeMessages([message], animated: true)
         }
     }
     
@@ -384,6 +411,16 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
     /// 重试(发送/上传/下载)
     func cellMenu(cell: SIMChatMessageCellProtocol, didRetryMessage message: SIMChatMessageProtocol) {
         SIMLog.debug(message.identifier)
+        // 重新发送
+        _conversation.sendMessage(message, isResend: true).response { //[weak self] in
+            // 检查操作状态
+            if let error = $0.error {
+                SIMLog.error(error)
+                return
+            }
+        }
+        // 不用等结果, 直接移动
+        _moveMessages([message], toIndex: -1, animated: true)
     }
     
     // 撤销
@@ -394,13 +431,39 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
     func cellMenu(cell: SIMChatMessageCellProtocol, didRevokeMessage message: SIMChatMessageProtocol) {
         SIMLog.debug(message.identifier)
         // 更新状态为revoked
-        message.status = .Revoked
-        // 更新
-        _reloadMessages([message], animated: true)
+        _conversation.updateMessage(message, status: .Revoked).response { [weak self] in
+            // 检查操作状态
+            if let error = $0.error {
+                SIMLog.error(error)
+                return
+            }
+            // 更新ui
+            self?._reloadMessages([message], animated: true)
+        }
+    }
+    
+    ///
+    /// 发送消息
+    ///
+    func sendMessage(content: SIMChatMessageContentProtocol) {
+        SIMLog.trace()
+        let message = manager.classProvider.message.messageWithContent(content,
+            receiver: _conversation.receiver,
+            sender: _conversation.sender)
+        
+        // 发送
+        _conversation.sendMessage(message).response {
+            // 检查操作状态
+            if let error = $0.error {
+                SIMLog.error(error)
+                return
+            }
+        }
+        // 不用等结果
+        _appendMessages([message], animated: true)
     }
     
     // MARK: Message Operator
-    
     
     ///
     /// 批量插入消息
@@ -412,10 +475,11 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
         guard let tableView = contentView where !ms.isEmpty else {
             return
         }
-        SIMLog.trace()
-
-        let count = allMessages.count
+        // 计算插入点
+        let count = _allMessages.count
         let position = min(max(index >= 0 ? index : index + count + 1, 0), count)
+        
+        SIMLog.trace("insert position: \(position) => \(count)")
 
         // tip1: 如果cell插入到visibleCells之前, 会导致contentSize改变(contentOffset不变),
         // tip2: 如果设置contentOffset会导致减速事件停止
@@ -442,8 +506,8 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
         /// 准备数据
         
         // 先获取插入点前后的消息
-        var first: SIMChatMessageProtocol? = (position - 1 < count && position > 0) ? allMessages[position - 1] : nil
-        let last: SIMChatMessageProtocol? = (position < count) ? allMessages[position] : nil
+        var first: SIMChatMessageProtocol? = (position - 1 < count && position > 0) ? _allMessages[position - 1] : nil
+        let last: SIMChatMessageProtocol? = (position < count) ? _allMessages[position] : nil
         
         var newMessages: Array<SIMChatMessageProtocol> = []
         
@@ -471,21 +535,21 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
         // 检查最后一条数据的timeline
         // 必须要显示时间线才添加timeline
         if let prevMessage = newMessages.last, nextMessage = last {
-            // 检查是否需要创建timeline
             if _needMakeTimeLine(prevMessage, nextMessage) {
-                SIMLog.debug("add date at \(position)")
+                SIMLog.debug("add timeline at \(position)")
                 newMessages.append(_makeTimeLine(prevMessage, nextMessage))
             } else if _needRemoveTimeLine(prevMessage, nextMessage) {
-                SIMLog.debug("remove date at \(position)")
+                SIMLog.debug("remove timeline at \(position)")
                 removeIndexPaths.append(NSIndexPath(forRow: position, inSection: 0))
-                allMessages.removeAtIndex(position)
+                _allMessages.removeAtIndex(position)
                 // 删除是谁?
                 if visibleIndexPaths?[0].row == position {
                     visibleIndexPaths?.removeAtIndex(0)
                 }
-            } else if _hasTimeLine(prevMessage, nextMessage) {
+            } else if _needUpdateTimeLine(prevMessage, nextMessage) {
                 // 需要更新
                 if let content = nextMessage.content as? SIMChatBaseMessageTimeLineContent {
+                    SIMLog.debug("reload timeline at \(position)")
                     content.frontMessage = prevMessage
                     content.backMessage = nextMessage
                     reloadIndexPaths.append(NSIndexPath(forRow: position, inSection: 0))
@@ -504,7 +568,7 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
         // 插入数据
         newMessages.enumerate().forEach {
             insertIndexPaths.append(NSIndexPath(forRow: $0.index + position, inSection: 0))
-            allMessages.insert($0.element, atIndex: min($0.index + position, allMessages.count))
+            _allMessages.insert($0.element, atIndex: min($0.index + position, _allMessages.count))
         }
         
         // 在更新之前先获取到从contentOffset到第一个显示的单元格的偏移
@@ -577,37 +641,6 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
     }
     
     ///
-    /// 追加消息
-    ///
-    private func _appendMessages(ms: Array<SIMChatMessageProtocol>) {
-        guard let tableView = self.contentView, last = ms.last else {
-            return
-        }
-        
-        SIMLog.trace()
-        
-        let isSelf = last.isSelf ?? false
-        let isLasted = (tableView.indexPathsForVisibleRows?.last?.row ?? 0) + ms.count == tableView.numberOfRowsInSection(0)
-        
-        _insertMessages(ms, atIndex: -1)
-        
-        SIMLog.debug("self: \(isSelf) lasted: \(isLasted)")
-        // 如果发送者是自己, 转到最后一行
-        // 如果发送者是其他人, 并且当前行在最后一行, 转到最后一行
-        if isSelf || isLasted {
-            // 如果不是正在发送更新为己读
-            // if last.status != .Sending {
-            //     self.conversation.readMessage(last, nil, nil)
-            // }
-            // ok, 更新
-            let idx = NSIndexPath(forRow: tableView.numberOfRowsInSection(0) - 1, inSection: 0)
-            tableView.scrollToRowAtIndexPath(idx, atScrollPosition: .Bottom, animated: true)
-        } else {
-            // 更新未读数量
-        }
-    }
-    
-    ///
     /// 更新消息
     ///
     private func _reloadMessages(ms: Array<SIMChatMessageProtocol>, animated: Bool = true) {
@@ -617,7 +650,7 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
         // TODO: 批量更新的测试没有做
         // 查找需要执行操作的单元格
         let indexs = ms.flatMap { e in
-            return allMessages.indexOf{
+            return _allMessages.indexOf{
                 return $0 == e
             }
         }
@@ -627,7 +660,7 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
             return
         }
         
-        SIMLog.trace("reload indexs: \(indexs)")
+        SIMLog.trace()
         
         var insertIndexPaths: Array<NSIndexPath> = []
         var reloadIndexPaths: Array<NSIndexPath> = []
@@ -635,9 +668,9 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
         
         indexs.forEach {
             
-            let prev: SIMChatMessageProtocol? = ($0 - 1 < allMessages.count && $0 > 0) ? allMessages[$0 - 1] : nil
-            let message = allMessages[$0]
-            let next: SIMChatMessageProtocol? = ($0 + 1 < allMessages.count) ? allMessages[$0 + 1] : nil
+            let prev: SIMChatMessageProtocol? = ($0 - 1 < _allMessages.count && $0 > 0) ? _allMessages[$0 - 1] : nil
+            let message = _allMessages[$0]
+            let next: SIMChatMessageProtocol? = ($0 + 1 < _allMessages.count) ? _allMessages[$0 + 1] : nil
             
             // 一定要重新计算高度
             tableView.fd_invalidateHeightForKey(message.identifier)
@@ -646,17 +679,18 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
                 // 添加到下面
                 let idx = $0 + 1
                 SIMLog.debug("add time line at \($0 + 1)")
-                allMessages.insert(_makeTimeLine(message, next), atIndex: idx)
+                _allMessages.insert(_makeTimeLine(message, next), atIndex: idx)
                 insertIndexPaths.append(NSIndexPath(forRow: $0, inSection: 0))
             }
             if _needRemoveTimeLine(prev, message) {
                 // 需要删除, 优先删除上面的
                 let idx = $0 - 1
                 SIMLog.debug("remove time line at \(idx)")
-                allMessages.removeAtIndex(idx)
+                _allMessages.removeAtIndex(idx)
                 removeIndexPaths.append(NSIndexPath(forRow: $0 - 1, inSection: 0))
             }
             
+            SIMLog.debug("reload row at \($0)")
             reloadIndexPaths.append(NSIndexPath(forRow: $0, inSection: 0))
         }
         
@@ -665,6 +699,36 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
         tableView.insertRowsAtIndexPaths(insertIndexPaths, withRowAnimation: .Fade)
         tableView.deleteRowsAtIndexPaths(removeIndexPaths, withRowAnimation: .Fade)
         tableView.endUpdates()
+    }
+    
+    ///
+    /// 移动消息, 如果有多条消息, 按参数顺序加到index之后
+    ///
+    private func _moveMessages(ms: Array<SIMChatMessageProtocol>, toIndex index: Int = -1, animated: Bool = true) {
+        guard let tableView = self.contentView where !ms.isEmpty else {
+            return
+        }
+        // TODO: 批量移动的测试没有做
+        // 查找需要执行操作的单元格
+        let indexs = ms.flatMap { e in
+            return _allMessages.indexOf{
+                return $0 == e
+            }
+        }
+        // 计算插入点
+        let count = _allMessages.count
+        let position = min(max(index >= 0 ? index : index + count, 0), count)
+        
+        SIMLog.trace("insert position: \(position) => \(count)")
+        
+        indexs.forEach {
+            // 抽出, 放到最后
+            let message = _allMessages.removeAtIndex($0)
+            _allMessages.insert(message, atIndex: position)
+            
+            tableView.moveRowAtIndexPath(NSIndexPath(forRow: $0, inSection: 0),
+                toIndexPath: NSIndexPath(forRow: position, inSection: 0))
+        }
     }
     
     ///
@@ -677,11 +741,11 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
         // TODO: 批量删除的测试没有做
         // 查找需要执行操作的单元格
         let indexs = ms.flatMap { e in
-            return allMessages.indexOf{
+            return _allMessages.indexOf{
                 return $0 == e
             }
         }
-        SIMLog.trace("remove indexs: \(indexs)")
+        SIMLog.trace()
         
         var reloadIndexPathsL: Array<NSIndexPath> = [] // Left
         var reloadIndexPathsR: Array<NSIndexPath> = [] // Right
@@ -711,35 +775,38 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
         
         indexs.forEach {
             
-            let prev: SIMChatMessageProtocol? = ($0 - 1 < allMessages.count && $0 > 0) ? allMessages[$0 - 1] : nil
-            let message: SIMChatMessageProtocol = allMessages[$0]
-            let next: SIMChatMessageProtocol? = ($0 + 1 < allMessages.count) ? allMessages[$0 + 1] : nil
+            let prev: SIMChatMessageProtocol? = ($0 - 1 < _allMessages.count && $0 > 0) ? _allMessages[$0 - 1] : nil
+            let message: SIMChatMessageProtocol = _allMessages[$0]
+            let next: SIMChatMessageProtocol? = ($0 + 1 < _allMessages.count) ? _allMessages[$0 + 1] : nil
             
             let indexPath = NSIndexPath(forRow: $0, inSection: 0)
             
             // 删除数据源
-            allMessages.removeAtIndex($0 - removeIndexPaths.count)
+            SIMLog.debug("remove row at \($0)")
+            _allMessages.removeAtIndex($0 - removeIndexPaths.count)
             
             if _needMakeTimeLine(prev, next) {
                 // 需要新加
                 SIMLog.debug("add time line at \($0)")
-                allMessages.insert(_makeTimeLine(prev, next), atIndex: $0)
+                _allMessages.insert(_makeTimeLine(prev, next), atIndex: $0)
                 reloadMessage(message, indexPath)
                 // 不可以删除.
                 return
             } else if _needRemoveTimeLine(prev, next) {
                 // 需要删除, 优先删除上面的
                 SIMLog.debug("remove time line at \($0 - 1)")
-                allMessages.removeAtIndex($0 - 1)
+                _allMessages.removeAtIndex($0 - 1)
                 removeMessage(message, NSIndexPath(forRow: $0 - 1, inSection: 0))
-            } else if _hasTimeLine(prev, next) {
+            } else if _needUpdateTimeLine(prev, next) {
                 // 需要更新
                 if let content = prev?.content as? SIMChatBaseMessageTimeLineContent {
+                    SIMLog.debug("reload timeline at \($0 - 1)")
                     let idx = NSIndexPath(forRow: $0 - 1, inSection: 0)
                     content.frontMessage = prev
                     content.backMessage = next
                     reloadIndexPathsF.append(idx)
                 } else if let content = next?.content as? SIMChatBaseMessageTimeLineContent {
+                    SIMLog.debug("reload timeline at \($0 + 1)")
                     let idx = NSIndexPath(forRow: $0 + 1, inSection: 0)
                     content.frontMessage = prev
                     content.backMessage = next
@@ -782,31 +849,61 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
         }
     }
     
+    ///
+    /// 追加消息
+    ///
+    private func _appendMessages(ms: Array<SIMChatMessageProtocol>, animated: Bool = true) {
+        guard let tableView = self.contentView, last = ms.last else {
+            return
+        }
+        
+        SIMLog.trace()
+        
+        let isSelf = last.isSelf ?? false
+        let isLasted = (tableView.indexPathsForVisibleRows?.last?.row ?? 0) + ms.count == tableView.numberOfRowsInSection(0)
+        
+        _insertMessages(ms, atIndex: -1)
+        
+        SIMLog.debug("self: \(isSelf) lasted: \(isLasted)")
+        // 如果发送者是自己, 转到最后一行
+        // 如果发送者是其他人, 并且当前行在最后一行, 转到最后一行
+        if isSelf || isLasted {
+            // 如果不是正在发送更新为己读
+            // if last.status != .Sending {
+            //     self._conversation.readMessage(last, nil, nil)
+            // }
+            // ok, 更新
+            let idx = NSIndexPath(forRow: tableView.numberOfRowsInSection(0) - 1, inSection: 0)
+            tableView.scrollToRowAtIndexPath(idx, atScrollPosition: .Bottom, animated: animated)
+        } else {
+            // 更新未读数量
+        }
+    }
     
     ///
     /// 加载历史消息
     ///
     private func _loadHistoryMessages() {
-        guard !isLoading else {
+        guard !_isLoading else {
             return
         }
         SIMLog.trace()
         // 防止多次加载
-        isLoading = true
+        _isLoading = true
         
         // TODO: 动画有问题
         
-        conversation.loadHistoryMessages(200).response { [weak self] in
+        _conversation.loadHistoryMessages(200).response { [weak self] in
             defer {
-                self?.isLoading = false
+                self?._isLoading = false
             }
-            guard let manager = self, tableView = self?.contentView else {
+            guard let sself = self, tableView = self?.contentView else {
                 return
             }
-            let isFirstLoad = manager.allMessages.isEmpty
-            if let allMessages = $0.value {
+            let isFirstLoad = sself._allMessages.isEmpty
+            if let _allMessages = $0.value {
                 // 如果所有的消息都加载完了, 关闭加载提示
-                if manager.conversation.allMessagesIsLoaded {
+                if sself._conversation.allMessagesIsLoaded {
                     UIView.performWithoutAnimation {
                         let h = tableView.tableHeaderView?.frame.height ?? 0
                         tableView.tableHeaderView = nil
@@ -814,9 +911,9 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
                     }
                 }
                 // 插入消息
-                manager._insertMessages(allMessages, atIndex: 0)
+                sself._insertMessages(_allMessages, atIndex: 0)
                 // 如果是第一次加载, 更新到最后
-                if isFirstLoad && !manager.allMessages.isEmpty {
+                if isFirstLoad && !sself._allMessages.isEmpty {
                     SIMLog.debug("first load")
                     let idx = NSIndexPath(forRow: tableView.numberOfRowsInSection(0) - 1, inSection: 0)
                     tableView.scrollToRowAtIndexPath(idx, atScrollPosition: .Bottom, animated: false)
@@ -831,20 +928,6 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
             }
         }
     }
-    
-    ///
-    /// 发送消息
-    ///
-    func sendMessage(content: SIMChatMessageContentProtocol) {
-        SIMLog.trace()
-        
-        let message = manager.classProvider.message.messageWithContent(content,
-            receiver: conversation.receiver,
-            sender: conversation.sender)
-        
-        _appendMessages([message])
-    }
-
 }
 
 //// MARK: - Message Send
@@ -910,14 +993,14 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
 //    ///
 //    private func sendMessage(content: SIMChatMessageContentProtocol) {
 //        // 真正的发送
-//        self.conversation.sendMessage(SIMChatMessage(content), isResend: false, nil, nil)
+//        self._conversation.sendMessage(SIMChatMessage(content), isResend: false, nil, nil)
 //    }
 //    ///
 //    /// 重新发送消息(禁止外部访问)
 //    ///
 //    private func resendMessage(m: SIMChatMessage) {
 //        // 真正的发送
-//        self.conversation.sendMessage(m, isResend: true, nil, nil)
+//        self._conversation.sendMessage(m, isResend: true, nil, nil)
 //    }
 //    
 //    ///
@@ -926,7 +1009,7 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
 //    func loadHistorys(total: Int, last: SIMChatMessage? = nil) {
 //        SIMLog.trace()
 //        // 查询消息
-//        self.conversation.queryMessages(total, last: last, { [weak self] ms in
+//        self._conversation.queryMessages(total, last: last, { [weak self] ms in
 //            // 插入
 //            self?.insertRows(ms.reverse(), atIndex: 0, animated: last != nil)
 //            self?.latest = ms.last
@@ -946,7 +1029,7 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
 //                }
 //                // 标记为己读
 //                if let m = ms.first {
-//                    self?.conversation.readMessage(m, nil, nil)
+//                    self?._conversation.readMessage(m, nil, nil)
 //                }
 //            }
 //        }, nil)
@@ -961,7 +1044,7 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
 //    func chatCellDidDelete(chatCell: SIMChatMessageCell) {
 ////        SIMLog.trace()
 ////        if let m = chatCell.message {
-////            self.conversation.removeMessage(m, nil, nil)
+////            self._conversation.removeMessage(m, nil, nil)
 ////        }
 //    }
 //    /// 选择了复制

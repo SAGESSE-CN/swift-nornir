@@ -7,6 +7,8 @@
 //
 
 // TODO: 还要预加载没有优化
+// TODO: 系统图片加载有问题
+// TODO: 显示大图有内存泄露
 
 import UIKit
 

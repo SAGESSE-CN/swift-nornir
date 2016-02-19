@@ -36,6 +36,7 @@ public class SIMChatViewController: UIViewController {
         }
     }
     deinit {
+        contentView.removeObserver(self, forKeyPath: SIMChatViewContentViewPanStateKeyPath)
         SIMChatNotificationCenter.removeObserver(self)
         SIMLog.trace()
     }
@@ -71,8 +72,8 @@ public class SIMChatViewController: UIViewController {
          bar.bottomBarButtonItems = [
              SIMChatInputPanelAudioView.inputPanelItem(),
             SIMChatBaseInputItem("", R("chat_bottom_PTV_nor"), R("chat_bottom_PTV_press")),
-            SIMChatBaseInputItem("", R("chat_bottom_photo_nor"), R("chat_bottom_photo_press")),
-            SIMChatBaseInputItem("", R("chat_bottom_Camera_nor"), R("chat_bottom_Camera_press")),
+            SIMChatBaseInputItem("kb:photo", R("chat_bottom_photo_nor"), R("chat_bottom_photo_press")),
+            SIMChatBaseInputItem("kb:camera", R("chat_bottom_Camera_nor"), R("chat_bottom_Camera_press")),
             SIMChatBaseInputItem("", R("chat_bottom_red_pack_nor"), R("chat_bottom_red_pack_press")),
             SIMChatInputPanelEmoticonView.inputPanelItem(),
             SIMChatInputPanelToolBoxView.inputPanelItem()
@@ -206,6 +207,11 @@ extension SIMChatViewController {
         view.addSubview(inputBar)
         view.addSubview(inputPanelContainer)
         
+        contentView.addObserver(self,
+            forKeyPath: SIMChatViewContentViewPanStateKeyPath,
+            options: [.New],
+            context: nil)
+        
         // 添加布局
         _contentViewLayout = SIMChatLayout.make(contentView)
             .top.equ(view).top
@@ -278,6 +284,14 @@ extension SIMChatViewController {
         edg.top = topLayoutGuide.length + -(contentViewLayout?.top ?? 0)
         contentView.contentInset = edg
         contentView.scrollIndicatorInsets = contentView.contentInset
+    }
+    
+    public override func observeValueForKeyPath(keyPath: String?, ofObject object: AnyObject?, change: [String : AnyObject]?, context: UnsafeMutablePointer<Void>) {
+        if keyPath == SIMChatViewContentViewPanStateKeyPath && contentView.panGestureRecognizer.state == .Began {
+            if inputBar.canResignFirstResponder() {
+                inputBar.resignFirstResponder()
+            }
+        }
     }
 }
 
@@ -519,3 +533,5 @@ extension SIMChatViewController: UIGestureRecognizerDelegate {
 //}
 
 
+/// 内容拖动手势状态改变
+private let SIMChatViewContentViewPanStateKeyPath: String = "panGestureRecognizer.state"

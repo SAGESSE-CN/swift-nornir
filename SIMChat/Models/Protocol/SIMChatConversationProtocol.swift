@@ -61,6 +61,14 @@ public protocol SIMChatConversationProtocol: class {
     ///
     func loadHistoryMessages(last: SIMChatMessageProtocol?, count: Int) -> SIMChatRequest<Array<SIMChatMessageProtocol>>
     ///
+    /// 更新消息状态
+    ///
+    /// - parameter message: 需要发送的消息
+    /// - parameter status:  新的状态, 一般检查该状态来决定是否需要访问网络
+    /// - returns: 返回结果是SIMChatMessageProtocol
+    ///
+    func updateMessage(message: SIMChatMessageProtocol, status: SIMChatMessageStatus) -> SIMChatRequest<SIMChatMessageProtocol>
+    ///
     /// 发送消息
     ///
     /// - parameter message: 需要发送的消息
@@ -68,13 +76,6 @@ public protocol SIMChatConversationProtocol: class {
     /// - returns: 返回结果是SIMChatMessageProtocol
     ///
     func sendMessage(message: SIMChatMessageProtocol, isResend: Bool) -> SIMChatRequest<SIMChatMessageProtocol>
-    ///
-    /// 发送消息状态
-    ///
-    /// - parameter message: 需要发送的消息(包含己修改的信息)
-    /// - returns: 返回结果是SIMChatMessageProtocol
-    ///
-    func sendMessageState(message: SIMChatMessageProtocol) -> SIMChatRequest<SIMChatMessageProtocol>
     ///
     /// 删除消息
     ///
@@ -90,19 +91,19 @@ public protocol SIMChatConversationProtocol: class {
     ///
     /// - parameter message: 被操作的消息
     ///
-    func updateMessageFromRemote(messsage: SIMChatMessageProtocol)
+    func updateMessageFromRemote(message: SIMChatMessageProtocol)
     ///
     /// 接收到来自服务端的消息(被动)
     ///
     /// - parameter message: 被操作的消息
     ///
-    func receiveMessageFromRemote(messsage: SIMChatMessageProtocol)
+    func receiveMessageFromRemote(message: SIMChatMessageProtocol)
     ///
     /// 服务端要求更删除消息(被动)
     ///
     /// - parameter message: 被操作的消息
     ///
-    func removeMessageFromRemote(messsage: SIMChatMessageProtocol)
+    func removeMessageFromRemote(message: SIMChatMessageProtocol)
     
     // MARK: Generate
     

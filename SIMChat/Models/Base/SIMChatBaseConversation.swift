@@ -109,20 +109,22 @@ public class SIMChatBaseConversation: SIMChatConversationProtocol {
     public func sendMessage(
         message: SIMChatMessageProtocol,
         isResend: Bool) -> SIMChatRequest<SIMChatMessageProtocol> {
-            SIMLog.trace()
+            SIMLog.trace("\(message.identifier) \(isResend ? "=> isResend" : "")")
             return SIMChatRequest.request {
                 $0.success(message)
             }
     }
     ///
-    /// 发送消息状态
+    /// 更新消息状态
     ///
-    /// - parameter message: 需要发送的消息(包含己修改的信息)
+    /// - parameter message: 需要发送的消息
+    /// - parameter status: 新的状态
     /// - returns: 返回结果是SIMChatMessageProtocol
     ///
-    public func sendMessageState(message: SIMChatMessageProtocol) -> SIMChatRequest<SIMChatMessageProtocol> {
-        SIMLog.trace()
+    public func updateMessage(message: SIMChatMessageProtocol, status: SIMChatMessageStatus) -> SIMChatRequest<SIMChatMessageProtocol> {
+        SIMLog.trace(message.identifier)
         return SIMChatRequest.request {
+            message.status = status
             $0.success(message)
         }
     }
@@ -133,7 +135,7 @@ public class SIMChatBaseConversation: SIMChatConversationProtocol {
     /// - returns: 返回结果是Void
     ///
     public func removeMessage(message: SIMChatMessageProtocol) -> SIMChatRequest<Void> {
-        SIMLog.trace()
+        SIMLog.trace(message.identifier)
         return SIMChatRequest.request {
             $0.success()
         }
@@ -146,24 +148,24 @@ public class SIMChatBaseConversation: SIMChatConversationProtocol {
     ///
     /// - parameter message: 被操作的消息
     ///
-    public func updateMessageFromRemote(messsage: SIMChatMessageProtocol) {
-        SIMLog.trace()
+    public func updateMessageFromRemote(message: SIMChatMessageProtocol) {
+        SIMLog.trace(message.identifier)
     }
     ///
     /// 接收到来自服务端的消息
     ///
     /// - parameter message: 被操作的消息
     ///
-    public func receiveMessageFromRemote(messsage: SIMChatMessageProtocol) {
-        SIMLog.trace()
+    public func receiveMessageFromRemote(message: SIMChatMessageProtocol) {
+        SIMLog.trace(message.identifier)
     }
     ///
     /// 服务端要求更删除消息
     ///
     /// - parameter message: 被操作的消息
     ///
-    public func removeMessageFromRemote(messsage: SIMChatMessageProtocol) {
-        SIMLog.trace()
+    public func removeMessageFromRemote(message: SIMChatMessageProtocol) {
+        SIMLog.trace(message.identifier)
     }
 }
 

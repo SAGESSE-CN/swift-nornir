@@ -68,19 +68,27 @@ extension SIMChatViewController: SIMChatInputBarDelegate, SIMChatInputPanelToolB
     // MARK: - SIMChatInputBarDelegate
     
     public func inputBar(inputBar: SIMChatInputBar, shouldSelectItem item: SIMChatInputItemProtocol) -> Bool {
-        SIMLog.trace()
-        // 不能选择, 并且放弃编辑
-        if item.itemIdentifier.isEmpty {
-            dispatch_async(dispatch_get_main_queue()) {
-                inputBar.resignFirstResponder()
-            }
+        SIMLog.trace(item.itemIdentifier)
+        switch item.itemIdentifier {
+        case let x where x.isEmpty:
+            // 空不能选择
             return false
+        case "kb:photo":
+            // 从相册选择图片
+            imagePickerWithPhoto()
+            return false
+        case "kb:camera":
+            // 从相机选择图片
+            imagePickerWithCamera()
+            return false
+        default:
+            // 显示面板
+            // 第一次显示.
+            if inputBar.selectedBarButtonItem == nil {
+                onShowPanel()
+            }
+            return true
         }
-        // 第一次显示.
-        if inputBar.selectedBarButtonItem == nil {
-            onShowPanel()
-        }
-        return true
     }
     public func inputBar(inputBar: SIMChatInputBar, didSelectItem item: SIMChatInputItemProtocol) {
         SIMLog.trace()
@@ -190,6 +198,35 @@ extension SIMChatViewController: SIMChatInputBarDelegate, SIMChatInputPanelToolB
     
     
     // MARK: - Public Method
+    
+    public func imagePickerWithPhoto() {
+        SIMLog.trace()
+        let picker = SIMChatPhotoPicker()
+        presentViewController(picker, animated: true, completion: nil)
+    }
+    
+    public func imagePickerWithCamera() {
+        SIMLog.trace()
+        // 是否可以使用相机?
+        guard UIImagePickerController.isSourceTypeAvailable(.Camera) else {
+            let av = UIAlertView(title: "提示", message: "当前设备的相机不可用。", delegate: nil, cancelButtonTitle: nil, otherButtonTitles: "好")
+            
+            return av.show()
+        }
+        // 检查有没有权限
+        if AVCaptureDevice.authorizationStatusForMediaType(AVMediaTypeVideo) == .Denied {
+            let av = UIAlertView(title: "提示", message: "请在设备的\"设置-隐私-相机\"中允许访问相机。", delegate: nil, cancelButtonTitle: nil, otherButtonTitles: "好")
+            
+            return av.show()
+        }
+        // 拍摄图片
+        let picker = UIImagePickerController()
+        // 配置
+        picker.sourceType = .Camera
+        //picker.delegate = self
+        //picker.editing = true
+        presentViewController(picker, animated: true, completion: nil)
+    }
     
     ///
     /// 更新高度
