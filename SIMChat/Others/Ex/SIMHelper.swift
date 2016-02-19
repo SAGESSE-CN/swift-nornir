@@ -162,3 +162,24 @@ extension NSTimer {
 public func dispatch_after_at_now(interval: NSTimeInterval, _ queue: dispatch_queue_t, _ block: dispatch_block_t) {
     return dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(interval * NSTimeInterval(NSEC_PER_SEC))), queue, block)
 }
+
+extension CollectionType {
+    /// 分隔成组
+    @warn_unused_result
+    public func splitInGroup(@noescape compare: (Generator.Element, Generator.Element) throws -> Bool) rethrows -> [SubSequence] {
+        var result = Array<SubSequence>()
+        var begin = startIndex
+        while begin != endIndex {
+            var end = begin.advancedBy(1)
+            while end != endIndex {
+                if try !compare(self[end.advancedBy(-1)], self[end]) {
+                    break
+                }
+                end = end.advancedBy(1)
+            }
+            result.append(self[begin ..< end])
+            begin = end
+        }
+        return result
+    }
+}

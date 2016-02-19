@@ -164,6 +164,16 @@ class ExChatConversation: SIMChatBaseConversation {
                 m.date = NSDate(timeIntervalSinceNow: i + 0)
                 rs.append(m)
             }
+            if true || (rand() % 10) < 6 {
+                let c = SIMChatBaseMessageTextContent(content: makeRandText())
+                let m = SIMChatBaseMessage.messageWithContent(c, receiver: o, sender: s)
+                m.option = [.ContactShow]
+                m.isSelf = (r % 2 == 0)
+                m.status = status
+                m.date = NSDate(timeIntervalSinceNow: i + 0)
+                rs.append(m)
+            }
+            
             if true || (rand() % 10) == 2 {
                 let c = SIMChatBaseMessageImageContent(remote: path, size: CGSizeMake(640, 480))
                 let m = SIMChatBaseMessage.messageWithContent(c, receiver: o, sender: s)
@@ -171,6 +181,25 @@ class ExChatConversation: SIMChatBaseConversation {
                 m.isSelf = (r % 2 == 0)
                 m.status = status
                 m.date = NSDate(timeIntervalSinceNow: i + 1)
+                rs.append(m)
+            }
+            if true || (rand() % 10) == 2 {
+                let c = SIMChatBaseMessageImageContent(remote: path, size: CGSizeMake(640, 480))
+                let m = SIMChatBaseMessage.messageWithContent(c, receiver: o, sender: s)
+                m.option = [.ContactShow]
+                m.isSelf = (r % 2 == 0)
+                m.status = status
+                m.date = NSDate(timeIntervalSinceNow: i + 1)
+                rs.append(m)
+            }
+            
+            if true || (rand() % 10) < 2 {
+                let c = SIMChatBaseMessageAudioContent(remote: path, duration: 6.2 * Double((r % 3600) + 1))
+                let m = SIMChatBaseMessage.messageWithContent(c, receiver: o, sender: s)
+                m.option = [.ContactShow]
+                m.isSelf = (r % 2 == 0)
+                m.status = status
+                m.date = NSDate(timeIntervalSinceNow: i + 2)
                 rs.append(m)
             }
             if true || (rand() % 10) < 2 {
@@ -182,6 +211,7 @@ class ExChatConversation: SIMChatBaseConversation {
                 m.date = NSDate(timeIntervalSinceNow: i + 2)
                 rs.append(m)
             }
+            
             if true || (rand() % 10) < 3 {
                 let c = SIMChatBaseMessageTipsContent(content: "this is a tips\nThis is a very long long long long long long long long the tips")
                 let m = SIMChatBaseMessage.messageWithContent(c, receiver: o, sender: s)
