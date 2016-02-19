@@ -18,22 +18,39 @@ public class SIMChatBaseMessageUnknowCell: SIMChatBaseMessageBaseCell {
     public override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         
-        // config
-        titleLabel.text = "未知的消息类型"
-        titleLabel.numberOfLines = 0
-        titleLabel.font = UIFont.systemFontOfSize(11)
-        titleLabel.textColor = UIColor(argb: 0xFF7B7B7B)
-        titleLabel.textAlignment = NSTextAlignment.Center
         // add views
+        contentView.addSubview(bubbleImageView)
         contentView.addSubview(titleLabel)
         // add constraints
+        
+        SIMChatLayout.make(bubbleImageView)
+            .top.equ(contentView).top
+            .left.gte(contentView).left(10)
+            .right.lte(contentView).right(10)
+            .bottom.equ(contentView).bottom(17)
+            .centerX.equ(contentView).centerX
+            .submit()
+        
         SIMChatLayout.make(titleLabel)
-            .top.equ(contentView).top(16)
-            .left.equ(contentView).left(8)
-            .right.equ(contentView).right(8)
-            .bottom.equ(contentView).bottom(8)
+            .top.equ(bubbleImageView).top(5)
+            .left.equ(bubbleImageView).left(10)
+            .right.equ(bubbleImageView).right(10)
+            .bottom.equ(bubbleImageView).bottom(5)
             .submit()
     }
-    private lazy var titleLabel = UILabel()
+    private lazy var titleLabel: UILabel = {
+        let view = UILabel()
+        view.numberOfLines = 0
+        view.font = UIFont.systemFontOfSize(12)
+        view.text = "未知的消息类型"
+        view.textColor = UIColor(argb: 0xFF7B7B7B)
+        view.textAlignment = NSTextAlignment.Center
+        return view
+    }()
+    private lazy var bubbleImageView: UIImageView = {
+        let view = UIImageView()
+        view.image = UIImage(named: "simchat_bubble_tips")
+        return view
+    }()
 }
 

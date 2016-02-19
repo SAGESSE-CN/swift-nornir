@@ -6,7 +6,11 @@
 [![License](http://img.shields.io/badge/license-MIT-lightgrey.svg?style=flat
 		)](http://mit-license.org)
 
+因为我没有iOS7的设备, 加上Framework不支持iOS7, 所以该库不直接支持iOS7.
+如果需要在iOS7上使用, 请直接使用源代码, 目前iOS7没有经过任何测试.
+
 # TODO
+
 * **输入栏**
 * [X] **支持自定义表情**
 * [ ] **支持禁言**
@@ -18,7 +22,7 @@
 * **输入面板**
 * [X] **内置表情, 提供QQ表情和Emoji表情, 如需添加其他, 在配置文件`emoticons.plist`中按格式添加即可**
 * [X] **支持扩展内置表情, 使用`SIMChatInputPanel.registerClass:byIdentifier:`进行注册**
-* [X] **支持自定义, 在`SIMChatInputPanelEmoticonViewDelegate``inputPanel:emoticonGroupAtIndex:`返回表情组即可. 注意:这里还要改**
+* [X] **支持自定义, 在`SIMChatInputPanelEmoticonViewDelegate``inputPanel:emoticonGroupAtIndex:`返回表情组即可. NOTE:这里还要改**
 * [X] **支持对讲**
 * [ ] **支持变声**
 * [ ] **支持录音**
@@ -29,8 +33,8 @@
 * [X] **支持下拉加载更多**
 * [X] **支持删除功能**
 * [X] **支持撤回功能**
-* [ ] **完善消息气泡**
-* [ ] **添加消息更新(重新发送, 发送完成)**
+* [X] **支持消息气泡, 50%, NOTE: 这里还要改变**
+* [ ] **支持消息更新(内容改变/状态改变/重新发送)**
 * [X] **支持发送文本消息**
 * [ ] **支持发送图片消息**
 * [ ] **支持发送地址消息**
@@ -40,8 +44,9 @@
 * **其他**
 * [ ] **支持图文并排(CoreText)**
 * [ ] **支持GIF图片**
-* [ ] **支持音频压缩(转换)**
 * [ ] **优化UITableView(20%)**
+* [ ] **把autolayout自动算高换成手动*, 效率问题*
+* [ ] **支持音频压缩(转换)**
 * [X] **多图选择**
 * [ ] **多图片预览**
 * [ ] **消息重新排序**

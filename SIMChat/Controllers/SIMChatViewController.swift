@@ -58,7 +58,7 @@ public class SIMChatViewController: UIViewController {
     private lazy var _inputBar: SIMChatInputBar = {
         let bar = SIMChatInputBar(frame: CGRectZero)
         let R = { (name: String) -> UIImage? in
-            return UIImage(named: name)
+            return SIMChatBundle.imageWithResource("InputBar/\(name).png")
         }
         bar.delegate = self
 //        bar.leftBarButtonItems = [
@@ -70,11 +70,12 @@ public class SIMChatViewController: UIViewController {
 //        ]
          bar.bottomBarButtonItems = [
              SIMChatInputPanelAudioView.inputPanelItem(),
-             SIMChatInputPanelAudioView.inputPanelItem(),
-             SIMChatInputPanelEmoticonView.inputPanelItem(),
-             SIMChatInputPanelEmoticonView.inputPanelItem(),
-             SIMChatInputPanelToolBoxView.inputPanelItem(),
-             SIMChatInputPanelToolBoxView.inputPanelItem()
+            SIMChatBaseInputItem("", R("chat_bottom_PTV_nor"), R("chat_bottom_PTV_press")),
+            SIMChatBaseInputItem("", R("chat_bottom_photo_nor"), R("chat_bottom_photo_press")),
+            SIMChatBaseInputItem("", R("chat_bottom_Camera_nor"), R("chat_bottom_Camera_press")),
+            SIMChatBaseInputItem("", R("chat_bottom_red_pack_nor"), R("chat_bottom_red_pack_press")),
+            SIMChatInputPanelEmoticonView.inputPanelItem(),
+            SIMChatInputPanelToolBoxView.inputPanelItem()
          ]
         return bar
     }()

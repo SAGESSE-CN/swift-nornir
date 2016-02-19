@@ -69,6 +69,13 @@ extension SIMChatViewController: SIMChatInputBarDelegate, SIMChatInputPanelToolB
     
     public func inputBar(inputBar: SIMChatInputBar, shouldSelectItem item: SIMChatInputItemProtocol) -> Bool {
         SIMLog.trace()
+        // 不能选择, 并且放弃编辑
+        if item.itemIdentifier.isEmpty {
+            dispatch_async(dispatch_get_main_queue()) {
+                inputBar.resignFirstResponder()
+            }
+            return false
+        }
         // 第一次显示.
         if inputBar.selectedBarButtonItem == nil {
             onShowPanel()

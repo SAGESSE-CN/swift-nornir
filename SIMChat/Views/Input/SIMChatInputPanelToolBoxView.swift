@@ -43,9 +43,9 @@ internal class SIMChatInputPanelToolBoxView: UIView, SIMChatInputPanelProtocol {
     /// 获取对应的Item
     static func inputPanelItem() -> SIMChatInputItemProtocol {
         let R = { (name: String) -> UIImage? in
-            return UIImage(named: name)
+            return SIMChatBundle.imageWithResource("InputBar/\(name).png")
         }
-        let item = SIMChatBaseInputItem("kb:toolbox", R("chat_bottom_up_nor"), R("chat_bottom_up_press"))
+        let item = SIMChatBaseInputItem("kb:toolbox", R("chat_bottom_more_nor"), R("chat_bottom_more_press"))
         SIMChatInputPanelContainer.registerClass(self.self, byItem: item)
         return item
     }

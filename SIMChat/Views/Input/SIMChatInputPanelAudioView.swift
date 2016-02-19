@@ -94,9 +94,9 @@ internal class SIMChatInputPanelAudioView: UIView, SIMChatInputPanelProtocol {
     /// 获取对应的Item
     static func inputPanelItem() -> SIMChatInputItemProtocol {
         let R = { (name: String) -> UIImage? in
-            return UIImage(named: name)
+            return SIMChatBundle.imageWithResource("InputBar/\(name).png")
         }
-        let item = SIMChatBaseInputItem("kb:audio", R("chat_bottom_voice_nor"), R("chat_bottom_voice_press"))
+        let item = SIMChatBaseInputItem("kb:audio", R("chat_bottom_PTT_nor"), R("chat_bottom_PTT_press"))
         SIMChatInputPanelContainer.registerClass(self.self, byItem: item)
         return item
     }

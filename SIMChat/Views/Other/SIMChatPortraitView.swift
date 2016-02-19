@@ -19,35 +19,23 @@ import UIKit
 /// 聊天头像
 ///
 class SIMChatPortraitView: SIMView {
-    /// 释放
-    deinit {
-        // remove kvo
-        removeObserver(self, forKeyPath: "contentView.bounds")
-    }
+
     /// 构建.
     override func build() {
         super.build()
         
-        let vs = ["c" : contentView]
-        
-        // config
-        contentView.clipsToBounds = true
-        contentView.translatesAutoresizingMaskIntoConstraints = false
+        contentView.frame = bounds
+        contentView.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
         
         // add views
         addSubview(contentView)
-        
-        // add constraints
-        addConstraints(NSLayoutConstraintMake("H:|-(5)-[c]-(5)-|", views: vs))
-        addConstraints(NSLayoutConstraintMake("V:|-(5)-[c]-(5)-|", views: vs))
-        
-        // add kvos
-        addObserver(self, forKeyPath: "contentView.bounds", options: .New, context: nil)
     }
-    override func observeValueForKeyPath(keyPath: String?, ofObject object: AnyObject?, change: [String : AnyObject]?, context: UnsafeMutablePointer<Void>) {
-        // 直接更新
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
         contentView.layer.cornerRadius = contentView.bounds.width / 2
     }
+    
     /// 关联的用户
     var user: SIMChatUserProtocol? {
         didSet {
@@ -68,5 +56,9 @@ class SIMChatPortraitView: SIMView {
         return SIMChatImageManager.defaultPortrait1
     }
     
-    private(set) lazy var contentView = UIImageView()
+    private(set) lazy var contentView: UIImageView = {
+        let view = UIImageView()
+        view.clipsToBounds = false
+        return view
+    }()
 }

@@ -55,9 +55,9 @@ internal class SIMChatInputPanelEmoticonView: UIView, SIMChatInputPanelProtocol 
     /// 获取对应的Item
     static func inputPanelItem() -> SIMChatInputItemProtocol {
         let R = { (name: String) -> UIImage? in
-            return UIImage(named: name)
+            return SIMChatBundle.imageWithResource("InputBar/\(name).png")
         }
-        let item = SIMChatBaseInputItem("kb:emoticon", R("chat_bottom_smile_nor"), R("chat_bottom_smile_press"))
+        let item = SIMChatBaseInputItem("kb:emoticon", R("chat_bottom_emotion_nor"), R("chat_bottom_emotion_press"))
         SIMChatInputPanelContainer.registerClass(self.self, byItem: item)
         return item
     }

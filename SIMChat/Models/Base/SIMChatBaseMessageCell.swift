@@ -44,27 +44,30 @@ public class SIMChatBaseMessageBubbleCell: UITableViewCell, SIMChatMessageCellPr
         
         // TODO: 有性能问题, 需要重新实现
         
-        let vs = ["p" : portraitView,
+        let vs = [
+            "p" : portraitView,
             "c" : visitCardView,
             "s" : stateView,
-            "b" : bubbleView]
+            "b" : bubbleView
+        ]
         
-        let ms = ["s0" : 50,
-            "s1" : 16,
-            
-            "mh0" : 7,
-            "mh1" : 0,
-            "mh2" : 57,
-            
-            "mv0" : 8,
-            "mv1" : 13,
+        let ms = [
+//            "s0" : 40,
+//            "s1" : 16,
+//            "mh0" : 7,
+//            "mh1" : 0,
+//            "mh2" : 57,
+//            
+//            "mv0" : 4,
+//            "mv1" : 9,
             
             "ph0" : hPriority,
             "ph1" : hPriority - 1,
             "ph2" : hPriority - 2,
             
             "pv0" : vPriority,
-            "pv1" : vPriority - 1]
+            "pv1" : vPriority - 1
+        ]
         
         let addConstraints = contentView.addConstraints
         
@@ -87,18 +90,30 @@ public class SIMChatBaseMessageBubbleCell: UITableViewCell, SIMChatMessageCellPr
         contentView.addSubview(bubbleView)
         contentView.addSubview(stateView)
         
+        // 8上/7下/3中
+        // 10
+        // 10左 4左
+        
+        // 54 = 10 + 40 + 4
+        
         // add constraints
-        addConstraints(NSLayoutConstraintMake("H:[p]-mh1@ph0-[b]-mh1@ph1-[p]", views: vs, metrics: ms))
-        addConstraints(NSLayoutConstraintMake("H:[p]-mh1@ph0-[c]-mh1@ph1-[p]", views: vs, metrics: ms))
-        addConstraints(NSLayoutConstraintMake("H:|-==mh0@ph0-[p(s0)]-mh0@ph2-|", views: vs, metrics: ms))
-        addConstraints(NSLayoutConstraintMake("H:|->=mh2-[b]->=mh2-|", views: vs, metrics: ms))
-        addConstraints(NSLayoutConstraintMake("H:|->=mh2-[c]->=mh2-|", views: vs, metrics: ms))
-        addConstraints(NSLayoutConstraintMake("V:|-(==mv0)-[p(s0)]-(>=0@850)-|", views: vs, metrics: ms))
-        addConstraints(NSLayoutConstraintMake("V:|-(==mv1)-[c(s1)]-(==2@pv1)-[b]|", views: vs, metrics: ms))
-        addConstraints(NSLayoutConstraintMake("V:|-(mv0@pv0)-[b(>=p)]", views: vs, metrics: ms))
-        addConstraints(NSLayoutConstraintMake("V:|-(mv0@pv0)-[b(>=p)]", views: vs, metrics: ms))
+        addConstraints(NSLayoutConstraintMake("H:|->=54-[b]->=54-|", views: vs, metrics: ms))
+        addConstraints(NSLayoutConstraintMake("H:|->=54-[c]->=54-|", views: vs, metrics: ms))
+        addConstraints(NSLayoutConstraintMake("H:[p]-(4@ph0)-[b]-(4@ph1)-[p]", views: vs, metrics: ms))
+        addConstraints(NSLayoutConstraintMake("H:[p]-(10@ph0)-[c]-(10@ph1)-[p]", views: vs, metrics: ms))
+        
+        addConstraints(NSLayoutConstraintMake("H:|-(==10@ph0)-[p(40)]-(==10@ph2)-|", views: vs, metrics: ms))
+        addConstraints(NSLayoutConstraintMake("V:|-(==8)-[p(40)]-(>=7@850)-|", views: vs, metrics: ms))
+        
+        addConstraints(NSLayoutConstraintMake("V:|-(==8)-[c(16)]-(==2@pv1)-[b]-7-|", views: vs, metrics: ms))
+        addConstraints(NSLayoutConstraintMake("V:|-(10@pv0)-[b(>=p)]", views: vs, metrics: ms))
+        //addConstraints(NSLayoutConstraintMake("V:|-(mv0@pv0)-[b(>=p)]", views: vs, metrics: ms))
         addConstraints(NSLayoutConstraintMake("H:[b]-(4@ph0)-[s]-(4@ph1)-[b]", views: vs, metrics: ms))
-        addConstraints(NSLayoutConstraintMake("V:[s]-(mv0)-|", views: vs, metrics: ms))
+        //addConstraints(NSLayoutConstraintMake("V:[s]-18-|", views: vs, metrics: ms))
+        
+        SIMChatLayout.make(stateView)
+            .bottom.equ(bubbleView).bottom(4)
+            .submit()
         
         // get constraints
         contentView.constraints.forEach {

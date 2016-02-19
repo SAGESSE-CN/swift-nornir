@@ -30,10 +30,10 @@ public class SIMChatBaseMessageTimeLineCell: SIMChatBaseMessageBaseCell {
         contentView.addSubview(titleLabel)
         // add constraints
         SIMChatLayout.make(titleLabel)
-            .top.equ(contentView).top(16)
-            .left.equ(contentView).left(8)
-            .right.equ(contentView).right(8)
-            .bottom.equ(contentView).bottom(8)
+            .top.equ(contentView).top(21)
+            .left.equ(contentView).left(0)
+            .right.equ(contentView).right(0)
+            .bottom.equ(contentView).bottom(9)
             .submit()
     }
     /// 关联的消息
