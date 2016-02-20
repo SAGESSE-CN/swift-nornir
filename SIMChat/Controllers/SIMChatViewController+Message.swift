@@ -113,7 +113,7 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
     /// 获取索引(结果和参数顺序有关)
     private func _indexsOfMessages(messages: Array<SIMChatMessageProtocol>) -> Array<Int> {
         // 批量操作测试
-        if true {
+        if false {
             var x = messages.flatMap { e in
                 return _allMessages.indexOf{
                     return $0 == e
@@ -682,52 +682,147 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
         guard let tableView = self.contentView where !ms.isEmpty else {
             return
         }
-        // TODO: 批量更新的测试没有做
-        // 查找需要执行操作的单元格
-        let indexs = ms.flatMap { e in
-            return _allMessages.indexOf{
-                return $0 == e
-            }
+        // 查找需要执行操作的单元格并转换为组
+        let indexGroups = _indexsOfMessages(ms).sort().splitInGroup {
+            $0 + 1 == $1
         }
-        
-        // 并没有操作
-        guard !indexs.isEmpty else {
+        guard !indexGroups.isEmpty else {
             return
         }
-        
         SIMLog.trace()
         
+        // 标记
         var insertIndexPaths: Array<NSIndexPath> = []
         var reloadIndexPaths: Array<NSIndexPath> = []
         var removeIndexPaths: Array<NSIndexPath> = []
         
-        indexs.forEach {
-            
-            let prev: SIMChatMessageProtocol? = ($0 - 1 < _allMessages.count && $0 > 0) ? _allMessages[$0 - 1] : nil
-            let message = _allMessages[$0]
-            let next: SIMChatMessageProtocol? = ($0 + 1 < _allMessages.count) ? _allMessages[$0 + 1] : nil
-            
-            // 一定要重新计算高度
-            tableView.fd_invalidateHeightForKey(message.identifier)
-            
-            if _needMakeTimeLine(message, next) {
-                // 添加到下面
-                let idx = $0 + 1
-                SIMLog.debug("add time line at \($0 + 1)")
-                _allMessages.insert(_makeTimeLine(message, next), atIndex: idx)
-                insertIndexPaths.append(NSIndexPath(forRow: $0, inSection: 0))
+        var indexOffset: Int { return insertIndexPaths.count - removeIndexPaths.count }
+        
+        // 辅助函数
+        let updateMessage = { (index: Int, refresh: Bool) in
+            let position = index + indexOffset
+            guard let message = self._messageWithIndex(position) else {
+                return
             }
-            if _needRemoveTimeLine(prev, message) {
-                // 需要删除, 优先删除上面的
-                let idx = $0 - 1
-                SIMLog.debug("remove time line at \(idx)")
-                _allMessages.removeAtIndex(idx)
-                removeIndexPaths.append(NSIndexPath(forRow: $0 - 1, inSection: 0))
+            SIMLog.debug("reload row at \(position)(\(index)) => \(message.identifier)")
+            // 清除缓存
+            if refresh {
+                tableView.fd_invalidateHeightForKey(message.identifier)
             }
-            
-            SIMLog.debug("reload row at \($0)")
-            reloadIndexPaths.append(NSIndexPath(forRow: $0, inSection: 0))
+            reloadIndexPaths.append(NSIndexPath(forRow: index, inSection: 0))
         }
+        let insertMessage = { (message: SIMChatMessageProtocol, index: Int) in
+            let position = index + indexOffset
+            SIMLog.debug("insert row at \(position)(\(position)) => \(message.identifier)")
+            // 插入新消息
+            self._allMessages.insert(message, atIndex: position)
+            insertIndexPaths.append(NSIndexPath(forRow: position, inSection: 0))
+        }
+        let removeMessage = { (index: Int) in
+            let position = index + indexOffset
+            guard var message = self._messageWithIndex(position) else {
+                return
+            }
+            SIMLog.debug("remove row at \(position)(\(index)) => \(message.identifier)")
+            // 清除缓存/删除消息
+            tableView.fd_invalidateHeightForKey(message.identifier)
+            self._allMessages.removeAtIndex(position)
+            removeIndexPaths.append(NSIndexPath(forRow: index, inSection: 0))
+        }
+        
+        // 处理
+        indexGroups.forEach {
+            // 获取需要删除的消息
+            let prevMessage = _messageWithIndex(indexOffset + $0.first! - 1)
+            let messages = _allMessages[indexOffset + $0.first! ... indexOffset + $0.last!]
+            let nextMessage = _messageWithIndex(indexOffset + $0.last! + 1)
+
+            // var p = prevMessage
+            
+            
+            
+//            if nextMessage {
+//                messages.append(<#T##newElement: Element##Element#>)
+//            }
+            
+            
+            //messages.forEach(<#T##body: (SIMChatMessageProtocol) throws -> ()##(SIMChatMessageProtocol) throws -> ()#>)
+            
+            
+//            // 检查头部
+//            if _needMakeTimeLine(prevMessage, messages.first) {
+//                // 需要添加timeline
+//                insertMessage(_makeTimeLine(prevMessage, messages.first), $0.first!)
+//            } else if _needRemoveTimeLine(prevMessage, messages.first) {
+//                // 需要删除timeline(前一条)
+//                removeMessage($0.first! - 1)
+//            } else if _needUpdateTimeLine(prevMessage, messages.first) {
+//                // 需要更新. 但只需要处理前一条
+//                if let content = prevMessage?.content as? SIMChatBaseMessageTimeLineContent {
+//                    content.frontMessage = prevMessage
+//                    content.backMessage = messages.first
+//                    updateMessage($0.first! - 1, false)
+//                }
+//            }
+//            
+//            // 需要..
+//            
+//            // 检查尾巴
+//            if _needMakeTimeLine(messages.last, nextMessage) {
+//                // 需要添加timeline
+//                insertMessage(_makeTimeLine(prevMessage, messages.first), $0.last!)
+//                
+//            } else if _needRemoveTimeLine(messages.last, nextMessage) {
+//                // 需要删除timeline(后一条?)
+//                removeMessage($0.first! + 1)
+//            } else if _needUpdateTimeLine(messages.last, nextMessage) {
+//                // 需要更新. 但只需要处理后一条
+//                if let content = nextMessage?.content as? SIMChatBaseMessageTimeLineContent {
+//                    content.frontMessage = messages.last
+//                    content.backMessage = nextMessage
+//                    updateMessage($0.first! + 1, false)
+//                }
+//            }
+            
+            // 更新区间内所有的消息
+            ($0.first! ... $0.last!).forEach {
+                updateMessage($0, true)
+            }
+        }
+        // 删除冲突的
+        removeIndexPaths.forEach {
+            if let idx = reloadIndexPaths.indexOf($0) {
+                reloadIndexPaths.removeAtIndex(idx)
+            }
+        }
+        
+//        indexs.forEach {
+//            
+//            let prev: SIMChatMessageProtocol? = ($0 - 1 < _allMessages.count && $0 > 0) ? _allMessages[$0 - 1] : nil
+//            let message = _allMessages[$0]
+//            let next: SIMChatMessageProtocol? = ($0 + 1 < _allMessages.count) ? _allMessages[$0 + 1] : nil
+//            
+//            // 一定要重新计算高度
+//            tableView.fd_invalidateHeightForKey(message.identifier)
+//            
+//            if _needMakeTimeLine(message, next) {
+//                // 添加到下面
+//                let idx = $0 + 1
+//                SIMLog.debug("add time line at \($0 + 1)")
+//                _allMessages.insert(_makeTimeLine(message, next), atIndex: idx)
+//                insertIndexPaths.append(NSIndexPath(forRow: $0, inSection: 0))
+//            }
+//            if _needRemoveTimeLine(prev, message) {
+//                // 需要删除, 优先删除上面的
+//                let idx = $0 - 1
+//                SIMLog.debug("remove time line at \(idx)")
+//                _allMessages.removeAtIndex(idx)
+//                removeIndexPaths.append(NSIndexPath(forRow: $0 - 1, inSection: 0))
+//            }
+//            
+//            SIMLog.debug("reload row at \($0)")
+//            reloadIndexPaths.append(NSIndexPath(forRow: $0, inSection: 0))
+//        }
         
         tableView.beginUpdates()
         tableView.reloadRowsAtIndexPaths(reloadIndexPaths, withRowAnimation: .Fade)
@@ -780,7 +875,7 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
         guard !indexGroups.isEmpty else {
             return
         }
-        
+        SIMLog.trace()
         // 标记
         var insertIndexPaths: Array<NSIndexPath> = []
         var reloadIndexPaths: Array<NSIndexPath> = []
@@ -790,7 +885,6 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
         var removeIndexPathsR: Array<NSIndexPath> = [] // Right
         
         var indexOffset: Int { return insertIndexPaths.count - removeIndexPaths.count }
-        
         // 辅助函数
         let updateMessage = { (index: Int) in
             let position = index + indexOffset
