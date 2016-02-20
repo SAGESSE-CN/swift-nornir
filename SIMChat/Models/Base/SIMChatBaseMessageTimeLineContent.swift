@@ -22,7 +22,7 @@ public class SIMChatBaseMessageTimeLineContent: SIMChatMessageContentProtocol {
     }
     
     /// 前面的消息
-    public var frontMessage: SIMChatMessageProtocol?
+    public weak var frontMessage: SIMChatMessageProtocol?
     /// 后面的消息
-    public var backMessage: SIMChatMessageProtocol?
+    public weak var backMessage: SIMChatMessageProtocol?
 }

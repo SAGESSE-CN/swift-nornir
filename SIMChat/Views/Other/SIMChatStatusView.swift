@@ -16,6 +16,14 @@ class SIMChatStatusView: SIMControl {
     override func intrinsicContentSize() -> CGSize {
         return CGSizeMake(20, 20)
     }
+    
+    override func hitTest(point: CGPoint, withEvent event: UIEvent?) -> UIView? {
+        if CGRectMake(-10, -10, bounds.width + 20, bounds.height + 20).contains(point) {
+            return showView
+        }
+        return nil
+    }
+    
     /// 当前状态
     var status = SIMChatStatus.None {
         willSet {

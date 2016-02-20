@@ -120,21 +120,12 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
 //                }
 //            }
 //            if let f = x.first {
-//                if false {
+//                if true {
 //                    // 连续操作内容
 //                    x.append(f - 1)
-////                    
-////                    let m = _messageWithIndex(f - 1)
-////                    m?.status = .Revoked
-//                    
 //                } else {
 //                    // 非连续操作内容
 //                    x.append(f - 2)
-//                    
-//                    let m = _messageWithIndex(f - 2)
-//                    if !(m?.content is SIMChatBaseMessageTimeLineContent) {
-//                        m?.status = .Revoked
-//                    }
 //                }
 //            }
 //            return x
@@ -202,12 +193,16 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
                 // 不允许显示timeline
                 return true
             }
-            if !(content.frontMessage?.showsTimeLine ?? true) {
-                // 上上一个不允许显示
-                return false
+            // 如果有上上一条消息, 检查他
+            if let pprevMessage = content.frontMessage {
+//                if !pprevMessage.showsTimeLine {
+//                    // 上上一个不允许显示
+//                    return false
+//                }
+                return fabs(pprevMessage.date.timeIntervalSinceDate(nextMessage.date)) < durationInterval
             }
         }
-        if let _ = next?.content as? SIMChatBaseMessageTimeLineContent {
+        if let content = next?.content as? SIMChatBaseMessageTimeLineContent {
             guard let prevMessage = prev else {
                 // 这是第一条
                 return false
@@ -215,6 +210,10 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
             if !prevMessage.showsTimeLine {
                 // 上一条消息不允许显示timeline, 那么这个就可以直接显示
                 return false
+            }
+            // 如果有下下一条消息, 检查他
+            if let nnextMessage = content.backMessage {
+                return fabs(nnextMessage.date.timeIntervalSinceDate(prevMessage.date)) < durationInterval
             }
         }
         guard let next = next, prev = prev else {
@@ -595,7 +594,6 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
                 if let content = nextMessage.content as? SIMChatBaseMessageTimeLineContent {
                     SIMLog.debug("reload timeline at \(position)")
                     content.frontMessage = prevMessage
-                    content.backMessage = nextMessage
                     reloadIndexPaths.append(NSIndexPath(forRow: position, inSection: 0))
                 }
             }
@@ -738,7 +736,6 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
             self._allMessages.removeAtIndex(position)
             removeIndexPaths.append(NSIndexPath(forRow: index, inSection: 0))
         }
-        
         // 处理
         indexGroups.forEach { group in
             // 更新区间内所有的消息
@@ -755,8 +752,12 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
                     // 需要添加timeline
                     insertMessage(_makeTimeLine(prevMessage, message), $0)
                 } else if _needRemoveTimeLine(prevMessage, message) {
-                    // 需要删除timeline(前一条)
-                    removeMessage($0 - 1)
+                    // 需要删除timeline(优先前一条)
+                    if prevMessage?.content is SIMChatBaseMessageTimeLineContent {
+                        removeMessage($0 - 1)
+                    } else if message?.content is SIMChatBaseMessageTimeLineContent {
+                        removeMessage($0 + 1)
+                    }
                 } else if $0 == group.first! && _needUpdateTimeLine(prevMessage, message) {
                     // 需要额外的更新
                     if let content = prevMessage?.content as? SIMChatBaseMessageTimeLineContent {
@@ -773,15 +774,11 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
                 reloadIndexPaths.removeAtIndex(idx)
             }
         }
-        
-        if animated {
-            // 使用系统动画
-            tableView.beginUpdates()
-            tableView.reloadRowsAtIndexPaths(reloadIndexPaths, withRowAnimation: .Fade)
-            tableView.insertRowsAtIndexPaths(insertIndexPaths, withRowAnimation: .Fade)
-            tableView.deleteRowsAtIndexPaths(removeIndexPaths, withRowAnimation: .Fade)
-            tableView.endUpdates()
-        } else {
+        // 如果没有做任何操作, 终止
+        if insertIndexPaths.isEmpty && reloadIndexPaths.isEmpty && removeIndexPaths.isEmpty {
+            return
+        }
+        guard animated else {
             // 关闭动画
             UIView.performWithoutAnimation {
                 tableView.beginUpdates()
@@ -790,7 +787,14 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
                 tableView.deleteRowsAtIndexPaths(removeIndexPaths, withRowAnimation: .None)
                 tableView.endUpdates()
             }
+            return
         }
+        // 使用系统动画
+        tableView.beginUpdates()
+        tableView.reloadRowsAtIndexPaths(reloadIndexPaths, withRowAnimation: .Fade)
+        tableView.insertRowsAtIndexPaths(insertIndexPaths, withRowAnimation: .Fade)
+        tableView.deleteRowsAtIndexPaths(removeIndexPaths, withRowAnimation: .Fade)
+        tableView.endUpdates()
     }
     
     ///
@@ -800,26 +804,268 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
         guard let tableView = self.contentView where !ms.isEmpty else {
             return
         }
-        // TODO: 批量移动的测试没有做
-        // 查找需要执行操作的单元格
-        let indexs = ms.flatMap { e in
-            return _allMessages.indexOf{
-                return $0 == e
-            }
+        // 查找需要执行操作的单元格并转换为组
+        let indexs = _indexsOfMessages(ms)
+        let indexGroups = indexs.sort().splitInGroup {
+            $0 + 1 == $1
+        }
+        guard !indexGroups.isEmpty else {
+            return
         }
         // 计算插入点
         let count = _allMessages.count
         let position = min(max(index >= 0 ? index : index + count, 0), count)
+        let targetIndexs = NSDictionary(
+            objects: indexs.enumerate().map({ position + $0.index }),
+            forKeys: indexs) as! Dictionary<Int, Int>
         
-        SIMLog.trace("insert position: \(position) => \(count)")
+        SIMLog.trace("\(position)/\(count)")
         
-        indexs.forEach {
-            // 抽出, 放到最后
-            let message = _allMessages.removeAtIndex($0)
-            _allMessages.insert(message, atIndex: position)
+        // 标记
+        var insertIndexPaths: Array<NSIndexPath> = []
+        var reloadIndexPaths: Array<NSIndexPath> = []
+        var removeIndexPaths: Array<NSIndexPath> = []
+        
+        var insertIndexPathsL: Array<NSIndexPath> = []
+        var insertIndexPathsR: Array<NSIndexPath> = []
+        var insertIndexPathsF: Array<NSIndexPath> = []
+        var removeIndexPathsL: Array<NSIndexPath> = [] // Left
+        var removeIndexPathsR: Array<NSIndexPath> = [] // Right
+        
+        var indexOffset: Int { return insertIndexPaths.count - removeIndexPaths.count }
+        
+        // 辅助函数
+        let moveMessage = { (index: Int, toIndex: Int) in
+            let position = index + indexOffset
+            let targetPosition = toIndex + indexOffset
+            // 如果相同就没意义了
+            guard index != toIndex else {
+                return
+            }
+            // 移动消息
+            let message = self._allMessages.removeAtIndex(position)
+            let indexPath = NSIndexPath(forRow: index, inSection: 0)
+            let targetIndexPath = NSIndexPath(forRow: targetPosition, inSection: 0)
+            self._allMessages.insert(message, atIndex: targetPosition)
+            SIMLog.debug("move row at \(position)(\(index)) to \(targetPosition)(\(targetPosition)) => \(message.identifier)")
             
-            tableView.moveRowAtIndexPath(NSIndexPath(forRow: $0, inSection: 0),
-                toIndexPath: NSIndexPath(forRow: position, inSection: 0))
+            removeIndexPaths.append(indexPath)
+            insertIndexPaths.append(targetIndexPath)
+            // 检查删除方向
+            if message.isSelf {
+                removeIndexPathsR.append(indexPath)
+                insertIndexPathsR.append(targetIndexPath)
+            } else {
+                removeIndexPathsL.append(indexPath)
+                insertIndexPathsL.append(targetIndexPath)
+            }
+        }
+        let updateMessage = { (index: Int) in
+            let position = index + indexOffset
+            guard let message = self._messageWithIndex(position) else {
+                return
+            }
+            SIMLog.debug("reload row at \(position)(\(index)) => \(message.identifier)")
+            reloadIndexPaths.append(NSIndexPath(forRow: index, inSection: 0))
+        }
+        let insertMessage = { (message: SIMChatMessageProtocol, index: Int, animated: Bool) in
+            let position = index + indexOffset
+            let indexPath = NSIndexPath(forRow: position, inSection: 0)
+            SIMLog.debug("insert row at \(position)(\(position)) => \(message.identifier)")
+            // 插入新消息
+            self._allMessages.insert(message, atIndex: position)
+            insertIndexPaths.append(indexPath)
+            // 如果是timeline, 取决于他关联的是什么
+            var isSelf: Bool {
+                if let content = message.content as? SIMChatBaseMessageTimeLineContent {
+                    return content.backMessage?.isSelf ?? message.isSelf
+                }
+                return message.isSelf
+            }
+            // 检查插入方向, 如果需要的话
+            if !animated {
+                insertIndexPathsF.append(indexPath)
+            } else if isSelf {
+                insertIndexPathsR.append(indexPath)
+            } else {
+                insertIndexPathsL.append(indexPath)
+            }
+        }
+        let removeMessage = { (index: Int) in
+            let position = index + indexOffset
+            let indexPath = NSIndexPath(forRow: index, inSection: 0)
+            guard let message = self._messageWithIndex(position) else {
+                return
+            }
+            SIMLog.debug("remove row at \(position)(\(index)) => \(message.identifier)")
+            // 清除缓存/删除消息
+            tableView.fd_invalidateHeightForKey(message.identifier)
+            self._allMessages.removeAtIndex(position)
+            removeIndexPaths.append(indexPath)
+            // 如果是timeline, 取决于他关联的是什么
+            var isSelf: Bool {
+                if let content = message.content as? SIMChatBaseMessageTimeLineContent {
+                    return content.backMessage?.isSelf ?? message.isSelf
+                }
+                return message.isSelf
+            }
+            // 检查删除方向
+            if isSelf {
+                removeIndexPathsR.append(indexPath)
+            } else {
+                removeIndexPathsL.append(indexPath)
+            }
+        }
+        // 处理
+        indexGroups.forEach {
+            // 获取需要删除的消息
+            let prevMessage = _messageWithIndex(indexOffset + $0.first! - 1)
+            let nextMessage = _messageWithIndex(indexOffset + $0.last! + 1)
+            // 移动区间内所有的消息
+            ($0.first! ... $0.last!).forEach {
+                moveMessage($0, targetIndexs[$0] ?? position)
+            }
+            // 检查timeline
+            if _needMakeTimeLine(prevMessage, nextMessage) {
+                // 需要添加一个新的timeline, + 1是为了删除了一条
+                insertMessage(_makeTimeLine(prevMessage, nextMessage), $0.first!, false)
+            } else if _needRemoveTimeLine(prevMessage, nextMessage) {
+                // 需要删除, 优先删除上面的, 删除区间之后index就是last了
+                if prevMessage?.content is SIMChatBaseMessageTimeLineContent {
+                    removeMessage($0.first! - 1)
+                } else if nextMessage?.content is SIMChatBaseMessageTimeLineContent {
+                    removeMessage($0.last! + 1)
+                }
+            } else if _needUpdateTimeLine(prevMessage, nextMessage) {
+                // 需要更新
+                if let content = prevMessage?.content as? SIMChatBaseMessageTimeLineContent {
+                    content.backMessage = nextMessage
+                    updateMessage($0.first! - 1)
+                } else if let content = nextMessage?.content as? SIMChatBaseMessageTimeLineContent {
+                    content.frontMessage = prevMessage
+                    updateMessage($0.last! + 1)
+                }
+
+            }
+        }
+        // 检查移动后的区间内的timeline
+        (position ..< position + ms.count).forEach {
+            // 获取需要检查的消息
+            let prevMessage = _messageWithIndex(indexOffset + $0 - 1)
+            let message = _messageWithIndex(indexOffset + $0)
+            // 开始检查
+            if _needMakeTimeLine(prevMessage, message) {
+                // 需要添加timeline
+                insertMessage(_makeTimeLine(prevMessage, message), $0, true)
+            } else if _needRemoveTimeLine(prevMessage, message) {
+                // 需要删除timeline(前一条)
+                if prevMessage?.content is SIMChatBaseMessageTimeLineContent {
+                    removeMessage($0 - 1)
+                } else if message?.content is SIMChatBaseMessageTimeLineContent {
+                    removeMessage($0 + 1)
+                }
+            } else if $0 == position && _needUpdateTimeLine(prevMessage, message) {
+                // 需要额外的更新
+                if let content = prevMessage?.content as? SIMChatBaseMessageTimeLineContent {
+                    content.backMessage = message
+                    updateMessage($0 - 1)
+                }
+            }
+        }
+        // 如果插入存在重复的row, 往后推
+        var existedNewRows: Set<Int> = []
+        insertIndexPaths.enumerate().forEach {
+            var row = $0.element.row
+            while existedNewRows.contains(row) {
+                row++
+            }
+            existedNewRows.insert(row)
+            guard $0.element.row != row else {
+                return
+            }
+            let indexPath = NSIndexPath(forRow: row, inSection: $0.element.section)
+            let oldIndexPath = $0.element
+            if let idx = insertIndexPathsL.indexOf({ $0 === oldIndexPath }) {
+                insertIndexPathsL[idx] = indexPath
+            }
+            if let idx = insertIndexPathsR.indexOf({ $0 === oldIndexPath }) {
+                insertIndexPathsR[idx] = indexPath
+            }
+            if let idx = insertIndexPathsF.indexOf({ $0 === oldIndexPath }) {
+                insertIndexPathsF[idx] = indexPath
+            }
+            insertIndexPaths[$0.index] = indexPath
+        }
+        // 删除冲突的
+        removeIndexPaths.forEach {
+            if let idx = reloadIndexPaths.indexOf($0) {
+                reloadIndexPaths.removeAtIndex(idx)
+            }
+        }
+        // 如果没有做任何操作, 终止
+        if insertIndexPaths.isEmpty && reloadIndexPaths.isEmpty && removeIndexPaths.isEmpty {
+            return
+        }
+        // 更新UI
+        guard animated else {
+            UIView.performWithoutAnimation {
+                tableView.beginUpdates()
+                tableView.insertRowsAtIndexPaths(insertIndexPaths, withRowAnimation: .None)
+                tableView.deleteRowsAtIndexPaths(removeIndexPaths, withRowAnimation: .None)
+                tableView.reloadRowsAtIndexPaths(reloadIndexPaths, withRowAnimation: .None)
+                tableView.endUpdates()
+            }
+            return
+        }
+        // 获取当前显示的Cell
+        let visibleCells = tableView.visibleCells
+        let visibleRows = tableView.indexPathsForVisibleRows
+        let cellsL: [UITableViewCell] = removeIndexPathsL.flatMap {
+            guard let index = visibleRows?.indexOf($0) else {
+                return nil
+            }
+            return visibleCells[index]
+        }
+        let cellsR: [UITableViewCell] = removeIndexPathsR.flatMap {
+            guard let index = visibleRows?.indexOf($0) else {
+                return nil
+            }
+            return visibleCells[index]
+        }
+        // 下一点
+        let nextStep = { (_: Bool) in
+            // 必须要隐藏, 否则系统动画会暴露
+            cellsL.forEach { $0.hidden = true }
+            cellsR.forEach { $0.hidden = true }
+            // 使用系统的更新
+            tableView.beginUpdates()
+            tableView.insertRowsAtIndexPaths(insertIndexPathsL, withRowAnimation: .Left)
+            tableView.insertRowsAtIndexPaths(insertIndexPathsR, withRowAnimation: .Right)
+            tableView.insertRowsAtIndexPaths(insertIndexPathsF, withRowAnimation: .Fade)
+            tableView.deleteRowsAtIndexPaths(removeIndexPathsL, withRowAnimation: .Top)
+            tableView.deleteRowsAtIndexPaths(removeIndexPathsR, withRowAnimation: .Top)
+            tableView.reloadRowsAtIndexPaths(reloadIndexPaths,  withRowAnimation: .Fade)
+            tableView.endUpdates()
+        }
+        if cellsL.isEmpty && cellsR.isEmpty {
+            SIMLog.debug("remove cells not visible!")
+            // 需要执行动画的cell不在显示区域
+            nextStep(false)
+        } else {
+            // 自定义删除动画,
+            let enabled = tableView.scrollEnabled
+            tableView.scrollEnabled = false
+            UIView.animateWithDuration(0.25,
+                animations: {
+                    cellsL.forEach { $0.frame.origin = CGPointMake(-$0.frame.width, $0.frame.minY) }
+                    cellsR.forEach { $0.frame.origin = CGPointMake(+$0.frame.width, $0.frame.minY) }
+                },
+                completion: { b in
+                    if !tableView.scrollEnabled {
+                        tableView.scrollEnabled = enabled
+                    }
+                    nextStep(b)
+            })
         }
     }
     
@@ -847,6 +1093,7 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
         var removeIndexPathsR: Array<NSIndexPath> = [] // Right
         
         var indexOffset: Int { return insertIndexPaths.count - removeIndexPaths.count }
+        
         // 辅助函数
         let updateMessage = { (index: Int) in
             let position = index + indexOffset
@@ -897,16 +1144,18 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
                 insertMessage(_makeTimeLine(prevMessage, nextMessage), $0.first!)
             } else if _needRemoveTimeLine(prevMessage, nextMessage) {
                 // 需要删除, 优先删除上面的, 删除区间之后index就是last了
-                removeMessage($0.first! - 1)
+                if prevMessage?.content is SIMChatBaseMessageTimeLineContent {
+                    removeMessage($0.first! - 1)
+                } else if nextMessage?.content is SIMChatBaseMessageTimeLineContent {
+                    removeMessage($0.last! + 1)
+                }
             } else if _needUpdateTimeLine(prevMessage, nextMessage) {
                 // 需要更新
                 if let content = prevMessage?.content as? SIMChatBaseMessageTimeLineContent {
-                    content.frontMessage = prevMessage
                     content.backMessage = nextMessage
                     updateMessage($0.first! - 1)
                 } else if let content = nextMessage?.content as? SIMChatBaseMessageTimeLineContent {
                     content.frontMessage = prevMessage
-                    content.backMessage = nextMessage
                     updateMessage($0.last! + 1)
                 }
             }
@@ -919,51 +1168,12 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
                 reloadIndexPaths.removeAtIndex(idx)
             }
         }
-        
+        // 如果没有做任何操作, 终止
+        if insertIndexPaths.isEmpty && reloadIndexPaths.isEmpty && removeIndexPaths.isEmpty {
+            return
+        }
         // 更新UI
-        if animated {
-            // 获取当前显示的Cell
-            let visibleCells = tableView.visibleCells
-            let visibleRows = tableView.indexPathsForVisibleRows
-            let cellsL: [UITableViewCell] = removeIndexPathsL.flatMap {
-                guard let index = visibleRows?.indexOf($0) else {
-                    return nil
-                }
-                return visibleCells[index]
-            }
-            let cellsR: [UITableViewCell] = removeIndexPathsR.flatMap {
-                guard let index = visibleRows?.indexOf($0) else {
-                    return nil
-                }
-                return visibleCells[index]
-            }
-            // 下一点
-            let next = { (_: Bool) in
-                // 必须要隐藏, 否则系统动画会暴露
-                cellsL.forEach { $0.hidden = true }
-                cellsR.forEach { $0.hidden = true }
-                // 使用系统的更新
-                tableView.beginUpdates()
-                tableView.insertRowsAtIndexPaths(insertIndexPaths,  withRowAnimation: .Fade)
-                tableView.deleteRowsAtIndexPaths(removeIndexPathsL, withRowAnimation: .Top)
-                tableView.deleteRowsAtIndexPaths(removeIndexPathsR, withRowAnimation: .Top)
-                tableView.reloadRowsAtIndexPaths(reloadIndexPaths,  withRowAnimation: .Fade)
-                tableView.endUpdates()
-            }
-            if cellsL.isEmpty && cellsR.isEmpty {
-                SIMLog.debug("remove cells not visible!")
-                // 需要执行动画的cell不在显示区域
-                next(false)
-            } else {
-                // 自定义删除动画,
-                UIView.animateWithDuration(0.25,
-                    animations: {
-                        cellsL.forEach { $0.frame.origin = CGPointMake(-$0.frame.width, $0.frame.minY) }
-                        cellsR.forEach { $0.frame.origin = CGPointMake(+$0.frame.width, $0.frame.minY) }
-                    },
-                    completion: next)
-            }
-        } else {
+        guard animated else {
             // 关闭动画的删除
             UIView.performWithoutAnimation {
                 tableView.beginUpdates()
@@ -972,6 +1182,54 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
                 tableView.reloadRowsAtIndexPaths(reloadIndexPaths, withRowAnimation: .None)
                 tableView.endUpdates()
             }
+            return
+        }
+        // 获取当前显示的Cell
+        let visibleCells = tableView.visibleCells
+        let visibleRows = tableView.indexPathsForVisibleRows
+        let cellsL: [UITableViewCell] = removeIndexPathsL.flatMap {
+            guard let index = visibleRows?.indexOf($0) else {
+                return nil
+            }
+            return visibleCells[index]
+        }
+        let cellsR: [UITableViewCell] = removeIndexPathsR.flatMap {
+            guard let index = visibleRows?.indexOf($0) else {
+                return nil
+            }
+            return visibleCells[index]
+        }
+        let nextStep = { (_: Bool) in
+            // 必须要隐藏, 否则系统动画会暴露
+            cellsL.forEach { $0.hidden = true }
+            cellsR.forEach { $0.hidden = true }
+            // 使用系统的更新
+            tableView.beginUpdates()
+            tableView.insertRowsAtIndexPaths(insertIndexPaths,  withRowAnimation: .Fade)
+            tableView.deleteRowsAtIndexPaths(removeIndexPathsL, withRowAnimation: .Top)
+            tableView.deleteRowsAtIndexPaths(removeIndexPathsR, withRowAnimation: .Top)
+            tableView.reloadRowsAtIndexPaths(reloadIndexPaths,  withRowAnimation: .Fade)
+            tableView.endUpdates()
+        }
+        if cellsL.isEmpty && cellsR.isEmpty {
+            SIMLog.debug("remove cells not visible!")
+            // 需要执行动画的cell不在显示区域
+            nextStep(false)
+        } else {
+            // 自定义删除动画,
+            let enabled = tableView.scrollEnabled
+            tableView.scrollEnabled = false
+            UIView.animateWithDuration(0.25,
+                animations: {
+                    cellsL.forEach { $0.frame.origin = CGPointMake(-$0.frame.width, $0.frame.minY) }
+                    cellsR.forEach { $0.frame.origin = CGPointMake(+$0.frame.width, $0.frame.minY) }
+                },
+                completion: { b in
+                    if !tableView.scrollEnabled {
+                        tableView.scrollEnabled = enabled
+                    }
+                    nextStep(b)
+                })
         }
     }
     
