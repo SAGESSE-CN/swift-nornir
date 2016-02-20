@@ -128,8 +128,8 @@
 		0C0DD6A31C60B65D00AEC8C4 /* SIMChatExample */ = {
 			isa = PBXGroup;
 			children = (
-				0C7C938D1C76D2F700E7DC5C /* Resources */,
 				0CE522871C63341800EB284D /* AudioToolbox.framework */,
+				0C7C938D1C76D2F700E7DC5C /* Resources */,
 				0C6B41581C61DA7E00085B66 /* t1.jpg */,
 				0C0DD6A41C60B65D00AEC8C4 /* AppDelegate.swift */,
 				0C6B41541C61D6E300085B66 /* ExChatManager.swift */,
@@ -408,7 +408,6 @@
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = "Brand Assets";
 				CODE_SIGN_ENTITLEMENTS = SIMChatExample/SIMChatExample.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
 				INFOPLIST_FILE = SIMChatExample/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
@@ -427,7 +426,6 @@
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = "Brand Assets";
 				CODE_SIGN_ENTITLEMENTS = SIMChatExample/SIMChatExample.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
 				INFOPLIST_FILE = SIMChatExample/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
