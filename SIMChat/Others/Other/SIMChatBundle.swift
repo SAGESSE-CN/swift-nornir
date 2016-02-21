@@ -13,7 +13,7 @@ public class SIMChatBundle {
     private init() {
         let mb = NSBundle(identifier: "SA.SIMChat.Framework") ?? NSBundle.mainBundle()
         guard let path = mb.pathForResource("SIMChat", ofType: "bundle") else {
-            fatalError("\"SIMChat.bundle\" no found, must add \"SIMChat.bundle\" file to your project!")
+            fatalError("\"SIMChat.bundle\" no found, must add \"SIMChat.bundle\" to your project!")
         }
         guard let bundle = NSBundle(path: path) else {
             fatalError("\"SIMChat.bundle\" invalid")

@@ -34,7 +34,7 @@ public class SIMChatFileProvider {
                     }
                 }
             case "chat-audio":
-                dispatch_after_at_now(1, dispatch_get_main_queue()) {
+                dispatch_after_at_now(0.5, dispatch_get_main_queue()) {
                     op.success("test")
                 }
             default:

@@ -16,7 +16,12 @@ class ExChatConversation: SIMChatBaseConversation {
     
     /// 所有消息都己经加载
     override var allMessagesIsLoaded: Bool {
-        return messages.count > 200
+        return messages.count > 2000
+    }
+    
+    override func sendMessage(message: SIMChatMessageProtocol, isResend: Bool) -> SIMChatRequest<SIMChatMessageProtocol> {
+        message.status = .Sending
+        return super.sendMessage(message, isResend: isResend)
     }
 
     override func loadHistoryMessages(last: SIMChatMessageProtocol?, count: Int) -> SIMChatRequest<Array<SIMChatMessageProtocol>> {
@@ -229,6 +234,15 @@ class ExChatConversation: SIMChatBaseConversation {
                 rs.append(m)
             }
         }
+        
+        let c = SIMChatBaseMessageAudioContent(remote: path, duration: 88)
+        let m = SIMChatBaseMessage.messageWithContent(c, receiver: receiver, sender: sender)
+        m.option = [.ContactShow]
+        m.isSelf = true//(r % 2 == 0)
+        m.status = .Unread //status
+        m.date = NSDate(timeIntervalSinceNow: i + 2)
+        rs.append(m)
+        
         return rs
     }
 }

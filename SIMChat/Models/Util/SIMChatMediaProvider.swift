@@ -15,6 +15,9 @@ public class SIMChatMediaProvider {
         self.fileProvider = fileProvider
     }
     
+    public func playWithContent(content: SIMChatMessageContentProtocol) {
+    }
+    
     public func playWithMessage(message: SIMChatMessageProtocol) {
         let center = SIMChatNotificationCenter.self
         // 如果是音频
@@ -32,7 +35,7 @@ public class SIMChatMediaProvider {
                     SIMLog.debug(r.value)
                     center.postNotificationName(SIMChatAudioManagerWillPlayNotification, object: message)
                     
-                    dispatch_after_at_now(1, dispatch_get_main_queue()) {
+                    dispatch_after_at_now(0.5, dispatch_get_main_queue()) {
                         center.postNotificationName(SIMChatAudioManagerDidPlayNotification, object: message)
                         dispatch_after_at_now(4, dispatch_get_main_queue()) {
                             center.postNotificationName(SIMChatAudioManagerWillStopNotification, object: message)
