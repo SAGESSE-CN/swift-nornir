@@ -20,6 +20,20 @@
                ReferencedContainer = "container:SIMChat.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "NO"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "0C48A8AB1C795C7B00571BF5"
+               BuildableName = "SIMChatTests.xctest"
+               BlueprintName = "SIMChatTests"
+               ReferencedContainer = "container:SIMChat.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
@@ -28,7 +42,26 @@
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "0C48A8AB1C795C7B00571BF5"
+               BuildableName = "SIMChatTests.xctest"
+               BlueprintName = "SIMChatTests"
+               ReferencedContainer = "container:SIMChat.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "0C0DD5A31C60B28E00AEC8C4"
+            BuildableName = "SIMChat.framework"
+            BlueprintName = "SIMChat"
+            ReferencedContainer = "container:SIMChat.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
       <AdditionalOptions>
       </AdditionalOptions>
    </TestAction>

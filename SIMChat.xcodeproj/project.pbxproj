@@ -96,6 +96,10 @@
 		0C0DD6971C60B4F000AEC8C4 /* SIMChat.h in Headers */ = {isa = PBXBuildFile; fileRef = 0C0DD61D1C60B4A900AEC8C4 /* SIMChat.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		0C2992B51C6B3989006697DC /* SIMChatBaseEmoticon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C2992B41C6B3989006697DC /* SIMChatBaseEmoticon.swift */; };
 		0C4404841C61E4D800C18004 /* SIMChatInputPanelProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C4404831C61E4D800C18004 /* SIMChatInputPanelProtocol.swift */; };
+		0C48A8971C78C21D00571BF5 /* SIMChatUpdatesTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C48A8961C78C21D00571BF5 /* SIMChatUpdatesTransaction.swift */; };
+		0C48A8AF1C795C7B00571BF5 /* SIMChatTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C48A8AE1C795C7B00571BF5 /* SIMChatTests.swift */; };
+		0C48A8B11C795C7B00571BF5 /* SIMChat.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0C0DD5A41C60B28E00AEC8C4 /* SIMChat.framework */; };
+		0C48A8BB1C79A50000571BF5 /* SIMChatUpdatesTransactionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C48A8BA1C79A50000571BF5 /* SIMChatUpdatesTransactionTests.swift */; };
 		0C4EF8F31C6B5E1200CA192D /* SIMChatBaseEmoticonGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C4EF8F21C6B5E1200CA192D /* SIMChatBaseEmoticonGroup.swift */; };
 		0C4EF8F51C6B68A800CA192D /* SIMChatEmoticonProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C4EF8F41C6B68A800CA192D /* SIMChatEmoticonProtocol.swift */; };
 		0C4EF8F71C6B68B400CA192D /* SIMChatEmoticonGroupProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C4EF8F61C6B68B400CA192D /* SIMChatEmoticonGroupProtocol.swift */; };
@@ -105,6 +109,16 @@
 		0C8BF7BE1C6783F70060684D /* SIMHelper+Force.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C8BF7BD1C6783F70060684D /* SIMHelper+Force.swift */; };
 		0C8BF7C01C6796360060684D /* UITextView+InsertAttributeString.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C8BF7BF1C6796360060684D /* UITextView+InsertAttributeString.swift */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		0C48A8B21C795C7B00571BF5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0C0DD59B1C60B28E00AEC8C4 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 0C0DD5A31C60B28E00AEC8C4;
+			remoteInfo = SIMChat;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		0C0DD5A41C60B28E00AEC8C4 /* SIMChat.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SIMChat.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -198,6 +212,11 @@
 		0C0DD6361C60B4A900AEC8C4 /* SIMChatVisitCardView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SIMChatVisitCardView.swift; sourceTree = "<group>"; };
 		0C2992B41C6B3989006697DC /* SIMChatBaseEmoticon.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SIMChatBaseEmoticon.swift; sourceTree = "<group>"; };
 		0C4404831C61E4D800C18004 /* SIMChatInputPanelProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SIMChatInputPanelProtocol.swift; path = ../../Views/Input/SIMChatInputPanelProtocol.swift; sourceTree = "<group>"; };
+		0C48A8961C78C21D00571BF5 /* SIMChatUpdatesTransaction.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SIMChatUpdatesTransaction.swift; sourceTree = "<group>"; };
+		0C48A8AC1C795C7B00571BF5 /* SIMChatTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SIMChatTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		0C48A8AE1C795C7B00571BF5 /* SIMChatTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SIMChatTests.swift; sourceTree = "<group>"; };
+		0C48A8B01C795C7B00571BF5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		0C48A8BA1C79A50000571BF5 /* SIMChatUpdatesTransactionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SIMChatUpdatesTransactionTests.swift; sourceTree = "<group>"; };
 		0C4EF8F21C6B5E1200CA192D /* SIMChatBaseEmoticonGroup.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SIMChatBaseEmoticonGroup.swift; sourceTree = "<group>"; };
 		0C4EF8F41C6B68A800CA192D /* SIMChatEmoticonProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SIMChatEmoticonProtocol.swift; sourceTree = "<group>"; };
 		0C4EF8F61C6B68B400CA192D /* SIMChatEmoticonGroupProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SIMChatEmoticonGroupProtocol.swift; sourceTree = "<group>"; };
@@ -216,6 +235,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		0C48A8A91C795C7B00571BF5 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0C48A8B11C795C7B00571BF5 /* SIMChat.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -223,6 +250,7 @@
 			isa = PBXGroup;
 			children = (
 				0C0DD5A61C60B28E00AEC8C4 /* SIMChat */,
+				0C48A8AD1C795C7B00571BF5 /* SIMChatTests */,
 				0C0DD5A51C60B28E00AEC8C4 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -231,6 +259,7 @@
 			isa = PBXGroup;
 			children = (
 				0C0DD5A41C60B28E00AEC8C4 /* SIMChat.framework */,
+				0C48A8AC1C795C7B00571BF5 /* SIMChatTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -358,6 +387,7 @@
 				0C0DD5F21C60B4A900AEC8C4 /* UITableView+HeightCache.swift */,
 				0C0DD5F31C60B4A900AEC8C4 /* UIViewController+Transition.swift */,
 				0C8BF7BF1C6796360060684D /* UITextView+InsertAttributeString.swift */,
+				0C48A8961C78C21D00571BF5 /* SIMChatUpdatesTransaction.swift */,
 			);
 			path = Ex;
 			sourceTree = "<group>";
@@ -500,6 +530,16 @@
 			path = Other;
 			sourceTree = "<group>";
 		};
+		0C48A8AD1C795C7B00571BF5 /* SIMChatTests */ = {
+			isa = PBXGroup;
+			children = (
+				0C48A8AE1C795C7B00571BF5 /* SIMChatTests.swift */,
+				0C48A8BA1C79A50000571BF5 /* SIMChatUpdatesTransactionTests.swift */,
+				0C48A8B01C795C7B00571BF5 /* Info.plist */,
+			);
+			path = SIMChatTests;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -532,18 +572,40 @@
 			productReference = 0C0DD5A41C60B28E00AEC8C4 /* SIMChat.framework */;
 			productType = "com.apple.product-type.framework";
 		};
+		0C48A8AB1C795C7B00571BF5 /* SIMChatTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 0C48A8B41C795C7B00571BF5 /* Build configuration list for PBXNativeTarget "SIMChatTests" */;
+			buildPhases = (
+				0C48A8A81C795C7B00571BF5 /* Sources */,
+				0C48A8A91C795C7B00571BF5 /* Frameworks */,
+				0C48A8AA1C795C7B00571BF5 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				0C48A8B31C795C7B00571BF5 /* PBXTargetDependency */,
+			);
+			name = SIMChatTests;
+			productName = SIMChatTests;
+			productReference = 0C48A8AC1C795C7B00571BF5 /* SIMChatTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
 		0C0DD59B1C60B28E00AEC8C4 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				LastSwiftUpdateCheck = 0720;
 				LastUpgradeCheck = 0720;
 				ORGANIZATIONNAME = sagesse;
 				TargetAttributes = {
 					0C0DD5A31C60B28E00AEC8C4 = {
 						CreatedOnToolsVersion = 7.2;
 						DevelopmentTeam = FN2B5W3WWQ;
+					};
+					0C48A8AB1C795C7B00571BF5 = {
+						CreatedOnToolsVersion = 7.2;
 					};
 				};
 			};
@@ -560,6 +622,7 @@
 			projectRoot = "";
 			targets = (
 				0C0DD5A31C60B28E00AEC8C4 /* SIMChat */,
+				0C48A8AB1C795C7B00571BF5 /* SIMChatTests */,
 			);
 		};
 /* End PBXProject section */
@@ -578,6 +641,13 @@
 				0C0DD6741C60B4A900AEC8C4 /* photo_picker_mark_deselect@2x.png in Resources */,
 				0C0DD6791C60B4A900AEC8C4 /* photo_picker_mark_select_sm@2x.png in Resources */,
 				0C0DD6721C60B4A900AEC8C4 /* photo_picker_icon_phone@2x.png in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		0C48A8AA1C795C7B00571BF5 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -627,6 +697,7 @@
 				0C0DD6871C60B4A900AEC8C4 /* SIMChatInputBar.swift in Sources */,
 				0C0DD65D1C60B4A900AEC8C4 /* UIGestureRecognizerDelegate+Forward.swift in Sources */,
 				0C4EF8F51C6B68A800CA192D /* SIMChatEmoticonProtocol.swift in Sources */,
+				0C48A8971C78C21D00571BF5 /* SIMChatUpdatesTransaction.swift in Sources */,
 				0C4EF8F31C6B5E1200CA192D /* SIMChatBaseEmoticonGroup.swift in Sources */,
 				0C0DD66F1C60B4A900AEC8C4 /* SIMChatPhotoAlbum.swift in Sources */,
 				0C0DD63F1C60B4A900AEC8C4 /* SIMChatBaseMessageTipsCell.swift in Sources */,
@@ -678,7 +749,24 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		0C48A8A81C795C7B00571BF5 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0C48A8AF1C795C7B00571BF5 /* SIMChatTests.swift in Sources */,
+				0C48A8BB1C79A50000571BF5 /* SIMChatUpdatesTransactionTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		0C48A8B31C795C7B00571BF5 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 0C0DD5A31C60B28E00AEC8C4 /* SIMChat */;
+			targetProxy = 0C48A8B21C795C7B00571BF5 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		0C0DD5AA1C60B28E00AEC8C4 /* Debug */ = {
@@ -810,6 +898,26 @@
 			};
 			name = Release;
 		};
+		0C48A8B51C795C7B00571BF5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				INFOPLIST_FILE = SIMChatTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = SA.SIMChatTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		0C48A8B61C795C7B00571BF5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				INFOPLIST_FILE = SIMChatTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = SA.SIMChatTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -830,6 +938,14 @@
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
+		};
+		0C48A8B41C795C7B00571BF5 /* Build configuration list for PBXNativeTarget "SIMChatTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0C48A8B51C795C7B00571BF5 /* Debug */,
+				0C48A8B61C795C7B00571BF5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
 		};
 /* End XCConfigurationList section */
 	};

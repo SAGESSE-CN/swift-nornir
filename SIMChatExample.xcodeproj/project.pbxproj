@@ -12,6 +12,7 @@
 		0C0DD6AA1C60B65D00AEC8C4 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0C0DD6A81C60B65D00AEC8C4 /* Main.storyboard */; };
 		0C0DD6AC1C60B65D00AEC8C4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0C0DD6AB1C60B65D00AEC8C4 /* Assets.xcassets */; };
 		0C0DD6AF1C60B65D00AEC8C4 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0C0DD6AD1C60B65D00AEC8C4 /* LaunchScreen.storyboard */; };
+		0C48A89F1C79566B00571BF5 /* SIMChatExampleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C48A89E1C79566B00571BF5 /* SIMChatExampleTests.swift */; };
 		0C6B414D1C60B7A600085B66 /* SIMChat.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0C0DD6BB1C60B6BE00AEC8C4 /* SIMChat.framework */; };
 		0C6B414E1C60B7A600085B66 /* SIMChat.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 0C0DD6BB1C60B6BE00AEC8C4 /* SIMChat.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		0C6B41531C61D68100085B66 /* ExChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C6B41521C61D68100085B66 /* ExChatViewController.swift */; };
@@ -45,6 +46,20 @@
 			remoteGlobalIDString = 0C0DD5A31C60B28E00AEC8C4;
 			remoteInfo = SIMChat;
 		};
+		0C48A8A11C79566B00571BF5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0C0DD6991C60B65D00AEC8C4 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 0C0DD6A01C60B65D00AEC8C4;
+			remoteInfo = SIMChatExample;
+		};
+		0C48A8B81C795C9900571BF5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0C0DD6B61C60B6BE00AEC8C4 /* SIMChat.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 0C48A8AC1C795C7B00571BF5;
+			remoteInfo = SIMChatTests;
+		};
 		0C6B414F1C60B7A600085B66 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 0C0DD6B61C60B6BE00AEC8C4 /* SIMChat.xcodeproj */;
@@ -77,6 +92,9 @@
 		0C0DD6AE1C60B65D00AEC8C4 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		0C0DD6B01C60B65D00AEC8C4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		0C0DD6B61C60B6BE00AEC8C4 /* SIMChat.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = SIMChat.xcodeproj; sourceTree = "<group>"; };
+		0C48A89C1C79566B00571BF5 /* SIMChatExampleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SIMChatExampleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		0C48A89E1C79566B00571BF5 /* SIMChatExampleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SIMChatExampleTests.swift; sourceTree = "<group>"; };
+		0C48A8A01C79566B00571BF5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		0C6B41521C61D68100085B66 /* ExChatViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExChatViewController.swift; sourceTree = "<group>"; };
 		0C6B41541C61D6E300085B66 /* ExChatManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExChatManager.swift; sourceTree = "<group>"; };
 		0C6B41561C61D74A00085B66 /* ExChatConversation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExChatConversation.swift; sourceTree = "<group>"; };
@@ -105,6 +123,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		0C48A8991C79566B00571BF5 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -113,6 +138,7 @@
 			children = (
 				0C0DD6B61C60B6BE00AEC8C4 /* SIMChat.xcodeproj */,
 				0C0DD6A31C60B65D00AEC8C4 /* SIMChatExample */,
+				0C48A89D1C79566B00571BF5 /* SIMChatExampleTests */,
 				0C0DD6A21C60B65D00AEC8C4 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -121,6 +147,7 @@
 			isa = PBXGroup;
 			children = (
 				0C0DD6A11C60B65D00AEC8C4 /* SIMChatExample.app */,
+				0C48A89C1C79566B00571BF5 /* SIMChatExampleTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -151,8 +178,18 @@
 			isa = PBXGroup;
 			children = (
 				0C0DD6BB1C60B6BE00AEC8C4 /* SIMChat.framework */,
+				0C48A8B91C795C9900571BF5 /* SIMChatTests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		0C48A89D1C79566B00571BF5 /* SIMChatExampleTests */ = {
+			isa = PBXGroup;
+			children = (
+				0C48A89E1C79566B00571BF5 /* SIMChatExampleTests.swift */,
+				0C48A8A01C79566B00571BF5 /* Info.plist */,
+			);
+			path = SIMChatExampleTests;
 			sourceTree = "<group>";
 		};
 		0C7C938D1C76D2F700E7DC5C /* Resources */ = {
@@ -194,6 +231,24 @@
 			productReference = 0C0DD6A11C60B65D00AEC8C4 /* SIMChatExample.app */;
 			productType = "com.apple.product-type.application";
 		};
+		0C48A89B1C79566B00571BF5 /* SIMChatExampleTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 0C48A8A31C79566B00571BF5 /* Build configuration list for PBXNativeTarget "SIMChatExampleTests" */;
+			buildPhases = (
+				0C48A8981C79566B00571BF5 /* Sources */,
+				0C48A8991C79566B00571BF5 /* Frameworks */,
+				0C48A89A1C79566B00571BF5 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				0C48A8A21C79566B00571BF5 /* PBXTargetDependency */,
+			);
+			name = SIMChatExampleTests;
+			productName = SIMChatExampleTests;
+			productReference = 0C48A89C1C79566B00571BF5 /* SIMChatExampleTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -215,6 +270,10 @@
 								enabled = 1;
 							};
 						};
+					};
+					0C48A89B1C79566B00571BF5 = {
+						CreatedOnToolsVersion = 7.2;
+						TestTargetID = 0C0DD6A01C60B65D00AEC8C4;
 					};
 				};
 			};
@@ -238,6 +297,7 @@
 			projectRoot = "";
 			targets = (
 				0C0DD6A01C60B65D00AEC8C4 /* SIMChatExample */,
+				0C48A89B1C79566B00571BF5 /* SIMChatExampleTests */,
 			);
 		};
 /* End PBXProject section */
@@ -248,6 +308,13 @@
 			fileType = wrapper.framework;
 			path = SIMChat.framework;
 			remoteRef = 0C0DD6BA1C60B6BE00AEC8C4 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		0C48A8B91C795C9900571BF5 /* SIMChatTests.xctest */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = SIMChatTests.xctest;
+			remoteRef = 0C48A8B81C795C9900571BF5 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */
@@ -273,6 +340,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		0C48A89A1C79566B00571BF5 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -288,6 +362,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		0C48A8981C79566B00571BF5 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0C48A89F1C79566B00571BF5 /* SIMChatExampleTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -295,6 +377,11 @@
 			isa = PBXTargetDependency;
 			name = SIMChat;
 			targetProxy = 0C0DD6BC1C60B6CB00AEC8C4 /* PBXContainerItemProxy */;
+		};
+		0C48A8A21C79566B00571BF5 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 0C0DD6A01C60B65D00AEC8C4 /* SIMChatExample */;
+			targetProxy = 0C48A8A11C79566B00571BF5 /* PBXContainerItemProxy */;
 		};
 		0C6B41501C60B7A600085B66 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -440,6 +527,30 @@
 			};
 			name = Release;
 		};
+		0C48A8A41C79566B00571BF5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				INFOPLIST_FILE = SIMChatExampleTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = SA.SIMChatExampleTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SIMChatExample.app/SIMChatExample";
+			};
+			name = Debug;
+		};
+		0C48A8A51C79566B00571BF5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				INFOPLIST_FILE = SIMChatExampleTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = SA.SIMChatExampleTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SIMChatExample.app/SIMChatExample";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -460,6 +571,14 @@
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
+		};
+		0C48A8A31C79566B00571BF5 /* Build configuration list for PBXNativeTarget "SIMChatExampleTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0C48A8A41C79566B00571BF5 /* Debug */,
+				0C48A8A51C79566B00571BF5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
 		};
 /* End XCConfigurationList section */
 	};

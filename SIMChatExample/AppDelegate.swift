@@ -117,7 +117,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         srand(UInt32(time(nil)))
-//        
+        
+//
 //        let ems: [SIMChatBaseEmoticon]? = (NSArray(contentsOfFile: "/Users/sagesse/Desktop/emoji.plist") as? Array<NSDictionary>)?.flatMap{
 //            let em = SIMChatBaseEmoticon()
 //            em.setValuesForKeysWithDictionary($0 as! [String : AnyObject])
