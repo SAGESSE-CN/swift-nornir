@@ -764,19 +764,18 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
         guard let tableView = self.contentView where !ms.isEmpty else {
             return
         }
+        // 计算插入点
+        let count = _allMessages.count
+        let position = min(max(index >= 0 ? index : index + count, 0), count)
+        var newMessages = Array<SIMChatMessageProtocol>()
         // 查找需要执行操作的单元格并转换为组
         let indexs = _indexsOfMessages(ms)
-        let indexGroups = indexs.sort().splitInGroup {
+        let indexGroups = indexs.filter({$0 != position}).sort().splitInGroup {
             $0 + 1 == $1
         }
         guard !indexGroups.isEmpty else {
             return
         }
-        // 计算插入点
-        let count = _allMessages.count
-        let position = min(max(index >= 0 ? index : index + count, 0), count)
-        var newMessages = Array<SIMChatMessageProtocol>()
-        
         // 辅助函数
         let animation = { (m: SIMChatMessageProtocol) -> UITableViewRowAnimation in
             // 如果是timeline, 取决于他关联的是什么

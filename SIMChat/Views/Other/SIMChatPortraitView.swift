@@ -29,6 +29,8 @@ class SIMChatPortraitView: SIMView {
         
         // add views
         addSubview(contentView)
+        
+        setNeedsLayout()
     }
     
     override func layoutSubviews() {
@@ -58,7 +60,7 @@ class SIMChatPortraitView: SIMView {
     
     private(set) lazy var contentView: UIImageView = {
         let view = UIImageView()
-        view.clipsToBounds = false
+        view.clipsToBounds = true
         return view
     }()
 }
