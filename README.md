@@ -6,6 +6,8 @@
 [![License](http://img.shields.io/badge/license-MIT-lightgrey.svg?style=flat
 		)](http://mit-license.org)
 
+![Screen](https://github.com/sagesse-cn/swift-chat/blob/master/Design/Screen%20Snapshoot.gif)
+
 该库目前只是纯UI库, 后面将会添加第三方的聊天服务(例如:融云,百川,腾讯云)使用示例, 再后面将会实现网络部分(swift/xmpp)
 
 因为我没有iOS7的设备, 加上Framework不支持iOS7, 所以该库不直接支持iOS7.
