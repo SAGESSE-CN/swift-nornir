@@ -50,7 +50,7 @@ class SIMChatUpdatesTransactionTests: XCTestCase {
     func testUpdatesTransactionOfInsert() {
         updatesTransaction.datas = ["t1","t2","t3","t4"]
         updatesTransaction.view.reloadData()
-        SIMLog.debug("BEGIN: \(updatesTransaction.datas)")
+        SIMLog.debug("B: \(updatesTransaction.datas)")
         SIMChatUpdatesTransactionPerform(updatesTransaction.view, &updatesTransaction.datas, true) {
             $0.insert("o1", atIndex: 0)
             $0.insert("o2", atIndex: 0)
@@ -61,7 +61,7 @@ class SIMChatUpdatesTransactionTests: XCTestCase {
             $0.insert("o6", atIndex: 4)
             $0.insert("o7", atIndex: 4)
         }
-        SIMLog.debug("END: \(updatesTransaction.datas)")
+        SIMLog.debug("E: \(updatesTransaction.datas)")
         XCTAssertEqual(updatesTransaction.datas, [
             "o1","o2","t1",
             "o3","o2","t2",
@@ -72,14 +72,14 @@ class SIMChatUpdatesTransactionTests: XCTestCase {
     // 删除测试
     func testUpdatesTransactionOfRemove() {
         updatesTransaction.resetData()
-        SIMLog.debug("BEGIN: \(updatesTransaction.datas)")
+        SIMLog.debug("B: \(updatesTransaction.datas)")
         SIMChatUpdatesTransactionPerform(updatesTransaction.view, &updatesTransaction.datas, true) {
             $0.removeAtIndex(0)
             $0.removeAtIndex(2)
             $0.removeAtIndex(4)
             $0.removeAtIndex(6)
         }
-        SIMLog.debug("END: \(updatesTransaction.datas)")
+        SIMLog.debug("E: \(updatesTransaction.datas)")
         XCTAssertEqual(updatesTransaction.datas, [
             "t2","t4","t6"
             ])
@@ -87,14 +87,14 @@ class SIMChatUpdatesTransactionTests: XCTestCase {
     // 移动测试
     func testUpdatesTransactionOfUpdate() {
         updatesTransaction.resetData()
-        SIMLog.debug("BEGIN: \(updatesTransaction.datas)")
+        SIMLog.debug("B: \(updatesTransaction.datas)")
         SIMChatUpdatesTransactionPerform(updatesTransaction.view, &updatesTransaction.datas, true) {
             $0.reloadAtIndex(0)
             $0.reloadAtIndex(2)
             $0.reloadAtIndex(4)
             $0.reloadAtIndex(6)
         }
-        SIMLog.debug("END: \(updatesTransaction.datas)")
+        SIMLog.debug("E: \(updatesTransaction.datas)")
         XCTAssertEqual(updatesTransaction.datas, [
             "t1","t2","t3","t4","t5","t6","t7"
             ])
@@ -106,13 +106,13 @@ class SIMChatUpdatesTransactionTests: XCTestCase {
             updatesTransaction.resetData()
             var v = updatesTransaction.datas
             v.insert(v.removeAtIndex(x.0), atIndex: x.1)
-            SIMLog.debug("BEGIN: \(updatesTransaction.datas)")
+            SIMLog.debug("B: \(updatesTransaction.datas)")
             SIMChatUpdatesTransactionPerform(updatesTransaction.view, &updatesTransaction.datas, true) {
                 $0.moveFromIndex(x.0, toIndex: x.1)
             }
-            SIMLog.debug("END: \(updatesTransaction.datas)")
-            SIMLog.debug("   : \(v)")
-            SIMLog.debug("   : \(x)")
+            SIMLog.debug("E: \(updatesTransaction.datas)")
+            SIMLog.debug("R: \(v)")
+            SIMLog.debug("O: \(x)")
             XCTAssertEqual(updatesTransaction.datas, v)
         }
         // 多个测试
@@ -127,13 +127,13 @@ class SIMChatUpdatesTransactionTests: XCTestCase {
                 }
                 v.insert(d, atIndex: $0.1)
             }
-            SIMLog.debug("BEGIN: \(updatesTransaction.datas)")
+            SIMLog.debug("B: \(updatesTransaction.datas)")
             SIMChatUpdatesTransactionPerform(updatesTransaction.view, &updatesTransaction.datas, true) { maker in
                 x.forEach { maker.moveFromIndex($0.0, toIndex: $0.1) }
             }
-            SIMLog.debug("END: \(updatesTransaction.datas)")
-            SIMLog.debug("   : \(v)")
-            SIMLog.debug("   : \(x)")
+            SIMLog.debug("E: \(updatesTransaction.datas)")
+            SIMLog.debug("R: \(v)")
+            SIMLog.debug("O: \(x)")
             
             //"t1","t2","t3","t4","t5","t6","t7"
             XCTAssertEqual(updatesTransaction.datas, v)
@@ -142,7 +142,7 @@ class SIMChatUpdatesTransactionTests: XCTestCase {
     // 综合测试: 插入和删除
     func testUpdatesTransactionOfInsertAndRemove() {
         updatesTransaction.resetData()
-        SIMLog.debug("BEGIN: \(updatesTransaction.datas)")
+        SIMLog.debug("B: \(updatesTransaction.datas)")
         SIMChatUpdatesTransactionPerform(updatesTransaction.view, &updatesTransaction.datas, true) {
             $0.insert("o1", atIndex: 0)
             $0.insert("o2", atIndex: 0)
@@ -156,7 +156,7 @@ class SIMChatUpdatesTransactionTests: XCTestCase {
             $0.removeAtIndex(4)
             $0.removeAtIndex(6)
         }
-        SIMLog.debug("END: \(updatesTransaction.datas)")
+        SIMLog.debug("E: \(updatesTransaction.datas)")
         XCTAssertEqual(updatesTransaction.datas, [
             // insert
             //"o1","o2","t1","t2","t3","t4","o3","o4","t5","t6","o5","o6","t7","o7","o8"
@@ -168,7 +168,7 @@ class SIMChatUpdatesTransactionTests: XCTestCase {
     // 综合测试: 插入和移动
     func testUpdatesTransactionOfInserAndMove() {
         updatesTransaction.resetData()
-        SIMLog.debug("BEGIN: \(updatesTransaction.datas)")
+        SIMLog.debug("B: \(updatesTransaction.datas)")
         SIMChatUpdatesTransactionPerform(updatesTransaction.view, &updatesTransaction.datas, true) {
             $0.insert("o1", atIndex: 0)
             $0.insert("o2", atIndex: 4)
@@ -176,7 +176,7 @@ class SIMChatUpdatesTransactionTests: XCTestCase {
             $0.insert("o4", atIndex: 7)
             $0.moveFromIndex(0, toIndex: 4)
         }
-        SIMLog.debug("END: \(updatesTransaction.datas)")
+        SIMLog.debug("E: \(updatesTransaction.datas)")
         XCTAssertEqual(updatesTransaction.datas, [
             // insert
             //"o1","t1","t2","t3","t4","o2","t5","t6","o3","t7","o4"
@@ -185,14 +185,14 @@ class SIMChatUpdatesTransactionTests: XCTestCase {
             ])
         
         updatesTransaction.resetData()
-        SIMLog.debug("BEGIN: \(updatesTransaction.datas)")
+        SIMLog.debug("B: \(updatesTransaction.datas)")
         SIMChatUpdatesTransactionPerform(updatesTransaction.view, &updatesTransaction.datas, true) {
             $0.insert("--", atIndex: 7)
             $0.moveFromIndex(0, toIndex: 6)
             $0.insert("--", atIndex: 7)
             $0.moveFromIndex(1, toIndex: 6)
         }
-        SIMLog.debug("END: \(updatesTransaction.datas)")
+        SIMLog.debug("E: \(updatesTransaction.datas)")
         XCTAssertEqual(updatesTransaction.datas, [
             "t3","t4","t5","t6","t7","--","t1","--","t2"
             ])
@@ -200,12 +200,12 @@ class SIMChatUpdatesTransactionTests: XCTestCase {
     // 删除和移动
     func testUpdatesTransactionOfRemoveAndMove() {
         updatesTransaction.resetData()
-        SIMLog.debug("BEGIN: \(updatesTransaction.datas)")
+        SIMLog.debug("B: \(updatesTransaction.datas)")
         SIMChatUpdatesTransactionPerform(updatesTransaction.view, &updatesTransaction.datas, true) {
             $0.removeAtIndex(6)
             $0.moveFromIndex(0, toIndex: 6)
         }
-        SIMLog.debug("END: \(updatesTransaction.datas)")
+        SIMLog.debug("E: \(updatesTransaction.datas)")
         XCTAssertEqual(updatesTransaction.datas, [
             "t2","t3","t4","t5","t6","t1"
             ])
@@ -213,7 +213,7 @@ class SIMChatUpdatesTransactionTests: XCTestCase {
     // 综合测试: 插入和删除和移动
     func testUpdatesTransactionOfAll() {
         updatesTransaction.resetData()
-        SIMLog.debug("BEGIN: \(updatesTransaction.datas)")
+        SIMLog.debug("B: \(updatesTransaction.datas)")
         SIMChatUpdatesTransactionPerform(updatesTransaction.view, &updatesTransaction.datas, true) {
             $0.removeAtIndex(6)
             $0.insert("--", atIndex: 7)
@@ -221,7 +221,7 @@ class SIMChatUpdatesTransactionTests: XCTestCase {
             $0.insert("--", atIndex: 7)
             $0.moveFromIndex(1, toIndex: 6)
         }
-        SIMLog.debug("END: \(updatesTransaction.datas)")
+        SIMLog.debug("E: \(updatesTransaction.datas)")
         XCTAssertEqual(updatesTransaction.datas, [
             "t3","t4","t5","t6","--","t1","--","t2"
             ])

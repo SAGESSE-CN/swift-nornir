@@ -34,6 +34,8 @@ public class SIMChatBaseMessageAudioContent: SIMChatMessageContentProtocol {
     
     public var played: Bool = false
     public var playing: Bool = false
+    //public var downloaded: Bool = false
+    public var downloading: Bool = false
     
     /// 音频在本地的路径, 只有在需要上传的时候这个值才会存在
     public let local: NSURL?

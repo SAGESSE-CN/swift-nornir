@@ -85,7 +85,7 @@ public class SIMChatUpdatesTransaction<Element> {
                 _inserts[k]?[$0] = (.element(datas[idx]), $1.1)
             }
         }
-        _moves.forEach { log("move element from index: \($0), to index: \($1.0)") }
+        //_moves.forEach { log("move element from index: \($0), to index: \($1.0)") }
         
         var indexs = Set<Int>()
         var modifier = 0
@@ -113,7 +113,7 @@ public class SIMChatUpdatesTransaction<Element> {
                         insertIndexPaths[$1] = []
                     }
                     modifier++
-                    log("insert element at index: \(position), at row: \(indexPath.row)")
+                    //log("insert element at index: \(position), at row: \(indexPath.row)")
                     datas.insert(data, atIndex: position)
                     insertIndexPaths[$1]?.append(indexPath)
                 }
@@ -126,17 +126,17 @@ public class SIMChatUpdatesTransaction<Element> {
                     removeIndexPaths[op] = []
                 }
                 modifier--
-                log("remove element at index: \(position), at row: \(indexPath.row)")
+                //log("remove element at index: \(position), at row: \(indexPath.row)")
                 datas.removeAtIndex(position)
                 removeIndexPaths[op]?.append(indexPath)
             } else if let op = _reloads[index] {
-                let position = index + modifier
+                //let position = index + modifier
                 let indexPath = NSIndexPath(forRow: index, inSection: 0)
                 // 刷新
                 if reloadIndexPaths[op] == nil {
                     reloadIndexPaths[op] = []
                 }
-                log("reload element at index: \(position), at row: \(indexPath.row)")
+                //log("reload element at index: \(position), at row: \(indexPath.row)")
                 reloadIndexPaths[op]?.append(indexPath)
             }
             //log("-- END: \(datas)")

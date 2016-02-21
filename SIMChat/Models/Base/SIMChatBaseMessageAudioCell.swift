@@ -108,22 +108,27 @@ public class SIMChatBaseMessageAudioCell: SIMChatBaseMessageBubbleCell {
         
             // 播放中.
             if content.playing {
-                animationView.startAnimating()
+                if !animationView.isAnimating() {
+                    animationView.startAnimating()
+                }
             } else {
-                animationView.stopAnimating()
+                if animationView.isAnimating() {
+                    animationView.stopAnimating()
+                }
             }
-            
             // 有改变
             guard message !== oldValue else {
                 return
             }
-            titleLabel.text = { duration in
-                if duration < 60 {
-                    return String(format: "%d''", Int(duration % 60))
-                }
-                return String(format: "%d'%02d''", Int(duration / 60), Int(duration % 60))
-            }(content.duration)
+            titleLabel.text = _formatAudioDuration(content.duration)
         }
+    }
+    
+    @inline(__always) private func _formatAudioDuration(duration: NSTimeInterval) -> String {
+        if duration < 60 {
+            return String(format: "%d''", Int(duration % 60))
+        }
+        return String(format: "%d'%02d''", Int(duration / 60), Int(duration % 60))
     }
     
     private let hPriority2 = UILayoutPriority(750)
@@ -140,75 +145,45 @@ extension SIMChatBaseMessageAudioCell {
     
     /// 音频开始播放
     internal func audioDidPlay(sender: NSNotification) {
-        guard sender.object === message else {
+        guard let message = message where sender.object === message.content else {
             return
         }
-        guard let content = message?.content as? SIMChatBaseMessageAudioContent else {
-            return
+        SIMLog.trace(message.identifier)
+        // 更新消息状态
+        conversation?.updateMessage(message, status: .Played)
+        // 更新UI
+        if !animationView.isAnimating() {
+            animationView.startAnimating()
         }
-        SIMLog.debug()
-        
-        content.playing = true
-        content.played = true
-        
-        //        // 只在是本消息的事件才处理
-        //        if content.url.storaged && *content.url === sender.object {
-        //            self.animationView.startAnimating()
-        //        }
-        
-        animationView.startAnimating()
     }
     /// 音频停止播放
     internal func audioDidStop(sender: NSNotification) {
-        SIMLog.trace()
-        // 不管是谁. 停了再说
-        if let ctx = message?.content as? SIMChatBaseMessageAudioContent {
-            ctx.playing = false
-        }
+        // 全部停止
         if animationView.isAnimating() {
             animationView.stopAnimating()
         }
+        guard let message = message where sender.object === message.content else {
+            return
+        }
+        SIMLog.trace(message.identifier)
     }
     /// 音频加载开始
     internal func audioWillLoad(sender: NSNotification) {
-        guard sender.object === message else {
+        guard let message = message where sender.object === message.content else {
             return
         }
-        SIMLog.debug()
-        
-        message?.status = .Receiving
+        SIMLog.trace(message.identifier)
+        // 更新状态
+        conversation?.updateMessage(message, status: .Receiving)
     }
     /// 音频加载完成
     internal func audioDidLoad(sender: NSNotification) {
-        guard sender.object === message else {
+        guard let message = message where sender.object === message else {
             return
         }
-        
-        SIMLog.debug()
-        
-        // 成功和失败
-        message?.status = .Received
-        // message?.status = .Error
-        
-        //        // 必须是音频
-        //        guard let ctx = self.message?.content as? SIMChatMessageContentAudio else {
-        //            return
-        //        }
-        //        // :)
-        //        if enabled && sender.object === message && ctx.url.storaged {
-        //            SIMLog.trace()
-        //            // 有没有加载成功?
-        //            // TODO: no changed
-        ////            if *(ctx.url) != nil {
-        ////                self.message?.status = .Received
-        ////            } else {
-        ////                self.message?.status = .Error
-        ////            }
-        //            // 通知状态修改
-        //            self.onMessageStateChanged(nil)
-        //            // 模拟一次点击
-        //            self.onBubblePress(sender)
-        //        }
+        SIMLog.trace(message.identifier)
+        // 更新状态
+        conversation?.updateMessage(message, status: .Received)
     }
 }
 

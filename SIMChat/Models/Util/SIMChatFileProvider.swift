@@ -18,14 +18,22 @@ public class SIMChatFileProvider {
         return false
     }
     
+    var c: UIImage?
+    
     func download(url: NSURL) -> SIMChatRequest<AnyObject> {
         return SIMChatRequest.request { op in
             switch url.scheme {
             case "chat-image":
+                if let image = self.c {
+                    op.success(image)
+                    return
+                }
                 let path = url.path!
                 dispatch_async(dispatch_get_global_queue(0, 0)) {
                     SIMLog.debug("download: \(path)")
                     if let image = UIImage(contentsOfFile: path) {
+                        // 缓存起来.
+                        self.c = image
                         dispatch_async(dispatch_get_main_queue()) {
                             op.success(image)
                         }

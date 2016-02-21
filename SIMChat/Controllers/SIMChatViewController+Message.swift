@@ -395,8 +395,8 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
     func cellEvent(cell: SIMChatMessageCellProtocol, didPressMessage message: SIMChatMessageProtocol) {
         SIMLog.debug(message.identifier)
         
-        if message.content is SIMChatBaseMessageAudioContent {
-            manager.mediaProvider.playWithMessage(message)
+        if manager.mediaProvider.isMedia(message.content) {
+            manager.mediaProvider.playMedia(message.content)
         }
     }
     
@@ -529,185 +529,12 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
         _appendMessages([message], animated: true)
     }
     
-    // MARK: Message Operator
-    
-    ///
-    /// 批量插入消息
-    ///
-    /// - parameter ms:       消息集合
-    /// - parameter index:    如果为index < 0, 插入点为count + index + 1
-    ///
-    private func _insertMessages(ms: Array<SIMChatMessageProtocol>, atIndex: Int, animated: Bool = true) {
-        guard let tableView = contentView where !ms.isEmpty else {
-            return
-        }
-        let newMessages = ms.filter { !$0.option.contains(.Hidden) }
-        guard !newMessages.isEmpty else {
-            return
-        }
-        
-        // 计算插入点
-        let count = _allMessages.count
-        let position = min(max(atIndex >= 0 ? atIndex : atIndex + count + 1, 0), count)
-        
-        SIMLog.trace("insert position: \(position) => \(count)")
-
-        // tip1: 如果cell插入到visibleCells之前, 会导致contentSize改变(contentOffset不变),
-        // tip2: 如果设置contentOffset会导致减速事件停止
-        // tip3: insertRowsAtIndexPaths的动画需要强制去除
-        // tip4: 不要在beginUpdates里面indexPath请求cell
-
-        // 检查是不是插入到visible之前
-        //let small = tableView.contentSize.height < tableView.bounds.height
-        var visibleIndexPaths = tableView.indexPathsForVisibleRows
-        let needResetOffset = /*!small &&*/ visibleIndexPaths?.contains({ position < $0.row }) ?? false
-        
-        // 在更新之前先获取到从contentOffset到第一个显示的单元格的偏移
-        let oldContentOffset = tableView.contentOffset
-        let firstVisibleCellFrame = needResetOffset ? tableView.rectForRowAtIndexPath(visibleIndexPaths![0]) : CGRectZero
-        
-        SIMChatUpdatesTransactionPerform(tableView, &_allMessages, animated) { maker in
-            var message = _messageWithIndex(position - 1)
-            newMessages.forEach {
-                // 检查timeline
-                if _needMakeTimeLine(message, $0) {
-                    // 需要添加一个新的timeline
-                    let tl = (position, _makeTimeLine(message, $0))
-                    maker.insert(tl.1, atIndex: tl.0, withAnimation: .Fade)
-                } else if $0 === newMessages.first && _needRemoveTimeLine(message, $0) {
-                    // 需要删除
-                    maker.removeAtIndex(position, withAnimation: .Fade)
-                } else if $0 === newMessages.first && _needUpdateTimeLine(message, $0) {
-                    // 需要更新
-                    _updateTimeLine(message, $0)
-                    maker.reloadAtIndex(position, withAnimation: .Fade)
-                }
-                // 插入
-                message = $0
-                maker.insert($0, atIndex: position)
-                // 最后一条的时候检查插入点的后一条消息
-                guard $0 === newMessages.last else {
-                    return
-                }
-                guard let lastMessage = _messageWithIndex(position) else {
-                    return
-                }
-                if _needMakeTimeLine($0, lastMessage) {
-                    // 需要添加一个新的timeline
-                    let tl = (position, _makeTimeLine($0, lastMessage))
-                    maker.insert(tl.1, atIndex: tl.0, withAnimation: .Fade)
-                } else if _needRemoveTimeLine($0, lastMessage) {
-                    // 需要删除
-                    maker.removeAtIndex(position, withAnimation: .Fade)
-                } else if _needUpdateTimeLine($0, lastMessage) {
-                    // 需要更新
-                    _updateTimeLine($0, lastMessage)
-                    maker.reloadAtIndex(position, withAnimation: .Fade)
-                }
-            }
-        }
-        
-        // 需要更新?
-        if needResetOffset {
-            // 默认为0
-            var idx = NSIndexPath(forRow: 0, inSection: 0)
-            // 需要保持位置的cell
-            if visibleIndexPaths!.count != 0 {
-                idx = NSIndexPath(forRow: visibleIndexPaths![0].row + (_allMessages.count - count), inSection: 0)
-            }
-            let distance = oldContentOffset.y - firstVisibleCellFrame.origin.y
-            let oldFirstVisibleCellFrame = tableView.rectForRowAtIndexPath(idx)
-            let newContentOffset = CGPointMake(0, oldFirstVisibleCellFrame.minY + distance)
-            let addedContentSize = CGSizeMake(tableView.frame.width, oldFirstVisibleCellFrame.minY - firstVisibleCellFrame.minY)
-            
-            let hx = tableView.panGestureRecognizer.translationInView(tableView)
-            
-            SIMLog.debug("old content offset: \(oldContentOffset)")
-            SIMLog.debug("first visible cell frame: \(firstVisibleCellFrame)")
-            SIMLog.debug("content offset to first cell distance: \(distance)")
-            SIMLog.debug("old first visible cell frame: \(oldFirstVisibleCellFrame)")
-            SIMLog.debug("added content size: \(addedContentSize)")
-            SIMLog.debug("new content offset: \(newContentOffset)")
-            SIMLog.debug("tableView: dragging(\(tableView.dragging)), decelerating(\(tableView.decelerating)), tracking(\(tableView.tracking))")
-            
-            //SIMLog.debug("startOffsetY: \(tableView.valueForKey("_startOffsetY"))")
-            //SIMLog.debug("lastUpdateOffsetY: \(tableView.valueForKey("_lastUpdateOffsetY"))")
-            
-            let sy = tableView.valueForKey("_startOffsetY") as? CGFloat ?? 0
-            let uy = tableView.valueForKey("_lastUpdateOffsetY") as? CGFloat ?? 0
-            
-            SIMLog.debug("table pan translation: \(hx)")
-            SIMLog.debug("offset to start offset: \(oldContentOffset.y - sy) => \(uy - sy)")
-            
-            tableView.setValue(newContentOffset.y + hx.y, forKey: "_startOffsetY")
-            tableView.setValue(newContentOffset.y + hx.y, forKey: "_lastUpdateOffsetY")
-            
-            tableView.setContentOffset(newContentOffset, animated: false)
-            
-            // tableView.valueForKey("_updatePanGesture")
-            
-            SIMLog.debug("startOffsetY: \(tableView.valueForKey("_startOffsetY"))")
-            SIMLog.debug("lastUpdateOffsetY: \(tableView.valueForKey("_lastUpdateOffsetY"))")
-            SIMLog.debug("apply content offset: \(tableView.contentOffset)")
-        }
-    }
-    
-    ///
-    /// 更新消息
-    ///
-    private func _reloadMessages(ms: Array<SIMChatMessageProtocol>, animated: Bool = true) {
-        guard let tableView = contentView where !ms.isEmpty else {
-            return
-        }
-        // 查找需要执行操作的单元格并转换为组
-        let indexGroups = _indexsOfMessages(ms).sort().splitInGroup {
-            $0 + 1 == $1
-        }
-        guard !indexGroups.isEmpty else {
-            return
-        }
-        SIMLog.trace()
-        
-        SIMChatUpdatesTransactionPerform(tableView, &_allMessages, animated) { maker in
-            indexGroups.forEach {
-                // 更新区间内所有的消息
-                ($0.first! ... $0.last!).forEach {
-                    if let message = _messageWithIndex($0) {
-                        tableView.fd_invalidateHeightForKey(message.identifier)
-                    }
-                    maker.reloadAtIndex($0, withAnimation: .Fade)
-                }
-                // 检查区间内的timeline
-                ($0.first! ... $0.last! + 1).forEach {
-                    // 获取需要检查的消息
-                    let begin = $0 - 1
-                    let end = $0
-                    let beginMessage = _messageWithIndex(begin)
-                    let endMessage = _messageWithIndex(end)
-                    // 检查timeline
-                    if _needMakeTimeLine(beginMessage, endMessage) {
-                        // 需要添加一个新的timeline, + 1是为了删除了一条
-                        let tl = ($0, _makeTimeLine(beginMessage, endMessage))
-                        maker.insert(tl.1, atIndex: tl.0, withAnimation: .Fade)
-                    } else if _needRemoveTimeLine(beginMessage, endMessage) {
-                        // 需要删除, 优先删除上面的, 删除区间之后index就是last了
-                        let tl = _timeLine(begin, end)
-                        maker.removeAtIndex(tl.0, withAnimation: .Fade)
-                    } else if _needUpdateTimeLine(beginMessage, endMessage) {
-                        // 需要更新
-                        let tl = _timeLine(begin, end)
-                        _updateTimeLine(beginMessage, endMessage)
-                        maker.reloadAtIndex(tl.0, withAnimation: .Fade)
-                    }
-                }
-            }
-        }
-    }
+    // MARK: Message
     
     ///
     /// 移动消息, 如果有多条消息, 按参数顺序加到index之后
     ///
-    private func _moveMessages(ms: Array<SIMChatMessageProtocol>, toIndex index: Int = -1, animated: Bool = true) {
+    private func _moveMessages(ms: Array<SIMChatMessageProtocol>, toIndex index: Int, animated: Bool = true) {
         guard let tableView = self.contentView where !ms.isEmpty else {
             return
         }
@@ -793,6 +620,179 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
                     let tl = _timeLine(begin, end)
                     _updateTimeLine(beginMessage, endMessage)
                     maker.reloadAtIndex(tl.0, withAnimation: .Fade)
+                }
+            }
+        }
+    }
+    
+    ///
+    /// 批量插入消息
+    ///
+    /// - parameter ms:       消息集合
+    /// - parameter index:    如果为index < 0, 插入点为count + index + 1
+    ///
+    private func _insertMessages(ms: Array<SIMChatMessageProtocol>, atIndex: Int, animated: Bool = true) {
+        guard let tableView = contentView where !ms.isEmpty else {
+            return
+        }
+        let newMessages = ms.filter { !$0.option.contains(.Hidden) }
+        guard !newMessages.isEmpty else {
+            return
+        }
+        
+        // 计算插入点
+        let count = _allMessages.count
+        let position = min(max(atIndex >= 0 ? atIndex : atIndex + count + 1, 0), count)
+        
+        SIMLog.trace("insert position: \(position) => \(count)")
+
+        // tip1: 如果cell插入到visibleCells之前, 会导致contentSize改变(contentOffset不变),
+        // tip2: 如果设置contentOffset会导致减速事件停止
+        // tip3: insertRowsAtIndexPaths的动画需要强制去除
+        // tip4: 不要在beginUpdates里面indexPath请求cell
+
+        // 检查是不是插入到visible之前
+        //let small = tableView.contentSize.height < tableView.bounds.height
+        var visibleIndexPaths = tableView.indexPathsForVisibleRows
+        let needResetOffset = /*!small &&*/ visibleIndexPaths?.contains({ position < $0.row }) ?? false
+        
+        // 在更新之前先获取到从contentOffset到第一个显示的单元格的偏移
+        let oldContentOffset = tableView.contentOffset
+        let firstVisibleCellFrame = needResetOffset ? tableView.rectForRowAtIndexPath(visibleIndexPaths![0]) : CGRectZero
+        
+        SIMChatUpdatesTransactionPerform(tableView, &_allMessages, animated) { maker in
+            var message = _messageWithIndex(position - 1)
+            newMessages.forEach {
+                // 检查timeline
+                if _needMakeTimeLine(message, $0) {
+                    // 需要添加一个新的timeline
+                    let tl = (position, _makeTimeLine(message, $0))
+                    maker.insert(tl.1, atIndex: tl.0, withAnimation: .Fade)
+                } else if $0 === newMessages.first && _needRemoveTimeLine(message, $0) {
+                    // 需要删除
+                    maker.removeAtIndex(position, withAnimation: .Fade)
+                } else if $0 === newMessages.first && _needUpdateTimeLine(message, $0) {
+                    // 需要更新
+                    _updateTimeLine(message, $0)
+                    maker.reloadAtIndex(position, withAnimation: .Fade)
+                }
+                // 插入
+                message = $0
+                maker.insert($0, atIndex: position, withAnimation: .Fade)
+                // 最后一条的时候检查插入点的后一条消息
+                guard $0 === newMessages.last else {
+                    return
+                }
+                guard let lastMessage = _messageWithIndex(position) else {
+                    return
+                }
+                if _needMakeTimeLine($0, lastMessage) {
+                    // 需要添加一个新的timeline
+                    let tl = (position, _makeTimeLine($0, lastMessage))
+                    maker.insert(tl.1, atIndex: tl.0, withAnimation: .Fade)
+                } else if _needRemoveTimeLine($0, lastMessage) {
+                    // 需要删除
+                    maker.removeAtIndex(position, withAnimation: .Fade)
+                } else if _needUpdateTimeLine($0, lastMessage) {
+                    // 需要更新
+                    _updateTimeLine($0, lastMessage)
+                    maker.reloadAtIndex(position, withAnimation: .Fade)
+                }
+            }
+        }
+        
+        // 需要更新?
+        if needResetOffset {
+            // 默认为0
+            var idx = NSIndexPath(forRow: 0, inSection: 0)
+            // 需要保持位置的cell
+            if visibleIndexPaths!.count != 0 {
+                idx = NSIndexPath(forRow: visibleIndexPaths![0].row + (_allMessages.count - count), inSection: 0)
+            }
+            let distance = oldContentOffset.y - firstVisibleCellFrame.origin.y
+            let oldFirstVisibleCellFrame = tableView.rectForRowAtIndexPath(idx)
+            let newContentOffset = CGPointMake(0, oldFirstVisibleCellFrame.minY + distance)
+            let addedContentSize = CGSizeMake(tableView.frame.width, oldFirstVisibleCellFrame.minY - firstVisibleCellFrame.minY)
+            
+            let hx = tableView.panGestureRecognizer.translationInView(tableView)
+            
+            SIMLog.debug("old content offset: \(oldContentOffset)")
+            SIMLog.debug("first visible cell frame: \(firstVisibleCellFrame)")
+            SIMLog.debug("content offset to first cell distance: \(distance)")
+            SIMLog.debug("old first visible cell frame: \(oldFirstVisibleCellFrame)")
+            SIMLog.debug("added content size: \(addedContentSize)")
+            SIMLog.debug("new content offset: \(newContentOffset)")
+            SIMLog.debug("tableView: dragging(\(tableView.dragging)), decelerating(\(tableView.decelerating)), tracking(\(tableView.tracking))")
+            
+            //SIMLog.debug("startOffsetY: \(tableView.valueForKey("_startOffsetY"))")
+            //SIMLog.debug("lastUpdateOffsetY: \(tableView.valueForKey("_lastUpdateOffsetY"))")
+            
+            let sy = tableView.valueForKey("_startOffsetY") as? CGFloat ?? 0
+            let uy = tableView.valueForKey("_lastUpdateOffsetY") as? CGFloat ?? 0
+            
+            SIMLog.debug("table pan translation: \(hx)")
+            SIMLog.debug("offset to start offset: \(oldContentOffset.y - sy) => \(uy - sy)")
+            
+            tableView.setValue(newContentOffset.y + hx.y, forKey: "_startOffsetY")
+            tableView.setValue(newContentOffset.y + hx.y, forKey: "_lastUpdateOffsetY")
+            
+            tableView.setContentOffset(newContentOffset, animated: false)
+            
+            // tableView.valueForKey("_updatePanGesture")
+            
+            SIMLog.debug("startOffsetY: \(tableView.valueForKey("_startOffsetY"))")
+            SIMLog.debug("lastUpdateOffsetY: \(tableView.valueForKey("_lastUpdateOffsetY"))")
+            SIMLog.debug("apply content offset: \(tableView.contentOffset)")
+        }
+    }
+    
+    ///
+    /// 更新消息
+    ///
+    private func _reloadMessages(ms: Array<SIMChatMessageProtocol>, animated: Bool = true) {
+        guard let tableView = contentView where !ms.isEmpty else {
+            return
+        }
+        // 查找需要执行操作的单元格并转换为组
+        let indexGroups = _indexsOfMessages(ms).sort().splitInGroup {
+            $0 + 1 == $1
+        }
+        guard !indexGroups.isEmpty else {
+            return
+        }
+        SIMLog.trace()
+        
+        SIMChatUpdatesTransactionPerform(tableView, &_allMessages, animated) {  maker in
+            indexGroups.forEach {
+                // 更新区间内所有的消息
+                ($0.first! ... $0.last!).forEach {
+                    if let message = _messageWithIndex($0) {
+                        tableView.fd_invalidateHeightForKey(message.identifier)
+                    }
+                    maker.reloadAtIndex($0, withAnimation: .Fade)
+                }
+                // 检查区间内的timeline
+                ($0.first! ... $0.last! + 1).forEach {
+                    // 获取需要检查的消息
+                    let begin = $0 - 1
+                    let end = $0
+                    let beginMessage = _messageWithIndex(begin)
+                    let endMessage = _messageWithIndex(end)
+                    // 检查timeline
+                    if _needMakeTimeLine(beginMessage, endMessage) {
+                        // 需要添加一个新的timeline, + 1是为了删除了一条
+                        let tl = ($0, _makeTimeLine(beginMessage, endMessage))
+                        maker.insert(tl.1, atIndex: tl.0, withAnimation: .Fade)
+                    } else if _needRemoveTimeLine(beginMessage, endMessage) {
+                        // 需要删除, 优先删除上面的, 删除区间之后index就是last了
+                        let tl = _timeLine(begin, end)
+                        maker.removeAtIndex(tl.0, withAnimation: .Fade)
+                    } else if _needUpdateTimeLine(beginMessage, endMessage) {
+                        // 需要更新
+                        let tl = _timeLine(begin, end)
+                        _updateTimeLine(beginMessage, endMessage)
+                        maker.reloadAtIndex(tl.0, withAnimation: .Fade)
+                    }
                 }
             }
         }
@@ -914,12 +914,18 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
                     }
                 }
                 // 插入消息
-                sself._insertMessages(_allMessages, atIndex: 0, animated: isFirstLoad)
+                sself._insertMessages(_allMessages, atIndex: 0, animated: false)
                 // 如果是第一次加载, 更新到最后
                 if isFirstLoad && !sself._allMessages.isEmpty {
                     SIMLog.debug("first load")
                     let idx = NSIndexPath(forRow: tableView.numberOfRowsInSection(0) - 1, inSection: 0)
                     tableView.scrollToRowAtIndexPath(idx, atScrollPosition: .Bottom, animated: false)
+                    // 加点淡入的动画
+                    let visibleCells = tableView.visibleCells
+                    visibleCells.forEach { $0.alpha = 0 }
+                    UIView.animateWithDuration(0.25) {
+                        visibleCells.forEach { $0.alpha = 1 }
+                    }
                 }
             } else if let header = tableView.tableHeaderView {
                 // 加载失败
