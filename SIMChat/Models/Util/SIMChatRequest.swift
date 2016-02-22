@@ -34,6 +34,10 @@ public final class SIMChatRequest<R> {
         return self
     }
     
+    public func progress(clouser: (Float -> Void)) -> Self {
+        return self
+    }
+    
     /// 延迟执行
     private func execute(clouser: (Operator -> Void)) {
         let runLoop = CFRunLoopGetCurrent()

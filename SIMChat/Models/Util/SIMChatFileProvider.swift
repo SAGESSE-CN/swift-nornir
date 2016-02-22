@@ -14,6 +14,12 @@ import UIKit
 ///
 public class SIMChatFileProvider {
     
+    private static var _sharedInstance = SIMChatFileProvider()
+    
+    public static func sharedInstance() -> SIMChatFileProvider {
+        return _sharedInstance
+    }
+    
     func cached(url: NSURL) -> Bool {
         return false
     }
@@ -42,8 +48,16 @@ public class SIMChatFileProvider {
                     }
                 }
             case "chat-audio":
+                let path = NSURL(fileURLWithPath: url.path!)
+                let needDownload = !NSFileManager().fileExistsAtPath(url.path!)
+                if needDownload {
+                    SIMChatNotificationCenter.postNotificationName(SIMChatFileProviderWillDownload, object: url)
+                }
                 dispatch_after_at_now(0.5, dispatch_get_main_queue()) {
-                    op.success("test")
+                    if needDownload {
+                        SIMChatNotificationCenter.postNotificationName(SIMChatFileProviderDidDownload, object: url)
+                    }
+                    op.success(path)
                 }
             default:
                 // 应该请求网络.
@@ -65,3 +79,9 @@ public class SIMChatFileProvider {
 //        }
 //    }
 }
+
+
+public let SIMChatFileProviderWillLoad = "SIMChatFileProviderWillLoad"
+public let SIMChatFileProviderDidLoad = "SIMChatFileProviderDidLoad"
+public let SIMChatFileProviderWillDownload = "SIMChatFileProviderWillDownload"
+public let SIMChatFileProviderDidDownload = "SIMChatFileProviderDidDownload"

@@ -18,6 +18,9 @@ extension SIMChatViewController {
             _conversation.delegate = self
         }
         
+        /// 最后操作的消息
+        private weak var _lastOperatorMessage: SIMChatMessageProtocol?
+        
         private var _allMessages: Array<SIMChatMessageProtocol>
         private var _conversation: SIMChatConversationProtocol
         private var _isLoading: Bool = false
@@ -394,10 +397,20 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
     // 点击消息
     func cellEvent(cell: SIMChatMessageCellProtocol, didPressMessage message: SIMChatMessageProtocol) {
         SIMLog.debug(message.identifier)
-        
-        if manager.mediaProvider.isMedia(message.content) {
-            manager.mediaProvider.playMedia(message.content)
+       
+        switch message.content {
+        case let content as SIMChatBaseMessageAudioContent:
+            // 音频.
+            let player = manager.mediaProvider.player(content.remote)
+            if !player.playing {
+                player.play()
+            } else {
+                player.stop()
+            }
+        default:
+            break
         }
+        _lastOperatorMessage = message
     }
     
     // 长按消息
@@ -459,6 +472,10 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
     // 删除
     func cellMenu(cell: SIMChatMessageCellProtocol, didRemoveMessage message: SIMChatMessageProtocol) {
         SIMLog.debug(message.identifier)
+        // 最后操作的就是删除的这一条消息, 这需要停止当前正在进行的工作
+        if message == _lastOperatorMessage {
+            manager.mediaProvider.stop()
+        }
         _conversation.removeMessage(message).response { [weak self] in
             // 检查操作状态
             if let error = $0.error {
@@ -477,6 +494,10 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
     /// 重试(发送/上传/下载)
     func cellMenu(cell: SIMChatMessageCellProtocol, didRetryMessage message: SIMChatMessageProtocol) {
         SIMLog.debug(message.identifier)
+        // 最后操作的就是重新发送的这一条消息, 这需要停止当前正在进行的工作
+        if message == _lastOperatorMessage {
+            manager.mediaProvider.stop()
+        }
         // 重新发送
         _conversation.sendMessage(message, isResend: true).response { //[weak self] in
             // 检查操作状态
@@ -496,6 +517,10 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
     // 撤销
     func cellMenu(cell: SIMChatMessageCellProtocol, didRevokeMessage message: SIMChatMessageProtocol) {
         SIMLog.debug(message.identifier)
+        // 最后操作的就是撤销的这一条消息, 这需要停止当前正在进行的工作
+        if message == _lastOperatorMessage {
+            manager.mediaProvider.stop()
+        }
         // 更新状态为revoked
         _conversation.updateMessage(message, status: .Revoked).response { [weak self] in
             // 检查操作状态

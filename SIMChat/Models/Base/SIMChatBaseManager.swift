@@ -23,7 +23,7 @@ public class SIMChatBaseManager: SIMChatManagerProtocol {
     /// 用户信息提供者
     public lazy var userProvider: SIMChatUserProvider =  SIMChatUserProvider(manager: self)
     /// 媒体播放提供者
-    public lazy var mediaProvider: SIMChatMediaProvider = SIMChatMediaProvider(fileProvider: self.fileProvider)
+    public lazy var mediaProvider: SIMChatMediaProvider = SIMChatMediaProvider()
     
     /// 类提供者, 用户可以在这里修改所有使用的实际类型
     public lazy var classProvider: SIMChatClassProvider = SIMChatClassProvider()

@@ -133,6 +133,12 @@ extension SIMChatViewController {
     /// 聊天会话
     ///
     public var conversation: SIMChatConversationProtocol { return _conversation }
+    public var manager: SIMChatManagerProtocol {
+        guard let manager = conversation.manager else {
+            fatalError("Must provider manager")
+        }
+        return manager
+    }
     ///
     /// 内容
     ///
@@ -261,9 +267,6 @@ extension SIMChatViewController {
     public override func viewWillDisappear(animated: Bool) {
         super.viewWillDisappear(animated)
         
-        // 禁止播放
-        SIMChatAudioManager.sharedManager.stop()
-        
         let center = NSNotificationCenter.defaultCenter()
         center.removeObserver(self, name: UIKeyboardWillShowNotification, object: nil)
         center.removeObserver(self, name: UIKeyboardWillHideNotification, object: nil)
@@ -273,6 +276,13 @@ extension SIMChatViewController {
             recognizer.delegate = _forwarder?.orign
             _forwarder = nil
         }
+    }
+    
+    public override func viewDidDisappear(animated: Bool) {
+        super.viewDidDisappear(animated)
+        
+        // 切换页面的时候停止播放
+        manager.mediaProvider.stop()
     }
     
     public override func viewDidLayoutSubviews() {

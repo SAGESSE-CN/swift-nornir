@@ -8,6 +8,8 @@
 
 import UIKit
 
+// TODO: 状态更新有问题
+
 ///
 /// 音频
 ///
@@ -58,12 +60,10 @@ public class SIMChatBaseMessageAudioCell: SIMChatBaseMessageBubbleCell {
     public override func initEvents() {
         super.initEvents()
         // add kvo
-        SIMChatNotificationCenter.addObserver(self, selector: "audioDidStop:", name: SIMChatAudioManagerWillStopNotification)
-        SIMChatNotificationCenter.addObserver(self, selector: "audioDidStop:", name: SIMChatAudioManagerWillRecordNotification)
-        SIMChatNotificationCenter.addObserver(self, selector: "audioDidPlay:", name: SIMChatAudioManagerWillPlayNotification)
-        
-        SIMChatNotificationCenter.addObserver(self, selector: "audioWillLoad:", name: SIMChatAudioManagerWillLoadNotification)
-        SIMChatNotificationCenter.addObserver(self, selector: "audioDidLoad:", name: SIMChatAudioManagerDidLoadNotification)
+        SIMChatNotificationCenter.addObserver(self, selector: "audioDidStop:", name: SIMChatMediaPlayerDidStop)
+        SIMChatNotificationCenter.addObserver(self, selector: "audioDidPlay:", name: SIMChatMediaPlayerDidPlay)
+        SIMChatNotificationCenter.addObserver(self, selector: "audioWillLoad:", name: SIMChatFileProviderWillDownload)
+        SIMChatNotificationCenter.addObserver(self, selector: "audioDidLoad:", name: SIMChatFileProviderDidDownload)
     }
     
     /// 显示类型
@@ -141,16 +141,35 @@ public class SIMChatBaseMessageAudioCell: SIMChatBaseMessageBubbleCell {
 
 // MARK: - Event
 
+
 extension SIMChatBaseMessageAudioCell {
+    
+    /// 检查是否是有效的通知
+    @inline(__always) private func _isValidNotification(sender: NSNotification) -> Bool {
+        guard let message = message, player = sender.object as? SIMChatMediaPlayerProtocol else {
+            return false // 参数为空
+        }
+        guard let content = message.content as? SIMChatBaseMessageAudioContent else {
+            return false // 目标错误
+        }
+        return player.url === content.remote
+    }
     
     /// 音频开始播放
     internal func audioDidPlay(sender: NSNotification) {
-        guard let message = message where sender.object === message.content else {
-            return
+        guard let message = message where _isValidNotification(sender) else {
+            return // 参数为空
         }
         SIMLog.trace(message.identifier)
-        // 更新消息状态
-        conversation?.updateMessage(message, status: .Played)
+        
+        // 更新Module
+        if let content = message.content as? SIMChatBaseMessageAudioContent {
+            content.played = true
+            content.playing = true
+        }
+        if !message.isSelf {
+            conversation?.updateMessage(message, status: .Played)
+        }
         // 更新UI
         if !animationView.isAnimating() {
             animationView.startAnimating()
@@ -162,15 +181,21 @@ extension SIMChatBaseMessageAudioCell {
         if animationView.isAnimating() {
             animationView.stopAnimating()
         }
-        guard let message = message where sender.object === message.content else {
-            return
+        guard let message = message where _isValidNotification(sender) else {
+            return // 参数为空
+        }
+        if let content = message.content as? SIMChatBaseMessageAudioContent {
+            content.playing = false
         }
         SIMLog.trace(message.identifier)
     }
     /// 音频加载开始
     internal func audioWillLoad(sender: NSNotification) {
-        guard let message = message where sender.object === message.content else {
-            return
+        guard let message = message where !message.isSelf else {
+            return // 参数为空
+        }
+        guard (message.content as? SIMChatBaseMessageAudioContent)?.remote === sender.object else {
+            return // 参数错误
         }
         SIMLog.trace(message.identifier)
         // 更新状态
@@ -178,8 +203,11 @@ extension SIMChatBaseMessageAudioCell {
     }
     /// 音频加载完成
     internal func audioDidLoad(sender: NSNotification) {
-        guard let message = message where sender.object === message else {
-            return
+        guard let message = message where !message.isSelf else {
+            return // 参数为空, 不操作自己的消息
+        }
+        guard (message.content as? SIMChatBaseMessageAudioContent)?.remote === sender.object else {
+            return // 参数错误
         }
         SIMLog.trace(message.identifier)
         // 更新状态
