@@ -10,8 +10,8 @@
 
 该库目前只是纯UI库, 后面将会添加第三方的聊天服务(例如:融云,百川,腾讯云)使用示例, 再后面将会实现网络部分(swift/xmpp)
 
-因为我没有iOS7的设备, 加上Framework不支持iOS7, 所以该库不直接支持iOS7.
-如果需要在iOS7上使用, 请直接使用源代码, 目前iOS7没有经过任何测试.
+因为我没有iOS7的设备, 加上Framework不支持iOS7, 所以该库**不直接支持iOS7**.
+如果需要**在iOS7**上使用, 请直接**使用源代码**, 目前iOS7没有经过任何测试.
 
 # TODO
 #### 聊天主界面
@@ -27,12 +27,12 @@
 * [X] **支持删除消息功能(一个或多个)**
 * [X] **支持撤回消息功能(一个或多个)**
 * [X] **支持更新消息功能(一个或多个), 涉及到: 内容改变, 状态改变, 重新发送**
-* [ ] **<font color=gray>支持发送视频消息</font>**
-* [ ] **<font color=gray>支持查看视频消息</font>**
-* [ ] **<font color=gray>支持发送地址消息</font>**
-* [ ] **<font color=gray>支持查看地址消息</font>**
-* [ ] **<font color=gray>支持发送文件消息</font>**
-* [ ] **<font color=gray>支持发送音乐消息</font>**
+* [ ] **支持发送视频消息**
+* [ ] **支持查看视频消息**
+* [ ] **支持发送地址消息**
+* [ ] **支持查看地址消息**
+* [ ] **支持发送文件消息**
+* [ ] **支持发送音乐消息**
 * [X] **支持拖动(交互式)隐藏键盘**
 
 #### 聊天主界面-输入栏
@@ -49,8 +49,8 @@
 * [X] **支持扩展内置表情, 使用`SIMChatInputPanel.registerClass:byIdentifier:`进行注册**
 * [X] **支持自定义, 在`SIMChatInputPanelEmoticonViewDelegate``inputPanel:emoticonGroupAtIndex:`返回表情组即可. NOTE:这里还要改**
 * [X] **支持对讲**
-* [ ] **<font color=gray>支持变声</font>**
-* [ ] **<font color=gray>支持录音</font>**
+* [ ] **支持变声**
+* [ ] **支持录音**
 * [ ] **支持(内嵌)选择图片**
 * [ ] **支持(内嵌)录制视频**
 * [X] **支持自定义工具项, 在`SIMChatInputPanelToolBoxDelegate``inputPanel:itemAtIndex:`返回对应的工具信息**
