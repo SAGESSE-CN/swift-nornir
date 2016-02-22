@@ -21,6 +21,7 @@ class ExChatConversation: SIMChatBaseConversation {
     
     override func sendMessage(message: SIMChatMessageProtocol, isResend: Bool) -> SIMChatRequest<SIMChatMessageProtocol> {
         message.status = .Sending
+        message.date = NSDate()
         return super.sendMessage(message, isResend: isResend)
     }
 

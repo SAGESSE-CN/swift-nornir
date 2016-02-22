@@ -190,8 +190,14 @@ public class SIMChatUpdatesTransaction<Element> {
                             tableView.scrollEnabled = enabled
                         }
                         // 必须要隐藏, 否则系统动画会暴露
-                        cellsL.forEach { $0.hidden = true }
-                        cellsR.forEach { $0.hidden = true }
+                        cellsL.forEach {
+                            $0.frame.origin = CGPointMake(-$0.frame.width, $0.frame.minY)
+                            $0.hidden = true
+                        }
+                        cellsR.forEach {
+                            $0.frame.origin = CGPointMake(+$0.frame.width, $0.frame.minY)
+                            $0.hidden = true
+                        }
                         // 使用系统的更新剩下的
                         tableView.beginUpdates()
                         insertIndexPaths.forEach { tableView.insertRowsAtIndexPaths($1, withRowAnimation: $0) }

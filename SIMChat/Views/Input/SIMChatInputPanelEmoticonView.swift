@@ -98,11 +98,13 @@ internal class SIMChatInputPanelEmoticonView: UIView, SIMChatInputPanelProtocol 
             .bottom.equ(_tabBar).bottom
             .submit()
         
+        
+        _contentView.reloadData()
+        
+        guard !_builtInGroups.isEmpty else {
+            return
+        }
         dispatch_async(dispatch_get_main_queue()) {
-            self._contentView.reloadData()
-            guard !self._builtInGroups.isEmpty else {
-                return
-            }
             dispatch_async(dispatch_get_main_queue()) {
                 // 查找默认显示的
                 let idx = (0 ..< self._contentView.numberOfSections()).indexOf {

@@ -24,7 +24,7 @@ extension SIMChatViewController {
         /// 快速映射
         private var _fastMap: Dictionary<String, String> = [:]
         
-        var durationInterval: NSTimeInterval = 1.2//10
+        var durationInterval: NSTimeInterval = 60
         
         lazy var header: UIView = {
             let view = UIView(frame: CGRectMake(0, 0, 320, 44))
