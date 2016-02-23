@@ -201,7 +201,7 @@ class ExChatConversation: SIMChatBaseConversation {
             }
             
             if true || (rand() % 10) < 2 {
-                let c = SIMChatBaseMessageAudioContent(remote: apath, duration: 6.2 * Double((r % 3600) + 1))
+                let c = SIMChatBaseMessageAudioContent(local: apath, duration: 6.2 * Double((r % 3600) + 1))
                 let m = SIMChatBaseMessage.messageWithContent(c, receiver: o, sender: s)
                 m.option = [.ContactShow]
                 m.isSelf = (r % 2 == 0)
@@ -210,7 +210,7 @@ class ExChatConversation: SIMChatBaseConversation {
                 rs.append(m)
             }
             if true || (rand() % 10) < 2 {
-                let c = SIMChatBaseMessageAudioContent(remote: apath, duration: 6.2 * Double((r % 3600) + 1))
+                let c = SIMChatBaseMessageAudioContent(local: apath, duration: 6.2 * Double((r % 3600) + 1))
                 let m = SIMChatBaseMessage.messageWithContent(c, receiver: o, sender: s)
                 m.option = [.ContactShow]
                 m.isSelf = (r % 2 == 0)
@@ -237,7 +237,7 @@ class ExChatConversation: SIMChatBaseConversation {
             }
         }
         
-        let c = SIMChatBaseMessageAudioContent(remote: apath, duration: 88)
+        let c = SIMChatBaseMessageAudioContent(local: apath, duration: 88)
         let m = SIMChatBaseMessage.messageWithContent(c, receiver: receiver, sender: sender)
         m.option = [.ContactShow]
         m.isSelf = true//(r % 2 == 0)

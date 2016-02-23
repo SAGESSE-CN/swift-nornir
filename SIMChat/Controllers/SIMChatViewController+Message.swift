@@ -401,7 +401,7 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
         switch message.content {
         case let content as SIMChatBaseMessageAudioContent:
             // 音频.
-            let player = manager.mediaProvider.player(content.remote)
+            let player = manager.mediaProvider.audioPlayer(content.remote)
             if !player.playing {
                 player.play()
             } else {

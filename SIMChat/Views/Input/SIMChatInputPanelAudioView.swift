@@ -9,6 +9,31 @@
 import UIKit
 
 ///
+/// 音频输入面板代理
+///
+internal protocol SIMChatInputPanelAudioViewDelegate: SIMChatInputPanelDelegate {
+    
+    ///
+    /// 请求一个音频录音器, 如果拒绝该请求返回nil
+    ///
+    func inputPanelAudioRecorder(inputPanel: UIView, url: NSURL) -> SIMChatMediaRecorderProtocol?
+    ///
+    /// 请求一个音频播放器, 如果拒绝该请求返回nil
+    ///
+    func inputPanelAudioPlayer(inputPanel: UIView, url: NSURL) -> SIMChatMediaPlayerProtocol?
+    
+    ///
+    /// 将要发送音频
+    ///
+    func inputPanelShouldSendAudio(inputPanel: UIView, url: NSURL, duration: NSTimeInterval) -> Bool
+    ///
+    /// 发送音频
+    ///
+    func inputPanelDidSendAudio(inputPanel: UIView, url: NSURL, duration: NSTimeInterval)
+}
+
+
+///
 /// 音频输入面板, 内部包含对讲, 录音, 变声
 ///
 internal class SIMChatInputPanelAudioView: UIView, SIMChatInputPanelProtocol {
@@ -53,6 +78,7 @@ internal class SIMChatInputPanelAudioView: UIView, SIMChatInputPanelProtocol {
         case None       // 空
         case Waiting    // 准备中(切换音频的时候会处于这个状态)
         case Recording  // 录音中
+        case Progressing // 处理中
         case Error(NSError) // 错
         
         // 普通
@@ -73,6 +99,12 @@ internal class SIMChatInputPanelAudioView: UIView, SIMChatInputPanelProtocol {
         func isRecording() -> Bool {
             switch self {
             case .Recording: return true
+            default:         return false
+            }
+        }
+        func isProgressing() -> Bool {
+            switch self {
+            case .Progressing: return true
             default:         return false
             }
         }
@@ -206,42 +238,6 @@ internal class SIMChatInputPanelAudioView: UIView, SIMChatInputPanelProtocol {
     }
 }
 
-///
-/// 音频输入面板代理
-///
-internal protocol SIMChatInputPanelAudioViewDelegate: SIMChatInputPanelDelegate {
-    ///
-    /// 将要启动录音, 返回的是SIMChatRequest, 这是一个异步操作, 如果拒绝这个请求, 可以直接返回nil
-    ///
-    func inputPanelShouldStartRecord(inputPanel: UIView) -> SIMChatRequest<Void>?
-    ///
-    /// 开始启动录音
-    ///
-    func inputPanelDidStartRecord(inputPanel: UIView)
-    
-    ///
-    /// 将要启动播放, 返回的是SIMChatRequest, 这是一个异步操作, 如果拒绝这个请求, 可以直接返回nil
-    ///
-    func inputPanelShouldStartPlay(inputPanel: UIView) -> SIMChatRequest<Void>?
-    ///
-    /// 开始启动录音
-    ///
-    func inputPanelDidStartPlay(inputPanel: UIView)
-    
-    ///
-    /// 停止录音和播放
-    ///
-    func inputPanelDidStopRecordAndPlay(inputPanel: UIView)
-    ///
-    /// 完成确认
-    ///
-    func inputPanelDidAudioComfirm(inputPanel: UIView)
-    ///
-    /// 完成取消
-    ///
-    func inputPanelDidAudioCancel(inputPanel: UIView)
-}
-
 // MARK: - UICollectionViewDataSource & UICollectionViewDelegateFlowLayout
 
 extension SIMChatInputPanelAudioView: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, SIMChatInputPanelAudioViewCellDelegate {
@@ -274,13 +270,14 @@ extension SIMChatInputPanelAudioView: UICollectionViewDataSource, UICollectionVi
 //        }
     }
     
-    /// 预览语音
-    func inputPanelShowAudioPreview(inputPanel: UIView) {
+    func inputPanelShowAudioPreview(inputPanel: UIView, url: NSURL, duration: NSTimeInterval) {
         SIMLog.trace()
         
         let view = SIMChatInputPanelAudioViewPreview()
         view.panel = self
         view.frame = bounds
+        view.url = url
+        view.duration = duration
         view.delegate = delegate as? SIMChatInputPanelAudioViewDelegate
         view.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
         view.backgroundColor = _contentView.backgroundColor
@@ -318,31 +315,37 @@ extension SIMChatInputPanelAudioView: UICollectionViewDataSource, UICollectionVi
     /// 确认
     dynamic func onAudioComfirm() {
         SIMLog.trace()
+        let tv = _preview
         inputPanelHideAudioPreview(self)
-        (delegate as? SIMChatInputPanelAudioViewDelegate)?.inputPanelDidAudioComfirm(self)
+        if let view = tv as? SIMChatInputPanelAudioViewPreview, url = view.url {
+            (delegate as? SIMChatInputPanelAudioViewDelegate)?.inputPanelDidSendAudio(self,
+                url: url,
+                duration: view.duration)
+        }
     }
     /// 取消
     dynamic func onAudioCancel() {
         SIMLog.trace()
         inputPanelHideAudioPreview(self)
-        (delegate as? SIMChatInputPanelAudioViewDelegate)?.inputPanelDidAudioCancel(self)
+        //并不需要操作
+        //(delegate as? SIMChatInputPanelAudioViewDelegate)?.inputPanelDidAudioCancel(self)
     }
 }
 
 ///
 /// 子面板: 对讲
 ///
-internal class SIMChatInputPanelAudioViewOfTalkback: UICollectionViewCell, SIMChatSpectrumViewDelegate {
+internal class SIMChatInputPanelAudioViewOfTalkback: UICollectionViewCell, SIMChatSpectrumViewDelegate, SIMChatMediaRecorderDelegate {
     
     func chatSpectrumViewWaveOfLeft(chatSpectrumView: SIMChatSpectrumView) -> Float {
         if _state.isRecording() && !_leftView.highlighted && !_rightView.highlighted {
-            let t = SIMChatAudioManager.sharedManager.currentTime
+            let t = _recorder?.currentTime ?? 0
             _tipsLabel.text = String(format: "%0d:%02d", Int(t / 60), Int(t % 60))
         }
-        return SIMChatAudioManager.sharedManager.meter(0)
+        return _recorder?.meter(0) ?? -60
     }
     func chatSpectrumViewWaveOfRight(chatSpectrumView: SIMChatSpectrumView) -> Float {
-        return SIMChatAudioManager.sharedManager.meter(0)
+        return _recorder?.meter(0) ?? -60
     }
     
     @inline(__always) private func build() {
@@ -378,68 +381,58 @@ internal class SIMChatInputPanelAudioViewOfTalkback: UICollectionViewCell, SIMCh
             .submit()
     }
     
-    private dynamic func onTouchStart(sender: AnyObject) {
-        guard let panel = self.panel where _state.isNone() || _state.isError() else {
-            return
+    private var _confirm: Bool = true
+    private weak var _recorder: SIMChatMediaRecorderProtocol?
+    
+    func recorderShouldPrepare(recorder: SIMChatMediaRecorderProtocol) -> Bool {
+        guard self._recordButton.highlighted else {
+            // 恢复为普通状态
+            _state = .None
+            return false
         }
-        SIMLog.trace()
-        guard let request = delegate?.inputPanelShouldStartRecord(panel) else {
-            return
-        }
-        // 进入等待状态
-        self._state = .Waiting
-        self._lastPoint = nil
-        
-        request.response {
-            guard self._recordButton.highlighted else {
-                // 恢复为普通状态
-                self._state = .None
-                return
-            }
-            if let error = $0.error {
-                // 出错了.
-                self._state = .Error(error)
-            } else {
-                // 进入录音状态
-                self._state = .Recording
-                self._operatorView.hidden = false
-                self._operatorView.alpha = 0
-                // 先重置状态
-                UIView.animateWithDuration(0.25,
-                    animations: {
-                        self._leftView.highlighted = false
-                        self._leftBackgroundView.highlighted = false
-                        self._leftBackgroundView.layer.transform = CATransform3DIdentity
-                        self._rightView.highlighted = false
-                        self._rightBackgroundView.highlighted = false
-                        self._rightBackgroundView.layer.transform = CATransform3DIdentity
-                        self._operatorView.alpha = 1
-                    },
-                    completion: { _ in
-                        //self._operatorView.alpha = 1
-                        //self._operatorView.hidden = false
-                })
-                // 启动成功.
-                self.delegate?.inputPanelDidStartRecord(panel)
-            }
-        }
+        return true
     }
-    private dynamic func onTouchStop(sender: AnyObject) {
-        guard let panel = self.panel where _state.isRecording() else {
-            return
+    func recorderDidPrepare(recorder: SIMChatMediaRecorderProtocol) {
+        SIMLog.trace()
+    }
+    
+    func recorderShouldRecord(recorder: SIMChatMediaRecorderProtocol) -> Bool {
+        guard self._recordButton.highlighted else {
+            // 恢复为普通状态
+            _state = .None
+            return false
         }
+        return true
+    }
+    func recorderDidRecord(recorder: SIMChatMediaRecorderProtocol) {
+        SIMLog.trace()
+        // 进入录音状态
+        _state = .Recording
+        _operatorView.hidden = false
+        _operatorView.alpha = 0
+        // 先重置状态
+        UIView.animateWithDuration(0.25,
+            animations: {
+                self._leftView.highlighted = false
+                self._leftBackgroundView.highlighted = false
+                self._leftBackgroundView.layer.transform = CATransform3DIdentity
+                self._rightView.highlighted = false
+                self._rightBackgroundView.highlighted = false
+                self._rightBackgroundView.layer.transform = CATransform3DIdentity
+                self._operatorView.alpha = 1
+            },
+            completion: { _ in
+                //self._operatorView.alpha = 1
+                //self._operatorView.hidden = false
+        })
+    }
+    func recorderDidStop(recorder: SIMChatMediaRecorderProtocol) {
         SIMLog.trace()
         
-        delegate?.inputPanelDidStopRecordAndPlay(panel)
+        // 进入处理模式
+        _state = .Progressing
         
-        if _leftView.highlighted {
-            cellDelegate?.inputPanelShowAudioPreview(panel)
-        } else if _rightView.highlighted {
-            delegate?.inputPanelDidAudioCancel(panel)
-        } else {
-            delegate?.inputPanelDidAudioComfirm(panel)
-        }
-        
+        // 放手就停下了
         if _recordButton.highlighted {
             let ani = CATransition()
             
@@ -464,9 +457,81 @@ internal class SIMChatInputPanelAudioViewOfTalkback: UICollectionViewCell, SIMCh
                 self._rightView.highlighted = false
                 self._rightBackgroundView.highlighted = false
                 self._operatorView.hidden = true
-                self._state = .None
             })
+        
         _lastPoint = nil
+    }
+    func recorderDidCancel(recorder: SIMChatMediaRecorderProtocol) {
+        SIMLog.trace()
+        
+        // 取消了
+        _state = .None
+        _recordButton.userInteractionEnabled = true
+    }
+    func recorderDidFinish(recorder: SIMChatMediaRecorderProtocol) {
+        SIMLog.trace()
+        
+        // 检查用户选择的是什么.
+        if let panel = panel {
+            if _confirm {
+                delegate?.inputPanelDidSendAudio(panel, url: recorder.url, duration: recorder.currentTime)
+            } else {
+                cellDelegate?.inputPanelShowAudioPreview(panel, url: recorder.url, duration: recorder.currentTime)
+            }
+        }
+        
+        // 完成
+        _state = .None
+        _recordButton.userInteractionEnabled = true
+    }
+    func recorderDidErrorOccur(recorder: SIMChatMediaRecorderProtocol, error: NSError) {
+        SIMLog.trace()
+        // 出错了.
+        _state = .Error(error)
+        _recordButton.userInteractionEnabled = true
+    }
+    
+    /// 临时录音路径
+    @inline(__always) private func _temporaryAudioRecordURL() -> NSURL {
+        return NSURL(fileURLWithPath: NSTemporaryDirectory() + "record.acc")
+    }
+    
+    
+    private dynamic func onTouchStart(sender: AnyObject) {
+        guard let panel = panel where _state.isNone() || _state.isError() else {
+            return
+        }
+        // 请求一个录音器
+        guard let recorder = delegate?.inputPanelAudioRecorder(panel, url: _temporaryAudioRecordURL()) else {
+            return
+        }
+        SIMLog.trace()
+        
+        // 进入等待状态
+        _recorder = recorder
+        _recorder?.delegate = self
+        _state = .Waiting
+        _lastPoint = nil
+        
+        // 直接开始. 如果失败了, 通过回调知之
+        recorder.record()
+    }
+    private dynamic func onTouchStop(sender: AnyObject) {
+        guard let panel = panel, recorder = _recorder where _state.isRecording() else {
+            return
+        }
+        SIMLog.trace()
+        
+        let isCancel = _rightView.highlighted
+        // 关掉操作响应
+        _recordButton.userInteractionEnabled = false
+        // 检查用户选择
+        if !isCancel && delegate?.inputPanelShouldSendAudio(panel, url: recorder.url, duration: recorder.currentTime) ?? true {
+            _confirm = !_leftView.highlighted
+            _recorder?.stop()
+        } else {
+            _recorder?.cancel()
+        }
     }
     private dynamic func onTouchInterrupt(sender: AnyObject) {
         guard _state.isRecording() else {
@@ -551,6 +616,10 @@ internal class SIMChatInputPanelAudioViewOfTalkback: UICollectionViewCell, SIMCh
                 _tipsLabel.text = "准备中..."
                 _spectrumView.hidden = true
                 _activityView.startAnimating()
+            case .Progressing:
+                _tipsLabel.text = "处理中..."
+                _spectrumView.hidden = true
+                _activityView.startAnimating()
             case .Recording:
                 if _activityView.isAnimating() {
                     _activityView.stopAnimating()
@@ -562,7 +631,7 @@ internal class SIMChatInputPanelAudioViewOfTalkback: UICollectionViewCell, SIMCh
                     _tipsLabel.text = "松开取消"
                     _spectrumView.hidden = true
                 } else {
-                    let t = SIMChatAudioManager.sharedManager.currentTime
+                    let t = _recorder?.currentTime ?? 0
                     _tipsLabel.text = String(format: "%0d:%02d", Int(t / 60), Int(t % 60))
                     _spectrumView.hidden = false
                 }
@@ -699,17 +768,18 @@ internal class SIMChatInputPanelAudioViewOfTalkback: UICollectionViewCell, SIMCh
 ///
 /// 子面板: 语音预览
 ///
-internal class SIMChatInputPanelAudioViewPreview: UIView, SIMChatSpectrumViewDelegate {
+internal class SIMChatInputPanelAudioViewPreview: UIView, SIMChatSpectrumViewDelegate, SIMChatMediaPlayerDelegate {
+    
     
     func chatSpectrumViewWaveOfLeft(chatSpectrumView: SIMChatSpectrumView) -> Float {
         if _state.isPlaying() {
-            let t = SIMChatAudioManager.sharedManager.currentTime
+            let t = _player?.duration ?? 0
             _tipsLabel.text = String(format: "%0d:%02d", Int(t / 60), Int(t % 60))
         }
-        return SIMChatAudioManager.sharedManager.meter(0)
+        return _player?.meter(0) ?? -60
     }
     func chatSpectrumViewWaveOfRight(chatSpectrumView: SIMChatSpectrumView) -> Float {
-        return SIMChatAudioManager.sharedManager.meter(0)
+        return _player?.meter(0) ?? -60
     }
     
     @inline(__always) private func build() {
@@ -742,6 +812,9 @@ internal class SIMChatInputPanelAudioViewPreview: UIView, SIMChatSpectrumViewDel
     weak var panel: UIView?
     weak var delegate: SIMChatInputPanelAudioViewDelegate?
     
+    var url: NSURL?
+    var duration: NSTimeInterval = 0
+    
     var _state: SIMChatInputPanelAudioView.PlayState = .None {
         didSet {
             switch _state {
@@ -757,7 +830,7 @@ internal class SIMChatInputPanelAudioViewPreview: UIView, SIMChatSpectrumViewDel
                 if _activityView.isAnimating() {
                     _activityView.stopAnimating()
                 }
-                let t = SIMChatAudioManager.sharedManager.currentTime
+                let t = _player?.duration ?? 0
                 _tipsLabel.text = String(format: "%0d:%02d", Int(t / 60), Int(t % 60))
                 _spectrumView.hidden = false
             case .Error(let error):
@@ -806,6 +879,8 @@ internal class SIMChatInputPanelAudioViewPreview: UIView, SIMChatSpectrumViewDel
         }
     }
     
+    var _player: SIMChatMediaPlayerProtocol?
+    
     dynamic func onTimer(sender: AnyObject) {
         // 计算当前进度
         let cur = CACurrentMediaTime() - _startAt
@@ -816,6 +891,51 @@ internal class SIMChatInputPanelAudioViewPreview: UIView, SIMChatSpectrumViewDel
             // ok 完成
             self.onStop()
         }
+    }
+    
+    func playerShouldPrepare(player: SIMChatMediaPlayerProtocol) -> Bool {
+        return true
+    }
+    func playerDidPrepare(player: SIMChatMediaPlayerProtocol) {
+        SIMLog.trace()
+    }
+    
+    func playerShouldPlay(player: SIMChatMediaPlayerProtocol) -> Bool {
+        return true
+    }
+    func playerDidPlay(player: SIMChatMediaPlayerProtocol) {
+        SIMLog.trace()
+        
+        // 进入播放状态
+        self._state = .Playing
+        self._playing = true
+        
+        // 进入计时
+        dispatch_async(dispatch_get_main_queue()) {
+            self._duration = player.duration
+            self._startAt = CACurrentMediaTime()
+            self._timer = NSTimer.scheduledTimerWithTimeInterval2(0.1, self, "onTimer:")
+        }
+    }
+    func playerDidStop(player: SIMChatMediaPlayerProtocol) {
+        SIMLog.trace()
+        
+        // 停止
+        _timer?.invalidate()
+        _timer = nil
+        
+        _state = .None
+        _playing = false
+        _playProgress.strokeEnd = 0
+        _playProgress.removeAllAnimations()
+    }
+    func playerDidFinish(player: SIMChatMediaPlayerProtocol) {
+        SIMLog.trace()
+    }
+    func playerDidErrorOccur(player: SIMChatMediaPlayerProtocol, error: NSError) {
+        SIMLog.trace()
+        // 出错了.
+        _state = .Error(error)
     }
     
     dynamic func onPlayOrPause() {
@@ -830,55 +950,30 @@ internal class SIMChatInputPanelAudioViewPreview: UIView, SIMChatSpectrumViewDel
     
     /// 播放
     @inline(__always) func onPlay() {
-        guard let panel = self.panel else {
+        guard let panel = panel, url = url else {
             return
         }
-        SIMLog.trace()
-        guard let request = delegate?.inputPanelShouldStartPlay(panel) else {
-            return
+        guard let player = delegate?.inputPanelAudioPlayer(panel, url: url) else {
+            return // 申请被拒绝
         }
         
+        SIMLog.trace()
+        
         // 重置
+        _player = player
+        _player?.delegate = self
         _playProgress.strokeEnd = 0
         _playProgress.removeAllAnimations()
         // 进行等待
         _state = .Waiting
         
-        request.response {
-            if let error = $0.error {
-                // 出错了.
-                self._state = .Error(error)
-            } else {
-                // 进入播放状态
-                self._state = .Playing
-                self._playing = true
-                self.delegate?.inputPanelDidStartPlay(panel)
-                
-                // 进入计时
-                dispatch_async(dispatch_get_main_queue()) {
-                    self._duration = SIMChatAudioManager.sharedManager.duration
-                    self._startAt = CACurrentMediaTime()
-                    self._timer = NSTimer.scheduledTimerWithTimeInterval2(0.1, self, "onTimer:")
-                }
-            }
-        }
+        // 直接播放, 处理在代理处理
+        _player?.play()
     }
     /// 停止
     @inline(__always) func onStop() {
-        guard let panel = self.panel else {
-            return
-        }
         SIMLog.trace()
-        
-        delegate?.inputPanelDidStopRecordAndPlay(panel)
-        
-        _timer?.invalidate()
-        _timer = nil
-        
-        _state = .None
-        _playing = false
-        _playProgress.strokeEnd = 0
-        _playProgress.removeAllAnimations()
+        _player?.stop()
     }
     
     override func willMoveToWindow(newWindow: UIWindow?) {
@@ -965,7 +1060,7 @@ internal class SIMChatInputPanelAudioViewPreview: UIView, SIMChatSpectrumViewDel
 /// 子面板: 语音预览代理
 ///
 internal protocol SIMChatInputPanelAudioViewCellDelegate: class {
-    func inputPanelShowAudioPreview(inputPanel: UIView)
+    func inputPanelShowAudioPreview(inputPanel: UIView, url: NSURL, duration: NSTimeInterval)
 }
 
 internal class SIMChatInputPanelAudioViewOfSimulate: UICollectionViewCell {

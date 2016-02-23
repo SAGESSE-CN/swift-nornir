@@ -15,19 +15,19 @@ import Foundation
 public class SIMChatBaseMessageAudioContent: SIMChatMessageContentProtocol {
     /// 使用本地链接创建内容
     public init(local: String, duration: NSTimeInterval) {
-        let l = local.stringByAddingPercentEncodingWithAllowedCharacters(.URLFragmentAllowedCharacterSet())!
+        let url = SIMChatFileProviderSource.Local(contentType: SIMChatMessageAudioContentType, path: local).URL
         
-        self.local = NSURL(string: "chat-audio://\(l)")!
-        self.remote = NSURL(string: "chat-audio://\(l)")!
+        self.local = url
+        self.remote = url
         
         self.duration = duration
     }
     /// 使用服务器链接创建内容
-    public init(remote: String, duration: NSTimeInterval) {
-        let r = remote.stringByAddingPercentEncodingWithAllowedCharacters(.URLFragmentAllowedCharacterSet())!
+    public init(remote: NSURL, duration: NSTimeInterval) {
+        let url = SIMChatFileProviderSource.Network(contentType: SIMChatMessageAudioContentType, address: remote).URL
         
-        self.local = NSURL(string: "chat-audio://\(r)")!
-        self.remote = NSURL(string: "chat-audio://\(r)")!
+        self.local =  nil
+        self.remote = url
         
         self.duration = duration
     }
@@ -44,3 +44,6 @@ public class SIMChatBaseMessageAudioContent: SIMChatMessageContentProtocol {
     /// 持续时间
     public let duration: NSTimeInterval
 }
+
+
+public let SIMChatMessageAudioContentType = "simchat.audio"

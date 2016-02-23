@@ -11,58 +11,45 @@ import AVFoundation
 
 extension SIMChatViewController: SIMChatInputBarDelegate, SIMChatInputPanelToolBoxDelegate, SIMChatInputPanelEmoticonViewDelegate, SIMChatInputPanelAudioViewDelegate {
     
+    
     // MARK: - SIMChatInputPanelAudioViewDelegate
     
     ///
-    /// 将要启动录音, 返回的是SIMChatRequest, 这是一个异步操作, 如果拒绝这个请求, 可以直接返回nil
+    /// 请求一个音频录音器, 如果拒绝该请求返回nil
     ///
-    func inputPanelShouldStartRecord(inputPanel: UIView) -> SIMChatRequest<Void>? {
-        SIMLog.trace()
-        return SIMChatAudioManager.sharedManager.prepareToRecord()
+    public func inputPanelAudioRecorder(inputPanel: UIView, url: NSURL) -> SIMChatMediaRecorderProtocol? {
+        return manager.mediaProvider.audioRecorder(url)
     }
     ///
-    /// 开始启动录音
+    /// 请求一个音频播放器, 如果拒绝该请求返回nil
     ///
-    func inputPanelDidStartRecord(inputPanel: UIView) {
-        SIMLog.trace()
-        SIMChatAudioManager.sharedManager.record()
+    public func inputPanelAudioPlayer(inputPanel: UIView, url: NSURL) -> SIMChatMediaPlayerProtocol? {
+        return manager.mediaProvider.audioPlayer(url)
     }
     
     ///
-    /// 将要启动播放, 返回的是SIMChatRequest, 这是一个异步操作, 如果拒绝这个请求, 可以直接返回nil
+    /// 将要发送音频
     ///
-    func inputPanelShouldStartPlay(inputPanel: UIView) -> SIMChatRequest<Void>? {
-        SIMLog.trace()
-        return SIMChatAudioManager.sharedManager.prepareToPlay()
+    public func inputPanelShouldSendAudio(inputPanel: UIView, url: NSURL, duration: NSTimeInterval) -> Bool {
+        if duration < 1 {
+            SIMChatMessageBox.Alert.error("录音时间太短了")
+            return false
+        }
+        return true
     }
     ///
-    /// 开始启动录音
+    /// 发送音频
     ///
-    func inputPanelDidStartPlay(inputPanel: UIView) {
+    public func inputPanelDidSendAudio(inputPanel: UIView, url: NSURL, duration: NSTimeInterval) {
         SIMLog.trace()
-        SIMChatAudioManager.sharedManager.play()
-    }
-    
-    ///
-    /// 停止录音和播放
-    ///
-    func inputPanelDidStopRecordAndPlay(inputPanel: UIView) {
-        SIMLog.trace()
-        SIMChatAudioManager.sharedManager.stop()
-    }
-    
-    ///
-    /// 完成确认
-    ///
-    func inputPanelDidAudioComfirm(inputPanel: UIView) {
-        SIMLog.trace()
-    }
-    
-    ///
-    /// 完成取消
-    ///
-    func inputPanelDidAudioCancel(inputPanel: UIView) {
-        SIMLog.trace()
+        
+        let newPath = NSTemporaryDirectory() + "\(NSDate().timeIntervalSinceNow).acc"
+        let _ = try? NSFileManager.defaultManager().moveItemAtURL(url, toURL: NSURL(fileURLWithPath: newPath))
+        let content = SIMChatBaseMessageAudioContent(local: newPath, duration: duration)
+        
+        dispatch_async(dispatch_get_main_queue()) {
+            self.messageManager.sendMessage(content)
+        }
     }
     
     // MARK: - SIMChatInputBarDelegate
