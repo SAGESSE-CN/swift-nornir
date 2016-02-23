@@ -8,7 +8,7 @@
 
 ![Screen](https://github.com/sagesse-cn/swift-chat/blob/master/Design/Screen%20Snapshoot.gif)
 
-该库目前只是纯UI库, 后面将会添加第三方的聊天服务(例如:融云,百川,腾讯云)使用示例, 再后面将会实现网络部分(swift/xmpp)
+该库目前只是纯UI库, 后面将会添加第三方的聊天服务(例如:融云,百川,腾讯云)使用示例, 再后面将会实现网络部分(swift/XMPP)
 
 因为我没有iOS7的设备, 加上Framework不支持iOS7, 所以该库**不直接支持iOS7**.
 如果需要**在iOS7**上使用, 请直接**使用源代码**, 目前iOS7没有经过任何测试.
@@ -46,8 +46,8 @@
 
 #### 聊天主界面-输入面板
 * [X] **内置表情, 提供QQ表情和Emoji表情, 如需添加其他, 在配置文件`emoticons.plist`中按格式添加即可**
-* [X] **支持扩展内置表情, 使用`SIMChatInputPanel.registerClass:byIdentifier:`进行注册**
-* [X] **支持自定义, 在`SIMChatInputPanelEmoticonViewDelegate``inputPanel:emoticonGroupAtIndex:`返回表情组即可. NOTE:这里还要改**
+* [X] **支持扩展内置表情, 在`SIMChatInputPanelEmoticonViewDelegate``inputPanel:emoticonGroupAtIndex:`返回表情组即可. NOTE:这里还要改**
+* [X] **支持自定义, 使用`SIMChatInputPanel.registerClass:byIdentifier:`进行注册**
 * [X] **支持对讲**
 * [ ] **支持变声**
 * [ ] **支持录音**
