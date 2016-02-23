@@ -8,6 +8,9 @@
 
 import UIKit
 
+
+// TODO: 混乱. 需要重构
+
 ///
 /// 音频输入面板代理
 ///
@@ -773,7 +776,7 @@ internal class SIMChatInputPanelAudioViewPreview: UIView, SIMChatSpectrumViewDel
     
     func chatSpectrumViewWaveOfLeft(chatSpectrumView: SIMChatSpectrumView) -> Float {
         if _state.isPlaying() {
-            let t = _player?.duration ?? 0
+            let t = _player?.currentTime ?? 0
             _tipsLabel.text = String(format: "%0d:%02d", Int(t / 60), Int(t % 60))
         }
         return _player?.meter(0) ?? -60
@@ -830,7 +833,7 @@ internal class SIMChatInputPanelAudioViewPreview: UIView, SIMChatSpectrumViewDel
                 if _activityView.isAnimating() {
                     _activityView.stopAnimating()
                 }
-                let t = _player?.duration ?? 0
+                let t = _player?.currentTime ?? 0
                 _tipsLabel.text = String(format: "%0d:%02d", Int(t / 60), Int(t % 60))
                 _spectrumView.hidden = false
             case .Error(let error):
@@ -1012,22 +1015,6 @@ internal class SIMChatInputPanelAudioViewPreview: UIView, SIMChatSpectrumViewDel
         view.setImage(UIImage(named: "simchat_keyboard_voice_button_play_press"), forState: .Highlighted)
         view.setBackgroundImage(UIImage(named: "simchat_keyboard_voice_background"), forState: .Normal)
         view.setBackgroundImage(UIImage(named: "simchat_keyboard_voice_background"), forState: .Highlighted)
-//
-//                if newValue {
-//                    // 正在播放
-//                    playButton.setImage(UIImage(named: "simchat_keyboard_voice_button_stop_nor"), forState: .Normal)
-//                    playButton.setImage(UIImage(named: "simchat_keyboard_voice_button_stop_press"), forState: .Highlighted)
-//                } else {
-//                    // 停止了
-//                    playButton.setImage(UIImage(named: "simchat_keyboard_voice_button_play_nor"), forState: .Normal)
-//                    playButton.setImage(UIImage(named: "simchat_keyboard_voice_button_play_press"), forState: .Highlighted)
-//        // add events
-//        view.addTarget(self, action: "onTouchStart:", forControlEvents: .TouchDown)
-//        view.addTarget(self, action: "onTouchDrag:withEvent:", forControlEvents: .TouchDragInside)
-//        view.addTarget(self, action: "onTouchDrag:withEvent:", forControlEvents: .TouchDragOutside)
-//        view.addTarget(self, action: "onTouchStop:", forControlEvents: .TouchUpInside)
-//        view.addTarget(self, action: "onTouchStop:", forControlEvents: .TouchUpOutside)
-//        view.addTarget(self, action: "onTouchInterrupt:", forControlEvents: .TouchCancel)
         
         view.sizeToFit()
         

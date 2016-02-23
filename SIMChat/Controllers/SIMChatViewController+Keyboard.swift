@@ -43,7 +43,7 @@ extension SIMChatViewController: SIMChatInputBarDelegate, SIMChatInputPanelToolB
     public func inputPanelDidSendAudio(inputPanel: UIView, url: NSURL, duration: NSTimeInterval) {
         SIMLog.trace()
         
-        let newPath = NSTemporaryDirectory() + "\(NSDate().timeIntervalSinceNow).acc"
+        let newPath = NSTemporaryDirectory() + "\(NSDate()).acc"
         let _ = try? NSFileManager.defaultManager().moveItemAtURL(url, toURL: NSURL(fileURLWithPath: newPath))
         let content = SIMChatBaseMessageAudioContent(local: newPath, duration: duration)
         

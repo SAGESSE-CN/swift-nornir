@@ -399,6 +399,9 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
         SIMLog.debug(message.identifier)
        
         switch message.content {
+        case let content as SIMChatBaseMessageImageContent:
+            
+            break
         case let content as SIMChatBaseMessageAudioContent:
             // 音频.
             let player = manager.mediaProvider.audioPlayer(content.remote)
