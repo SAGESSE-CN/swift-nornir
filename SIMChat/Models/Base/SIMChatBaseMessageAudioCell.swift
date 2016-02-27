@@ -152,7 +152,7 @@ extension SIMChatBaseMessageAudioCell {
         guard let content = message.content as? SIMChatBaseMessageAudioContent else {
             return false // 目标错误
         }
-        return player.url === content.remote
+        return player.URL === content.remoteURL
     }
     
     /// 音频开始播放
@@ -194,7 +194,7 @@ extension SIMChatBaseMessageAudioCell {
         guard let message = message where !message.isSelf else {
             return // 参数为空
         }
-        guard (message.content as? SIMChatBaseMessageAudioContent)?.remote === sender.object else {
+        guard (message.content as? SIMChatBaseMessageAudioContent)?.remoteURL === sender.object else {
             return // 参数错误
         }
         SIMLog.trace(message.identifier)
@@ -206,7 +206,7 @@ extension SIMChatBaseMessageAudioCell {
         guard let message = message where !message.isSelf else {
             return // 参数为空, 不操作自己的消息
         }
-        guard (message.content as? SIMChatBaseMessageAudioContent)?.remote === sender.object else {
+        guard (message.content as? SIMChatBaseMessageAudioContent)?.remoteURL === sender.object else {
             return // 参数错误
         }
         SIMLog.trace(message.identifier)

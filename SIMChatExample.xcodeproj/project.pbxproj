@@ -30,6 +30,7 @@
 		0C7C93941C76D2F700E7DC5C /* photo_picker_mark_select@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 0C7C938B1C76D2F700E7DC5C /* photo_picker_mark_select@2x.png */; };
 		0C7C93951C76D2F700E7DC5C /* photo_picker_mark_select_sm@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 0C7C938C1C76D2F700E7DC5C /* photo_picker_mark_select_sm@2x.png */; };
 		0CE522881C63341800EB284D /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0CE522871C63341800EB284D /* AudioToolbox.framework */; };
+		0CFA07191C81BC7100AF0F87 /* t1_t.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 0CFA07181C81BC7100AF0F87 /* t1_t.jpg */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -113,6 +114,7 @@
 		0C7C938C1C76D2F700E7DC5C /* photo_picker_mark_select_sm@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "photo_picker_mark_select_sm@2x.png"; sourceTree = "<group>"; };
 		0CE522861C63341800EB284D /* SIMChatExample.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = SIMChatExample.entitlements; sourceTree = "<group>"; };
 		0CE522871C63341800EB284D /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
+		0CFA07181C81BC7100AF0F87 /* t1_t.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = t1_t.jpg; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -157,10 +159,11 @@
 		0C0DD6A31C60B65D00AEC8C4 /* SIMChatExample */ = {
 			isa = PBXGroup;
 			children = (
+				0CFA07181C81BC7100AF0F87 /* t1_t.jpg */,
+				0C6B41581C61DA7E00085B66 /* t1.jpg */,
 				0C4070F61C7B605900AEECB7 /* Music.m4a */,
 				0CE522871C63341800EB284D /* AudioToolbox.framework */,
 				0C7C938D1C76D2F700E7DC5C /* Resources */,
-				0C6B41581C61DA7E00085B66 /* t1.jpg */,
 				0C0DD6A41C60B65D00AEC8C4 /* AppDelegate.swift */,
 				0C6B41541C61D6E300085B66 /* ExChatManager.swift */,
 				0C6B41561C61D74A00085B66 /* ExChatConversation.swift */,
@@ -328,6 +331,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				0C7C938F1C76D2F700E7DC5C /* photo_picker_icon_video@2x.png in Resources */,
+				0CFA07191C81BC7100AF0F87 /* t1_t.jpg in Resources */,
 				0C7C93931C76D2F700E7DC5C /* photo_picker_mark_null_sm@2x.png in Resources */,
 				0C0DD6AF1C60B65D00AEC8C4 /* LaunchScreen.storyboard in Resources */,
 				0C0DD6AC1C60B65D00AEC8C4 /* Assets.xcassets in Resources */,

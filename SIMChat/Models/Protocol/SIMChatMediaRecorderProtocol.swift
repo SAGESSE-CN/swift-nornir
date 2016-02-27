@@ -24,7 +24,7 @@ public protocol SIMChatMediaRecorderDelegate: class {
 
 public protocol SIMChatMediaRecorderProtocol: class {
     
-    var url: NSURL { get }
+    var URL: NSURL { get }
     var recording: Bool { get }
     var currentTime: NSTimeInterval { get }
     

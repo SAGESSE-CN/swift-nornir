@@ -477,9 +477,9 @@ internal class SIMChatInputPanelAudioViewOfTalkback: UICollectionViewCell, SIMCh
         // 检查用户选择的是什么.
         if let panel = panel {
             if _confirm {
-                delegate?.inputPanelDidSendAudio(panel, url: recorder.url, duration: recorder.currentTime)
+                delegate?.inputPanelDidSendAudio(panel, url: recorder.URL, duration: recorder.currentTime)
             } else {
-                cellDelegate?.inputPanelShowAudioPreview(panel, url: recorder.url, duration: recorder.currentTime)
+                cellDelegate?.inputPanelShowAudioPreview(panel, url: recorder.URL, duration: recorder.currentTime)
             }
         }
         
@@ -529,7 +529,7 @@ internal class SIMChatInputPanelAudioViewOfTalkback: UICollectionViewCell, SIMCh
         // 关掉操作响应
         _recordButton.userInteractionEnabled = false
         // 检查用户选择
-        if !isCancel && delegate?.inputPanelShouldSendAudio(panel, url: recorder.url, duration: recorder.currentTime) ?? true {
+        if !isCancel && delegate?.inputPanelShouldSendAudio(panel, url: recorder.URL, duration: recorder.currentTime) ?? true {
             _confirm = !_leftView.highlighted
             _recorder?.stop()
         } else {

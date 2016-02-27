@@ -11,8 +11,8 @@ import AVFoundation
 
 public class SIMChatMediaAudioPlayer: NSObject, SIMChatMediaPlayerProtocol, AVAudioPlayerDelegate {
     
-    public init(url: NSURL) {
-        _url = url
+    public init(URL: NSURL) {
+        _url = URL
         super.init()
         
         NSNotificationCenter.defaultCenter().addObserver(self,
@@ -32,7 +32,7 @@ public class SIMChatMediaAudioPlayer: NSObject, SIMChatMediaPlayerProtocol, AVAu
         NSNotificationCenter.defaultCenter().removeObserver(self)
     }
     
-    public var url: NSURL { return _url }
+    public var URL: NSURL { return _url }
     public var playing: Bool { return _isPlaying }
     public var duration: NSTimeInterval { return _player?.duration ?? 0 }
     public var currentTime: NSTimeInterval { return _player?.currentTime ?? 0 }
@@ -102,9 +102,11 @@ public class SIMChatMediaAudioPlayer: NSObject, SIMChatMediaPlayerProtocol, AVAu
                     if !player.prepareToPlay() {
                         throw NSError(domain: "Prepare Play Fail", code: -1, userInfo: nil)
                     }
-                    self?._player = player
-                    self?._isPrepareing = false
-                    self?._didPrepare()
+                    dispatch_after_at_now(0.5, dispatch_get_main_queue()) {
+                        self?._player = player
+                        self?._isPrepareing = false
+                        self?._didPrepare()
+                    }
                 } catch let error as NSError {
                     self?._isPrepareing = false
                     self?._didErrorOccur(error)

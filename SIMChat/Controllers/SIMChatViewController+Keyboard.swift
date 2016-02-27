@@ -45,7 +45,7 @@ extension SIMChatViewController: SIMChatInputBarDelegate, SIMChatInputPanelToolB
         
         let newPath = NSTemporaryDirectory() + "\(NSDate()).acc"
         let _ = try? NSFileManager.defaultManager().moveItemAtURL(url, toURL: NSURL(fileURLWithPath: newPath))
-        let content = SIMChatBaseMessageAudioContent(local: newPath, duration: duration)
+        let content = SIMChatBaseMessageAudioContent(path: newPath, duration: duration)
         
         dispatch_async(dispatch_get_main_queue()) {
             self.messageManager.sendMessage(content)

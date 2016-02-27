@@ -11,8 +11,8 @@ import AVFoundation
 
 public class SIMChatMediaAudioRecorder: NSObject, SIMChatMediaRecorderProtocol, AVAudioRecorderDelegate {
     
-    public init(url: NSURL) {
-        _url = url
+    public init(URL: NSURL) {
+        _url = URL
         super.init()
         
         SIMChatMediaAudioRecorder.retainInstance = self
@@ -33,7 +33,7 @@ public class SIMChatMediaAudioRecorder: NSObject, SIMChatMediaRecorderProtocol, 
         NSNotificationCenter.defaultCenter().removeObserver(self)
     }
     
-    public var url: NSURL { return _url }
+    public var URL: NSURL { return _url }
     public var recording: Bool { return false }
     public var currentTime: NSTimeInterval {
         if let time = _recorder?.currentTime where _recorder?.recording ?? false {
@@ -111,9 +111,11 @@ public class SIMChatMediaAudioRecorder: NSObject, SIMChatMediaRecorderProtocol, 
                 if !recorder.prepareToRecord() {
                     throw NSError(domain: "Prepare Record Fail!", code: -1, userInfo: nil)
                 }
-                self?._recorder = recorder
-                self?._isPrepareing = false
-                self?._didPrepare()
+                dispatch_after_at_now(0.5, dispatch_get_main_queue()) {
+                    self?._recorder = recorder
+                    self?._isPrepareing = false
+                    self?._didPrepare()
+                }
             } catch let error as NSError  {
                 self?._isPrepareing = false
                 self?._didErrorOccur(error)

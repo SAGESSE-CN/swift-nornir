@@ -396,15 +396,22 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
     }
     // 点击消息
     func cellEvent(cell: SIMChatMessageCellProtocol, didPressMessage message: SIMChatMessageProtocol) {
+        guard let cell = cell as? UITableViewCell else {
+            return // 未知错误
+        }
+        
         SIMLog.debug(message.identifier)
        
         switch message.content {
         case let content as SIMChatBaseMessageImageContent:
-            
-            break
+            if let view = (cell as? SIMChatBaseMessageImageCell)?.previewImageView {
+                let browser = manager.mediaProvider.imageBrowser()
+                browser.browse(content.remoteURL)
+                browser.show(view)
+            }
         case let content as SIMChatBaseMessageAudioContent:
             // 音频.
-            let player = manager.mediaProvider.audioPlayer(content.remote)
+            let player = manager.mediaProvider.audioPlayer(content.remoteURL)
             if !player.playing {
                 player.play()
             } else {

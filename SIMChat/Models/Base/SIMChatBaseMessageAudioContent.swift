@@ -14,20 +14,20 @@ import Foundation
 ///
 public class SIMChatBaseMessageAudioContent: SIMChatMessageContentProtocol {
     /// 使用本地链接创建内容
-    public init(local: String, duration: NSTimeInterval) {
-        let url = SIMChatFileProviderSource.Local(contentType: SIMChatMessageAudioContentType, path: local).URL
+    public init(path: String, duration: NSTimeInterval) {
+        let url = SIMChatFileProviderSource.Local(path: path).URL
         
-        self.local = url
-        self.remote = url
+        self.localURL = url
+        self.remoteURL = url
         
         self.duration = duration
     }
     /// 使用服务器链接创建内容
-    public init(remote: NSURL, duration: NSTimeInterval) {
-        let url = SIMChatFileProviderSource.Network(contentType: SIMChatMessageAudioContentType, address: remote).URL
+    public init(URL: NSURL, duration: NSTimeInterval) {
+        let url = SIMChatFileProviderSource.Network(address: URL).URL
         
-        self.local =  nil
-        self.remote = url
+        self.localURL = nil
+        self.remoteURL = url
         
         self.duration = duration
     }
@@ -37,12 +37,13 @@ public class SIMChatBaseMessageAudioContent: SIMChatMessageContentProtocol {
     //public var downloaded: Bool = false
     public var downloading: Bool = false
     
-    /// 音频在本地的路径, 只有在需要上传的时候这个值才会存在
-    public let local: NSURL?
-    /// 音频在服务器上的路径
-    public let remote: NSURL
     /// 持续时间
     public let duration: NSTimeInterval
+    
+    /// 音频在本地的路径, 只有在需要上传的时候这个值才会存在
+    public let localURL: NSURL?
+    /// 音频在服务器上的路径
+    public let remoteURL: NSURL
 }
 
 

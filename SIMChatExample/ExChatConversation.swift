@@ -140,6 +140,8 @@ class ExChatConversation: SIMChatBaseConversation {
         var rs: Array<SIMChatMessageProtocol> = []
         
         let path = NSBundle.mainBundle().pathForResource("t1", ofType: "jpg")!
+        let tpath = NSBundle.mainBundle().pathForResource("t1_t", ofType: "jpg")!
+        
         let apath = NSBundle.mainBundle().pathForResource("Music", ofType: "m4a")!
         
         for r in 0 ..< (2 * 11) {
@@ -182,7 +184,7 @@ class ExChatConversation: SIMChatBaseConversation {
             }
             
             if true || (rand() % 10) == 2 {
-                let c = SIMChatBaseMessageImageContent(remote: path, size: CGSizeMake(640, 480))
+                let c = SIMChatBaseMessageImageContent(originPath: path, thumbnailPath: tpath, size: CGSizeMake(640, 480))
                 let m = SIMChatBaseMessage.messageWithContent(c, receiver: o, sender: s)
                 m.option = [.ContactShow]
                 m.isSelf = (r % 2 == 0)
@@ -191,7 +193,7 @@ class ExChatConversation: SIMChatBaseConversation {
                 rs.append(m)
             }
             if true || (rand() % 10) == 2 {
-                let c = SIMChatBaseMessageImageContent(remote: path, size: CGSizeMake(640, 480))
+                let c = SIMChatBaseMessageImageContent(originPath: path, thumbnailPath: tpath, size: CGSizeMake(640, 480))
                 let m = SIMChatBaseMessage.messageWithContent(c, receiver: o, sender: s)
                 m.option = [.ContactShow]
                 m.isSelf = (r % 2 == 0)
@@ -201,7 +203,7 @@ class ExChatConversation: SIMChatBaseConversation {
             }
             
             if true || (rand() % 10) < 2 {
-                let c = SIMChatBaseMessageAudioContent(local: apath, duration: 6.2 * Double((r % 3600) + 1))
+                let c = SIMChatBaseMessageAudioContent(path: apath, duration: 6.2 * Double((r % 3600) + 1))
                 let m = SIMChatBaseMessage.messageWithContent(c, receiver: o, sender: s)
                 m.option = [.ContactShow]
                 m.isSelf = (r % 2 == 0)
@@ -210,7 +212,7 @@ class ExChatConversation: SIMChatBaseConversation {
                 rs.append(m)
             }
             if true || (rand() % 10) < 2 {
-                let c = SIMChatBaseMessageAudioContent(local: apath, duration: 6.2 * Double((r % 3600) + 1))
+                let c = SIMChatBaseMessageAudioContent(path: apath, duration: 6.2 * Double((r % 3600) + 1))
                 let m = SIMChatBaseMessage.messageWithContent(c, receiver: o, sender: s)
                 m.option = [.ContactShow]
                 m.isSelf = (r % 2 == 0)
@@ -237,7 +239,7 @@ class ExChatConversation: SIMChatBaseConversation {
             }
         }
         
-        let c = SIMChatBaseMessageAudioContent(local: apath, duration: 88)
+        let c = SIMChatBaseMessageImageContent(originPath: path, thumbnailPath: tpath, size: CGSizeMake(640, 480))
         let m = SIMChatBaseMessage.messageWithContent(c, receiver: receiver, sender: sender)
         m.option = [.ContactShow]
         m.isSelf = true//(r % 2 == 0)

@@ -57,13 +57,16 @@ public class SIMChatBaseMessageImageCell: SIMChatBaseMessageBubbleCell {
             }
             
             previewImageView.image = UIImage(named: "simchat_images_default")
-            // 下载缩略图
-            manager?.fileProvider.download(content.thumbnail)
+            
+            SIMChatFileProvider.sharedInstance().download(content.thumbnailURL)
                 .response { [weak self] in
                     guard message == self?.message else {
                         return
                     }
-                    self?.previewImageView.image = $0.value as? UIImage
+                    if let url = $0.value as? NSURL {
+                        let img = UIImage(contentsOfFile: url.path!)
+                        self?.previewImageView.image = img//$0.value as? UIImage
+                    }
             }
         }
     }

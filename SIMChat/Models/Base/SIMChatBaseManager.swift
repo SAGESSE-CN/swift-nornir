@@ -17,9 +17,6 @@ public class SIMChatBaseManager: SIMChatManagerProtocol {
     /// 当前登录的用户.
     public var user: SIMChatUserProtocol?
     
-    /// 文件提供者
-    public lazy var fileProvider: SIMChatFileProvider = SIMChatFileProvider()
-    
     /// 用户信息提供者
     public lazy var userProvider: SIMChatUserProvider =  SIMChatUserProvider(manager: self)
     /// 媒体播放提供者
