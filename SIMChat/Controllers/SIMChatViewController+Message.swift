@@ -10,7 +10,7 @@ import UIKit
 
 
 extension SIMChatViewController {
-    class MessageManager: NSObject {
+    class MessageManager: NSObject, SIMChatBrowseAnimatedTransitioningTarget {
         init(conversation: SIMChatConversationProtocol) {
             _allMessages = []
             _conversation = conversation
@@ -28,6 +28,9 @@ extension SIMChatViewController {
         private var _fastMap: Dictionary<String, String> = [:]
         
         var durationInterval: NSTimeInterval = 60
+        
+        /// 目标view
+        weak var targetView: UIImageView?
         
         lazy var header: UIView = {
             let view = UIView(frame: CGRectMake(0, 0, 320, 44))
@@ -55,6 +58,10 @@ extension SIMChatViewController {
                 //contentView?.keyboardDismissMode = .OnDrag //.Interactive
                 contentView?.tableHeaderView = header
             }
+        }
+        
+        private var mediaProvider: SIMChatMediaProvider {
+            return manager.mediaProvider
         }
         
         private var manager: SIMChatManagerProtocol {
@@ -276,292 +283,6 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
             }
         }
         fatalError("time not found!")
-    }
-    
-    // MARK: UITableViewDataSource
-    
-    /// 消息数量
-    @objc func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return _allMessages.count
-    }
-    /// 计算高度
-    @objc func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
-        let message = _allMessages[indexPath.row]
-        let identifier = reuseIndentifierWithMessage(message)
-        return tableView.fd_heightForCellWithIdentifier(identifier, cacheByKey: message.identifier) {
-            if let mcell = $0 as? SIMChatMessageCellProtocol {
-                // configuation
-                mcell.conversation = self._conversation
-                mcell.message = message
-            }
-        }
-    }
-    /// 创建
-    @objc func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let identifier = reuseIndentifierWithMessage(_allMessages[indexPath.row])
-        let cell = tableView.dequeueReusableCellWithIdentifier(identifier, forIndexPath: indexPath)
-        
-        // default configuation
-        cell.selectionStyle = .None
-        cell.backgroundColor = .clearColor()
-        cell.clipsToBounds = true
-        //cell.backgroundColor = indexPath.row <= 1 ? .orangeColor() : .clearColor()
-        //cell.backgroundColor = indexPath.row % 2 == 0 ? UIColor.purpleColor() : UIColor.orangeColor()
-        
-        return cell
-    }
-    
-    // MARK: UIScrollViewDelegate
-    
-    @objc func scrollViewDidScroll(scrollView: UIScrollView) {
-//        SIMLog.debug("offset: \(scrollView.contentOffset)")
-    }
-    /// 开始拖动
-    @objc func scrollViewWillBeginDragging(scrollView: UIScrollView) {
-//        SIMLog.trace()
-//        scrollView.window?.endEditing(true)
-//        SIMLog.debug("offset: \(scrollView.contentOffset)")
-    }
-    @objc func scrollViewWillEndDragging(scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
-//        SIMLog.debug("offset: \(scrollView.contentOffset)")
-//        SIMLog.debug("startOffsetY: \(scrollView.valueForKey("_startOffsetY"))")
-//        SIMLog.debug("lastUpdateOffsetY: \(scrollView.valueForKey("_lastUpdateOffsetY"))")
-    }
-    /// 结束拖动
-    @objc func scrollViewDidEndDragging(scrollView: UIScrollView, willDecelerate decelerate: Bool) {
-        guard !scrollView.decelerating else {
-            return
-        }
-        // 因为如果拖动的距离不足以支持滑动的话, scrollViewDidEndDecelerating是不会被调用的, 手动模拟一次
-        scrollViewDidEndDecelerating(scrollView)
-    }
-    /// 结束滑动
-    @objc func scrollViewDidEndDecelerating(scrollView: UIScrollView) {
-        //SIMLog.trace(scrollView.contentOffset)
-        // 允许加载更多并且没有正在加载
-        guard contentView?.tableHeaderView != nil && !_isLoading else {
-            return
-        }
-        if scrollView.contentInset.top + scrollView.contentOffset.y <= header.frame.height {
-            _loadHistoryMessages()
-        }
-    }
-    /// 移到头部
-    @objc func scrollViewDidScrollToTop(scrollView: UIScrollView) {
-        guard contentView?.tableHeaderView != nil && !_isLoading else {
-            return
-        }
-        _loadHistoryMessages()
-    }
-    
-    // MARK: UITableViewDataSource
-    
-    /// 绑定
-    @objc func tableView(tableView: UITableView, willDisplayCell cell: UITableViewCell, forRowAtIndexPath indexPath: NSIndexPath) {
-        
-        let message = _allMessages[indexPath.row]
-        if let mcell = cell as? SIMChatMessageCellProtocol {
-            // custom configuation
-            mcell.conversation = self._conversation
-            mcell.message = message
-            mcell.delegate = self
-        }
-    }
-
-    // MARK: SIMChatConversationDelegate
-    
-    /// 接收到消息
-    func conversation(conversation: SIMChatConversationProtocol, didReciveMessage message: SIMChatMessageProtocol) {
-        SIMLog.debug()
-        _appendMessages([message], animated: true)
-    }
-    
-    /// 删除消息请求
-    func conversation(conversation: SIMChatConversationProtocol, didRemoveMessage message: SIMChatMessageProtocol) {
-        SIMLog.debug()
-        _removeMessages([message], animated: true)
-    }
-    
-    /// 更新消息请求
-    func conversation(conversation: SIMChatConversationProtocol, didUpdateMessage message: SIMChatMessageProtocol) {
-        SIMLog.debug()
-        _reloadMessages([message], animated: true)
-    }
-    
-    // MARK: SIMChatMessageCellDelegate
-    
-    // 点击消息
-    func cellEvent(cell: SIMChatMessageCellProtocol, shouldPressMessage message: SIMChatMessageProtocol) -> Bool {
-        return true
-    }
-    // 点击消息
-    func cellEvent(cell: SIMChatMessageCellProtocol, didPressMessage message: SIMChatMessageProtocol) {
-        guard let cell = cell as? UITableViewCell else {
-            return // 未知错误
-        }
-        
-        SIMLog.debug(message.identifier)
-       
-        switch message.content {
-        case let content as SIMChatBaseMessageImageContent:
-            if let view = (cell as? SIMChatBaseMessageImageCell)?.previewImageView {
-                let browser = manager.mediaProvider.imageBrowser()
-                browser.browse(content.remoteURL)
-                browser.show(view)
-            }
-        case let content as SIMChatBaseMessageAudioContent:
-            // 音频.
-            let player = manager.mediaProvider.audioPlayer(content.remoteURL)
-            if !player.playing {
-                player.play()
-            } else {
-                player.stop()
-            }
-        default:
-            break
-        }
-        _lastOperatorMessage = message
-    }
-    
-    // 长按消息
-    func cellEvent(cell: SIMChatMessageCellProtocol, shouldLongPressMessage message: SIMChatMessageProtocol) -> Bool {
-        return true
-    }
-    // 长按消息
-    func cellEvent(cell: SIMChatMessageCellProtocol, didLongPressMessage message: SIMChatMessageProtocol) {
-        SIMLog.debug(message.identifier)
-        
-        if let cell = cell as? SIMChatBaseMessageBubbleCell {
-            // 准备菜单
-            let mu = SIMChatMenuController.sharedMenuController()
-            let responder = cell.window?.findFirstResponder()
-            
-            // 检查第一响应者, 如果为空或者是cell, 重新激活
-            if responder == nil || responder is SIMChatBaseMessageBubbleCell {
-                cell.becomeFirstResponder()
-            }
-            
-            mu.menuItems = cell.bubbleMenuItems
-            mu.showMenu(cell, withRect: cell.bubbleView.frame, inView: cell)
-        }
-    }
-    
-    // 点击用户
-    func cellEvent(cell: SIMChatMessageCellProtocol, shouldPressUser user: SIMChatUserProtocol) -> Bool {
-        return true
-    }
-    // 点击用户
-    func cellEvent(cell: SIMChatMessageCellProtocol, didPressUser user: SIMChatUserProtocol) {
-        SIMLog.debug(user.identifier)
-    }
-    
-    // 长按用户
-    func cellEvent(cell: SIMChatMessageCellProtocol, shouldLongPressUser user: SIMChatUserProtocol) -> Bool {
-        return true
-    }
-    // 长按用户
-    func cellEvent(cell: SIMChatMessageCellProtocol, didLongPressUser user: SIMChatUserProtocol) {
-        SIMLog.debug(user.identifier)
-    }
-    
-    // MARK: SIMChatMessageCellMenuDelegate
-    
-    // 复制
-    func cellMenu(cell: SIMChatMessageCellProtocol, shouldCopyMessage message: SIMChatMessageProtocol) -> Bool {
-        return true
-    }
-    // 复制
-    func cellMenu(cell: SIMChatMessageCellProtocol, didCopyMessage message: SIMChatMessageProtocol) {
-        SIMLog.debug(message.identifier)
-    }
-    
-    // 删除
-    func cellMenu(cell: SIMChatMessageCellProtocol, shouldRemoveMessage message: SIMChatMessageProtocol) -> Bool {
-        return true
-    }
-    // 删除
-    func cellMenu(cell: SIMChatMessageCellProtocol, didRemoveMessage message: SIMChatMessageProtocol) {
-        SIMLog.debug(message.identifier)
-        // 最后操作的就是删除的这一条消息, 这需要停止当前正在进行的工作
-        if message == _lastOperatorMessage {
-            manager.mediaProvider.stop()
-        }
-        _conversation.removeMessage(message).response { [weak self] in
-            // 检查操作状态
-            if let error = $0.error {
-                SIMLog.error(error)
-                return
-            }
-            // 更新ui
-            self?._removeMessages([message], animated: true)
-        }
-    }
-    
-    /// 重试(发送/上传/下载)
-    func cellMenu(cell: SIMChatMessageCellProtocol, shouldRetryMessage message: SIMChatMessageProtocol) -> Bool {
-        return true
-    }
-    /// 重试(发送/上传/下载)
-    func cellMenu(cell: SIMChatMessageCellProtocol, didRetryMessage message: SIMChatMessageProtocol) {
-        SIMLog.debug(message.identifier)
-        // 最后操作的就是重新发送的这一条消息, 这需要停止当前正在进行的工作
-        if message == _lastOperatorMessage {
-            manager.mediaProvider.stop()
-        }
-        // 重新发送
-        _conversation.sendMessage(message, isResend: true).response { //[weak self] in
-            // 检查操作状态
-            if let error = $0.error {
-                SIMLog.error(error)
-                return
-            }
-        }
-        // 不用等结果, 直接移动
-        _moveMessages([message], toIndex: -1, animated: true)
-    }
-    
-    // 撤销
-    func cellMenu(cell: SIMChatMessageCellProtocol, shouldRevokeMessage message: SIMChatMessageProtocol) -> Bool {
-        return true
-    }
-    // 撤销
-    func cellMenu(cell: SIMChatMessageCellProtocol, didRevokeMessage message: SIMChatMessageProtocol) {
-        SIMLog.debug(message.identifier)
-        // 最后操作的就是撤销的这一条消息, 这需要停止当前正在进行的工作
-        if message == _lastOperatorMessage {
-            manager.mediaProvider.stop()
-        }
-        // 更新状态为revoked
-        _conversation.updateMessage(message, status: .Revoked).response { [weak self] in
-            // 检查操作状态
-            if let error = $0.error {
-                SIMLog.error(error)
-                return
-            }
-            // 更新ui
-            self?._reloadMessages([message], animated: true)
-        }
-    }
-    
-    ///
-    /// 发送消息
-    ///
-    func sendMessage(content: SIMChatMessageContentProtocol) {
-        SIMLog.trace()
-        let message = manager.classProvider.message.messageWithContent(content,
-            receiver: _conversation.receiver,
-            sender: _conversation.sender)
-        
-        // 发送
-        _conversation.sendMessage(message).response {
-            // 检查操作状态
-            if let error = $0.error {
-                SIMLog.error(error)
-                return
-            }
-        }
-        // 不用等结果
-        _appendMessages([message], animated: true)
     }
     
     // MARK: Message
@@ -972,6 +693,291 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
             }
         }
     }
+    /// 自动放弃(停止播放)
+    private func _autoResignMessage(message: SIMChatMessageProtocol) {
+        // 最后操作的就是删除的这一条消息, 这需要停止当前正在进行的工作
+        if message == _lastOperatorMessage {
+            mediaProvider.stop()
+        }
+    }
+    
+    // MARK: UITableViewDataSource
+    
+    /// 消息数量
+    @objc func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return _allMessages.count
+    }
+    /// 计算高度
+    @objc func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
+        let message = _allMessages[indexPath.row]
+        let identifier = reuseIndentifierWithMessage(message)
+        return tableView.fd_heightForCellWithIdentifier(identifier, cacheByKey: message.identifier) {
+            if let mcell = $0 as? SIMChatMessageCellProtocol {
+                // configuation
+                mcell.conversation = self._conversation
+                mcell.message = message
+            }
+        }
+    }
+    /// 创建
+    @objc func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+        let identifier = reuseIndentifierWithMessage(_allMessages[indexPath.row])
+        let cell = tableView.dequeueReusableCellWithIdentifier(identifier, forIndexPath: indexPath)
+        
+        // default configuation
+        cell.selectionStyle = .None
+        cell.backgroundColor = .clearColor()
+        cell.clipsToBounds = true
+        //cell.backgroundColor = indexPath.row <= 1 ? .orangeColor() : .clearColor()
+        //cell.backgroundColor = indexPath.row % 2 == 0 ? UIColor.purpleColor() : UIColor.orangeColor()
+        
+        return cell
+    }
+    
+    // MARK: UIScrollViewDelegate
+    
+    @objc func scrollViewDidScroll(scrollView: UIScrollView) {
+//        SIMLog.debug("offset: \(scrollView.contentOffset)")
+    }
+    /// 开始拖动
+    @objc func scrollViewWillBeginDragging(scrollView: UIScrollView) {
+//        SIMLog.trace()
+//        scrollView.window?.endEditing(true)
+//        SIMLog.debug("offset: \(scrollView.contentOffset)")
+    }
+    @objc func scrollViewWillEndDragging(scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
+//        SIMLog.debug("offset: \(scrollView.contentOffset)")
+//        SIMLog.debug("startOffsetY: \(scrollView.valueForKey("_startOffsetY"))")
+//        SIMLog.debug("lastUpdateOffsetY: \(scrollView.valueForKey("_lastUpdateOffsetY"))")
+    }
+    /// 结束拖动
+    @objc func scrollViewDidEndDragging(scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+        guard !scrollView.decelerating else {
+            return
+        }
+        // 因为如果拖动的距离不足以支持滑动的话, scrollViewDidEndDecelerating是不会被调用的, 手动模拟一次
+        scrollViewDidEndDecelerating(scrollView)
+    }
+    /// 结束滑动
+    @objc func scrollViewDidEndDecelerating(scrollView: UIScrollView) {
+        //SIMLog.trace(scrollView.contentOffset)
+        // 允许加载更多并且没有正在加载
+        guard contentView?.tableHeaderView != nil && !_isLoading else {
+            return
+        }
+        if scrollView.contentInset.top + scrollView.contentOffset.y <= header.frame.height {
+            _loadHistoryMessages()
+        }
+    }
+    /// 移到头部
+    @objc func scrollViewDidScrollToTop(scrollView: UIScrollView) {
+        guard contentView?.tableHeaderView != nil && !_isLoading else {
+            return
+        }
+        _loadHistoryMessages()
+    }
+    
+    // MARK: UITableViewDataSource
+    
+    /// 绑定
+    @objc func tableView(tableView: UITableView, willDisplayCell cell: UITableViewCell, forRowAtIndexPath indexPath: NSIndexPath) {
+        
+        let message = _allMessages[indexPath.row]
+        if let mcell = cell as? SIMChatMessageCellProtocol {
+            // custom configuation
+            mcell.conversation = self._conversation
+            mcell.message = message
+            mcell.delegate = self
+        }
+    }
+
+    // MARK: SIMChatConversationDelegate
+    
+    /// 接收到消息
+    func conversation(conversation: SIMChatConversationProtocol, didReciveMessage message: SIMChatMessageProtocol) {
+        SIMLog.debug()
+        _appendMessages([message], animated: true)
+    }
+    
+    /// 删除消息请求
+    func conversation(conversation: SIMChatConversationProtocol, didRemoveMessage message: SIMChatMessageProtocol) {
+        SIMLog.debug()
+        _removeMessages([message], animated: true)
+    }
+    
+    /// 更新消息请求
+    func conversation(conversation: SIMChatConversationProtocol, didUpdateMessage message: SIMChatMessageProtocol) {
+        SIMLog.debug()
+        _reloadMessages([message], animated: true)
+    }
+    
+    // MARK: SIMChatMessageCellDelegate
+    
+    // 点击消息
+    func cellEvent(cell: SIMChatMessageCellProtocol, shouldPressMessage message: SIMChatMessageProtocol) -> Bool {
+        return true
+    }
+    // 点击消息
+    func cellEvent(cell: SIMChatMessageCellProtocol, didPressMessage message: SIMChatMessageProtocol) {
+        guard let cell = cell as? UITableViewCell else {
+            return // 未知错误
+        }
+        
+        SIMLog.debug(message.identifier)
+       
+        switch message.content {
+        case let content as SIMChatBaseMessageImageContent:
+            if let view = (cell as? SIMChatBaseMessageImageCell)?.previewImageView {
+                targetView = view
+                mediaProvider.imageBrowser().browse(content, withTarget: self)
+            }
+        case let content as SIMChatBaseMessageAudioContent:
+            // 音频.
+            let player = mediaProvider.audioPlayer(content.remoteURL)
+            if !player.playing {
+                player.play()
+            } else {
+                player.stop()
+            }
+        default:
+            break
+        }
+        _lastOperatorMessage = message
+    }
+    
+    // 长按消息
+    func cellEvent(cell: SIMChatMessageCellProtocol, shouldLongPressMessage message: SIMChatMessageProtocol) -> Bool {
+        return true
+    }
+    // 长按消息
+    func cellEvent(cell: SIMChatMessageCellProtocol, didLongPressMessage message: SIMChatMessageProtocol) {
+        SIMLog.debug(message.identifier)
+        
+        if let cell = cell as? SIMChatBaseMessageBubbleCell {
+            // 准备菜单
+            let mu = SIMChatMenuController.sharedMenuController()
+            let responder = cell.window?.findFirstResponder()
+            
+            // 检查第一响应者, 如果为空或者是cell, 重新激活
+            if responder == nil || responder is SIMChatBaseMessageBubbleCell {
+                cell.becomeFirstResponder()
+            }
+            
+            mu.menuItems = cell.bubbleMenuItems
+            mu.showMenu(cell, withRect: cell.bubbleView.frame, inView: cell)
+        }
+    }
+    
+    // 点击用户
+    func cellEvent(cell: SIMChatMessageCellProtocol, shouldPressUser user: SIMChatUserProtocol) -> Bool {
+        return true
+    }
+    // 点击用户
+    func cellEvent(cell: SIMChatMessageCellProtocol, didPressUser user: SIMChatUserProtocol) {
+        SIMLog.debug(user.identifier)
+    }
+    
+    // 长按用户
+    func cellEvent(cell: SIMChatMessageCellProtocol, shouldLongPressUser user: SIMChatUserProtocol) -> Bool {
+        return true
+    }
+    // 长按用户
+    func cellEvent(cell: SIMChatMessageCellProtocol, didLongPressUser user: SIMChatUserProtocol) {
+        SIMLog.debug(user.identifier)
+    }
+    
+    // MARK: SIMChatMessageCellMenuDelegate
+    
+    // 复制
+    func cellMenu(cell: SIMChatMessageCellProtocol, shouldCopyMessage message: SIMChatMessageProtocol) -> Bool {
+        return true
+    }
+    // 复制
+    func cellMenu(cell: SIMChatMessageCellProtocol, didCopyMessage message: SIMChatMessageProtocol) {
+        SIMLog.debug(message.identifier)
+    }
+    
+    // 删除
+    func cellMenu(cell: SIMChatMessageCellProtocol, shouldRemoveMessage message: SIMChatMessageProtocol) -> Bool {
+        return true
+    }
+    // 删除
+    func cellMenu(cell: SIMChatMessageCellProtocol, didRemoveMessage message: SIMChatMessageProtocol) {
+        SIMLog.debug(message.identifier)
+        
+        _autoResignMessage(message)
+        _conversation.removeMessage(message).response { [weak self] in
+            // 检查操作状态
+            if let error = $0.error {
+                SIMLog.error(error)
+                return
+            }
+            // 更新ui
+            self?._removeMessages([message], animated: true)
+        }
+    }
+    
+    /// 重试(发送/上传/下载)
+    func cellMenu(cell: SIMChatMessageCellProtocol, shouldRetryMessage message: SIMChatMessageProtocol) -> Bool {
+        return true
+    }
+    /// 重试(发送/上传/下载)
+    func cellMenu(cell: SIMChatMessageCellProtocol, didRetryMessage message: SIMChatMessageProtocol) {
+        SIMLog.debug(message.identifier)
+        // 重新发送
+        _autoResignMessage(message)
+        _conversation.sendMessage(message, isResend: true).response { //[weak self] in
+            // 检查操作状态
+            if let error = $0.error {
+                SIMLog.error(error)
+                return
+            }
+        }
+        // 不用等结果, 直接移动
+        _moveMessages([message], toIndex: -1, animated: true)
+    }
+    
+    // 撤销
+    func cellMenu(cell: SIMChatMessageCellProtocol, shouldRevokeMessage message: SIMChatMessageProtocol) -> Bool {
+        return true
+    }
+    // 撤销
+    func cellMenu(cell: SIMChatMessageCellProtocol, didRevokeMessage message: SIMChatMessageProtocol) {
+        SIMLog.debug(message.identifier)
+        // 更新状态为revoked
+        _autoResignMessage(message)
+        _conversation.updateMessage(message, status: .Revoked).response { [weak self] in
+            // 检查操作状态
+            if let error = $0.error {
+                SIMLog.error(error)
+                return
+            }
+            // 更新ui
+            self?._reloadMessages([message], animated: true)
+        }
+    }
+    
+    ///
+    /// 发送消息
+    ///
+    func sendMessage(content: SIMChatMessageContentProtocol) {
+        SIMLog.trace()
+        let message = manager.classProvider.message.messageWithContent(content,
+            receiver: _conversation.receiver,
+            sender: _conversation.sender)
+        
+        // 发送
+        _conversation.sendMessage(message).response {
+            // 检查操作状态
+            if let error = $0.error {
+                SIMLog.error(error)
+                return
+            }
+        }
+        // 不用等结果
+        _appendMessages([message], animated: true)
+    }
+    
 }
 
 //// MARK: - Message Send

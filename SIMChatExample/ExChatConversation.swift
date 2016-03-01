@@ -184,7 +184,7 @@ class ExChatConversation: SIMChatBaseConversation {
             }
             
             if true || (rand() % 10) == 2 {
-                let c = SIMChatBaseMessageImageContent(originPath: path, thumbnailPath: tpath, size: CGSizeMake(640, 480))
+                let c = SIMChatBaseMessageImageContent(originPath: path, thumbnailPath: tpath, size: CGSizeMake(1024, 768))
                 let m = SIMChatBaseMessage.messageWithContent(c, receiver: o, sender: s)
                 m.option = [.ContactShow]
                 m.isSelf = (r % 2 == 0)
@@ -193,7 +193,7 @@ class ExChatConversation: SIMChatBaseConversation {
                 rs.append(m)
             }
             if true || (rand() % 10) == 2 {
-                let c = SIMChatBaseMessageImageContent(originPath: path, thumbnailPath: tpath, size: CGSizeMake(640, 480))
+                let c = SIMChatBaseMessageImageContent(originPath: path, thumbnailPath: tpath, size: CGSizeMake(1024, 768))
                 let m = SIMChatBaseMessage.messageWithContent(c, receiver: o, sender: s)
                 m.option = [.ContactShow]
                 m.isSelf = (r % 2 == 0)
@@ -239,7 +239,7 @@ class ExChatConversation: SIMChatBaseConversation {
             }
         }
         
-        let c = SIMChatBaseMessageImageContent(originPath: path, thumbnailPath: tpath, size: CGSizeMake(640, 480))
+        let c = SIMChatBaseMessageImageContent(originPath: path, thumbnailPath: tpath, size: CGSizeMake(1024, 768))
         let m = SIMChatBaseMessage.messageWithContent(c, receiver: receiver, sender: sender)
         m.option = [.ContactShow]
         m.isSelf = true//(r % 2 == 0)

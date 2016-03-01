@@ -37,7 +37,7 @@ public class SIMChatMediaProvider {
     }
     
     public func imageBrowser() -> SIMChatMediaBrowserProtocol {
-        return SIMChatMediaImageBrowser()
+        return SIMChatMediaPhotoBrowser()
     }
     
     public func audioPlayer(URL: NSURL) -> SIMChatMediaPlayerProtocol {

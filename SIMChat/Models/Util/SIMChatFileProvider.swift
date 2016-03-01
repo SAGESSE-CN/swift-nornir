@@ -8,52 +8,120 @@
 
 import UIKit
 
-/// 来源
-public enum SIMChatFileProviderSource {
-    case Raw(identifier: String)    // 原始数据
-    case Local(path: String)  // 本地文件
-    case Network(address: NSURL) // 网络文件
+///// 来源
+//public enum SIMChatFileProviderSource {
+//    case Raw(identifier: String)    // 原始数据
+//    case Local(path: String)  // 本地文件
+//    case Network(address: NSURL) // 网络文件
+//    
+//    // 从URL识别
+//    public init?(URL: NSURL) {
+//        guard let components = NSURLComponents(URL: URL, resolvingAgainstBaseURL: false) else {
+//            return nil // 错误
+//        }
+//        guard components.scheme == "simchat" else {
+//            return nil // 未知
+//        }
+//        guard let source = components.host, parameter = components.query else {
+//            return nil // 参数错误
+//        }
+//        switch source {
+//        case "chat.raw.sa":      self = .Raw(identifier: parameter)
+//        case "chat.local.sa":    self = .Local(path: parameter)
+//        case "chat.network.sa":  self = .Network(address: NSURL(string: parameter)!)
+//        default:            return nil
+//        }
+//    }
+//    // 转为URL
+//    public var URL: NSURL {
+//        let components = NSURLComponents()
+//        components.scheme = "simchat"
+//        switch self {
+//        case .Raw(let identifier):
+//            components.host = "chat.raw.sa"
+//            components.path = "/param"
+//            components.query = identifier
+//        case .Local(let path):
+//            components.host = "chat.local.sa"
+//            components.path = "/param"
+//            components.query = path
+//        case .Network(let address):
+//            components.host = "chat.network.sa"
+//            components.path = "/param"
+//            components.query = address.relativeString
+//        }
+//        return components.URL!
+//    }
+//}
+//
+///
+/// 文件请求
+///
+public class SIMChatFileRequest {
+    ///
+    /// 操作返回结果
+    ///
+    public typealias Result = SIMChatResult<AnyObject, NSError>
     
-    // 从URL识别
-    public init?(URL: NSURL) {
-        guard let components = NSURLComponents(URL: URL, resolvingAgainstBaseURL: false) else {
-            return nil // 错误
-        }
-        guard components.scheme == "simchat" else {
-            return nil // 未知
-        }
-        guard let source = components.host, parameter = components.query else {
-            return nil // 参数错误
-        }
-        switch source {
-        case "chat.raw.sa":      self = .Raw(identifier: parameter)
-        case "chat.local.sa":    self = .Local(path: parameter)
-        case "chat.network.sa":  self = .Network(address: NSURL(string: parameter)!)
-        default:            return nil
+    /// 响应
+    public func response(completionHandler: (Result -> Void)) -> Self {
+        responseClouser = completionHandler
+        return self
+    }
+    
+    /// 响应图片
+    public func responseImage(completionHandler: (SIMChatResult<UIImage?, NSError> -> Void)) -> Self {
+        return response {
+                do {
+                    guard !self._isCancel else {
+                        throw NSError(domain: "Use Cancel", code: -1, userInfo: nil)
+                    }
+                    guard let value = $0.value else {
+                        throw $0.error ?? NSError(domain: "Unknow Error", code: -1, userInfo: nil)
+                    }
+                    let completion = { (img: UIImage?) in
+                        dispatch_async(dispatch_get_main_queue()) {
+                            completionHandler(.Success(img))
+                        }
+                    }
+                    switch value {
+                    case let path as String:
+                        dispatch_async(dispatch_get_global_queue(0, 0)) {
+                            let img = UIImage(contentsOfFile: path)
+                            completion(img)
+                        }
+                    case let URL as NSURL:
+                        dispatch_async(dispatch_get_global_queue(0, 0)) {
+                            if let path = URL.path where URL.scheme == "file" {
+                                let img = UIImage(contentsOfFile: path)
+                                completion(img)
+                            } else {
+                                let data = NSData(contentsOfURL: URL)
+                                let img = UIImage(data: data!)
+                                completion(img)
+                            }
+                        }
+                    default:
+                            completionHandler(.Success(nil))
+                        throw NSError(domain: "unsupport type", code: -1, userInfo: nil)
+                    }
+                } catch let error as NSError {
+                    completionHandler(.Failure(error))
+                }
+            // clear
+            self.responseClouser = nil
         }
     }
-    // 转为URL
-    public var URL: NSURL {
-        let components = NSURLComponents()
-        components.scheme = "simchat"
-        switch self {
-        case .Raw(let identifier):
-            components.host = "chat.raw.sa"
-            components.path = "/param"
-            components.query = identifier
-        case .Local(let path):
-            components.host = "chat.local.sa"
-            components.path = "/param"
-            components.query = path
-        case .Network(let address):
-            components.host = "chat.network.sa"
-            components.path = "/param"
-            components.query = address.relativeString
-        }
-        return components.URL!
+    
+    public func cancel() {
+        SIMLog.trace()
+        _isCancel = true
     }
+    
+    private var _isCancel: Bool = false
+    
+    private var responseClouser: (Result -> Void)?
 }
-
 
 ///
 /// 文件提供者. <br>
@@ -64,67 +132,55 @@ public class SIMChatFileProvider {
         return _sharedInstance
     }
     
+    ///
+    /// 注册解释器
+    ///
+    public func register(parser: SIMChatParserProtocol) {
+        SIMLog.debug("\(parser.identifier) => \(parser.dynamicType)")
+        _parsers[parser.identifier] = parser
+    }
+    
+    /// 解释URL
+    private func _parseURL(URL: NSURL, success: (AnyObject -> Void)?, fail: (NSError -> Void)?) {
+        // 读取
+        let parser: SIMChatParserProtocol = {
+            let p = SIMChatBaseFileParser.sharedInstance()
+            guard let key = URL.user where URL.scheme == "simchat" else {
+                return p
+            }
+            return _parsers[key] ?? p
+        }()
+        // 解释
+        parser.decode(URL, success: success, fail: fail)
+    }
+    
     func cached(url: NSURL) -> Bool {
         return false
     }
     
     var c: UIImage?
     
-    func download(url: NSURL) -> SIMChatRequest<AnyObject> {
-        return SIMChatRequest.request { op in
-            switch url.scheme {
-            case "chat-image":
-                if let image = self.c {
-                    op.success(image)
-                    return
-                }
-                let path = url.path!
-                dispatch_async(dispatch_get_global_queue(0, 0)) {
-                    SIMLog.debug("download: \(path)")
-                    if let image = UIImage(contentsOfFile: path) {
-                        // 缓存起来.
-                        self.c = image
-                        dispatch_async(dispatch_get_main_queue()) {
-                            op.success(image)
-                        }
-                    } else {
-                        op.failure(NSError(domain: "Load Image Fail", code: -1, userInfo: nil))
-                    }
-                }
-            case "simchat":
-                guard let source = SIMChatFileProviderSource(URL: url) else {
-                    op.failure(NSError(domain: "Source Fail!", code: -1, userInfo: nil))
-                    return
-                }
-                switch source {
-                case .Raw(let identifier):
-                    SIMLog.debug("raw => \(identifier)")
-                    break // 转发
-                case .Local(let path):
-                    SIMLog.debug("local => \(path)")
-                    let path = NSURL(fileURLWithPath: path)
-                    let needDownload = !NSFileManager().fileExistsAtPath(url.path!)
-                    if needDownload {
-                        SIMChatNotificationCenter.postNotificationName(SIMChatFileProviderWillDownload, object: url)
-                    }
+    func download(URL: NSURL) -> SIMChatFileRequest {
+        let request = SIMChatFileRequest()
+        SIMChatRequest<Void>.request { op in
+            self._parseURL(URL,
+                success: { v in
                     dispatch_after_at_now(0.5, dispatch_get_main_queue()) {
-                        if needDownload {
-                            SIMChatNotificationCenter.postNotificationName(SIMChatFileProviderDidDownload, object: url)
+                        if let path = v as? String {
+                            request.responseClouser?(.Success(NSURL(fileURLWithPath: path)))
+                        } else {
+                            request.responseClouser?(.Success(v))
                         }
-                        op.success(path)
                     }
-                    break // 文件
-                case .Network(let address):
-                    SIMLog.debug("network => \(address)")
-                    break // o
-                }
-            default:
-                // 直接返回
-                op.success(url)
-                // 应该请求网络.
-                //op.failure(NSError(domain: "Unknow scheme", code: -1, userInfo: nil))
-            }
+                },
+                fail: {
+                    request.responseClouser?(.Failure($0))
+                })
         }
+        return request
+        
+//        return SIMChatRequest.request { op in
+//        }
     }
     
     //    func request(url: NSURL) -> SIMChatRequest<UIImage> {
@@ -139,6 +195,8 @@ public class SIMChatFileProvider {
     //            }
     //        }
     //    }
+    
+    private lazy var _parsers: Dictionary<String, SIMChatParserProtocol> = [:]
     
     private static var _sharedInstance = SIMChatFileProvider()
 }

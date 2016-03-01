@@ -58,18 +58,20 @@ public class SIMChatBaseMessageImageCell: SIMChatBaseMessageBubbleCell {
             
             previewImageView.image = UIImage(named: "simchat_images_default")
             
-            SIMChatFileProvider.sharedInstance().download(content.thumbnailURL)
-                .response { [weak self] in
-                    guard message == self?.message else {
+            let fp = SIMChatFileProvider.sharedInstance()
+            
+            _request?.cancel()
+            _request = fp.download(content.thumbnailURL)
+                .responseImage { [weak self] in
+                    guard let image = $0.value where message == self?.message else {
                         return
                     }
-                    if let url = $0.value as? NSURL {
-                        let img = UIImage(contentsOfFile: url.path!)
-                        self?.previewImageView.image = img//$0.value as? UIImage
-                    }
-            }
+                    self?.previewImageView.image = image
+                }
         }
     }
+    
+    private weak var _request: SIMChatFileRequest?
     
     private(set) var previewImageViewLayout: SIMChatLayout?
     private(set) lazy var previewImageView = UIImageView()
