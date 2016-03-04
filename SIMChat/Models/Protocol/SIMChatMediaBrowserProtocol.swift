@@ -14,11 +14,10 @@ import UIKit
 public protocol SIMChatMediaProtocol: class {
     /// 显示尺寸
     var size: CGSize { get }
-    
-    /// 原文件地址
-    var originalURL: NSURL { get }
-    /// 缩略图地址
-    var thumbnailURL: NSURL { get }
+    /// 原文件
+    var origin: SIMChatResourceProtocol { get }
+    /// 缩略图
+    var thumbnail: SIMChatResourceProtocol { get }
 }
 
 ///

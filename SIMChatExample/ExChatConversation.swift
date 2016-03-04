@@ -139,10 +139,15 @@ class ExChatConversation: SIMChatBaseConversation {
     func makeRandHistory() -> Array<SIMChatMessageProtocol> {
         var rs: Array<SIMChatMessageProtocol> = []
         
-        let path = NSBundle.mainBundle().pathForResource("t1", ofType: "jpg")!
-        let tpath = NSBundle.mainBundle().pathForResource("t1_t", ofType: "jpg")!
+        let path = SIMChatBaseImageResource(NSBundle.mainBundle().pathForResource("t1", ofType: "jpg")!)
+        let tpath = SIMChatBaseImageResource(NSBundle.mainBundle().pathForResource("t1_t", ofType: "jpg")!)
+        let size = CGSizeMake(1600, 1200)
         
-        let apath = NSBundle.mainBundle().pathForResource("Music", ofType: "m4a")!
+        let path2 = SIMChatBaseImageResource(NSBundle.mainBundle().pathForResource("t2", ofType: "jpg")!)
+        let tpath2 = SIMChatBaseImageResource(NSBundle.mainBundle().pathForResource("t2_t", ofType: "jpg")!)
+        let size2 = CGSizeMake(1115, 1600)
+        
+        let apath = SIMChatBaseFileResource(NSBundle.mainBundle().pathForResource("Music", ofType: "m4a")!)
         
         for r in 0 ..< (2 * 11) {
         //while rs.count < 10 {
@@ -184,7 +189,7 @@ class ExChatConversation: SIMChatBaseConversation {
             }
             
             if true || (rand() % 10) == 2 {
-                let c = SIMChatBaseMessageImageContent(originPath: path, thumbnailPath: tpath, size: CGSizeMake(1024, 768))
+                let c = SIMChatBaseMessageImageContent(origin: path, thumbnail: tpath, size: size)
                 let m = SIMChatBaseMessage.messageWithContent(c, receiver: o, sender: s)
                 m.option = [.ContactShow]
                 m.isSelf = (r % 2 == 0)
@@ -193,7 +198,7 @@ class ExChatConversation: SIMChatBaseConversation {
                 rs.append(m)
             }
             if true || (rand() % 10) == 2 {
-                let c = SIMChatBaseMessageImageContent(originPath: path, thumbnailPath: tpath, size: CGSizeMake(1024, 768))
+                let c = SIMChatBaseMessageImageContent(origin: path2, thumbnail: tpath2, size: size2)
                 let m = SIMChatBaseMessage.messageWithContent(c, receiver: o, sender: s)
                 m.option = [.ContactShow]
                 m.isSelf = (r % 2 == 0)
@@ -203,7 +208,7 @@ class ExChatConversation: SIMChatBaseConversation {
             }
             
             if true || (rand() % 10) < 2 {
-                let c = SIMChatBaseMessageAudioContent(path: apath, duration: 6.2 * Double((r % 3600) + 1))
+                let c = SIMChatBaseMessageAudioContent(origin: apath, duration: 6.2 * Double((r % 3600) + 1))
                 let m = SIMChatBaseMessage.messageWithContent(c, receiver: o, sender: s)
                 m.option = [.ContactShow]
                 m.isSelf = (r % 2 == 0)
@@ -212,7 +217,7 @@ class ExChatConversation: SIMChatBaseConversation {
                 rs.append(m)
             }
             if true || (rand() % 10) < 2 {
-                let c = SIMChatBaseMessageAudioContent(path: apath, duration: 6.2 * Double((r % 3600) + 1))
+                let c = SIMChatBaseMessageAudioContent(origin: apath, duration: 6.2 * Double((r % 3600) + 1))
                 let m = SIMChatBaseMessage.messageWithContent(c, receiver: o, sender: s)
                 m.option = [.ContactShow]
                 m.isSelf = (r % 2 == 0)
@@ -238,14 +243,6 @@ class ExChatConversation: SIMChatBaseConversation {
                 rs.append(m)
             }
         }
-        
-        let c = SIMChatBaseMessageImageContent(originPath: path, thumbnailPath: tpath, size: CGSizeMake(1024, 768))
-        let m = SIMChatBaseMessage.messageWithContent(c, receiver: receiver, sender: sender)
-        m.option = [.ContactShow]
-        m.isSelf = true//(r % 2 == 0)
-        m.status = .Unread //status
-        m.date = NSDate(timeIntervalSinceNow: i + 2)
-        rs.append(m)
         
         return rs
     }

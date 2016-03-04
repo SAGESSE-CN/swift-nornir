@@ -135,23 +135,24 @@ public class SIMChatFileProvider {
     ///
     /// 注册解释器
     ///
-    public func register(parser: SIMChatParserProtocol) {
-        SIMLog.debug("\(parser.identifier) => \(parser.dynamicType)")
-        _parsers[parser.identifier] = parser
-    }
+//    public func register(parser: SIMChatParserProtocol) {
+//        SIMLog.debug("\(parser.identifier) => \(parser.dynamicType)")
+//        _parsers[parser.identifier] = parser
+//    }
     
     /// 解释URL
     private func _parseURL(URL: NSURL, success: (AnyObject -> Void)?, fail: (NSError -> Void)?) {
-        // 读取
-        let parser: SIMChatParserProtocol = {
-            let p = SIMChatBaseFileParser.sharedInstance()
-            guard let key = URL.user where URL.scheme == "simchat" else {
-                return p
-            }
-            return _parsers[key] ?? p
-        }()
-        // 解释
-        parser.decode(URL, success: success, fail: fail)
+//        // 读取
+//        let parser: SIMChatParserProtocol = {
+//            let p = SIMChatBaseFileParser.sharedInstance()
+//            guard let key = URL.user where URL.scheme == "simchat" else {
+//                return p
+//            }
+//            return _parsers[key] ?? p
+//        }()
+//        // 解释
+//        parser.decode(URL, success: success, fail: fail)
+        
     }
     
     func cached(url: NSURL) -> Bool {
@@ -160,22 +161,52 @@ public class SIMChatFileProvider {
     
     var c: UIImage?
     
+    /// 加载资源
+    public func loadResource(resource: SIMChatResourceProtocol, closure: SIMChatResult<AnyObject, NSError> -> Void) {
+        let identifier = resource.identifier
+        // 读取缓存
+        if let value = _cache.objectForKey(identifier) {
+            SIMLog.debug("\(identifier) hit cache")
+            // 直接完成
+            closure(.Success(value))
+        } else {
+            SIMLog.debug("\(identifier) load resouce")
+            // 真实的加载
+            resource.resource { [weak self] result in
+                // 只缓存成功
+                if let value = result.value {
+                    self?._cache.setObject(value, forKey: identifier)
+                }
+                guard !NSThread.isMainThread() else {
+                    closure(result)
+                    return
+                }
+                dispatch_async(dispatch_get_main_queue()) {
+                    closure(result)
+                }
+            }
+        }
+    }
+    
+    /// 缓存.
+    private let _cache = NSCache()
+    
     func download(URL: NSURL) -> SIMChatFileRequest {
         let request = SIMChatFileRequest()
         SIMChatRequest<Void>.request { op in
-            self._parseURL(URL,
-                success: { v in
-                    dispatch_after_at_now(0.5, dispatch_get_main_queue()) {
-                        if let path = v as? String {
-                            request.responseClouser?(.Success(NSURL(fileURLWithPath: path)))
-                        } else {
-                            request.responseClouser?(.Success(v))
-                        }
-                    }
-                },
-                fail: {
-                    request.responseClouser?(.Failure($0))
-                })
+            
+            
+////            self._parseURL(URL,
+////                success: { v in
+////                    if let path = v as? String {
+                        request.responseClouser?(.Success(URL))
+////                    } else {
+////                        request.responseClouser?(.Success(v))
+////                    }
+////                },
+////                fail: {
+////                    request.responseClouser?(.Failure($0))
+////                })
         }
         return request
         
@@ -196,7 +227,7 @@ public class SIMChatFileProvider {
     //        }
     //    }
     
-    private lazy var _parsers: Dictionary<String, SIMChatParserProtocol> = [:]
+//    private lazy var _parsers: Dictionary<String, SIMChatParserProtocol> = [:]
     
     private static var _sharedInstance = SIMChatFileProvider()
 }

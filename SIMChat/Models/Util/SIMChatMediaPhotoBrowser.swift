@@ -34,7 +34,6 @@ public class SIMChatMediaPhotoBrowser: UIViewController, SIMChatMediaBrowserProt
         super.viewWillDisappear(animated)
     }
     
-    
 //    public func browse(URL: NSURL, withTarget: SIMChatBrowseAnimatedTransitioningTarget) {
 //        SIMLog.trace(URL)
 //        
@@ -66,17 +65,7 @@ public class SIMChatMediaPhotoBrowser: UIViewController, SIMChatMediaBrowserProt
     // MARK: SIMChatBrowseAnimatedTransitioningTarget
     
     public var targetView: UIImageView? {
-        guard let indexPath = _collectionView.indexPathsForVisibleItems().first ?? _defaultIndexPath else {
-            return nil
-        }
-        let cell = _collectionView.cellForItemAtIndexPath(indexPath) ?? _defaultCell ?? {
-            let cell = _collectionView.dequeueReusableCellWithReuseIdentifier("Image", forIndexPath: indexPath)
-            cell.frame = view.bounds
-            collectionView(_collectionView, willDisplayCell: cell, forItemAtIndexPath: indexPath)
-            _defaultCell = cell
-            return cell
-        }()
-        guard let target = cell as? SIMChatBrowseAnimatedTransitioningTarget else {
+        guard let target = _currentDisplayCell() as? SIMChatBrowseAnimatedTransitioningTarget else {
             return nil
         }
         return target.targetView
@@ -87,9 +76,30 @@ public class SIMChatMediaPhotoBrowser: UIViewController, SIMChatMediaBrowserProt
     public func browse(media: SIMChatMediaProtocol, withTarget: SIMChatBrowseAnimatedTransitioningTarget) {
         SIMLog.trace()
         
-        let fp = SIMChatFileProvider.sharedInstance()
+        _datas.append(media)
+        _collectionView.reloadData()
         
-        fp.download(media.thumbnailURL)
+        let indexPath = NSIndexPath(forItem: 0, inSection: 0)
+        
+        _defaultIndexPath = indexPath
+        _collectionView.scrollToItemAtIndexPath(indexPath,
+            atScrollPosition: .None,
+            animated: false)
+        
+        guard let window = withTarget.targetView?.window, rootViewController = window.rootViewController else {
+            return // 并没有显示
+        }
+        
+        SIMLog.trace()
+        
+        _browseTransitioning = SIMChatBrowseAnimatedTransitioning(from: withTarget, to: self)
+        
+        transitioningDelegate = _browseTransitioning
+        modalPresentationStyle = .Custom
+        
+        dispatch_async(dispatch_get_main_queue()) {
+            rootViewController.presentViewController(self, animated: true, completion: nil)
+        }
     }
     
     // MARK: UICollectionViewDataSource
@@ -106,6 +116,9 @@ public class SIMChatMediaPhotoBrowser: UIViewController, SIMChatMediaBrowserProt
     }
     
     public func collectionView(collectionView: UICollectionView, willDisplayCell cell: UICollectionViewCell, forItemAtIndexPath indexPath: NSIndexPath) {
+        if let cell = cell as? SIMChatMediaPhotoBrowserView {
+            cell.media = _datas[indexPath.row]
+        }
     }
     
     // MARK: UICollectionViewDelegateFlowLayout
@@ -114,10 +127,26 @@ public class SIMChatMediaPhotoBrowser: UIViewController, SIMChatMediaBrowserProt
         return view.bounds.size
     }
     
-    /// 浏览的动画.
-    private weak var _defaultCell: UICollectionViewCell?
+    /// 获取当前
+    private func _currentDisplayCell() -> UICollectionViewCell? {
+        guard let indexPath = _collectionView.indexPathsForVisibleItems().first ?? _defaultIndexPath else {
+            return nil
+        }
+        return _collectionView.cellForItemAtIndexPath(indexPath) ?? _defaultCell ?? {
+            let cell = _collectionView.dequeueReusableCellWithReuseIdentifier("Image", forIndexPath: indexPath)
+            cell.frame = view.bounds
+            collectionView(_collectionView, willDisplayCell: cell, forItemAtIndexPath: indexPath)
+            _defaultCell = cell
+            return cell
+        }()
+    }
+    
+    private var _defaultCell: UICollectionViewCell?
     private var _defaultIndexPath: NSIndexPath?
+    
     private var _browseTransitioning: SIMChatBrowseAnimatedTransitioning?
+    
+    private lazy var _datas: Array<SIMChatMediaProtocol> = []
     
     private lazy var _collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
@@ -150,24 +179,24 @@ internal class SIMChatMediaPhotoBrowserView: UICollectionViewCell, UIScrollViewD
         
         SIMLog.trace(self)
         
-        _imageView.image = UIImage(named: "t1_t.jpg")
         
-        _scrollView.frame = contentView.bounds
-        _scrollView.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
         _scrollView.addSubview(_imageView)
-        
         _scrollView.addGestureRecognizer(_tapGestureRecognizer)
         _scrollView.addGestureRecognizer(_doubleTapGestureRecognizer)
-        
-        _resetZoomScale()
         
         backgroundColor = UIColor.clearColor()
         contentView.addSubview(_scrollView)
     }
     
+    private func _resetFrame() {
+        if _scrollView.frame.size != bounds.size {
+            _scrollView.frame = bounds
+        }
+    }
+    
     private func _resetZoomScale() {
         let from = _imageView.bounds.size
-        var to = _imageView.image?.size ?? CGSizeZero
+        var to = media?.size ?? _imageView.image?.size ?? CGSizeZero
         
         to.width = max(to.width, 1)
         to.height = max(to.height, 1)
@@ -247,6 +276,8 @@ internal class SIMChatMediaPhotoBrowserView: UICollectionViewCell, UIScrollViewD
     /// 准备复用
     override func prepareForReuse() {
         super.prepareForReuse()
+        // 重置
+        _resetFrame()
         _resetZoomScale()
     }
     
@@ -259,6 +290,48 @@ internal class SIMChatMediaPhotoBrowserView: UICollectionViewCell, UIScrollViewD
         
         _imageView.center = CGPointMake(width / 2, height / 2)
     }
+    
+    var media: SIMChatMediaProtocol? {
+        didSet {
+            guard let media = media where media !== oldValue else {
+                return
+            }
+            
+            // 重置大小
+            _isLoadOrigin = false
+            _resetFrame()
+            _resetZoomScale()
+            
+            let fp = SIMChatFileProvider.sharedInstance()
+            
+            // 加载原图
+            fp.loadResource(media.origin) { [weak self] in
+                guard let image = $0.value as? UIImage
+                    where media === self?.media else {
+                        return
+                }
+                SIMLog.trace("use image in origin")
+                self?._isLoadOrigin = true
+                self?._imageView.image = image
+            }
+            // 检查是否加载了原图
+            guard !_isLoadOrigin else {
+                return
+            }
+            // 加载缩略图
+            fp.loadResource(media.thumbnail) { [weak self] in
+                guard let image = $0.value as? UIImage
+                    where media === self?.media
+                        && !(self?._isLoadOrigin ?? false) else {
+                            return
+                }
+                SIMLog.trace("use image in thumbnail")
+                self?._imageView.image = image
+            }
+        }
+    }
+    
+    private var _isLoadOrigin = false
     
     var targetView: UIImageView? {
         return _imageView

@@ -17,51 +17,29 @@ public class SIMChatBaseMessageFileContent: SIMChatMessageContentProtocol {
 ///
 public class SIMChatBaseMessageImageContent: SIMChatMessageContentProtocol, SIMChatMediaProtocol {
     ///
-    /// 使用本地链接创建内容
+    /// 创建图片内容
     ///
-    /// - parameter originPath: 原图地址
-    /// - parameter thumbnailPath: 缩略图地址, 如果为空, 使用原图
+    /// - parameter origin: 原图
+    /// - parameter thumbnail: 缩略图, 如果为空, 使用原图
     /// - parameter size: 图片大小
     ///
-    public init(originPath: String, thumbnailPath: String? = nil, size: CGSize) {
-        let parser = SIMChatBaseFileParser.sharedInstance()
-        
-        let o = parser.encode(originPath)
-        let t = parser.encode(thumbnailPath ?? originPath)
-        
+    public init(origin: SIMChatResourceProtocol, thumbnail: SIMChatResourceProtocol? = nil, size: CGSize) {
         self.size = size
-        self.localURL = o
-        self.originalURL = o
-        self.thumbnailURL = t
-    }
-    ///
-    /// 使用服务器链接创建内容
-    ///
-    /// - parameter originURL: 原图地址
-    /// - parameter thumbnailURL: 缩略图地址, 如果为空, 使用原图
-    /// - parameter size: 图片大小
-    ///
-    public init(originURL: NSURL, thumbnailURL: NSURL? = nil, size: CGSize) {
-        let parser = SIMChatBaseFileParser.sharedInstance()
+        self.origin = origin
+        self.thumbnail = thumbnail ?? origin
         
-        let o = parser.encode(originURL)
-        let t = parser.encode(thumbnailURL ?? originURL)
-        
-        self.size = size
         self.localURL = nil
-        self.originalURL = o
-        self.thumbnailURL = t
     }
     
     /// 图片在本地的路径, 只有在需要上传的时候这个值才会存在
     public let localURL: NSURL?
     
-    /// 图片实际大小
+    /// 实际大小
     public let size: CGSize
-    /// 图片在服务器上的路径
-    public let originalURL: NSURL
-    /// 缩略图在服务器上的路径
-    public let thumbnailURL: NSURL
+    /// 原文件
+    public let origin: SIMChatResourceProtocol
+    /// 缩略图
+    public let thumbnail: SIMChatResourceProtocol
     
     /// 上传进度/操作
 }

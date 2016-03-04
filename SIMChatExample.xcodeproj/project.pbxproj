@@ -12,6 +12,8 @@
 		0C0DD6AA1C60B65D00AEC8C4 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0C0DD6A81C60B65D00AEC8C4 /* Main.storyboard */; };
 		0C0DD6AC1C60B65D00AEC8C4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0C0DD6AB1C60B65D00AEC8C4 /* Assets.xcassets */; };
 		0C0DD6AF1C60B65D00AEC8C4 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0C0DD6AD1C60B65D00AEC8C4 /* LaunchScreen.storyboard */; };
+		0C2475761C87E073003077B2 /* t2_t.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 0C2475741C87E073003077B2 /* t2_t.jpg */; };
+		0C2475771C87E073003077B2 /* t2.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 0C2475751C87E073003077B2 /* t2.jpg */; };
 		0C4070F71C7B605900AEECB7 /* Music.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 0C4070F61C7B605900AEECB7 /* Music.m4a */; };
 		0C48A89F1C79566B00571BF5 /* SIMChatExampleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C48A89E1C79566B00571BF5 /* SIMChatExampleTests.swift */; };
 		0C6B414D1C60B7A600085B66 /* SIMChat.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0C0DD6BB1C60B6BE00AEC8C4 /* SIMChat.framework */; };
@@ -94,6 +96,8 @@
 		0C0DD6AE1C60B65D00AEC8C4 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		0C0DD6B01C60B65D00AEC8C4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		0C0DD6B61C60B6BE00AEC8C4 /* SIMChat.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = SIMChat.xcodeproj; sourceTree = "<group>"; };
+		0C2475741C87E073003077B2 /* t2_t.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = t2_t.jpg; sourceTree = "<group>"; };
+		0C2475751C87E073003077B2 /* t2.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = t2.jpg; sourceTree = "<group>"; };
 		0C4070F61C7B605900AEECB7 /* Music.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Music.m4a; sourceTree = "<group>"; };
 		0C48A89C1C79566B00571BF5 /* SIMChatExampleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SIMChatExampleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		0C48A89E1C79566B00571BF5 /* SIMChatExampleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SIMChatExampleTests.swift; sourceTree = "<group>"; };
@@ -159,6 +163,8 @@
 		0C0DD6A31C60B65D00AEC8C4 /* SIMChatExample */ = {
 			isa = PBXGroup;
 			children = (
+				0C2475741C87E073003077B2 /* t2_t.jpg */,
+				0C2475751C87E073003077B2 /* t2.jpg */,
 				0CFA07181C81BC7100AF0F87 /* t1_t.jpg */,
 				0C6B41581C61DA7E00085B66 /* t1.jpg */,
 				0C4070F61C7B605900AEECB7 /* Music.m4a */,
@@ -330,6 +336,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0C2475761C87E073003077B2 /* t2_t.jpg in Resources */,
 				0C7C938F1C76D2F700E7DC5C /* photo_picker_icon_video@2x.png in Resources */,
 				0CFA07191C81BC7100AF0F87 /* t1_t.jpg in Resources */,
 				0C7C93931C76D2F700E7DC5C /* photo_picker_mark_null_sm@2x.png in Resources */,
@@ -342,6 +349,7 @@
 				0C7C93901C76D2F700E7DC5C /* photo_picker_mark_deselect@2x.png in Resources */,
 				0C7C93911C76D2F700E7DC5C /* photo_picker_mark_deselect_sm@2x.png in Resources */,
 				0C7C93921C76D2F700E7DC5C /* photo_picker_mark_null@2x.png in Resources */,
+				0C2475771C87E073003077B2 /* t2.jpg in Resources */,
 				0C0DD6AA1C60B65D00AEC8C4 /* Main.storyboard in Resources */,
 				0C7C93951C76D2F700E7DC5C /* photo_picker_mark_select_sm@2x.png in Resources */,
 				0C6B415D1C61DC7500085B66 /* SIMChat.xcassets in Resources */,

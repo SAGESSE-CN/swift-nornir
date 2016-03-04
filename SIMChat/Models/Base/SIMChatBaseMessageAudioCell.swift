@@ -99,29 +99,37 @@ public class SIMChatBaseMessageAudioCell: SIMChatBaseMessageBubbleCell {
             setNeedsLayout()
         }
     }
-    /// 消息内容
+    /// 消息
     public override var message: SIMChatMessageProtocol? {
         didSet {
             guard let content = message?.content as? SIMChatBaseMessageAudioContent else {
                 return
             }
-        
-            // 播放中.
-            if content.playing {
+            
+            // 检查播放状态
+            if let player = manager?.mediaProvider.currentPlayer()
+                where player.URL === content.origin.resourceURL {
+                // 播放中.
                 if !animationView.isAnimating() {
                     animationView.startAnimating()
                 }
             } else {
+                // 停止中.
                 if animationView.isAnimating() {
                     animationView.stopAnimating()
                 }
             }
+            
             // 有改变
             guard message !== oldValue else {
                 return
             }
             titleLabel.text = _formatAudioDuration(content.duration)
         }
+    }
+    /// 内容
+    private var content: SIMChatBaseMessageAudioContent? {
+        return message?.content as? SIMChatBaseMessageAudioContent
     }
     
     @inline(__always) private func _formatAudioDuration(duration: NSTimeInterval) -> String {
@@ -146,13 +154,10 @@ extension SIMChatBaseMessageAudioCell {
     
     /// 检查是否是有效的通知
     @inline(__always) private func _isValidNotification(sender: NSNotification) -> Bool {
-        guard let message = message, player = sender.object as? SIMChatMediaPlayerProtocol else {
+        guard let content = content, player = sender.object as? SIMChatMediaPlayerProtocol else {
             return false // 参数为空
         }
-        guard let content = message.content as? SIMChatBaseMessageAudioContent else {
-            return false // 目标错误
-        }
-        return player.URL === content.remoteURL
+        return player.URL === content.origin.resourceURL
     }
     
     /// 音频开始播放
@@ -163,9 +168,8 @@ extension SIMChatBaseMessageAudioCell {
         SIMLog.trace(message.identifier)
         
         // 更新Module
-        if let content = message.content as? SIMChatBaseMessageAudioContent {
+        if let content = content {
             content.played = true
-            content.playing = true
         }
         if !message.isSelf {
             conversation?.updateMessage(message, status: .Played)
@@ -184,9 +188,6 @@ extension SIMChatBaseMessageAudioCell {
         guard let message = message where _isValidNotification(sender) else {
             return // 参数为空
         }
-        if let content = message.content as? SIMChatBaseMessageAudioContent {
-            content.playing = false
-        }
         SIMLog.trace(message.identifier)
     }
     /// 音频加载开始
@@ -194,7 +195,7 @@ extension SIMChatBaseMessageAudioCell {
         guard let message = message where !message.isSelf else {
             return // 参数为空
         }
-        guard (message.content as? SIMChatBaseMessageAudioContent)?.remoteURL === sender.object else {
+        guard content?.origin.resourceURL === sender.object else {
             return // 参数错误
         }
         SIMLog.trace(message.identifier)
@@ -206,7 +207,7 @@ extension SIMChatBaseMessageAudioCell {
         guard let message = message where !message.isSelf else {
             return // 参数为空, 不操作自己的消息
         }
-        guard (message.content as? SIMChatBaseMessageAudioContent)?.remoteURL === sender.object else {
+        guard content?.origin.resourceURL === sender.object else {
             return // 参数错误
         }
         SIMLog.trace(message.identifier)

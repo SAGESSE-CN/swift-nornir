@@ -9,10 +9,10 @@
 import UIKit
 import AVFoundation
 
-extension SIMChatViewController: SIMChatInputBarDelegate, SIMChatInputPanelToolBoxDelegate, SIMChatInputPanelEmoticonViewDelegate, SIMChatInputPanelAudioViewDelegate {
+extension SIMChatViewController: SIMChatInputBarDelegate, SIMChatInputPanelToolBoxDelegate, SIMChatInputPanelEmoticonViewDelegate, SIMChatInputPanelAudioViewDelegate, SIMChatPhotoPickerDelegate, UIImagePickerControllerDelegate {
     
     
-    // MARK: - SIMChatInputPanelAudioViewDelegate
+    // MARK: SIMChatInputPanelAudioViewDelegate
     
     ///
     /// 请求一个音频录音器, 如果拒绝该请求返回nil
@@ -45,14 +45,14 @@ extension SIMChatViewController: SIMChatInputBarDelegate, SIMChatInputPanelToolB
         
         let newPath = NSTemporaryDirectory() + "\(NSDate()).acc"
         let _ = try? NSFileManager.defaultManager().moveItemAtURL(url, toURL: NSURL(fileURLWithPath: newPath))
-        let content = SIMChatBaseMessageAudioContent(path: newPath, duration: duration)
+        let content = SIMChatBaseMessageAudioContent(origin: SIMChatBaseFileResource(newPath), duration: duration)
         
         dispatch_async(dispatch_get_main_queue()) {
             self.messageManager.sendMessage(content)
         }
     }
     
-    // MARK: - SIMChatInputBarDelegate
+    // MARK: SIMChatInputBarDelegate
     
     public func inputBar(inputBar: SIMChatInputBar, shouldSelectItem item: SIMChatInputItemProtocol) -> Bool {
         SIMLog.trace(item.itemIdentifier)
@@ -101,7 +101,7 @@ extension SIMChatViewController: SIMChatInputBarDelegate, SIMChatInputPanelToolB
         return false
     }
     
-    // MARK: - SIMChatInputPanelEmoticonViewDelegate
+    // MARK: SIMChatInputPanelEmoticonViewDelegate
     
     ///
     /// 获取表情组数量
@@ -155,7 +155,7 @@ extension SIMChatViewController: SIMChatInputBarDelegate, SIMChatInputPanelToolB
         return true
     }
     
-    // MARK: - SIMChatInputPanelToolBoxDelegate
+    // MARK: SIMChatInputPanelToolBoxDelegate
     
     ///
     /// 获取工具箱中的工具数量
@@ -183,12 +183,29 @@ extension SIMChatViewController: SIMChatInputBarDelegate, SIMChatInputPanelToolB
         SIMLog.debug("\(item.itemIdentifier) => \(item.itemName)")
     }
     
+    // MARK: SIMChatPhotoPickerDelegate
+    
+    public func picker(picker: SIMChatPhotoPicker, didFinishPickingAssets assets: [SIMChatPhotoAsset]) {
+        SIMLog.trace()
+    }
+    
+    // MARK: UIImagePickerControllerDelegate
+    
+    ///
+    /// 图片选择完成
+    ///
+    public func imagePickerController(picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : AnyObject]) {
+        SIMLog.trace()
+        
+        
+    }
     
     // MARK: - Public Method
     
     public func imagePickerWithPhoto() {
         SIMLog.trace()
         let picker = SIMChatPhotoPicker()
+        picker.delegate2 = self
         presentViewController(picker, animated: true, completion: nil)
     }
     

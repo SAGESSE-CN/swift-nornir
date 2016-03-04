@@ -126,7 +126,7 @@ public class SIMChatBrowseAnimatedTransitioning: NSObject, UIViewControllerTrans
             let backgroundView = UIView(frame: containerView.bounds)
             
             // 配置
-            imageView.image = toView?.image ?? fromView?.image
+            imageView.image = fromView?.image ?? toView?.image
             imageView.frame = containerView.convertRect(fframe, fromView: fromView)
             backgroundView.backgroundColor = toVC.view.backgroundColor
             backgroundView.alpha = 0

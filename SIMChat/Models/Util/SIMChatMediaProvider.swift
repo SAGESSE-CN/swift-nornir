@@ -40,6 +40,13 @@ public class SIMChatMediaProvider {
         return SIMChatMediaPhotoBrowser()
     }
     
+    public func currentPlayer() -> SIMChatMediaPlayerProtocol? {
+        return _player
+    }
+    public func currentRecorder() -> SIMChatMediaRecorderProtocol? {
+        return _recorder
+    }
+    
     public func audioPlayer(URL: NSURL) -> SIMChatMediaPlayerProtocol {
         return _reusePlayer(URL) ?? {
             let player = SIMChatMediaAudioPlayer(URL: URL)

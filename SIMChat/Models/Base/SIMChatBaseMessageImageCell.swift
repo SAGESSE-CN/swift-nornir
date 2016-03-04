@@ -39,10 +39,10 @@ public class SIMChatBaseMessageImageCell: SIMChatBaseMessageBubbleCell {
             .height.equ(0).priority(751)
             .submit()
     }
-    /// 消息内容
+    /// 消息
     public override var message: SIMChatMessageProtocol? {
         didSet {
-            guard let message = message, content = message.content as? SIMChatBaseMessageImageContent where message != oldValue else {
+            guard let message = message, content = content where message != oldValue else {
                 return
             }
             let width = max(content.size.width, 32)
@@ -56,23 +56,26 @@ public class SIMChatBaseMessageImageCell: SIMChatBaseMessageBubbleCell {
                 return
             }
             
-            previewImageView.image = UIImage(named: "simchat_images_default")
-            
-            let fp = SIMChatFileProvider.sharedInstance()
-            
-            _request?.cancel()
-            _request = fp.download(content.thumbnailURL)
-                .responseImage { [weak self] in
-                    guard let image = $0.value where message == self?.message else {
-                        return
-                    }
-                    self?.previewImageView.image = image
+            /// 默认
+            previewImageView.image = self.dynamicType.defaultImage
+            // 加载
+            SIMChatFileProvider.sharedInstance().loadResource(content.thumbnail) { [weak self] in
+                guard let image = $0.value as? UIImage where message == self?.message else {
+                    return
                 }
+                self?.previewImageView.image = image
+            }
         }
+    }
+    /// 内容
+    private var content: SIMChatBaseMessageImageContent? {
+        return message?.content as? SIMChatBaseMessageImageContent
     }
     
     private weak var _request: SIMChatFileRequest?
     
     private(set) var previewImageViewLayout: SIMChatLayout?
     private(set) lazy var previewImageView = UIImageView()
+    
+    private static let defaultImage = UIImage(named: "simchat_images_default")
 }
