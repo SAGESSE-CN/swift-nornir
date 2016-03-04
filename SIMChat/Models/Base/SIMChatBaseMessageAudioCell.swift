@@ -172,7 +172,8 @@ extension SIMChatBaseMessageAudioCell {
             content.played = true
         }
         if !message.isSelf {
-            conversation?.updateMessage(message, status: .Played)
+            conversation?.updateMessage(message, status: .Played, closure: nil)
+            //conversation?.updateMessage(message, status: .Played)
         }
         // 更新UI
         if !animationView.isAnimating() {
@@ -200,7 +201,7 @@ extension SIMChatBaseMessageAudioCell {
         }
         SIMLog.trace(message.identifier)
         // 更新状态
-        conversation?.updateMessage(message, status: .Receiving)
+        conversation?.updateMessage(message, status: .Receiving, closure: nil)
     }
     /// 音频加载完成
     internal func audioDidLoad(sender: NSNotification) {
@@ -212,7 +213,7 @@ extension SIMChatBaseMessageAudioCell {
         }
         SIMLog.trace(message.identifier)
         // 更新状态
-        conversation?.updateMessage(message, status: .Received)
+        conversation?.updateMessage(message, status: .Received, closure: nil)
     }
 }
 

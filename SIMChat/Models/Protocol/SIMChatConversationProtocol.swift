@@ -8,6 +8,10 @@
 
 import Foundation
 
+/// 消息处理者
+public typealias SIMChatMessageHandler = SIMChatResult<SIMChatMessageProtocol, NSError> -> Void
+public typealias SIMChatMessagesHandler = SIMChatResult<Array<SIMChatMessageProtocol>, NSError> -> Void
+
 ///
 /// 抽象的聊天会话协议.
 ///
@@ -57,32 +61,32 @@ public protocol SIMChatConversationProtocol: class {
     ///
     /// - parameter last: 最后一条消息, 如果为nil则没有
     /// - parameter count: 容量
-    /// - returns: 返回结果是Array<SIMChatMessageProtocol>
+    /// - parameter closure: 执行结果
     ///
-    func loadHistoryMessages(last: SIMChatMessageProtocol?, count: Int) -> SIMChatRequest<Array<SIMChatMessageProtocol>>
+    func loadHistoryMessages(last: SIMChatMessageProtocol?, count: Int, closure: SIMChatMessagesHandler?)
     ///
     /// 更新消息状态
     ///
     /// - parameter message: 需要发送的消息
     /// - parameter status:  新的状态, 一般检查该状态来决定是否需要访问网络
-    /// - returns: 返回结果是SIMChatMessageProtocol
+    /// - parameter closure: 执行结果
     ///
-    func updateMessage(message: SIMChatMessageProtocol, status: SIMChatMessageStatus) -> SIMChatRequest<SIMChatMessageProtocol>
+    func updateMessage(message: SIMChatMessageProtocol, status: SIMChatMessageStatus, closure: SIMChatMessageHandler?)
     ///
     /// 发送消息
     ///
     /// - parameter message: 需要发送的消息
     /// - parameter isResend: 是否是重发消息
-    /// - returns: 返回结果是SIMChatMessageProtocol
+    /// - parameter closure: 执行结果
     ///
-    func sendMessage(message: SIMChatMessageProtocol, isResend: Bool) -> SIMChatRequest<SIMChatMessageProtocol>
+    func sendMessage(message: SIMChatMessageProtocol, isResend: Bool, closure: SIMChatMessageHandler?)
     ///
     /// 删除消息
     ///
     /// - parameter message: 需要删除的消息
-    /// - returns: 返回结果是Void
+    /// - parameter closure: 执行结果
     ///
-    func removeMessage(message: SIMChatMessageProtocol) -> SIMChatRequest<Void>
+    func removeMessage(message: SIMChatMessageProtocol, closure: SIMChatMessageHandler?)
     
     // MARK: Message Of Remote
     
@@ -133,19 +137,19 @@ extension SIMChatConversationProtocol {
     ///
     /// - parameter last: 最后一条消息, 如果为nil则没有
     /// - parameter count: 容量
-    /// - returns: 返回结果是Array<SIMChatMessageProtocol>
+    /// - parameter closure: 执行结果
     ///
-    public func loadHistoryMessages(count: Int) -> SIMChatRequest<Array<SIMChatMessageProtocol>> {
-        return loadHistoryMessages(nil, count: count)
+    public func loadHistoryMessages(count: Int, closure: SIMChatMessagesHandler?) {
+        loadHistoryMessages(nil, count: count, closure: closure)
     }
     ///
     /// 发送消息
     ///
     /// - parameter message: 需要发送的消息
-    /// - returns: 返回结果是SIMChatMessageProtocol
+    /// - parameter closure: 执行结果
     ///
-    public func sendMessage(message: SIMChatMessageProtocol) -> SIMChatRequest<SIMChatMessageProtocol> {
-        return sendMessage(message, isResend: false)
+    public func sendMessage(message: SIMChatMessageProtocol, closure: SIMChatMessageHandler?) {
+        sendMessage(message, isResend: false, closure: closure)
     }
 }
 

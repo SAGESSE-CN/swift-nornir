@@ -43,16 +43,15 @@ public protocol SIMChatManagerProtocol: class {
     /// 登录用户
     ///
     /// - parameter user: 用户信息
-    /// - return: 请求
+    /// - parameter closure: 执行结果
     ///
-    func login(user: SIMChatUserProtocol) -> SIMChatRequest<Void>
+    func login(user: SIMChatUserProtocol, closure: SIMChatResult<Void, NSError> -> Void)
     ///
-    /// 登录用户
+    /// 登出用户
     ///
-    /// - parameter user: 用户信息
-    /// - return: 请求
+    /// - parameter closure: 执行结果
     ///
-    func logout() -> SIMChatRequest<Void>
+    func logout(closure: SIMChatResult<Void, NSError> -> Void)
     
     // MARK: Conversation Method
     

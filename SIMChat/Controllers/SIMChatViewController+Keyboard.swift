@@ -45,6 +45,8 @@ extension SIMChatViewController: SIMChatInputBarDelegate, SIMChatInputPanelToolB
         
         let content = SIMChatBaseMessageAudioContent(origin: resource, duration: duration)
         
+        content.localURL = resource.resourceURL
+        
         dispatch_async(dispatch_get_main_queue()) {
             self.messageManager.sendMessage(content)
         }
@@ -197,6 +199,7 @@ extension SIMChatViewController: SIMChatInputBarDelegate, SIMChatInputPanelToolB
         picker.dismissViewControllerAnimated(true) {
             SIMLog.trace()
             let content = SIMChatBaseMessageImageContent(origin: SIMChatBaseImageResource(path), size: image.size)
+            content.localURL = NSURL(fileURLWithPath: path)
             self.messageManager.sendMessage(content)
         }
     }

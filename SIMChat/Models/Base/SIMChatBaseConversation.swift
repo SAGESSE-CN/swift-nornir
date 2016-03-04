@@ -91,13 +91,9 @@ public class SIMChatBaseConversation: SIMChatConversationProtocol {
     /// - parameter count: 容量
     /// - returns: 返回结果是Array<SIMChatMessageProtocol>
     ///
-    public func loadHistoryMessages(
-        last: SIMChatMessageProtocol?,
-        count: Int) -> SIMChatRequest<Array<SIMChatMessageProtocol>> {
-            SIMLog.trace()
-            return SIMChatRequest.request { 
-                $0.success(self.messages)
-            }
+    public func loadHistoryMessages(last: SIMChatMessageProtocol?, count: Int, closure: SIMChatMessagesHandler?) {
+        SIMLog.trace(count)
+        closure?(.Success(self.messages))
     }
     ///
     /// 发送消息
@@ -106,13 +102,9 @@ public class SIMChatBaseConversation: SIMChatConversationProtocol {
     /// - parameter isResend: 是否是重发消息
     /// - returns: 返回结果是SIMChatMessageProtocol
     ///
-    public func sendMessage(
-        message: SIMChatMessageProtocol,
-        isResend: Bool) -> SIMChatRequest<SIMChatMessageProtocol> {
-            SIMLog.trace("\(message.identifier) \(isResend ? "=> isResend" : "")")
-            return SIMChatRequest.request {
-                $0.success(message)
-            }
+    public func sendMessage(message: SIMChatMessageProtocol, isResend: Bool, closure: SIMChatMessageHandler?) {
+        SIMLog.trace("\(message.identifier) \(isResend ? "=> isResend" : "")")
+        closure?(.Success(message))
     }
     ///
     /// 更新消息状态
@@ -121,12 +113,9 @@ public class SIMChatBaseConversation: SIMChatConversationProtocol {
     /// - parameter status: 新的状态
     /// - returns: 返回结果是SIMChatMessageProtocol
     ///
-    public func updateMessage(message: SIMChatMessageProtocol, status: SIMChatMessageStatus) -> SIMChatRequest<SIMChatMessageProtocol> {
+    public func updateMessage(message: SIMChatMessageProtocol, status: SIMChatMessageStatus, closure: SIMChatMessageHandler?) {
         SIMLog.trace(message.identifier)
-        return SIMChatRequest.request {
-            message.status = status
-            $0.success(message)
-        }
+        closure?(.Success(message))
     }
     ///
     /// 删除消息
@@ -134,11 +123,9 @@ public class SIMChatBaseConversation: SIMChatConversationProtocol {
     /// - parameter message: 需要删除的消息
     /// - returns: 返回结果是Void
     ///
-    public func removeMessage(message: SIMChatMessageProtocol) -> SIMChatRequest<Void> {
+    public func removeMessage(message: SIMChatMessageProtocol, closure: SIMChatMessageHandler?) {
         SIMLog.trace(message.identifier)
-        return SIMChatRequest.request {
-            $0.success()
-        }
+        closure?(.Success(message))
     }
     
     // MARK: Message Of Remote
@@ -150,6 +137,7 @@ public class SIMChatBaseConversation: SIMChatConversationProtocol {
     ///
     public func updateMessageFromRemote(message: SIMChatMessageProtocol) {
         SIMLog.trace(message.identifier)
+        delegate?.conversation(self, didUpdateMessage: message)
     }
     ///
     /// 接收到来自服务端的消息
@@ -158,6 +146,7 @@ public class SIMChatBaseConversation: SIMChatConversationProtocol {
     ///
     public func receiveMessageFromRemote(message: SIMChatMessageProtocol) {
         SIMLog.trace(message.identifier)
+        delegate?.conversation(self, didReciveMessage: message)
     }
     ///
     /// 服务端要求更删除消息
@@ -166,6 +155,7 @@ public class SIMChatBaseConversation: SIMChatConversationProtocol {
     ///
     public func removeMessageFromRemote(message: SIMChatMessageProtocol) {
         SIMLog.trace(message.identifier)
+        delegate?.conversation(self, didRemoveMessage: message)
     }
 }
 

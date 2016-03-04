@@ -16,11 +16,22 @@
 		0C2475771C87E073003077B2 /* t2.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 0C2475751C87E073003077B2 /* t2.jpg */; };
 		0C4070F71C7B605900AEECB7 /* m1.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 0C4070F61C7B605900AEECB7 /* m1.m4a */; };
 		0C48A89F1C79566B00571BF5 /* SIMChatExampleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C48A89E1C79566B00571BF5 /* SIMChatExampleTests.swift */; };
+		0C4C0C8D1C89C5DA00DC3D56 /* ImSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0C4C0C8A1C89C5DA00DC3D56 /* ImSDK.framework */; };
+		0C4C0C8E1C89C5DA00DC3D56 /* QALSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0C4C0C8B1C89C5DA00DC3D56 /* QALSDK.framework */; };
+		0C4C0C8F1C89C5DA00DC3D56 /* TLSSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0C4C0C8C1C89C5DA00DC3D56 /* TLSSDK.framework */; };
+		0C4C0C911C89CA3A00DC3D56 /* libstdc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 0C4C0C901C89CA3A00DC3D56 /* libstdc++.tbd */; };
+		0C4C0C931C89CA5400DC3D56 /* libsqlite3.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 0C4C0C921C89CA5400DC3D56 /* libsqlite3.tbd */; };
+		0C4C0C951C89CA5F00DC3D56 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 0C4C0C941C89CA5F00DC3D56 /* libz.tbd */; };
+		0C4C0C971C89CA6B00DC3D56 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0C4C0C961C89CA6B00DC3D56 /* SystemConfiguration.framework */; };
+		0C4C0C991C89CA7A00DC3D56 /* CoreTelephony.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0C4C0C981C89CA7A00DC3D56 /* CoreTelephony.framework */; };
+		0C4C0C9B1C89D0D900DC3D56 /* ExUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C4C0C9A1C89D0D900DC3D56 /* ExUser.swift */; };
+		0C4C0C9D1C89D3DC00DC3D56 /* MMProgressHUD.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0C4C0C9C1C89D3DC00DC3D56 /* MMProgressHUD.framework */; };
+		0C6755131C89E62700435FFB /* ExMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C6755121C89E62700435FFB /* ExMessage.swift */; };
 		0C6B414D1C60B7A600085B66 /* SIMChat.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0C0DD6BB1C60B6BE00AEC8C4 /* SIMChat.framework */; };
 		0C6B414E1C60B7A600085B66 /* SIMChat.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 0C0DD6BB1C60B6BE00AEC8C4 /* SIMChat.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		0C6B41531C61D68100085B66 /* ExChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C6B41521C61D68100085B66 /* ExChatViewController.swift */; };
-		0C6B41551C61D6E300085B66 /* ExChatManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C6B41541C61D6E300085B66 /* ExChatManager.swift */; };
-		0C6B41571C61D74A00085B66 /* ExChatConversation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C6B41561C61D74A00085B66 /* ExChatConversation.swift */; };
+		0C6B41551C61D6E300085B66 /* ExManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C6B41541C61D6E300085B66 /* ExManager.swift */; };
+		0C6B41571C61D74A00085B66 /* ExConversation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C6B41561C61D74A00085B66 /* ExConversation.swift */; };
 		0C6B41591C61DA7E00085B66 /* t1.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 0C6B41581C61DA7E00085B66 /* t1.jpg */; };
 		0C6B415D1C61DC7500085B66 /* SIMChat.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0C6B415C1C61DC7500085B66 /* SIMChat.xcassets */; };
 		0C7C938E1C76D2F700E7DC5C /* photo_picker_icon_phone@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 0C7C93851C76D2F700E7DC5C /* photo_picker_icon_phone@2x.png */; };
@@ -90,7 +101,7 @@
 /* Begin PBXFileReference section */
 		0C0DD6A11C60B65D00AEC8C4 /* SIMChatExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SIMChatExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0C0DD6A41C60B65D00AEC8C4 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; wrapsLines = 0; };
-		0C0DD6A61C60B65D00AEC8C4 /* ExConversationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExConversationViewController.swift; sourceTree = "<group>"; };
+		0C0DD6A61C60B65D00AEC8C4 /* ExConversationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExConversationViewController.swift; sourceTree = "<group>"; wrapsLines = 0; };
 		0C0DD6A91C60B65D00AEC8C4 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		0C0DD6AB1C60B65D00AEC8C4 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		0C0DD6AE1C60B65D00AEC8C4 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -102,9 +113,20 @@
 		0C48A89C1C79566B00571BF5 /* SIMChatExampleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SIMChatExampleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		0C48A89E1C79566B00571BF5 /* SIMChatExampleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SIMChatExampleTests.swift; sourceTree = "<group>"; };
 		0C48A8A01C79566B00571BF5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		0C4C0C8A1C89C5DA00DC3D56 /* ImSDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = ImSDK.framework; sourceTree = "<group>"; };
+		0C4C0C8B1C89C5DA00DC3D56 /* QALSDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = QALSDK.framework; sourceTree = "<group>"; };
+		0C4C0C8C1C89C5DA00DC3D56 /* TLSSDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = TLSSDK.framework; sourceTree = "<group>"; };
+		0C4C0C901C89CA3A00DC3D56 /* libstdc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libstdc++.tbd"; path = "usr/lib/libstdc++.tbd"; sourceTree = SDKROOT; };
+		0C4C0C921C89CA5400DC3D56 /* libsqlite3.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.tbd; path = usr/lib/libsqlite3.tbd; sourceTree = SDKROOT; };
+		0C4C0C941C89CA5F00DC3D56 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
+		0C4C0C961C89CA6B00DC3D56 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
+		0C4C0C981C89CA7A00DC3D56 /* CoreTelephony.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreTelephony.framework; path = System/Library/Frameworks/CoreTelephony.framework; sourceTree = SDKROOT; };
+		0C4C0C9A1C89D0D900DC3D56 /* ExUser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExUser.swift; sourceTree = "<group>"; };
+		0C4C0C9C1C89D3DC00DC3D56 /* MMProgressHUD.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = MMProgressHUD.framework; sourceTree = "<group>"; };
+		0C6755121C89E62700435FFB /* ExMessage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExMessage.swift; sourceTree = "<group>"; };
 		0C6B41521C61D68100085B66 /* ExChatViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExChatViewController.swift; sourceTree = "<group>"; };
-		0C6B41541C61D6E300085B66 /* ExChatManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExChatManager.swift; sourceTree = "<group>"; };
-		0C6B41561C61D74A00085B66 /* ExChatConversation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExChatConversation.swift; sourceTree = "<group>"; };
+		0C6B41541C61D6E300085B66 /* ExManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExManager.swift; sourceTree = "<group>"; wrapsLines = 0; };
+		0C6B41561C61D74A00085B66 /* ExConversation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExConversation.swift; sourceTree = "<group>"; };
 		0C6B41581C61DA7E00085B66 /* t1.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = t1.jpg; sourceTree = "<group>"; };
 		0C6B415C1C61DC7500085B66 /* SIMChat.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = SIMChat.xcassets; sourceTree = "<group>"; };
 		0C7C93831C761AC100E7DC5C /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = SOURCE_ROOT; };
@@ -126,8 +148,17 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0C4C0C991C89CA7A00DC3D56 /* CoreTelephony.framework in Frameworks */,
+				0C4C0C971C89CA6B00DC3D56 /* SystemConfiguration.framework in Frameworks */,
+				0C4C0C951C89CA5F00DC3D56 /* libz.tbd in Frameworks */,
+				0C4C0C931C89CA5400DC3D56 /* libsqlite3.tbd in Frameworks */,
+				0C4C0C911C89CA3A00DC3D56 /* libstdc++.tbd in Frameworks */,
+				0C4C0C8E1C89C5DA00DC3D56 /* QALSDK.framework in Frameworks */,
 				0C6B414D1C60B7A600085B66 /* SIMChat.framework in Frameworks */,
 				0CE522881C63341800EB284D /* AudioToolbox.framework in Frameworks */,
+				0C4C0C9D1C89D3DC00DC3D56 /* MMProgressHUD.framework in Frameworks */,
+				0C4C0C8F1C89C5DA00DC3D56 /* TLSSDK.framework in Frameworks */,
+				0C4C0C8D1C89C5DA00DC3D56 /* ImSDK.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -163,16 +194,18 @@
 		0C0DD6A31C60B65D00AEC8C4 /* SIMChatExample */ = {
 			isa = PBXGroup;
 			children = (
+				0C4C0C881C89C5DA00DC3D56 /* Frameworks */,
 				0C2475741C87E073003077B2 /* t2_t.jpg */,
 				0C2475751C87E073003077B2 /* t2.jpg */,
 				0CFA07181C81BC7100AF0F87 /* t1_t.jpg */,
 				0C6B41581C61DA7E00085B66 /* t1.jpg */,
 				0C4070F61C7B605900AEECB7 /* m1.m4a */,
-				0CE522871C63341800EB284D /* AudioToolbox.framework */,
 				0C7C938D1C76D2F700E7DC5C /* Resources */,
 				0C0DD6A41C60B65D00AEC8C4 /* AppDelegate.swift */,
-				0C6B41541C61D6E300085B66 /* ExChatManager.swift */,
-				0C6B41561C61D74A00085B66 /* ExChatConversation.swift */,
+				0C4C0C9A1C89D0D900DC3D56 /* ExUser.swift */,
+				0C6B41541C61D6E300085B66 /* ExManager.swift */,
+				0C6755121C89E62700435FFB /* ExMessage.swift */,
+				0C6B41561C61D74A00085B66 /* ExConversation.swift */,
 				0C6B41521C61D68100085B66 /* ExChatViewController.swift */,
 				0C0DD6A61C60B65D00AEC8C4 /* ExConversationViewController.swift */,
 				0C0DD6A81C60B65D00AEC8C4 /* Main.storyboard */,
@@ -202,6 +235,31 @@
 				0C48A8A01C79566B00571BF5 /* Info.plist */,
 			);
 			path = SIMChatExampleTests;
+			sourceTree = "<group>";
+		};
+		0C4C0C881C89C5DA00DC3D56 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				0C4C0C9C1C89D3DC00DC3D56 /* MMProgressHUD.framework */,
+				0C4C0C981C89CA7A00DC3D56 /* CoreTelephony.framework */,
+				0C4C0C961C89CA6B00DC3D56 /* SystemConfiguration.framework */,
+				0C4C0C941C89CA5F00DC3D56 /* libz.tbd */,
+				0C4C0C921C89CA5400DC3D56 /* libsqlite3.tbd */,
+				0C4C0C901C89CA3A00DC3D56 /* libstdc++.tbd */,
+				0CE522871C63341800EB284D /* AudioToolbox.framework */,
+				0C4C0C891C89C5DA00DC3D56 /* TIM */,
+			);
+			path = Frameworks;
+			sourceTree = "<group>";
+		};
+		0C4C0C891C89C5DA00DC3D56 /* TIM */ = {
+			isa = PBXGroup;
+			children = (
+				0C4C0C8A1C89C5DA00DC3D56 /* ImSDK.framework */,
+				0C4C0C8B1C89C5DA00DC3D56 /* QALSDK.framework */,
+				0C4C0C8C1C89C5DA00DC3D56 /* TLSSDK.framework */,
+			);
+			path = TIM;
 			sourceTree = "<group>";
 		};
 		0C7C938D1C76D2F700E7DC5C /* Resources */ = {
@@ -370,11 +428,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0C6755131C89E62700435FFB /* ExMessage.swift in Sources */,
 				0C0DD6A71C60B65D00AEC8C4 /* ExConversationViewController.swift in Sources */,
 				0C0DD6A51C60B65D00AEC8C4 /* AppDelegate.swift in Sources */,
-				0C6B41551C61D6E300085B66 /* ExChatManager.swift in Sources */,
+				0C4C0C9B1C89D0D900DC3D56 /* ExUser.swift in Sources */,
+				0C6B41551C61D6E300085B66 /* ExManager.swift in Sources */,
 				0C6B41531C61D68100085B66 /* ExChatViewController.swift in Sources */,
-				0C6B41571C61D74A00085B66 /* ExChatConversation.swift in Sources */,
+				0C6B41571C61D74A00085B66 /* ExConversation.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -515,6 +575,11 @@
 				CODE_SIGN_ENTITLEMENTS = SIMChatExample/SIMChatExample.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/SIMChatExample/Frameworks/TIM",
+					"$(PROJECT_DIR)/SIMChatExample/Frameworks",
+				);
 				INFOPLIST_FILE = SIMChatExample/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -533,6 +598,11 @@
 				CODE_SIGN_ENTITLEMENTS = SIMChatExample/SIMChatExample.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/SIMChatExample/Frameworks/TIM",
+					"$(PROJECT_DIR)/SIMChatExample/Frameworks",
+				);
 				INFOPLIST_FILE = SIMChatExample/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";

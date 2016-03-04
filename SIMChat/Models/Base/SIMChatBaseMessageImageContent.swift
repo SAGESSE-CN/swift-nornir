@@ -27,12 +27,10 @@ public class SIMChatBaseMessageImageContent: SIMChatMessageContentProtocol, SIMC
         self.size = size
         self.origin = origin
         self.thumbnail = thumbnail ?? origin
-        
-        self.localURL = nil
     }
     
     /// 图片在本地的路径, 只有在需要上传的时候这个值才会存在
-    public let localURL: NSURL?
+    public var localURL: NSURL?
     
     /// 实际大小
     public let size: CGSize

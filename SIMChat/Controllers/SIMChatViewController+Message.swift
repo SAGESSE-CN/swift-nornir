@@ -652,7 +652,7 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
         
         // TODO: 动画有问题
         
-        _conversation.loadHistoryMessages(200).response { [weak self] in
+        _conversation.loadHistoryMessages(_allMessages.last, count: 200) { [weak self] in
             defer {
                 self?._isLoading = false
             }
@@ -906,7 +906,7 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
         SIMLog.debug(message.identifier)
         
         _autoResignMessage(message)
-        _conversation.removeMessage(message).response { [weak self] in
+        _conversation.removeMessage(message) { [weak self] in
             // 检查操作状态
             if let error = $0.error {
                 SIMLog.error(error)
@@ -926,7 +926,7 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
         SIMLog.debug(message.identifier)
         // 重新发送
         _autoResignMessage(message)
-        _conversation.sendMessage(message, isResend: true).response { //[weak self] in
+        _conversation.sendMessage(message, isResend: true) { //[weak self] in
             // 检查操作状态
             if let error = $0.error {
                 SIMLog.error(error)
@@ -946,7 +946,7 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
         SIMLog.debug(message.identifier)
         // 更新状态为revoked
         _autoResignMessage(message)
-        _conversation.updateMessage(message, status: .Revoked).response { [weak self] in
+        _conversation.updateMessage(message, status: .Revoked) { [weak self] in
             // 检查操作状态
             if let error = $0.error {
                 SIMLog.error(error)
@@ -967,7 +967,7 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
             sender: _conversation.sender)
         
         // 发送
-        _conversation.sendMessage(message).response {
+        _conversation.sendMessage(message) {
             // 检查操作状态
             if let error = $0.error {
                 SIMLog.error(error)

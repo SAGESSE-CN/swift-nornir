@@ -463,6 +463,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 window.addSubview(label)
             }
         }
+        
         // Override point for customization after application launch.
         return true
     }

@@ -155,7 +155,7 @@
 		0C0DD5D81C60B4A900AEC8C4 /* SIMChatBaseMessage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SIMChatBaseMessage.swift; sourceTree = "<group>"; };
 		0C0DD5D91C60B4A900AEC8C4 /* SIMChatBaseUser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SIMChatBaseUser.swift; sourceTree = "<group>"; };
 		0C0DD5DB1C60B4A900AEC8C4 /* SIMChatMessageCellProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SIMChatMessageCellProtocol.swift; sourceTree = "<group>"; };
-		0C0DD5DD1C60B4A900AEC8C4 /* SIMChatConversationProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SIMChatConversationProtocol.swift; sourceTree = "<group>"; };
+		0C0DD5DD1C60B4A900AEC8C4 /* SIMChatConversationProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SIMChatConversationProtocol.swift; sourceTree = "<group>"; wrapsLines = 0; };
 		0C0DD5DE1C60B4A900AEC8C4 /* SIMChatManagerProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SIMChatManagerProtocol.swift; sourceTree = "<group>"; };
 		0C0DD5DF1C60B4A900AEC8C4 /* SIMChatMessageProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SIMChatMessageProtocol.swift; sourceTree = "<group>"; };
 		0C0DD5E01C60B4A900AEC8C4 /* SIMChatUserProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SIMChatUserProtocol.swift; sourceTree = "<group>"; };

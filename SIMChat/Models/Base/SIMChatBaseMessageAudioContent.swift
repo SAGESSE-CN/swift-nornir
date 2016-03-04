@@ -22,8 +22,6 @@ public class SIMChatBaseMessageAudioContent: SIMChatMessageContentProtocol {
     public init(origin: SIMChatResourceProtocol, duration: NSTimeInterval) {
         self.origin = origin
         self.duration = duration
-        
-        self.localURL = nil
     }
     
     public var played: Bool = false
@@ -31,7 +29,7 @@ public class SIMChatBaseMessageAudioContent: SIMChatMessageContentProtocol {
     public var downloading: Bool = false
     
     /// 音频在本地的路径, 只有在需要上传的时候这个值才会存在
-    public let localURL: NSURL?
+    public var localURL: NSURL?
     
     /// 持续时间
     public let duration: NSTimeInterval

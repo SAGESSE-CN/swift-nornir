@@ -14,6 +14,7 @@ import Foundation
 public class SIMChatBaseManager: SIMChatManagerProtocol {
     public init() {}
     
+    
     /// 当前登录的用户.
     public var user: SIMChatUserProtocol?
     
@@ -26,45 +27,36 @@ public class SIMChatBaseManager: SIMChatManagerProtocol {
     public lazy var classProvider: SIMChatClassProvider = SIMChatClassProvider()
     
     /// 所有的会话.
-    private lazy var conversations: Dictionary<String, SIMChatConversationProtocol> = [:]
-}
-
-// MARK: - User Login & Logout
-
-extension SIMChatBaseManager {
+    public lazy var conversations: Dictionary<String, SIMChatConversationProtocol> = [:]
+    
+    // MARK: User Login & Logout
+    
     ///
     /// 登录用户
     ///
     /// - parameter user: 用户信息
-    /// - return: 请求
+    /// - parameter closure: 执行结果
     ///
-    public func login(user: SIMChatUserProtocol) -> SIMChatRequest<Void> {
+    public func login(user: SIMChatUserProtocol, closure: SIMChatResult<Void, NSError> -> Void) {
         SIMLog.trace()
         
-        return SIMChatRequest.request {
-            self.user = user
-            $0.success()
-        }
+        self.user = user
+        closure(.Success())
     }
     ///
-    /// 登录用户
+    /// 登出用户
     ///
-    /// - parameter user: 用户信息
-    /// - return: 请求
+    /// - parameter closure: 执行结果
     ///
-    public func logout() -> SIMChatRequest<Void> {
+    public func logout(closure: SIMChatResult<Void, NSError> -> Void) {
         SIMLog.trace()
         
-        return SIMChatRequest.request {
-            self.user = nil
-            $0.success()
-        }
+        self.user = nil
+        closure(.Success())
     }
-}
-
-// MARK: - Conversation Method
-
-extension SIMChatBaseManager {
+    
+    // MARK: - Conversation Method
+    
     ///
     /// 所有的会话
     ///
