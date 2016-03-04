@@ -108,7 +108,7 @@ public class SIMChatBaseMessageAudioCell: SIMChatBaseMessageBubbleCell {
             
             // 检查播放状态
             if let player = manager?.mediaProvider.currentPlayer()
-                where player.URL === content.origin.resourceURL {
+                where player.resource === content.origin {
                 // 播放中.
                 if !animationView.isAnimating() {
                     animationView.startAnimating()
@@ -157,7 +157,7 @@ extension SIMChatBaseMessageAudioCell {
         guard let content = content, player = sender.object as? SIMChatMediaPlayerProtocol else {
             return false // 参数为空
         }
-        return player.URL === content.origin.resourceURL
+        return player.resource === content.origin
     }
     
     /// 音频开始播放

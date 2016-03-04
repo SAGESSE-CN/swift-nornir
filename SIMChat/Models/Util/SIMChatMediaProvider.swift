@@ -13,22 +13,22 @@ public class SIMChatMediaProvider {
     private weak var _player: SIMChatMediaPlayerProtocol?
     private weak var _recorder: SIMChatMediaRecorderProtocol?
     
-    private func _reusePlayer(url: NSURL) -> SIMChatMediaPlayerProtocol? {
+    private func _reusePlayer(resource: SIMChatResourceProtocol) -> SIMChatMediaPlayerProtocol? {
         _recorder?.stop()
         if let player = _player {
             // 一样的.
-            if player.URL === url {
+            if player.resource == resource {
                 return player
             }
             player.stop()
         }
         return nil
     }
-    private func _reuseRecorder(url: NSURL) -> SIMChatMediaRecorderProtocol? {
+    private func _reuseRecorder(resource: SIMChatResourceProtocol) -> SIMChatMediaRecorderProtocol? {
         _recorder?.stop()
         if let recorder = _recorder {
             // 一样的.
-            if recorder.URL === url {
+            if recorder.resource == resource {
                 return recorder
             }
             recorder.stop()
@@ -47,31 +47,31 @@ public class SIMChatMediaProvider {
         return _recorder
     }
     
-    public func audioPlayer(URL: NSURL) -> SIMChatMediaPlayerProtocol {
-        return _reusePlayer(URL) ?? {
-            let player = SIMChatMediaAudioPlayer(URL: URL)
+    public func audioPlayer(resource: SIMChatResourceProtocol) -> SIMChatMediaPlayerProtocol {
+        return _reusePlayer(resource) ?? {
+            let player = SIMChatMediaAudioPlayer(resource)
             _player = player
             return player
         }()
     }
-    public func audioRecorder(URL: NSURL) -> SIMChatMediaRecorderProtocol {
-        return _reuseRecorder(URL) ?? {
-            let recorder = SIMChatMediaAudioRecorder(URL: URL)
+    public func audioRecorder(resource: SIMChatResourceProtocol) -> SIMChatMediaRecorderProtocol {
+        return _reuseRecorder(resource) ?? {
+            let recorder = SIMChatMediaAudioRecorder(resource)
             _recorder = recorder
             return recorder
         }()
     }
     
-    public func videoPlayer(URL: NSURL) -> SIMChatMediaPlayerProtocol {
-        return _reusePlayer(URL) ?? {
-            let player = SIMChatMediaAudioPlayer(URL: URL)
+    public func videoPlayer(resource: SIMChatResourceProtocol) -> SIMChatMediaPlayerProtocol {
+        return _reusePlayer(resource) ?? {
+            let player = SIMChatMediaAudioPlayer(resource)
             _player = player
             return player
         }()
     }
-    public func videoRecorder(URL: NSURL) -> SIMChatMediaRecorderProtocol {
-        return _reuseRecorder(URL) ?? {
-            let recorder = SIMChatMediaAudioRecorder(URL: URL)
+    public func videoRecorder(resource: SIMChatResourceProtocol) -> SIMChatMediaRecorderProtocol {
+        return _reuseRecorder(resource) ?? {
+            let recorder = SIMChatMediaAudioRecorder(resource)
             _recorder = recorder
             return recorder
         }()

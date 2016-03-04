@@ -11,8 +11,8 @@ import AVFoundation
 
 public class SIMChatMediaAudioPlayer: NSObject, SIMChatMediaPlayerProtocol, AVAudioPlayerDelegate {
     
-    public init(URL: NSURL) {
-        _url = URL
+    public init(_ resource: SIMChatResourceProtocol) {
+        _resource = resource
         super.init()
         
         NSNotificationCenter.defaultCenter().addObserver(self,
@@ -32,7 +32,8 @@ public class SIMChatMediaAudioPlayer: NSObject, SIMChatMediaPlayerProtocol, AVAu
         NSNotificationCenter.defaultCenter().removeObserver(self)
     }
     
-    public var URL: NSURL { return _url }
+    public var resource: SIMChatResourceProtocol { return _resource }
+    
     public var playing: Bool { return _isPlaying }
     public var duration: NSTimeInterval { return _player?.duration ?? 0 }
     public var currentTime: NSTimeInterval { return _player?.currentTime ?? 0 }
@@ -57,7 +58,7 @@ public class SIMChatMediaAudioPlayer: NSObject, SIMChatMediaPlayerProtocol, AVAu
         return _player?.averagePowerForChannel(channel) ?? -60
     }
     
-    private var _url: NSURL
+    private var _resource: SIMChatResourceProtocol
     private var _player: AVAudioPlayer?
     
     private var _isActive: Bool = false
@@ -79,39 +80,38 @@ public class SIMChatMediaAudioPlayer: NSObject, SIMChatMediaPlayerProtocol, AVAu
         // 进入.
         SIMChatMediaAudioPlayer.retainInstance = self
         // 下载文件.
-        SIMChatFileProvider.sharedInstance().download(_url)
-            .response { [weak self] in
-                do {
-                    guard let value = $0.value else {
-                        throw $0.error ?? NSError(domain: "Unknow Error", code: -1, userInfo: nil)
-                    }
-                    // 创建真实现的播放器
-                    let player: AVAudioPlayer = try {
-                        switch value {
-                        case let data as NSData:
-                            return try AVAudioPlayer(data: data)
-                        case let url as NSURL:
-                            return try AVAudioPlayer(contentsOfURL: url)
-                        default:
-                            throw NSError(domain: "Unsupport Content \(value)", code: -1, userInfo: nil)
-                        }
-                    }()
-                    player.delegate = self
-                    player.meteringEnabled = true
-                    // 真正的准备~
-                    if !player.prepareToPlay() {
-                        throw NSError(domain: "Prepare Play Fail", code: -1, userInfo: nil)
-                    }
-                    dispatch_after_at_now(0.5, dispatch_get_main_queue()) {
-                        self?._player = player
-                        self?._isPrepareing = false
-                        self?._didPrepare()
-                    }
-                } catch let error as NSError {
-                    self?._isPrepareing = false
-                    self?._didErrorOccur(error)
+        SIMChatFileProvider.sharedInstance().loadResource(_resource, canCache: false) { [weak self] in
+            do {
+                guard let value = $0.value else {
+                    throw $0.error ?? NSError(domain: "Unknow Error", code: -1, userInfo: nil)
                 }
+                // 创建真实现的播放器
+                let player: AVAudioPlayer = try {
+                    switch value {
+                    case let data as NSData:
+                        return try AVAudioPlayer(data: data)
+                    case let url as NSURL:
+                        return try AVAudioPlayer(contentsOfURL: url)
+                    default:
+                        throw NSError(domain: "Unsupport Content \(value)", code: -1, userInfo: nil)
+                    }
+                }()
+                player.delegate = self
+                player.meteringEnabled = true
+                // 真正的准备~
+                if !player.prepareToPlay() {
+                    throw NSError(domain: "Prepare Play Fail", code: -1, userInfo: nil)
+                }
+                dispatch_after_at_now(0.5, dispatch_get_main_queue()) {
+                    self?._player = player
+                    self?._isPrepareing = false
+                    self?._didPrepare()
+                }
+            } catch let error as NSError {
+                self?._isPrepareing = false
+                self?._didErrorOccur(error)
             }
+        }
     }
     @inline(__always) private func _active() throws {
         guard !_isActive else {

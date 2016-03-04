@@ -162,7 +162,7 @@ public class SIMChatFileProvider {
     var c: UIImage?
     
     /// 加载资源
-    public func loadResource(resource: SIMChatResourceProtocol, closure: SIMChatResult<AnyObject, NSError> -> Void) {
+    public func loadResource(resource: SIMChatResourceProtocol, canCache: Bool = true, closure: SIMChatResult<AnyObject, NSError> -> Void) {
         let identifier = resource.identifier
         // 读取缓存
         if let value = _cache.objectForKey(identifier) {
@@ -174,7 +174,7 @@ public class SIMChatFileProvider {
             // 真实的加载
             resource.resource { [weak self] result in
                 // 只缓存成功
-                if let value = result.value {
+                if let value = result.value where canCache {
                     self?._cache.setObject(value, forKey: identifier)
                 }
                 guard !NSThread.isMainThread() else {

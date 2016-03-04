@@ -827,13 +827,13 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
        
         switch message.content {
         case let content as SIMChatBaseMessageImageContent:
-            if let view = (cell as? SIMChatBaseMessageImageCell)?.previewImageView where view.image != nil {
+            if let view = (cell as? SIMChatBaseMessageImageCell)?.imageView where view.image != nil {
                 targetView = view
                 mediaProvider.imageBrowser().browse(content, withTarget: self)
             }
         case let content as SIMChatBaseMessageAudioContent:
             // 音频.
-            let player = mediaProvider.audioPlayer(content.origin.resourceURL)
+            let player = mediaProvider.audioPlayer(content.origin)
             if !player.playing {
                 player.play()
             } else {

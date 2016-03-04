@@ -460,11 +460,12 @@ internal class SIMChatInputPanelEmoticonCell: UICollectionViewCell, UIGestureRec
                 return
             }
             dispatch_async(dispatch_get_global_queue(0, 0)) {
-                let image = self.drawToImage()
+                let image = page.content ?? self.drawToImage()
                 dispatch_async(dispatch_get_main_queue()) {
                     guard self.page === page else {
                         return
                     }
+                    self.page?.content = image
                     self.contentView.layer.contents = image?.CGImage
                 }
             }
@@ -753,7 +754,9 @@ internal class SIMChatInputPanelEmoticonPage {
         }
     }
     
+    var content: UIImage?
     var group: SIMChatEmoticonGroup?
+    
     lazy var emoticons: Array<SIMChatEmoticon> = []
 }
 

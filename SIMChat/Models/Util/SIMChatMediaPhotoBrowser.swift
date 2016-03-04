@@ -98,6 +98,9 @@ public class SIMChatMediaPhotoBrowser: UIViewController, SIMChatMediaBrowserProt
         modalPresentationStyle = .Custom
         
         dispatch_async(dispatch_get_main_queue()) {
+            // 不允许为空
+            self.targetView?.image = self.targetView?.image ?? withTarget.targetView?.image
+            // 弹出
             rootViewController.presentViewController(self, animated: true, completion: nil)
         }
     }
@@ -304,20 +307,6 @@ internal class SIMChatMediaPhotoBrowserView: UICollectionViewCell, UIScrollViewD
             
             let fp = SIMChatFileProvider.sharedInstance()
             
-            // 加载原图
-            fp.loadResource(media.origin) { [weak self] in
-                guard let image = $0.value as? UIImage
-                    where media === self?.media else {
-                        return
-                }
-                SIMLog.trace("use image in origin")
-                self?._isLoadOrigin = true
-                self?._imageView.image = image
-            }
-            // 检查是否加载了原图
-            guard !_isLoadOrigin else {
-                return
-            }
             // 加载缩略图
             fp.loadResource(media.thumbnail) { [weak self] in
                 guard let image = $0.value as? UIImage
@@ -325,7 +314,15 @@ internal class SIMChatMediaPhotoBrowserView: UICollectionViewCell, UIScrollViewD
                         && !(self?._isLoadOrigin ?? false) else {
                             return
                 }
-                SIMLog.trace("use image in thumbnail")
+                self?._imageView.image = image
+            }
+            // 加载原图
+            fp.loadResource(media.origin, canCache: false) { [weak self] in
+                guard let image = $0.value as? UIImage
+                    where media === self?.media else {
+                        return
+                }
+                self?._isLoadOrigin = true
                 self?._imageView.image = image
             }
         }

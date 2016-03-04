@@ -23,14 +23,16 @@ public class SIMChatBaseMessageImageCell: SIMChatBaseMessageBubbleCell {
         // TODO: 有性能问题, 需要重新实现
         
         // config
-        previewImageView.clipsToBounds = true
-        previewImageView.contentMode = .ScaleAspectFill
-        previewImageView.translatesAutoresizingMaskIntoConstraints = false
+        
+        
+        _imageView.clipsToBounds = true
+        _imageView.contentMode = .ScaleAspectFill
+        _imageView.translatesAutoresizingMaskIntoConstraints = false
         
         // add views
-        bubbleView.contentView.addSubview(previewImageView)
+        bubbleView.contentView.addSubview(_imageView)
         
-        previewImageViewLayout = SIMChatLayout.make(previewImageView)
+        _imageViewLayout = SIMChatLayout.make(_imageView)
             .top.equ(bubbleView.contentView).top
             .left.equ(bubbleView.contentView).left
             .right.equ(bubbleView.contentView).right
@@ -49,21 +51,23 @@ public class SIMChatBaseMessageImageCell: SIMChatBaseMessageBubbleCell {
             let height = max(content.size.height, 1)
             let scale = min(min(135, width) / width, min(135, height) / height)
             
-            previewImageViewLayout?.width = width * scale
-            previewImageViewLayout?.height = height * scale
+            _imageViewLayout?.width = width * scale
+            _imageViewLayout?.height = height * scale
             
             guard superview != nil else {
                 return
             }
             
             /// 默认
-            previewImageView.image = self.dynamicType.defaultImage
+            isLoaded = false
+            imageView?.image = self.dynamicType.defaultImage
             // 加载
             SIMChatFileProvider.sharedInstance().loadResource(content.thumbnail) { [weak self] in
                 guard let image = $0.value as? UIImage where message == self?.message else {
                     return
                 }
-                self?.previewImageView.image = image
+                self?.isLoaded = true
+                self?.imageView?.image = image
             }
         }
     }
@@ -72,10 +76,13 @@ public class SIMChatBaseMessageImageCell: SIMChatBaseMessageBubbleCell {
         return message?.content as? SIMChatBaseMessageImageContent
     }
     
-    private weak var _request: SIMChatFileRequest?
+    public var isLoaded: Bool = false
+    public override var imageView: UIImageView? {
+        return _imageView
+    }
     
-    private(set) var previewImageViewLayout: SIMChatLayout?
-    private(set) lazy var previewImageView = UIImageView()
+    private var _imageViewLayout: SIMChatLayout?
+    private lazy var _imageView: UIImageView = UIImageView()
     
     private static let defaultImage = UIImage(named: "simchat_images_default")
 }

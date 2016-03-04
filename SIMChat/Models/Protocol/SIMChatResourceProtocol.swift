@@ -11,7 +11,7 @@ import Foundation
 ///
 /// 资源协议
 ///
-public protocol SIMChatResourceProtocol {
+public protocol SIMChatResourceProtocol: class {
     /// 资源id
     var identifier: String { get }
     /// 资源链接
@@ -23,4 +23,12 @@ public protocol SIMChatResourceProtocol {
     /// - parameter closure: 结果回调
     ///
     func resource(closure: SIMChatResult<AnyObject, NSError> -> Void)
+}
+
+/// 比较
+public func ==(lhs: SIMChatResourceProtocol, rhs: SIMChatResourceProtocol) -> Bool {
+    return lhs.identifier == rhs.identifier
+}
+public func !=(lhs: SIMChatResourceProtocol, rhs: SIMChatResourceProtocol) -> Bool {
+    return lhs.identifier != rhs.identifier
 }

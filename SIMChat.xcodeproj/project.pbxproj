@@ -111,6 +111,7 @@
 		0C4EF8F71C6B68B400CA192D /* SIMChatEmoticonGroupProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C4EF8F61C6B68B400CA192D /* SIMChatEmoticonGroupProtocol.swift */; };
 		0C5EBFB61C8966BD00E0B923 /* SIMChatBaseFileResource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C5EBFB51C8966BD00E0B923 /* SIMChatBaseFileResource.swift */; };
 		0C5EBFB81C89677F00E0B923 /* SIMChatBaseImageResource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C5EBFB71C89677F00E0B923 /* SIMChatBaseImageResource.swift */; };
+		0C5EBFBA1C89852C00E0B923 /* SIMChatBaseAudioResource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C5EBFB91C89852C00E0B923 /* SIMChatBaseAudioResource.swift */; };
 		0C71D3331C6A3BFA001CBC13 /* SIMChatInputPanelContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C71D3321C6A3BFA001CBC13 /* SIMChatInputPanelContainer.swift */; };
 		0C71D3351C6AE9E9001CBC13 /* SIMChatBaseInputItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C71D3341C6AE9E9001CBC13 /* SIMChatBaseInputItem.swift */; };
 		0C7448591C75A138009CF6A7 /* SIMChatMessageContentProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C7448581C75A138009CF6A7 /* SIMChatMessageContentProtocol.swift */; };
@@ -239,6 +240,7 @@
 		0C4EF8F61C6B68B400CA192D /* SIMChatEmoticonGroupProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SIMChatEmoticonGroupProtocol.swift; sourceTree = "<group>"; };
 		0C5EBFB51C8966BD00E0B923 /* SIMChatBaseFileResource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SIMChatBaseFileResource.swift; sourceTree = "<group>"; };
 		0C5EBFB71C89677F00E0B923 /* SIMChatBaseImageResource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SIMChatBaseImageResource.swift; sourceTree = "<group>"; };
+		0C5EBFB91C89852C00E0B923 /* SIMChatBaseAudioResource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SIMChatBaseAudioResource.swift; sourceTree = "<group>"; };
 		0C71D3321C6A3BFA001CBC13 /* SIMChatInputPanelContainer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SIMChatInputPanelContainer.swift; sourceTree = "<group>"; };
 		0C71D3341C6AE9E9001CBC13 /* SIMChatBaseInputItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SIMChatBaseInputItem.swift; sourceTree = "<group>"; };
 		0C7448581C75A138009CF6A7 /* SIMChatMessageContentProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SIMChatMessageContentProtocol.swift; sourceTree = "<group>"; };
@@ -352,6 +354,7 @@
 				0C4EF8F21C6B5E1200CA192D /* SIMChatBaseEmoticonGroup.swift */,
 				0C5EBFB51C8966BD00E0B923 /* SIMChatBaseFileResource.swift */,
 				0C5EBFB71C89677F00E0B923 /* SIMChatBaseImageResource.swift */,
+				0C5EBFB91C89852C00E0B923 /* SIMChatBaseAudioResource.swift */,
 			);
 			path = Base;
 			sourceTree = "<group>";
@@ -359,6 +362,7 @@
 		0C0DD5DA1C60B4A900AEC8C4 /* Protocol */ = {
 			isa = PBXGroup;
 			children = (
+				0C2475791C892052003077B2 /* SIMChatResourceProtocol.swift */,
 				0C0DD5DD1C60B4A900AEC8C4 /* SIMChatConversationProtocol.swift */,
 				0C0DD6251C60B4A900AEC8C4 /* SIMChatInputItemProtocol.swift */,
 				0C4404831C61E4D800C18004 /* SIMChatInputPanelProtocol.swift */,
@@ -372,7 +376,6 @@
 				0C4070FA1C7B757E00AEECB7 /* SIMChatMediaPlayerProtocol.swift */,
 				0C7AF3001C7C901B00F87D2C /* SIMChatMediaBrowserProtocol.swift */,
 				0C4070FC1C7B75A000AEECB7 /* SIMChatMediaRecorderProtocol.swift */,
-				0C2475791C892052003077B2 /* SIMChatResourceProtocol.swift */,
 			);
 			path = Protocol;
 			sourceTree = "<group>";
@@ -734,6 +737,7 @@
 				0C4EF8F51C6B68A800CA192D /* SIMChatEmoticonProtocol.swift in Sources */,
 				0C48A8971C78C21D00571BF5 /* SIMChatUpdatesTransaction.swift in Sources */,
 				0C4EF8F31C6B5E1200CA192D /* SIMChatBaseEmoticonGroup.swift in Sources */,
+				0C5EBFBA1C89852C00E0B923 /* SIMChatBaseAudioResource.swift in Sources */,
 				0C0DD66F1C60B4A900AEC8C4 /* SIMChatPhotoAlbum.swift in Sources */,
 				0C0DD63F1C60B4A900AEC8C4 /* SIMChatBaseMessageTipsCell.swift in Sources */,
 				0C0DD63B1C60B4A900AEC8C4 /* SIMChatBaseMessageAudioCell.swift in Sources */,

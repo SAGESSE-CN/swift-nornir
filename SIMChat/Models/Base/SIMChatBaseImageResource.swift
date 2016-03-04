@@ -32,7 +32,7 @@ public class SIMChatBaseImageResource: SIMChatBaseFileResource {
                 }
             }
         case .Path(let path):
-            dispatch_after_at_now(1.0, dispatch_get_global_queue(0, 0)) {
+            dispatch_async(dispatch_get_global_queue(0, 0)) {
                 if let image = UIImage(contentsOfFile: path) {
                     closure(.Success(image))
                 } else {

@@ -9,7 +9,7 @@
 import UIKit
 import AVFoundation
 
-extension SIMChatViewController: SIMChatInputBarDelegate, SIMChatInputPanelToolBoxDelegate, SIMChatInputPanelEmoticonViewDelegate, SIMChatInputPanelAudioViewDelegate, SIMChatPhotoPickerDelegate, UIImagePickerControllerDelegate {
+extension SIMChatViewController: SIMChatInputBarDelegate, SIMChatInputPanelToolBoxDelegate, SIMChatInputPanelEmoticonViewDelegate, SIMChatInputPanelAudioViewDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     
     
     // MARK: SIMChatInputPanelAudioViewDelegate
@@ -17,20 +17,20 @@ extension SIMChatViewController: SIMChatInputBarDelegate, SIMChatInputPanelToolB
     ///
     /// 请求一个音频录音器, 如果拒绝该请求返回nil
     ///
-    public func inputPanelAudioRecorder(inputPanel: UIView, url: NSURL) -> SIMChatMediaRecorderProtocol? {
-        return manager.mediaProvider.audioRecorder(url)
+    public func inputPanelAudioRecorder(inputPanel: UIView, resource: SIMChatResourceProtocol) -> SIMChatMediaRecorderProtocol? {
+        return manager.mediaProvider.audioRecorder(resource)
     }
     ///
     /// 请求一个音频播放器, 如果拒绝该请求返回nil
     ///
-    public func inputPanelAudioPlayer(inputPanel: UIView, url: NSURL) -> SIMChatMediaPlayerProtocol? {
-        return manager.mediaProvider.audioPlayer(url)
+    public func inputPanelAudioPlayer(inputPanel: UIView, resource: SIMChatResourceProtocol) -> SIMChatMediaPlayerProtocol? {
+        return manager.mediaProvider.audioPlayer(resource)
     }
     
     ///
     /// 将要发送音频
     ///
-    public func inputPanelShouldSendAudio(inputPanel: UIView, url: NSURL, duration: NSTimeInterval) -> Bool {
+    public func inputPanelShouldSendAudio(inputPanel: UIView, resource: SIMChatResourceProtocol, duration: NSTimeInterval) -> Bool {
         if duration < 1 {
             SIMChatMessageBox.Alert.error("录音时间太短了")
             return false
@@ -40,12 +40,10 @@ extension SIMChatViewController: SIMChatInputBarDelegate, SIMChatInputPanelToolB
     ///
     /// 发送音频
     ///
-    public func inputPanelDidSendAudio(inputPanel: UIView, url: NSURL, duration: NSTimeInterval) {
-        SIMLog.trace()
+    public func inputPanelDidSendAudio(inputPanel: UIView, resource: SIMChatResourceProtocol, duration: NSTimeInterval) {
+        SIMLog.trace(resource.resourceURL)
         
-        let newPath = NSTemporaryDirectory() + "\(NSDate()).acc"
-        let _ = try? NSFileManager.defaultManager().moveItemAtURL(url, toURL: NSURL(fileURLWithPath: newPath))
-        let content = SIMChatBaseMessageAudioContent(origin: SIMChatBaseFileResource(newPath), duration: duration)
+        let content = SIMChatBaseMessageAudioContent(origin: resource, duration: duration)
         
         dispatch_async(dispatch_get_main_queue()) {
             self.messageManager.sendMessage(content)
@@ -183,29 +181,36 @@ extension SIMChatViewController: SIMChatInputBarDelegate, SIMChatInputPanelToolB
         SIMLog.debug("\(item.itemIdentifier) => \(item.itemName)")
     }
     
-    // MARK: SIMChatPhotoPickerDelegate
-    
-    public func picker(picker: SIMChatPhotoPicker, didFinishPickingAssets assets: [SIMChatPhotoAsset]) {
-        SIMLog.trace()
-    }
-    
     // MARK: UIImagePickerControllerDelegate
     
     ///
     /// 图片选择完成
     ///
     public func imagePickerController(picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : AnyObject]) {
-        SIMLog.trace()
+        guard let image = info[UIImagePickerControllerOriginalImage] as? UIImage else {
+            return
+        }
+        // 写到文件
+        let path = NSTemporaryDirectory() + "\(NSDate()).jpg"
+        UIImageJPEGRepresentation(image, 0.75)?.writeToFile(path, atomically: true)
         
-        
+        picker.dismissViewControllerAnimated(true) {
+            SIMLog.trace()
+            let content = SIMChatBaseMessageImageContent(origin: SIMChatBaseImageResource(path), size: image.size)
+            self.messageManager.sendMessage(content)
+        }
     }
     
     // MARK: - Public Method
     
     public func imagePickerWithPhoto() {
         SIMLog.trace()
-        let picker = SIMChatPhotoPicker()
-        picker.delegate2 = self
+        // 拍摄图片
+        let picker = UIImagePickerController()
+        // 配置
+        picker.sourceType = .PhotoLibrary
+        picker.delegate = self
+        //picker.editing = true
         presentViewController(picker, animated: true, completion: nil)
     }
     
@@ -227,7 +232,7 @@ extension SIMChatViewController: SIMChatInputBarDelegate, SIMChatInputPanelToolB
         let picker = UIImagePickerController()
         // 配置
         picker.sourceType = .Camera
-        //picker.delegate = self
+        picker.delegate = self
         //picker.editing = true
         presentViewController(picker, animated: true, completion: nil)
     }

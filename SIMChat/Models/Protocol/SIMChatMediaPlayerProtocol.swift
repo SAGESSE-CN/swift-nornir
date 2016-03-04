@@ -24,7 +24,8 @@ public protocol SIMChatMediaPlayerDelegate: class {
 
 public protocol SIMChatMediaPlayerProtocol: class {
     
-    var URL: NSURL { get }
+    var resource: SIMChatResourceProtocol { get }
+    
     var playing: Bool { get }
     var duration: NSTimeInterval { get }
     var currentTime: NSTimeInterval { get }

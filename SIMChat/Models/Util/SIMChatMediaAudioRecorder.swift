@@ -11,8 +11,8 @@ import AVFoundation
 
 public class SIMChatMediaAudioRecorder: NSObject, SIMChatMediaRecorderProtocol, AVAudioRecorderDelegate {
     
-    public init(URL: NSURL) {
-        _url = URL
+    public init(_ resource: SIMChatResourceProtocol) {
+        _resource = resource
         super.init()
         
         SIMChatMediaAudioRecorder.retainInstance = self
@@ -33,7 +33,8 @@ public class SIMChatMediaAudioRecorder: NSObject, SIMChatMediaRecorderProtocol, 
         NSNotificationCenter.defaultCenter().removeObserver(self)
     }
     
-    public var URL: NSURL { return _url }
+    public var resource: SIMChatResourceProtocol { return _resource }
+    
     public var recording: Bool { return false }
     public var currentTime: NSTimeInterval {
         if let time = _recorder?.currentTime where _recorder?.recording ?? false {
@@ -66,7 +67,7 @@ public class SIMChatMediaAudioRecorder: NSObject, SIMChatMediaRecorderProtocol, 
         return _recorder?.averagePowerForChannel(channel) ?? -60
     }
     
-    private var _url: NSURL
+    private var _resource: SIMChatResourceProtocol
     private var _recorder: AVAudioRecorder?
     private var _currentTime: NSTimeInterval = 0
     
@@ -93,7 +94,7 @@ public class SIMChatMediaAudioRecorder: NSObject, SIMChatMediaRecorderProtocol, 
             return // 申请被拒绝
         }
         SIMLog.trace()
-        let url = _url
+        let url = _resource.resourceURL
         _isPrepareing = true
         // 首先请求录音权限
         AVAudioSession.sharedInstance().requestRecordPermission { [weak self] hasPermission in

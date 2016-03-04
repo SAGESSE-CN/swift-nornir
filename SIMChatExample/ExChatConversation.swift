@@ -147,7 +147,7 @@ class ExChatConversation: SIMChatBaseConversation {
         let tpath2 = SIMChatBaseImageResource(NSBundle.mainBundle().pathForResource("t2_t", ofType: "jpg")!)
         let size2 = CGSizeMake(1115, 1600)
         
-        let apath = SIMChatBaseFileResource(NSBundle.mainBundle().pathForResource("Music", ofType: "m4a")!)
+        let apath = SIMChatBaseAudioResource(NSBundle.mainBundle().pathForResource("m1", ofType: "m4a")!)
         
         for r in 0 ..< (2 * 11) {
         //while rs.count < 10 {

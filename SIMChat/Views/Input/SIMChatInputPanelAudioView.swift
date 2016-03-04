@@ -19,20 +19,20 @@ internal protocol SIMChatInputPanelAudioViewDelegate: SIMChatInputPanelDelegate 
     ///
     /// 请求一个音频录音器, 如果拒绝该请求返回nil
     ///
-    func inputPanelAudioRecorder(inputPanel: UIView, url: NSURL) -> SIMChatMediaRecorderProtocol?
+    func inputPanelAudioRecorder(inputPanel: UIView, resource: SIMChatResourceProtocol) -> SIMChatMediaRecorderProtocol?
     ///
     /// 请求一个音频播放器, 如果拒绝该请求返回nil
     ///
-    func inputPanelAudioPlayer(inputPanel: UIView, url: NSURL) -> SIMChatMediaPlayerProtocol?
+    func inputPanelAudioPlayer(inputPanel: UIView, resource: SIMChatResourceProtocol) -> SIMChatMediaPlayerProtocol?
     
     ///
     /// 将要发送音频
     ///
-    func inputPanelShouldSendAudio(inputPanel: UIView, url: NSURL, duration: NSTimeInterval) -> Bool
+    func inputPanelShouldSendAudio(inputPanel: UIView, resource: SIMChatResourceProtocol, duration: NSTimeInterval) -> Bool
     ///
     /// 发送音频
     ///
-    func inputPanelDidSendAudio(inputPanel: UIView, url: NSURL, duration: NSTimeInterval)
+    func inputPanelDidSendAudio(inputPanel: UIView, resource: SIMChatResourceProtocol, duration: NSTimeInterval)
 }
 
 
@@ -273,13 +273,13 @@ extension SIMChatInputPanelAudioView: UICollectionViewDataSource, UICollectionVi
 //        }
     }
     
-    func inputPanelShowAudioPreview(inputPanel: UIView, url: NSURL, duration: NSTimeInterval) {
+    func inputPanelShowAudioPreview(inputPanel: UIView, resource: SIMChatResourceProtocol, duration: NSTimeInterval) {
         SIMLog.trace()
         
         let view = SIMChatInputPanelAudioViewPreview()
         view.panel = self
         view.frame = bounds
-        view.url = url
+        view.resource = resource
         view.duration = duration
         view.delegate = delegate as? SIMChatInputPanelAudioViewDelegate
         view.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
@@ -320,9 +320,9 @@ extension SIMChatInputPanelAudioView: UICollectionViewDataSource, UICollectionVi
         SIMLog.trace()
         let tv = _preview
         inputPanelHideAudioPreview(self)
-        if let view = tv as? SIMChatInputPanelAudioViewPreview, url = view.url {
+        if let view = tv as? SIMChatInputPanelAudioViewPreview, resource = view.resource {
             (delegate as? SIMChatInputPanelAudioViewDelegate)?.inputPanelDidSendAudio(self,
-                url: url,
+                resource: resource,
                 duration: view.duration)
         }
     }
@@ -477,9 +477,13 @@ internal class SIMChatInputPanelAudioViewOfTalkback: UICollectionViewCell, SIMCh
         // 检查用户选择的是什么.
         if let panel = panel {
             if _confirm {
-                delegate?.inputPanelDidSendAudio(panel, url: recorder.URL, duration: recorder.currentTime)
+                delegate?.inputPanelDidSendAudio(panel,
+                    resource: recorder.resource,
+                    duration: recorder.currentTime)
             } else {
-                cellDelegate?.inputPanelShowAudioPreview(panel, url: recorder.URL, duration: recorder.currentTime)
+                cellDelegate?.inputPanelShowAudioPreview(panel,
+                    resource: recorder.resource,
+                    duration: recorder.currentTime)
             }
         }
         
@@ -495,8 +499,8 @@ internal class SIMChatInputPanelAudioViewOfTalkback: UICollectionViewCell, SIMCh
     }
     
     /// 临时录音路径
-    @inline(__always) private func _temporaryAudioRecordURL() -> NSURL {
-        return NSURL(fileURLWithPath: NSTemporaryDirectory() + "record.acc")
+    @inline(__always) private func _temporaryAudioRecordResource() -> SIMChatResourceProtocol {
+        return SIMChatBaseAudioResource(NSTemporaryDirectory() + "record.acc")
     }
     
     
@@ -505,7 +509,7 @@ internal class SIMChatInputPanelAudioViewOfTalkback: UICollectionViewCell, SIMCh
             return
         }
         // 请求一个录音器
-        guard let recorder = delegate?.inputPanelAudioRecorder(panel, url: _temporaryAudioRecordURL()) else {
+        guard let recorder = delegate?.inputPanelAudioRecorder(panel, resource: _temporaryAudioRecordResource()) else {
             return
         }
         SIMLog.trace()
@@ -529,7 +533,7 @@ internal class SIMChatInputPanelAudioViewOfTalkback: UICollectionViewCell, SIMCh
         // 关掉操作响应
         _recordButton.userInteractionEnabled = false
         // 检查用户选择
-        if !isCancel && delegate?.inputPanelShouldSendAudio(panel, url: recorder.URL, duration: recorder.currentTime) ?? true {
+        if !isCancel && delegate?.inputPanelShouldSendAudio(panel, resource: recorder.resource, duration: recorder.currentTime) ?? true {
             _confirm = !_leftView.highlighted
             _recorder?.stop()
         } else {
@@ -815,7 +819,7 @@ internal class SIMChatInputPanelAudioViewPreview: UIView, SIMChatSpectrumViewDel
     weak var panel: UIView?
     weak var delegate: SIMChatInputPanelAudioViewDelegate?
     
-    var url: NSURL?
+    var resource: SIMChatResourceProtocol?
     var duration: NSTimeInterval = 0
     
     var _state: SIMChatInputPanelAudioView.PlayState = .None {
@@ -953,10 +957,10 @@ internal class SIMChatInputPanelAudioViewPreview: UIView, SIMChatSpectrumViewDel
     
     /// 播放
     @inline(__always) func onPlay() {
-        guard let panel = panel, url = url else {
+        guard let panel = panel, resource = resource else {
             return
         }
-        guard let player = delegate?.inputPanelAudioPlayer(panel, url: url) else {
+        guard let player = delegate?.inputPanelAudioPlayer(panel, resource: resource) else {
             return // 申请被拒绝
         }
         
@@ -1047,7 +1051,7 @@ internal class SIMChatInputPanelAudioViewPreview: UIView, SIMChatSpectrumViewDel
 /// 子面板: 语音预览代理
 ///
 internal protocol SIMChatInputPanelAudioViewCellDelegate: class {
-    func inputPanelShowAudioPreview(inputPanel: UIView, url: NSURL, duration: NSTimeInterval)
+    func inputPanelShowAudioPreview(inputPanel: UIView, resource: SIMChatResourceProtocol, duration: NSTimeInterval)
 }
 
 internal class SIMChatInputPanelAudioViewOfSimulate: UICollectionViewCell {
