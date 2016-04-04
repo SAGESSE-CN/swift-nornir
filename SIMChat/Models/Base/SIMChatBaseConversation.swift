@@ -11,7 +11,7 @@ import Foundation
 ///
 /// 聊天会话
 ///
-public class SIMChatBaseConversation: SIMChatConversationProtocol {
+public class SIMChatBaseConversation: SIMChatConversation {
     ///
     /// 创建一个新的会话
     ///
@@ -20,7 +20,7 @@ public class SIMChatBaseConversation: SIMChatConversationProtocol {
     ///
     public required init(
         receiver: SIMChatUserProtocol,
-        manager: SIMChatManagerProtocol) {
+        manager: SIMChatManager) {
             self.receiver = receiver
             self.manager = manager
     }
@@ -33,14 +33,14 @@ public class SIMChatBaseConversation: SIMChatConversationProtocol {
     /// 发送都信息
     ///
     public var sender: SIMChatUserProtocol {
-        guard let user = manager?.user else {
+        guard let user = manager?.currentUser else {
             fatalError("Must login")
         }
         return user
     }
     
     /// 相关的管理器
-    public weak var manager: SIMChatManagerProtocol?
+    public weak var manager: SIMChatManager?
     /// 代理
     public weak var delegate: SIMChatConversationDelegate?
     
@@ -52,21 +52,21 @@ public class SIMChatBaseConversation: SIMChatConversationProtocol {
     ///
     public class func conversation(
         receiver: SIMChatUserProtocol,
-        manager: SIMChatManagerProtocol) -> SIMChatConversationProtocol {
+        manager: SIMChatManager) -> SIMChatConversation {
             return self.init(
                 receiver: receiver,
                 manager: manager)
     }
     
     /// 所有的消息
-    public var messages: Array<SIMChatMessageProtocol> = []
+    public var messages: Array<SIMChatMessage> = []
     
     // MARK - Util
     
     ///
     /// 最新的一条消息, 如果为nil则没有
     ///
-    public var latest: SIMChatMessageProtocol? {
+    public var latest: SIMChatMessage? {
         return messages.last
     }
     ///
@@ -85,35 +85,66 @@ public class SIMChatBaseConversation: SIMChatConversationProtocol {
     // MARK - Message
     
     ///
-    /// 加载(历史)消息
+    /// 创建消息
     ///
-    /// - parameter last: 最后一条消息(结果不包含该消息), 如果为nil则没有最后一条从头开始
-    /// - parameter count: 容量
-    /// - returns: 返回结果是Array<SIMChatMessageProtocol>
+    /// - parameter content: 消息内容
+    /// - returns: 新建的消息
     ///
-    public func loadHistoryMessages(last: SIMChatMessageProtocol?, count: Int, closure: SIMChatMessagesHandler?) {
-        SIMLog.trace(count)
-        closure?(.Success(self.messages))
+    private func _makeMessage(content: SIMChatMessageBody) -> SIMChatMessage {
+        return SIMChatBaseMessage(content: content, receiver: receiver, sender: sender)
     }
+    
+    /// 发送一条消息(重新发送)
+    ///
+    /// - parameter message: 需要发送的消息
+    /// - parameter closure: 执行结果
+    ///
+    public func sendMessage(message: SIMChatMessage, closure: SIMChatMessageHandler?) {
+        SIMLog.trace("\(message.identifier) => ReSend")
+        closure?(.Success(message))
+    }
+    ///
+    /// 发送一条消息(新建)
+    ///
+    /// - parameter content: 消息内容
+    /// - returns: 新建的消息
+    ///
+    public func sendMessage(content: SIMChatMessageBody, closure: SIMChatMessageHandler?) -> SIMChatMessage {
+        let message = _makeMessage(content)
+        SIMLog.trace("\(message.identifier)")
+        closure?(.Success(message))
+        return message
+    }
+    
     ///
     /// 发送消息
     ///
     /// - parameter message: 需要发送的消息
     /// - parameter isResend: 是否是重发消息
-    /// - returns: 返回结果是SIMChatMessageProtocol
+    /// - returns: 返回结果是SIMChatMessage
     ///
-    public func sendMessage(message: SIMChatMessageProtocol, isResend: Bool, closure: SIMChatMessageHandler?) {
-        SIMLog.trace("\(message.identifier) \(isResend ? "=> isResend" : "")")
-        closure?(.Success(message))
+    public func sendMessage(message: SIMChatMessage, isResend: Bool, closure: SIMChatMessageHandler?) {
+    }
+    
+    ///
+    /// 加载(历史)消息
+    ///
+    /// - parameter last: 最后一条消息(结果不包含该消息), 如果为nil则没有最后一条从头开始
+    /// - parameter count: 容量
+    /// - returns: 返回结果是Array<SIMChatMessage>
+    ///
+    public func loadHistoryMessages(last: SIMChatMessage?, count: Int, closure: SIMChatMessagesHandler?) {
+        SIMLog.trace(count)
+        closure?(.Success(self.messages))
     }
     ///
     /// 更新消息状态
     ///
     /// - parameter message: 需要发送的消息
     /// - parameter status: 新的状态
-    /// - returns: 返回结果是SIMChatMessageProtocol
+    /// - returns: 返回结果是SIMChatMessage
     ///
-    public func updateMessage(message: SIMChatMessageProtocol, status: SIMChatMessageStatus, closure: SIMChatMessageHandler?) {
+    public func updateMessage(message: SIMChatMessage, status: SIMChatMessageStatus, closure: SIMChatMessageHandler?) {
         SIMLog.trace(message.identifier)
         closure?(.Success(message))
     }
@@ -123,7 +154,7 @@ public class SIMChatBaseConversation: SIMChatConversationProtocol {
     /// - parameter message: 需要删除的消息
     /// - returns: 返回结果是Void
     ///
-    public func removeMessage(message: SIMChatMessageProtocol, closure: SIMChatMessageHandler?) {
+    public func removeMessage(message: SIMChatMessage, closure: SIMChatMessageHandler?) {
         SIMLog.trace(message.identifier)
         closure?(.Success(message))
     }
@@ -135,7 +166,7 @@ public class SIMChatBaseConversation: SIMChatConversationProtocol {
     ///
     /// - parameter message: 被操作的消息
     ///
-    public func updateMessageFromRemote(message: SIMChatMessageProtocol) {
+    public func updateMessageFromRemote(message: SIMChatMessage) {
         SIMLog.trace(message.identifier)
         delegate?.conversation(self, didUpdateMessage: message)
     }
@@ -144,7 +175,7 @@ public class SIMChatBaseConversation: SIMChatConversationProtocol {
     ///
     /// - parameter message: 被操作的消息
     ///
-    public func receiveMessageFromRemote(message: SIMChatMessageProtocol) {
+    public func receiveMessageFromRemote(message: SIMChatMessage) {
         SIMLog.trace(message.identifier)
         delegate?.conversation(self, didReciveMessage: message)
     }
@@ -153,7 +184,7 @@ public class SIMChatBaseConversation: SIMChatConversationProtocol {
     ///
     /// - parameter message: 被操作的消息
     ///
-    public func removeMessageFromRemote(message: SIMChatMessageProtocol) {
+    public func removeMessageFromRemote(message: SIMChatMessage) {
         SIMLog.trace(message.identifier)
         delegate?.conversation(self, didRemoveMessage: message)
     }
@@ -177,7 +208,7 @@ public class SIMChatBaseConversation: SIMChatConversationProtocol {
 //}
 //
 //// MARK: - Protocol
-//extension SIMChatConversation : SIMChatConversationProtocol {
+//extension SIMChatConversation : SIMChatConversation {
 //    ///
 //    /// 查询消息
 //    ///

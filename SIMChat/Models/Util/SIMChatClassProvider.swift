@@ -15,17 +15,17 @@ public class SIMChatClassProvider {
     ///
     /// 初始化
     ///
-    public init() {
-        user = SIMChatBaseUser.self
-        message = SIMChatBaseMessage.self
-        conversation = SIMChatBaseConversation.self
+    private init() {
+//        user = SIMChatBaseUser.self
+//        message = SIMChatBaseMessage.self
+//        conversation = SIMChatBaseConversation.self
         
         _allMessageCells = [
-            SIMChatMessageUnknowContentKey:     SIMChatBaseMessageUnknowCell.self,
-            SIMChatMessageTimeLineContentKey:   SIMChatBaseMessageTimeLineCell.self,
+            SIMChatUnknowMessageKey:     SIMChatUnknowMessageCell.self,
+            SIMChatTimeLineMessageKey:   SIMChatTimeLineMessageCell.self,
             
-            SIMChatMessageRevokedContentKey:    SIMChatBaseMessageTipsCell.self,
-            SIMChatMessageDestoryedContentKey:  SIMChatBaseMessageTipsCell.self,
+            SIMChatRevokedMessageKey:    SIMChatBaseMessageTipsCell.self,
+            SIMChatDestoryedMessageKey:  SIMChatBaseMessageTipsCell.self,
             
             NSStringFromClass(SIMChatBaseMessageTextContent.self):    SIMChatBaseMessageTextCell.self,
             NSStringFromClass(SIMChatBaseMessageTipsContent.self):    SIMChatBaseMessageTipsCell.self,
@@ -35,22 +35,14 @@ public class SIMChatClassProvider {
     }
     
     ///
-    /// 用户使用的类型
-    ///
-    public var user: SIMChatUserProtocol.Type
-    ///
-    /// 消息使用的类型
-    ///
-    public var message: SIMChatMessageProtocol.Type
-    ///
-    /// 会话使用的类型
-    ///
-    public var conversation: SIMChatConversationProtocol.Type
-    
-    ///
     /// 显示内容时使用的类型
     ///
     private var _allMessageCells: Dictionary<String, SIMChatMessageCellProtocol.Type> = [:]
+    
+    ///
+    /// 单例
+    ///
+    public static let sharedInstance: SIMChatClassProvider = SIMChatClassProvider()
 }
 
 // MARK: - Register
@@ -67,13 +59,13 @@ extension SIMChatClassProvider {
     ///
     /// 注册显示内容时使用的类型
     ///
-    public func registerCell(contentType: SIMChatMessageContentProtocol.Type, viewType: SIMChatMessageCellProtocol.Type) {
+    public func registerCell(contentType: SIMChatMessageBody.Type, viewType: SIMChatMessageCellProtocol.Type) {
         return _allMessageCells[NSStringFromClass(contentType)] = viewType
     }
     ///
     /// 获取注册的Cell
     ///
-    public func registeredCell(content: SIMChatMessageContentProtocol) -> (String, SIMChatMessageCellProtocol.Type)? {
+    public func registeredCell(content: SIMChatMessageBody) -> (String, SIMChatMessageCellProtocol.Type)? {
         let type = content.dynamicType
         let key = NSStringFromClass(type)
         // 获取己之兼容的类型
@@ -93,60 +85,47 @@ extension SIMChatClassProvider {
     /// 注册未知消息时显示的Cell
     ///
     public func registerUnknowCell(viewType: SIMChatMessageCellProtocol.Type) {
-        return _allMessageCells[SIMChatMessageUnknowContentKey] = viewType
+        return _allMessageCells[SIMChatUnknowMessageKey] = viewType
     }
     ///
     /// 获取未知消息时显示的Cell
     ///
     public func registeredUnknowCell() -> SIMChatMessageCellProtocol.Type {
-        return _allMessageCells[SIMChatMessageUnknowContentKey]!
+        return _allMessageCells[SIMChatUnknowMessageKey]!
     }
     
     ///
     /// 注册撤销时显示的Cell
     ///
     public func registerRevokedCell(viewType: SIMChatMessageCellProtocol.Type) {
-        return _allMessageCells[SIMChatMessageRevokedContentKey] = viewType
+        return _allMessageCells[SIMChatRevokedMessageKey] = viewType
     }
     ///
     /// 获取撤销时显示的Cell
     ///
     public func registeredRevokedCell() -> SIMChatMessageCellProtocol.Type {
-        return _allMessageCells[SIMChatMessageRevokedContentKey]!
+        return _allMessageCells[SIMChatRevokedMessageKey]!
     }
     
     ///
     /// 注册销毁时显示的Cell
     ///
     public func registerDestoryedCell(viewType: SIMChatMessageCellProtocol.Type) {
-        return _allMessageCells[SIMChatMessageDestoryedContentKey] = viewType
+        return _allMessageCells[SIMChatDestoryedMessageKey] = viewType
     }
     ///
     /// 获取销毁时显示的Cell
     ///
     public func registeredDestoryedCell() -> SIMChatMessageCellProtocol.Type {
-        return _allMessageCells[SIMChatMessageDestoryedContentKey]!
-    }
-    
-    ///
-    /// 注册显示日期时显示的Cell
-    ///
-    public func registerTimeLineCell(viewType: SIMChatMessageCellProtocol.Type) {
-        return _allMessageCells[SIMChatMessageTimeLineContentKey] = viewType
-    }
-    ///
-    /// 获取显示日期时显示的Cell
-    ///
-    public func registeredTimeLineCell() -> SIMChatMessageCellProtocol.Type {
-        return _allMessageCells[SIMChatMessageDestoryedContentKey]!
+        return _allMessageCells[SIMChatDestoryedMessageKey]!
     }
 }
 
 /// 未知的消息的Key
-public let SIMChatMessageUnknowContentKey = "SIMChat.Message.Unknow"
-/// 撤消的消息的Key
-public let SIMChatMessageRevokedContentKey = "SIMChat.Message.Revoked"
-/// 销毁的消息的Key
-public let SIMChatMessageDestoryedContentKey = "SIMChat.Message.Destroyed"
+public let SIMChatUnknowMessageKey = "SIMChat.Message.Unknow"
 /// 日期的消息的Key
-public let SIMChatMessageTimeLineContentKey = "SIMChat.Message.TimeLine"
+public let SIMChatTimeLineMessageKey = "SIMChat.Message.TimeLine"
+/// 撤消的消息的Key
+public let SIMChatRevokedMessageKey = "SIMChat.Message.Revoked"
+/// 销毁的消息的Key
+public let SIMChatDestoryedMessageKey = "SIMChat.Message.Destroyed"

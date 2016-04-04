@@ -12,7 +12,7 @@ import Foundation
 ///
 /// 音频
 ///
-public class SIMChatBaseMessageAudioContent: SIMChatMessageContentProtocol {
+public class SIMChatBaseMessageAudioContent: SIMChatMessageBody {
     ///
     /// 使用本地链接创建内容
     ///

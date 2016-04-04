@@ -12,7 +12,7 @@ import Foundation
 ///
 /// 提示信息
 ///
-public class SIMChatBaseMessageTipsContent: SIMChatMessageContentProtocol {
+public class SIMChatBaseMessageTipsContent: SIMChatMessageBody {
     ///
     /// 初始化
     ///

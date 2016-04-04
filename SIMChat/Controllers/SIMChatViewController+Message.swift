@@ -11,7 +11,7 @@ import UIKit
 
 extension SIMChatViewController {
     class MessageManager: NSObject, SIMChatBrowseAnimatedTransitioningTarget {
-        init(conversation: SIMChatConversationProtocol) {
+        init(conversation: SIMChatConversation) {
             _allMessages = []
             _conversation = conversation
             super.init()
@@ -19,10 +19,10 @@ extension SIMChatViewController {
         }
         
         /// 最后操作的消息
-        private weak var _lastOperatorMessage: SIMChatMessageProtocol?
+        private weak var _lastOperatorMessage: SIMChatMessage?
         
-        private var _allMessages: Array<SIMChatMessageProtocol>
-        private var _conversation: SIMChatConversationProtocol
+        private var _allMessages: Array<SIMChatMessage>
+        private var _conversation: SIMChatConversation
         private var _isLoading: Bool = false
         /// 快速映射
         private var _fastMap: Dictionary<String, String> = [:]
@@ -61,10 +61,11 @@ extension SIMChatViewController {
         }
         
         private var mediaProvider: SIMChatMediaProvider {
-            return manager.mediaProvider
+            return SIMChatMediaProvider()
+            //return manager.mediaProvider
         }
         
-        private var manager: SIMChatManagerProtocol {
+        private var manager: SIMChatManager {
             guard let manager = _conversation.manager else {
                 fatalError("Must provider manager")
             }
@@ -77,7 +78,7 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
     /// some prepare
     func prepare() {
         // reigster all cell class
-        manager.classProvider.registeredAllCells().forEach {
+        SIMChatClassProvider.sharedInstance.registeredAllCells().forEach {
             self.contentView?.registerClass($0.1, forCellReuseIdentifier: $0.0)
             SIMLog.debug("\($0.0) => \(NSStringFromClass($0.1))")
         }
@@ -87,23 +88,23 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
         }
     }
     /// query reuseindentifier with message
-    private func reuseIndentifierWithMessage(message: SIMChatMessageProtocol) -> String {
+    private func reuseIndentifierWithMessage(message: SIMChatMessage) -> String {
         // 获取前置类型
         if message.status == .Revoked {
-            return SIMChatMessageRevokedContentKey
+            return SIMChatRevokedMessageKey
         }
         if message.status == .Destroyed {
-            return SIMChatMessageDestoryedContentKey
+            return SIMChatDestoryedMessageKey
         }
-        if message.content is SIMChatBaseMessageTimeLineContent {
-            return SIMChatMessageTimeLineContentKey
+        if message is SIMChatTimeLineMessage {
+            return SIMChatTimeLineMessageKey
         }
         let key = NSStringFromClass(message.content.dynamicType)
         // 读取
         return _fastMap[key] ?? {
-            var ds = SIMChatMessageUnknowContentKey
+            var ds = SIMChatUnknowMessageKey
             // 查找可以使用的key
-            if let x = manager.classProvider.registeredCell(message.content) {
+            if let x = SIMChatClassProvider.sharedInstance.registeredCell(message.content) {
                 ds = x.0
             }
             // 快速缓存
@@ -113,7 +114,7 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
     }
     
     /// 使用索引获取消息(安全的)
-    private func _messageWithIndex(index: Int) -> SIMChatMessageProtocol? {
+    private func _messageWithIndex(index: Int) -> SIMChatMessage? {
         guard index >= 0 && index < _allMessages.count else {
             return nil
         }
@@ -121,7 +122,7 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
     }
     
     /// 获取索引(结果和参数顺序有关)
-    private func _indexsOfMessages(messages: Array<SIMChatMessageProtocol>) -> Array<Int> {
+    private func _indexsOfMessages(messages: Array<SIMChatMessage>) -> Array<Int> {
 //        // 批量操作测试
 //        if true {
 //            var x = messages.flatMap { e in
@@ -150,136 +151,131 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
     ///
     /// 检查是否存在timeline
     ///
-    private func _hasTimeLine(prev: SIMChatMessageProtocol?, _ next: SIMChatMessageProtocol?) -> Bool {
-        return prev?.content is SIMChatBaseMessageTimeLineContent
-            || next?.content is SIMChatBaseMessageTimeLineContent
+    private func _hasTimeLine(before: SIMChatMessage?, _ after: SIMChatMessage?) -> Bool {
+        return before is SIMChatTimeLineMessage
+            || after is SIMChatTimeLineMessage
     }
     
     ///
     /// 检查是否需要生成timeline
     ///
-    private func _needMakeTimeLine(prev: SIMChatMessageProtocol?, _ next: SIMChatMessageProtocol?) -> Bool {
+    private func _needMakeTimeLine(before: SIMChatMessage?, _ after: SIMChatMessage?) -> Bool {
         // 如果存在timeline就不需要添加
-        if _hasTimeLine(prev, next) {
+        if _hasTimeLine(before, after) {
             return false
         }
         // next必须存在并且要可以显示timeline
-        guard let next = next where next.showsTimeLine else {
+        guard let after = after where after.showsTimeLine else {
             return false
         }
         // prev可以不存在, 但如果存在就必须符合条件
-        guard let prev = prev else {
+        guard let before = before else {
             return true
         }
         // 如果上一个不允许显示时间, 那就必须显示
-        if !prev.showsTimeLine {
+        if !before.showsTimeLine {
             return true
         }
         // 都符合就检查时间
-        return fabs(prev.date.timeIntervalSinceDate(next.date)) >= durationInterval
+        return fabs(before.timestamp.timeIntervalSinceDate(after.timestamp)) >= durationInterval
     }
     
     ///
     /// 检查是否需要移除timeline
     ///
-    private func _needRemoveTimeLine(prev: SIMChatMessageProtocol?, _ next: SIMChatMessageProtocol?) -> Bool {
+    private func _needRemoveTimeLine(before: SIMChatMessage?, _ after: SIMChatMessage?) -> Bool {
         // 两个都是timeline
-        if next?.content is SIMChatBaseMessageTimeLineContent
-            && prev?.content is SIMChatBaseMessageTimeLineContent {
+        if before is SIMChatTimeLineMessage
+            && after is SIMChatTimeLineMessage {
             return true
         }
         // 两个都不是timeline
-        if !(next?.content is SIMChatBaseMessageTimeLineContent)
-            && !(prev?.content is SIMChatBaseMessageTimeLineContent) {
+        if !(before is SIMChatTimeLineMessage)
+            && !(after is SIMChatTimeLineMessage) {
             return false
         }
         // 必须要有创建才有删除
-        if let content = prev?.content as? SIMChatBaseMessageTimeLineContent {
-            guard let nextMessage = next else {
+        if let tl = before as? SIMChatTimeLineMessage {
+            guard let after = after else {
                 // 没有下一条了, 需要删除
                 return true
             }
-            if !nextMessage.showsTimeLine {
+            if !after.showsTimeLine {
                 // 不允许显示timeline
                 return true
             }
             // 如果有上上一条消息, 检查他
-            if let pprevMessage = content.frontMessage {
+            if let bbefore = tl.beforeMessage {
 //                if !pprevMessage.showsTimeLine {
 //                    // 上上一个不允许显示
 //                    return false
 //                }
-                return fabs(pprevMessage.date.timeIntervalSinceDate(nextMessage.date)) < durationInterval
+                return fabs(bbefore.timestamp.timeIntervalSinceDate(after.timestamp)) < durationInterval
             }
         }
-        if let content = next?.content as? SIMChatBaseMessageTimeLineContent {
-            guard let prevMessage = prev else {
+        if let tl = after as? SIMChatTimeLineMessage {
+            guard let before = before else {
                 // 这是第一条
                 return false
             }
-            if !prevMessage.showsTimeLine {
+            if !before.showsTimeLine {
                 // 上一条消息不允许显示timeline, 那么这个就可以直接显示
                 return false
             }
             // 如果有下下一条消息, 检查他
-            if let nnextMessage = content.backMessage {
-                return fabs(nnextMessage.date.timeIntervalSinceDate(prevMessage.date)) < durationInterval
+            if let aafter = tl.afterMessage {
+                return fabs(aafter.timestamp.timeIntervalSinceDate(before.timestamp)) < durationInterval
             }
         }
-        guard let next = next, prev = prev else {
+        guard let after = after, before = before else {
             return false
         }
         // 计算
-        return fabs(prev.date.timeIntervalSinceDate(next.date)) < durationInterval
+        return fabs(before.timestamp.timeIntervalSinceDate(after.timestamp)) < durationInterval
     }
     
     ///
     /// 检查是否需要更新
     ///
-    private func _needUpdateTimeLine(frontMessage: SIMChatMessageProtocol?, _ backMessage: SIMChatMessageProtocol?) -> Bool {
+    private func _needUpdateTimeLine(before: SIMChatMessage?, _ after: SIMChatMessage?) -> Bool {
         // 如果没有timeline, 就谈不上更新了
-        if !_hasTimeLine(frontMessage, backMessage) {
+        if !_hasTimeLine(before, after) {
             return false
         }
         // 后一条消息改变了
-        if let content = frontMessage?.content as? SIMChatBaseMessageTimeLineContent {
-            return content.backMessage !== backMessage
+        if let tl = before as? SIMChatTimeLineMessage {
+            return tl.afterMessage !== after
         }
         // 前一条消息改变了
-        if let content = backMessage?.content as? SIMChatBaseMessageTimeLineContent {
-            return content.frontMessage !== frontMessage
+        if let tl = after as? SIMChatTimeLineMessage {
+            return tl.beforeMessage !== before
         }
         return false
     }
     
-    private func _updateTimeLine(frontMessage: SIMChatMessageProtocol?, _ backMessage: SIMChatMessageProtocol?) {
-        if let content = frontMessage?.content as? SIMChatBaseMessageTimeLineContent {
-            content.backMessage = backMessage
+    private func _updateTimeLine(before: SIMChatMessage?, _ after: SIMChatMessage?) {
+        if let tl = before as? SIMChatTimeLineMessage {
+            tl.afterMessage = after
         }
-        if let content = backMessage?.content as? SIMChatBaseMessageTimeLineContent {
-            content.frontMessage = frontMessage
+        if let tl = after as? SIMChatTimeLineMessage {
+            tl.beforeMessage = before
         }
     }
     /// 生成timeline
-    private func _makeTimeLine(frontMessage: SIMChatMessageProtocol?, _ backMessage: SIMChatMessageProtocol?) -> SIMChatMessageProtocol {
-        let content = SIMChatBaseMessageTimeLineContent(frontMessage: frontMessage, backMessage: backMessage)
-        let messageClass = manager.classProvider.message
-        let message = messageClass.messageWithContent(content,
-            receiver: _conversation.receiver,
-            sender: _conversation.sender)
-        return message
+    private func _makeTimeLine(beforeMessage: SIMChatMessage?, _ afterMessage: SIMChatMessage?) -> SIMChatMessage {
+        return SIMChatTimeLineMessage(beforeMessage: beforeMessage, afterMessage: afterMessage)
     }
     
     /// 获取timeline
-    private func _timeLine(prevIndex: Int, _ nextIndex: Int) -> (Int, SIMChatMessageProtocol) {
-        if let prevMessage = self._messageWithIndex(prevIndex) {
-            if prevMessage.content is SIMChatBaseMessageTimeLineContent {
-                return (prevIndex, prevMessage)
+    private func _timeLine(beforeIndex: Int, _ afterIndex: Int) -> (Int, SIMChatMessage) {
+        if let before = self._messageWithIndex(beforeIndex) {
+            if before is SIMChatTimeLineMessage {
+                return (beforeIndex, before)
             }
         }
-        if let nextMessage = self._messageWithIndex(nextIndex) {
-            if nextMessage.content is SIMChatBaseMessageTimeLineContent {
-                return (nextIndex, nextMessage)
+        if let after = self._messageWithIndex(afterIndex) {
+            if after is SIMChatTimeLineMessage {
+                return (afterIndex, after)
             }
         }
         fatalError("time not found!")
@@ -290,14 +286,14 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
     ///
     /// 移动消息, 如果有多条消息, 按参数顺序加到index之后
     ///
-    private func _moveMessages(ms: Array<SIMChatMessageProtocol>, toIndex index: Int, animated: Bool = true) {
+    private func _moveMessages(ms: Array<SIMChatMessage>, toIndex index: Int, animated: Bool = true) {
         guard let tableView = self.contentView where !ms.isEmpty else {
             return
         }
         // 计算插入点
         let count = _allMessages.count
         let position = min(max(index >= 0 ? index : index + count, 0), count)
-        var newMessages = Array<SIMChatMessageProtocol>()
+        var newMessages = Array<SIMChatMessage>()
         // 查找需要执行操作的单元格并转换为组
         let indexs = _indexsOfMessages(ms)
         let indexGroups = indexs.filter({$0 != position}).sort().splitInGroup {
@@ -307,9 +303,9 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
             return
         }
         // 辅助函数
-        let animation = { (m: SIMChatMessageProtocol) -> UITableViewRowAnimation in
+        let animation = { (m: SIMChatMessage) -> UITableViewRowAnimation in
             // 如果是timeline, 取决于他关联的是什么
-            let isSelf = (m.content as? SIMChatBaseMessageTimeLineContent)?.backMessage?.isSelf ?? m.isSelf
+            let isSelf = (m as? SIMChatTimeLineMessage)?.afterMessage?.isSelf ?? m.isSelf
             // 转换为方向
             return isSelf ? .Right : .Left
         }
@@ -332,7 +328,7 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
                     maker.reloadAtIndex(position, withAnimation: .Fade)
                 }
                 // 不要移动时间
-                if message.content is SIMChatBaseMessageTimeLineContent {
+                if message is SIMChatTimeLineMessage {
                     maker.removeAtIndex($0, withAnimation: animation(message))
                 } else {
                     newMessages.append(message)
@@ -387,7 +383,7 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
     /// - parameter ms:       消息集合
     /// - parameter index:    如果为index < 0, 插入点为count + index + 1
     ///
-    private func _insertMessages(ms: Array<SIMChatMessageProtocol>, atIndex: Int, animated: Bool = true) {
+    private func _insertMessages(ms: Array<SIMChatMessage>, atIndex: Int, animated: Bool = true) {
         guard let tableView = contentView where !ms.isEmpty else {
             return
         }
@@ -505,7 +501,7 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
     ///
     /// 更新消息
     ///
-    private func _reloadMessages(ms: Array<SIMChatMessageProtocol>, animated: Bool = true) {
+    private func _reloadMessages(ms: Array<SIMChatMessage>, animated: Bool = true) {
         guard let tableView = contentView where !ms.isEmpty else {
             return
         }
@@ -557,7 +553,7 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
     ///
     /// 删除消息
     ///
-    private func _removeMessages(ms: Array<SIMChatMessageProtocol>, animated: Bool = true) {
+    private func _removeMessages(ms: Array<SIMChatMessage>, animated: Bool = true) {
         guard let tableView = contentView where !ms.isEmpty else {
             return
         }
@@ -571,9 +567,9 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
         SIMLog.trace()
         
         // 辅助函数
-        let animation = { (m: SIMChatMessageProtocol) -> UITableViewRowAnimation in
+        let animation = { (m: SIMChatMessage) -> UITableViewRowAnimation in
             // 如果是timeline, 取决于他关联的是什么
-            let isSelf = (m.content as? SIMChatBaseMessageTimeLineContent)?.backMessage?.isSelf ?? m.isSelf
+            let isSelf = (m.content as? SIMChatTimeLineMessage)?.afterMessage?.isSelf ?? m.isSelf
             // 转换为方向
             return isSelf ? .Right : .Left
         }
@@ -611,7 +607,7 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
     ///
     /// 追加消息
     ///
-    private func _appendMessages(ms: Array<SIMChatMessageProtocol>, animated: Bool = true) {
+    private func _appendMessages(ms: Array<SIMChatMessage>, animated: Bool = true) {
         guard let tableView = self.contentView, last = ms.last else {
             return
         }
@@ -694,7 +690,7 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
         }
     }
     /// 自动放弃(停止播放)
-    private func _autoResignMessage(message: SIMChatMessageProtocol) {
+    private func _autoResignMessage(message: SIMChatMessage) {
         // 最后操作的就是删除的这一条消息, 这需要停止当前正在进行的工作
         if message == _lastOperatorMessage {
             mediaProvider.stop()
@@ -715,7 +711,7 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
             if let mcell = $0 as? SIMChatMessageCellProtocol {
                 // configuation
                 mcell.conversation = self._conversation
-                mcell.message = message
+                mcell.model = message
             }
         }
     }
@@ -786,7 +782,7 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
         if let mcell = cell as? SIMChatMessageCellProtocol {
             // custom configuation
             mcell.conversation = self._conversation
-            mcell.message = message
+            mcell.model = message
             mcell.delegate = self
         }
     }
@@ -794,19 +790,19 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
     // MARK: SIMChatConversationDelegate
     
     /// 接收到消息
-    func conversation(conversation: SIMChatConversationProtocol, didReciveMessage message: SIMChatMessageProtocol) {
+    func conversation(conversation: SIMChatConversation, didReciveMessage message: SIMChatMessage) {
         SIMLog.debug()
         _appendMessages([message], animated: true)
     }
     
     /// 删除消息请求
-    func conversation(conversation: SIMChatConversationProtocol, didRemoveMessage message: SIMChatMessageProtocol) {
+    func conversation(conversation: SIMChatConversation, didRemoveMessage message: SIMChatMessage) {
         SIMLog.debug()
         _removeMessages([message], animated: true)
     }
     
     /// 更新消息请求
-    func conversation(conversation: SIMChatConversationProtocol, didUpdateMessage message: SIMChatMessageProtocol) {
+    func conversation(conversation: SIMChatConversation, didUpdateMessage message: SIMChatMessage) {
         SIMLog.debug()
         _reloadMessages([message], animated: true)
     }
@@ -814,11 +810,11 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
     // MARK: SIMChatMessageCellDelegate
     
     // 点击消息
-    func cellEvent(cell: SIMChatMessageCellProtocol, shouldPressMessage message: SIMChatMessageProtocol) -> Bool {
+    func cellEvent(cell: SIMChatMessageCellProtocol, shouldPressMessage message: SIMChatMessage) -> Bool {
         return true
     }
     // 点击消息
-    func cellEvent(cell: SIMChatMessageCellProtocol, didPressMessage message: SIMChatMessageProtocol) {
+    func cellEvent(cell: SIMChatMessageCellProtocol, didPressMessage message: SIMChatMessage) {
         guard let cell = cell as? UITableViewCell else {
             return // 未知错误
         }
@@ -846,11 +842,11 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
     }
     
     // 长按消息
-    func cellEvent(cell: SIMChatMessageCellProtocol, shouldLongPressMessage message: SIMChatMessageProtocol) -> Bool {
+    func cellEvent(cell: SIMChatMessageCellProtocol, shouldLongPressMessage message: SIMChatMessage) -> Bool {
         return true
     }
     // 长按消息
-    func cellEvent(cell: SIMChatMessageCellProtocol, didLongPressMessage message: SIMChatMessageProtocol) {
+    func cellEvent(cell: SIMChatMessageCellProtocol, didLongPressMessage message: SIMChatMessage) {
         SIMLog.debug(message.identifier)
         
         if let cell = cell as? SIMChatBaseMessageBubbleCell {
@@ -889,20 +885,20 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
     // MARK: SIMChatMessageCellMenuDelegate
     
     // 复制
-    func cellMenu(cell: SIMChatMessageCellProtocol, shouldCopyMessage message: SIMChatMessageProtocol) -> Bool {
+    func cellMenu(cell: SIMChatMessageCellProtocol, shouldCopyMessage message: SIMChatMessage) -> Bool {
         return true
     }
     // 复制
-    func cellMenu(cell: SIMChatMessageCellProtocol, didCopyMessage message: SIMChatMessageProtocol) {
+    func cellMenu(cell: SIMChatMessageCellProtocol, didCopyMessage message: SIMChatMessage) {
         SIMLog.debug(message.identifier)
     }
     
     // 删除
-    func cellMenu(cell: SIMChatMessageCellProtocol, shouldRemoveMessage message: SIMChatMessageProtocol) -> Bool {
+    func cellMenu(cell: SIMChatMessageCellProtocol, shouldRemoveMessage message: SIMChatMessage) -> Bool {
         return true
     }
     // 删除
-    func cellMenu(cell: SIMChatMessageCellProtocol, didRemoveMessage message: SIMChatMessageProtocol) {
+    func cellMenu(cell: SIMChatMessageCellProtocol, didRemoveMessage message: SIMChatMessage) {
         SIMLog.debug(message.identifier)
         
         _autoResignMessage(message)
@@ -918,15 +914,15 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
     }
     
     /// 重试(发送/上传/下载)
-    func cellMenu(cell: SIMChatMessageCellProtocol, shouldRetryMessage message: SIMChatMessageProtocol) -> Bool {
+    func cellMenu(cell: SIMChatMessageCellProtocol, shouldRetryMessage message: SIMChatMessage) -> Bool {
         return true
     }
     /// 重试(发送/上传/下载)
-    func cellMenu(cell: SIMChatMessageCellProtocol, didRetryMessage message: SIMChatMessageProtocol) {
+    func cellMenu(cell: SIMChatMessageCellProtocol, didRetryMessage message: SIMChatMessage) {
         SIMLog.debug(message.identifier)
         // 重新发送
         _autoResignMessage(message)
-        _conversation.sendMessage(message, isResend: true) { //[weak self] in
+        _conversation.sendMessage(message) {  //[weak self] in
             // 检查操作状态
             if let error = $0.error {
                 SIMLog.error(error)
@@ -938,11 +934,11 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
     }
     
     // 撤销
-    func cellMenu(cell: SIMChatMessageCellProtocol, shouldRevokeMessage message: SIMChatMessageProtocol) -> Bool {
+    func cellMenu(cell: SIMChatMessageCellProtocol, shouldRevokeMessage message: SIMChatMessage) -> Bool {
         return true
     }
     // 撤销
-    func cellMenu(cell: SIMChatMessageCellProtocol, didRevokeMessage message: SIMChatMessageProtocol) {
+    func cellMenu(cell: SIMChatMessageCellProtocol, didRevokeMessage message: SIMChatMessage) {
         SIMLog.debug(message.identifier)
         // 更新状态为revoked
         _autoResignMessage(message)
@@ -960,24 +956,21 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
     ///
     /// 发送消息
     ///
-    func sendMessage(content: SIMChatMessageContentProtocol) {
+    /// - parameter content: 需要发送的消息
+    ///
+    func sendMessage(content: SIMChatMessageBody) {
         SIMLog.trace()
-        let message = manager.classProvider.message.messageWithContent(content,
-            receiver: _conversation.receiver,
-            sender: _conversation.sender)
-        
         // 发送
-        _conversation.sendMessage(message) {
+        let message = _conversation.sendMessage(content) {
             // 检查操作状态
             if let error = $0.error {
                 SIMLog.error(error)
                 return
             }
         }
-        // 不用等结果
+        // 不用等操作结果
         _appendMessages([message], animated: true)
     }
-    
 }
 
 //// MARK: - Message Send
@@ -1033,7 +1026,7 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
 //    ///
 //    /// 发送自定义消息
 //    ///
-//    func sendMessageForCustom(data: SIMChatMessageContentProtocol) {
+//    func sendMessageForCustom(data: SIMChatMessageBody) {
 //        SIMLog.trace()
 //        // :)
 //        self.sendMessage(data)
@@ -1041,7 +1034,7 @@ extension SIMChatViewController.MessageManager: UITableViewDelegate, UITableView
 //    ///
 //    /// 发送内容(禁止外部访问)
 //    ///
-//    private func sendMessage(content: SIMChatMessageContentProtocol) {
+//    private func sendMessage(content: SIMChatMessageBody) {
 //        // 真正的发送
 //        self._conversation.sendMessage(SIMChatMessage(content), isResend: false, nil, nil)
 //    }

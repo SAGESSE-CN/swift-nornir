@@ -42,9 +42,9 @@ public class SIMChatBaseMessageImageCell: SIMChatBaseMessageBubbleCell {
             .submit()
     }
     /// 消息
-    public override var message: SIMChatMessageProtocol? {
+    public override var model: SIMChatMessage? {
         didSet {
-            guard let message = message, content = content where message != oldValue else {
+            guard let message = model, content = content where message != oldValue else {
                 return
             }
             let width = max(content.size.width, 32)
@@ -63,7 +63,7 @@ public class SIMChatBaseMessageImageCell: SIMChatBaseMessageBubbleCell {
             imageView?.image = self.dynamicType.defaultImage
             // 加载
             SIMChatFileProvider.sharedInstance().loadResource(content.thumbnail) { [weak self] in
-                guard let image = $0.value as? UIImage where message == self?.message else {
+                guard let image = $0.value as? UIImage where message == self?.model else {
                     return
                 }
                 self?.isLoaded = true
@@ -73,7 +73,7 @@ public class SIMChatBaseMessageImageCell: SIMChatBaseMessageBubbleCell {
     }
     /// 内容
     private var content: SIMChatBaseMessageImageContent? {
-        return message?.content as? SIMChatBaseMessageImageContent
+        return model?.content as? SIMChatBaseMessageImageContent
     }
     
     public var isLoaded: Bool = false

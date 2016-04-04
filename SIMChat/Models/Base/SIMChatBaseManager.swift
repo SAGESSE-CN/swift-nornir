@@ -11,7 +11,7 @@ import Foundation
 ///
 /// 管理器
 ///
-public class SIMChatBaseManager: SIMChatManagerProtocol {
+public class SIMChatBaseManager: SIMChatManager {
     public init() {}
     
     
@@ -24,10 +24,17 @@ public class SIMChatBaseManager: SIMChatManagerProtocol {
     public lazy var mediaProvider: SIMChatMediaProvider = SIMChatMediaProvider()
     
     /// 类提供者, 用户可以在这里修改所有使用的实际类型
-    public lazy var classProvider: SIMChatClassProvider = SIMChatClassProvider()
+//    public lazy var classProvider: SIMChatClassProvider = SIMChatClassProvider()
     
     /// 所有的会话.
-    public lazy var conversations: Dictionary<String, SIMChatConversationProtocol> = [:]
+    public lazy var conversations: Dictionary<String, SIMChatConversation> = [:]
+    
+    ///
+    /// 获取当前登录的用户
+    ///
+    public var currentUser: SIMChatUserProtocol? {
+        return user
+    }
     
     // MARK: User Login & Logout
     
@@ -60,9 +67,8 @@ public class SIMChatBaseManager: SIMChatManagerProtocol {
     ///
     /// 所有的会话
     ///
-    public func allConversations() -> Array<SIMChatConversationProtocol> {
+    public func allConversations() -> Array<SIMChatConversation> {
         SIMLog.trace()
-        
         return Array(conversations.values)
     }
     ///
@@ -71,10 +77,10 @@ public class SIMChatBaseManager: SIMChatManagerProtocol {
     /// - parameter receiver: 接收者信息
     /// - returns: 会话信息
     ///
-    public func conversation(receiver: SIMChatUserProtocol) -> SIMChatConversationProtocol {
+    public func conversation(receiver: SIMChatUserProtocol) -> SIMChatConversation {
         SIMLog.trace()
         return conversations[receiver.identifier] ?? {
-            let conversation = classProvider.conversation.conversation(receiver, manager: self)
+            let conversation = SIMChatBaseConversation(receiver: receiver, manager: self)
             conversations[receiver.identifier] = conversation
             return conversation
         }()
@@ -84,7 +90,7 @@ public class SIMChatBaseManager: SIMChatManagerProtocol {
     ///
     /// - parameter receiver: 被删除会放的接收者信息
     ///
-    public func removeConversationWithReceiver(receiver: SIMChatUserProtocol) {
+    public func removeConversation(receiver: SIMChatUserProtocol) {
         SIMLog.trace()
         if let index = conversations.indexOf({ receiver == $1.receiver }) {
             conversations.removeAtIndex(index)

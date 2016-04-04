@@ -18,13 +18,15 @@ extension SIMChatViewController: SIMChatInputBarDelegate, SIMChatInputPanelToolB
     /// 请求一个音频录音器, 如果拒绝该请求返回nil
     ///
     public func inputPanelAudioRecorder(inputPanel: UIView, resource: SIMChatResourceProtocol) -> SIMChatMediaRecorderProtocol? {
-        return manager.mediaProvider.audioRecorder(resource)
+        return nil
+//        return manager.mediaProvider.audioRecorder(resource)
     }
     ///
     /// 请求一个音频播放器, 如果拒绝该请求返回nil
     ///
     public func inputPanelAudioPlayer(inputPanel: UIView, resource: SIMChatResourceProtocol) -> SIMChatMediaPlayerProtocol? {
-        return manager.mediaProvider.audioPlayer(resource)
+        return nil
+//        return manager.mediaProvider.audioPlayer(resource)
     }
     
     ///

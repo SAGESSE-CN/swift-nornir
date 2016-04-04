@@ -39,9 +39,9 @@ public class SIMChatBaseMessageTipsCell: SIMChatBaseMessageBaseCell {
             .submit()
     }
     /// 关联的消息
-    public override var message: SIMChatMessageProtocol? {
+    public override var model: SIMChatMessage? {
         didSet {
-            guard let message = message where message !== oldValue else {
+            guard let message = model where message !== oldValue else {
                 return
             }
             

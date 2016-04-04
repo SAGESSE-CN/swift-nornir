@@ -16,9 +16,6 @@
 		0C2475771C87E073003077B2 /* t2.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 0C2475751C87E073003077B2 /* t2.jpg */; };
 		0C4070F71C7B605900AEECB7 /* m1.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 0C4070F61C7B605900AEECB7 /* m1.m4a */; };
 		0C48A89F1C79566B00571BF5 /* SIMChatExampleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C48A89E1C79566B00571BF5 /* SIMChatExampleTests.swift */; };
-		0C4C0C8D1C89C5DA00DC3D56 /* ImSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0C4C0C8A1C89C5DA00DC3D56 /* ImSDK.framework */; };
-		0C4C0C8E1C89C5DA00DC3D56 /* QALSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0C4C0C8B1C89C5DA00DC3D56 /* QALSDK.framework */; };
-		0C4C0C8F1C89C5DA00DC3D56 /* TLSSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0C4C0C8C1C89C5DA00DC3D56 /* TLSSDK.framework */; };
 		0C4C0C911C89CA3A00DC3D56 /* libstdc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 0C4C0C901C89CA3A00DC3D56 /* libstdc++.tbd */; };
 		0C4C0C931C89CA5400DC3D56 /* libsqlite3.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 0C4C0C921C89CA5400DC3D56 /* libsqlite3.tbd */; };
 		0C4C0C951C89CA5F00DC3D56 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 0C4C0C941C89CA5F00DC3D56 /* libz.tbd */; };
@@ -113,9 +110,6 @@
 		0C48A89C1C79566B00571BF5 /* SIMChatExampleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SIMChatExampleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		0C48A89E1C79566B00571BF5 /* SIMChatExampleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SIMChatExampleTests.swift; sourceTree = "<group>"; };
 		0C48A8A01C79566B00571BF5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		0C4C0C8A1C89C5DA00DC3D56 /* ImSDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = ImSDK.framework; sourceTree = "<group>"; };
-		0C4C0C8B1C89C5DA00DC3D56 /* QALSDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = QALSDK.framework; sourceTree = "<group>"; };
-		0C4C0C8C1C89C5DA00DC3D56 /* TLSSDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = TLSSDK.framework; sourceTree = "<group>"; };
 		0C4C0C901C89CA3A00DC3D56 /* libstdc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libstdc++.tbd"; path = "usr/lib/libstdc++.tbd"; sourceTree = SDKROOT; };
 		0C4C0C921C89CA5400DC3D56 /* libsqlite3.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.tbd; path = usr/lib/libsqlite3.tbd; sourceTree = SDKROOT; };
 		0C4C0C941C89CA5F00DC3D56 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
@@ -153,12 +147,9 @@
 				0C4C0C951C89CA5F00DC3D56 /* libz.tbd in Frameworks */,
 				0C4C0C931C89CA5400DC3D56 /* libsqlite3.tbd in Frameworks */,
 				0C4C0C911C89CA3A00DC3D56 /* libstdc++.tbd in Frameworks */,
-				0C4C0C8E1C89C5DA00DC3D56 /* QALSDK.framework in Frameworks */,
 				0C6B414D1C60B7A600085B66 /* SIMChat.framework in Frameworks */,
 				0CE522881C63341800EB284D /* AudioToolbox.framework in Frameworks */,
 				0C4C0C9D1C89D3DC00DC3D56 /* MMProgressHUD.framework in Frameworks */,
-				0C4C0C8F1C89C5DA00DC3D56 /* TLSSDK.framework in Frameworks */,
-				0C4C0C8D1C89C5DA00DC3D56 /* ImSDK.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -247,19 +238,8 @@
 				0C4C0C921C89CA5400DC3D56 /* libsqlite3.tbd */,
 				0C4C0C901C89CA3A00DC3D56 /* libstdc++.tbd */,
 				0CE522871C63341800EB284D /* AudioToolbox.framework */,
-				0C4C0C891C89C5DA00DC3D56 /* TIM */,
 			);
 			path = Frameworks;
-			sourceTree = "<group>";
-		};
-		0C4C0C891C89C5DA00DC3D56 /* TIM */ = {
-			isa = PBXGroup;
-			children = (
-				0C4C0C8A1C89C5DA00DC3D56 /* ImSDK.framework */,
-				0C4C0C8B1C89C5DA00DC3D56 /* QALSDK.framework */,
-				0C4C0C8C1C89C5DA00DC3D56 /* TLSSDK.framework */,
-			);
-			path = TIM;
 			sourceTree = "<group>";
 		};
 		0C7C938D1C76D2F700E7DC5C /* Resources */ = {
@@ -573,7 +553,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = "Brand Assets";
 				CODE_SIGN_ENTITLEMENTS = SIMChatExample/SIMChatExample.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Developer: ZhiCong Yuan (2ZEHH58C69)";
 				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -586,7 +566,7 @@
 				OTHER_SWIFT_FLAGS = "-DDEBUG";
 				PRODUCT_BUNDLE_IDENTIFIER = SA.SIMChat;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE = "d5a320ab-193b-4995-9e46-6cadfc6634d8";
 			};
 			name = Debug;
 		};
@@ -596,7 +576,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = "Brand Assets";
 				CODE_SIGN_ENTITLEMENTS = SIMChatExample/SIMChatExample.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Developer: ZhiCong Yuan (2ZEHH58C69)";
 				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -609,7 +589,7 @@
 				OTHER_SWIFT_FLAGS = "-DNDEBUG";
 				PRODUCT_BUNDLE_IDENTIFIER = SA.SIMChat;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE = "d5a320ab-193b-4995-9e46-6cadfc6634d8";
 			};
 			name = Release;
 		};

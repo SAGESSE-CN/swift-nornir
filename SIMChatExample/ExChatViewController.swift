@@ -9,13 +9,14 @@
 import UIKit
 import SIMChat
 
+
 class ExChatViewController: SIMChatViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        // Do any additional setup after loading the view.
     }
+    
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()

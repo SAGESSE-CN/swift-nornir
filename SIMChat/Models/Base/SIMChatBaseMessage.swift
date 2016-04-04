@@ -11,7 +11,7 @@ import Foundation
 ///
 /// 聊天消息
 ///
-public class SIMChatBaseMessage: SIMChatMessageProtocol {
+public class SIMChatBaseMessage: SIMChatMessage {
     ///
     /// 初始化
     ///
@@ -21,7 +21,7 @@ public class SIMChatBaseMessage: SIMChatMessageProtocol {
     /// - parameter identifier: 唯一标识符
     ///
     public required init(
-        content: SIMChatMessageContentProtocol,
+        content: SIMChatMessageBody,
         receiver: SIMChatUserProtocol,
         sender: SIMChatUserProtocol,
         identifier: String = NSUUID().UUIDString) {
@@ -45,12 +45,12 @@ public class SIMChatBaseMessage: SIMChatMessageProtocol {
     ///
     /// 消息内容
     ///
-    public var content: SIMChatMessageContentProtocol
+    public var content: SIMChatMessageBody
     
     ///
     /// 消息发生时间(发送/接收)
     ///
-    public lazy var date: NSDate = NSDate()
+    public lazy var timestamp: NSDate = NSDate()
     ///
     /// 消息是否是自己发送的
     ///
@@ -74,10 +74,10 @@ public class SIMChatBaseMessage: SIMChatMessageProtocol {
     /// - returns:  消息
     ///
     public class func messageWithContent(
-        content: SIMChatMessageContentProtocol,
+        content: SIMChatMessageBody,
         receiver: SIMChatUserProtocol,
         sender: SIMChatUserProtocol,
-        identifier: String) -> SIMChatMessageProtocol {
+        identifier: String) -> SIMChatMessage {
             return self.init(
                 content: content,
                 receiver: receiver,

@@ -12,8 +12,7 @@ import MMProgressHUD
 
 class ExConversationViewController: UITableViewController {
     
-    lazy var manager: SIMChatManagerProtocol = ExManager.sharedInstance
-    
+    lazy var manager: SIMChatManager = ExManager.sharedInstance
     
     lazy var user2: SIMChatUserProtocol = {
         let identifier = "admin"
@@ -57,6 +56,7 @@ class ExConversationViewController: UITableViewController {
                 return
             }
         }
+        // Do any additional setup after loading the view.
     }
     
     @IBOutlet weak var t1: UILabel!
@@ -76,7 +76,7 @@ class ExConversationViewController: UITableViewController {
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         tableView.deselectRowAtIndexPath(indexPath, animated: true)
         
-        guard manager.user != nil else {
+        guard manager.currentUser != nil else {
             SIMChatMessageBox.Alert.error("用户未登录")
             return
         }

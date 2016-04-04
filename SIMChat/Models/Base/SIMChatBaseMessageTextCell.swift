@@ -50,9 +50,9 @@ public class SIMChatBaseMessageTextCell: SIMChatBaseMessageBubbleCell {
         }
     }
     /// 消息内容
-    public override var message: SIMChatMessageProtocol? {
+    public override var model: SIMChatMessage? {
         didSet {
-            guard let message = message where message != oldValue else {
+            guard let message = model where message != oldValue else {
                 return
             }
             

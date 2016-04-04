@@ -9,13 +9,13 @@
 import UIKit
 
 
-public class SIMChatBaseMessageFileContent: SIMChatMessageContentProtocol {
+public class SIMChatBaseMessageFileContent: SIMChatMessageBody {
 }
 
 ///
 /// 图片
 ///
-public class SIMChatBaseMessageImageContent: SIMChatMessageContentProtocol, SIMChatMediaProtocol {
+public class SIMChatBaseMessageImageContent: SIMChatMessageBody, SIMChatMediaProtocol {
     ///
     /// 创建图片内容
     ///

@@ -12,8 +12,8 @@ import UIKit
 /// 最基本的实现
 ///
 public class SIMChatBaseMessageBaseCell: UITableViewCell, SIMChatMessageCellProtocol {
-    public var message: SIMChatMessageProtocol?
-    public weak var conversation: SIMChatConversationProtocol?
+    public var model: SIMChatMessage?
+    public weak var conversation: SIMChatConversation?
     public weak var delegate: protocol<SIMChatMessageCellDelegate, SIMChatMessageCellMenuDelegate>?
     
     /// 时间线
@@ -141,10 +141,10 @@ public class SIMChatBaseMessageBubbleCell: UITableViewCell, SIMChatMessageCellPr
         }
     }
     /// 关联的内容
-    public var message: SIMChatMessageProtocol? {
+    public var model: SIMChatMessage? {
         didSet {
             messageUpdate()
-            guard let m = message where m != oldValue else {
+            guard let m = model where m != oldValue else {
                 return
             }
             // 气泡方向
@@ -237,7 +237,7 @@ public class SIMChatBaseMessageBubbleCell: UITableViewCell, SIMChatMessageCellPr
     private(set) lazy var portraitView = SIMChatPortraitView(frame: CGRectZero)
     private(set) lazy var visitCardView = SIMChatVisitCardView(frame: CGRectZero)
     
-    public weak var conversation: SIMChatConversationProtocol?
+    public weak var conversation: SIMChatConversation?
     public weak var delegate: protocol<SIMChatMessageCellDelegate, SIMChatMessageCellMenuDelegate>?
     
     
@@ -289,7 +289,7 @@ extension SIMChatBaseMessageBubbleCell {
                 return delegate?.cellEvent(self, shouldLongPressUser: user) ?? true
             }
         }
-        if let message = message where bubbleView.bounds.contains(gestureRecognizer.locationInView(bubbleView)) {
+        if let message = model where bubbleView.bounds.contains(gestureRecognizer.locationInView(bubbleView)) {
             if gestureRecognizer == _bubbleGRP {
                 return delegate?.cellEvent(self, shouldPressMessage: message) ?? true
             } else if gestureRecognizer == _bubbleGRLP {
@@ -301,7 +301,7 @@ extension SIMChatBaseMessageBubbleCell {
     
     
     private dynamic func _copyMessage(sender: AnyObject) {
-        guard let message = message else {
+        guard let message = model else {
             return
         }
         if delegate?.cellMenu(self, shouldCopyMessage: message) ?? true {
@@ -309,7 +309,7 @@ extension SIMChatBaseMessageBubbleCell {
         }
     }
     private dynamic func _removeMessage(sender: AnyObject) {
-        guard let message = message else {
+        guard let message = model else {
             return
         }
         if delegate?.cellMenu(self, shouldRemoveMessage: message) ?? true {
@@ -317,7 +317,7 @@ extension SIMChatBaseMessageBubbleCell {
         }
     }
     private dynamic func _revokeMessage(sender: AnyObject) {
-        guard let message = message else {
+        guard let message = model else {
             return
         }
         if delegate?.cellMenu(self, shouldRevokeMessage: message) ?? true {
@@ -328,7 +328,7 @@ extension SIMChatBaseMessageBubbleCell {
     
     /// 更新消息
     private func messageUpdate() {
-        guard let message = message where superview != nil else {
+        guard let message = model where superview != nil else {
             return
         }
         switch message.status {
@@ -350,18 +350,18 @@ extension SIMChatBaseMessageBubbleCell {
         guard superview != nil else {
             return
         }
-        portraitView.user = message?.sender
-        visitCardView.user = message?.sender
+        portraitView.user = model?.sender
+        visitCardView.user = model?.sender
     }
     
     internal dynamic func bubbleDidPress(sender: UITapGestureRecognizer) {
-        guard let message = message where sender.state == .Ended else {
+        guard let message = model where sender.state == .Ended else {
             return
         }
         delegate?.cellEvent(self, didPressMessage: message)
     }
     internal dynamic func bubbleDidLongPress(sender: UILongPressGestureRecognizer) {
-        guard let message = message where sender.state == .Began else {
+        guard let message = model where sender.state == .Began else {
             return
         }
         delegate?.cellEvent(self, didLongPressMessage: message)
@@ -379,7 +379,7 @@ extension SIMChatBaseMessageBubbleCell {
         delegate?.cellEvent(self, didLongPressUser: user)
     }
     internal dynamic func statusDidPressRetry(sender: AnyObject) {
-        guard let message = message else {
+        guard let message = model else {
             return
         }
         if delegate?.cellMenu(self, shouldRetryMessage: message) ?? true {
@@ -387,7 +387,7 @@ extension SIMChatBaseMessageBubbleCell {
         }
     }
     internal dynamic func statusDidChange(sender: NSNotification) {
-        guard let message = sender.object as? SIMChatMessageProtocol where message == self.message else {
+        guard let message = sender.object as? SIMChatMessage where message == self.model else {
             return
         }
         messageUpdate()

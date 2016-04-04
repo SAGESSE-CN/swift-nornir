@@ -12,6 +12,7 @@ import UIKit
 /// 聊天控制器
 ///
 public class SIMChatViewController: UIViewController {
+    
     ///
     /// 初始化
     ///
@@ -19,7 +20,7 @@ public class SIMChatViewController: UIViewController {
         fatalError("must use init(conversation:) initialze")
     }
     /// 初始化
-    public required init(conversation: SIMChatConversationProtocol) {
+    public required init(conversation: SIMChatConversation) {
         _conversation = conversation
         _messageManager = MessageManager(conversation: conversation)
         super.init(nibName: nil, bundle: nil)
@@ -120,7 +121,7 @@ public class SIMChatViewController: UIViewController {
         ]
     }()
     
-    private var _conversation: SIMChatConversationProtocol
+    private var _conversation: SIMChatConversation
     private var _messageManager: MessageManager
     
     internal var messageManager: MessageManager { return _messageManager }
@@ -132,8 +133,8 @@ extension SIMChatViewController {
     ///
     /// 聊天会话
     ///
-    public var conversation: SIMChatConversationProtocol { return _conversation }
-    public var manager: SIMChatManagerProtocol {
+    public var conversation: SIMChatConversation { return _conversation }
+    public var manager: SIMChatManager {
         guard let manager = conversation.manager else {
             fatalError("Must provider manager")
         }
@@ -281,8 +282,8 @@ extension SIMChatViewController {
     public override func viewDidDisappear(animated: Bool) {
         super.viewDidDisappear(animated)
         
-        // 切换页面的时候停止播放
-        manager.mediaProvider.stop()
+//        // 切换页面的时候停止播放
+//        manager.mediaProvider.stop()
     }
     
     public override func viewDidLayoutSubviews() {
@@ -420,7 +421,7 @@ extension SIMChatViewController: UIGestureRecognizerDelegate {
 //    /// 最新的消息
 //    var latest: SIMChatMessage?
 //    /// 会话
-//    var conversation: SIMChatConversationProtocol! {
+//    var conversation: SIMChatConversation! {
 //        willSet { conversation.delegate = nil  }
 //        didSet  { conversation.delegate = self }
 //    }

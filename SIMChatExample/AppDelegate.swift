@@ -9,6 +9,9 @@
 import UIKit
 import SIMChat
 
+public func xxxxxx() {
+}
+
 let dic = [
     "阿": ["ā", "ē"],
     "挨": ["āi", "ái"],
