@@ -1,0 +1,379 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="11762" systemVersion="16A323" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="gr3-aP-eDL">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11757"/>
+        <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Tab Bar Controller-->
+        <scene sceneID="Q1y-7r-Wu6">
+            <objects>
+                <tabBarController id="gr3-aP-eDL" sceneMemberID="viewController">
+                    <tabBar key="tabBar" contentMode="scaleToFill" id="QV1-d5-jY5">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="49"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                    </tabBar>
+                    <connections>
+                        <segue destination="lbg-gf-CpA" kind="relationship" relationship="viewControllers" id="gEc-5i-hde"/>
+                        <segue destination="3TZ-vU-9Iz" kind="relationship" relationship="viewControllers" id="DgX-he-7yQ"/>
+                    </connections>
+                </tabBarController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="gRI-rg-BUS" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1068" y="1065"/>
+        </scene>
+        <!--ChatRoot-->
+        <scene sceneID="7jg-cp-Hxb">
+            <objects>
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" hidesBottomBarWhenPushed="YES" id="lbg-gf-CpA" userLabel="ChatRoot" sceneMemberID="viewController">
+                    <tabBarItem key="tabBarItem" systemItem="contacts" id="oq8-fu-4Oi" userLabel="Chat"/>
+                    <toolbarItems/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="t9I-jB-lbB">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="LLu-ie-ASu" kind="relationship" relationship="rootViewController" id="cLt-9A-nQB"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="YIo-Ky-CEz" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2020" y="736.28185907046486"/>
+        </scene>
+        <!--Chat-->
+        <scene sceneID="6Ss-KN-vVU">
+            <objects>
+                <tableViewController id="LLu-ie-ASu" customClass="ContactsViewController" customModule="Example" customModuleProvider="target" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="64" sectionHeaderHeight="28" sectionFooterHeight="28" id="7TG-cc-B8Y">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <prototypes>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="Cell" id="gK5-H1-rd5">
+                                <rect key="frame" x="0.0" y="28" width="375" height="64"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="gK5-H1-rd5" id="nN2-CD-ldT">
+                                    <rect key="frame" x="0.0" y="0.0" width="375" height="63.5"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="head" translatesAutoresizingMaskIntoConstraints="NO" id="3Xn-gg-UA5">
+                                            <rect key="frame" x="16" y="7" width="50" height="50"/>
+                                            <constraints>
+                                                <constraint firstAttribute="height" constant="50" id="bZS-5s-8ZA"/>
+                                                <constraint firstAttribute="width" secondItem="3Xn-gg-UA5" secondAttribute="height" id="t4z-Qq-izd"/>
+                                            </constraints>
+                                            <userDefinedRuntimeAttributes>
+                                                <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                                                    <integer key="value" value="25"/>
+                                                </userDefinedRuntimeAttribute>
+                                            </userDefinedRuntimeAttributes>
+                                        </imageView>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Name" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="BSR-uo-Vly">
+                                            <rect key="frame" x="74" y="11" width="285" height="20.5"/>
+                                            <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                                            <nil key="textColor"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Note" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ZMf-vy-hLN">
+                                            <rect key="frame" x="74" y="35.5" width="285" height="18"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                            <color key="textColor" white="0.5" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                    </subviews>
+                                    <constraints>
+                                        <constraint firstAttribute="trailingMargin" secondItem="BSR-uo-Vly" secondAttribute="trailing" constant="8" id="EyS-sQ-qnH"/>
+                                        <constraint firstItem="ZMf-vy-hLN" firstAttribute="leading" secondItem="3Xn-gg-UA5" secondAttribute="trailing" constant="8" id="LiE-WT-7Aj"/>
+                                        <constraint firstAttribute="trailingMargin" secondItem="ZMf-vy-hLN" secondAttribute="trailing" constant="8" id="UXe-Uu-wgp"/>
+                                        <constraint firstItem="3Xn-gg-UA5" firstAttribute="leading" secondItem="nN2-CD-ldT" secondAttribute="leadingMargin" constant="8" id="aTX-w4-eLq"/>
+                                        <constraint firstItem="BSR-uo-Vly" firstAttribute="leading" secondItem="3Xn-gg-UA5" secondAttribute="trailing" constant="8" id="bM6-LS-Xw1"/>
+                                        <constraint firstItem="BSR-uo-Vly" firstAttribute="top" secondItem="3Xn-gg-UA5" secondAttribute="top" constant="4" id="gr7-vS-oIQ"/>
+                                        <constraint firstItem="3Xn-gg-UA5" firstAttribute="centerY" secondItem="nN2-CD-ldT" secondAttribute="centerY" id="gwY-2V-Voa"/>
+                                        <constraint firstItem="ZMf-vy-hLN" firstAttribute="top" secondItem="BSR-uo-Vly" secondAttribute="bottom" constant="4" id="nd6-RZ-JDS"/>
+                                    </constraints>
+                                </tableViewCellContentView>
+                            </tableViewCell>
+                        </prototypes>
+                        <connections>
+                            <outlet property="dataSource" destination="LLu-ie-ASu" id="Wr7-rf-VST"/>
+                            <outlet property="delegate" destination="LLu-ie-ASu" id="YlY-ks-TZ4"/>
+                        </connections>
+                    </tableView>
+                    <navigationItem key="navigationItem" title="Chat" id="4OA-YD-IEr"/>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Tqh-ZL-x7r" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2836" y="736"/>
+        </scene>
+        <!--DebugRoot-->
+        <scene sceneID="sGd-ys-xxE">
+            <objects>
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" hidesBottomBarWhenPushed="YES" id="3TZ-vU-9Iz" userLabel="DebugRoot" sceneMemberID="viewController">
+                    <tabBarItem key="tabBarItem" systemItem="mostViewed" id="s7q-OM-1Of" userLabel="Debug"/>
+                    <toolbarItems/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="lkc-6w-E27">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="8eN-qb-UtN" kind="relationship" relationship="rootViewController" id="90l-MF-mf2"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Chx-dt-17B" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2018" y="1369"/>
+        </scene>
+        <!--Debug-->
+        <scene sceneID="1dY-vC-EdM">
+            <objects>
+                <tableViewController id="8eN-qb-UtN" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="static" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" id="vuB-Rq-piW">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <sections>
+                            <tableViewSection headerTitle="Photos" id="APx-cs-Lcn" userLabel="Photos">
+                                <cells>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" textLabel="VWy-6W-fw9" style="IBUITableViewCellStyleDefault" id="Z0b-zw-UzZ">
+                                        <rect key="frame" x="0.0" y="28" width="375" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="Z0b-zw-UzZ" id="Qnf-fl-9VU">
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="SAPContainterView" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="VWy-6W-fw9">
+                                                    <rect key="frame" x="15" y="0.0" width="345" height="43.5"/>
+                                                    <autoresizingMask key="autoresizingMask"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                        </tableViewCellContentView>
+                                        <connections>
+                                            <segue destination="4hT-d3-zzh" kind="show" id="GGE-M8-gNz"/>
+                                        </connections>
+                                    </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" textLabel="32h-Pn-VWJ" style="IBUITableViewCellStyleDefault" id="Us4-aZ-Z99">
+                                        <rect key="frame" x="0.0" y="72" width="375" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="Us4-aZ-Z99" id="BTk-C6-SMY">
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="SAPBrowseableDetailView" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="32h-Pn-VWJ">
+                                                    <rect key="frame" x="15" y="0.0" width="345" height="43.5"/>
+                                                    <autoresizingMask key="autoresizingMask"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                        </tableViewCellContentView>
+                                        <connections>
+                                            <segue destination="gj4-8S-5k6" kind="show" id="1bY-8T-NnG"/>
+                                        </connections>
+                                    </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" textLabel="Vwh-EA-0GJ" style="IBUITableViewCellStyleDefault" id="qc2-nb-EAb">
+                                        <rect key="frame" x="0.0" y="116" width="375" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="qc2-nb-EAb" id="qey-n8-KOp">
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="SAPBrowseableProgressView" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="Vwh-EA-0GJ">
+                                                    <rect key="frame" x="15" y="0.0" width="345" height="43.5"/>
+                                                    <autoresizingMask key="autoresizingMask"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                        </tableViewCellContentView>
+                                        <connections>
+                                            <segue destination="BeJ-Bh-XmG" kind="show" id="o9K-xt-8ED"/>
+                                        </connections>
+                                    </tableViewCell>
+                                </cells>
+                            </tableViewSection>
+                        </sections>
+                        <connections>
+                            <outlet property="dataSource" destination="8eN-qb-UtN" id="YSG-qJ-3Yw"/>
+                            <outlet property="delegate" destination="8eN-qb-UtN" id="zyJ-q1-wmO"/>
+                        </connections>
+                    </tableView>
+                    <navigationItem key="navigationItem" title="Debug" id="Wmh-XX-6Cy"/>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="FbM-EN-aLa" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2835" y="1370"/>
+        </scene>
+        <!--SAPBrowseableProgressView-->
+        <scene sceneID="0Tk-Lw-wtn">
+            <objects>
+                <viewController hidesBottomBarWhenPushed="YES" id="BeJ-Bh-XmG" customClass="TXPProgressViewController" customModule="Example" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="JK4-Yc-7Vl"/>
+                        <viewControllerLayoutGuide type="bottom" id="ulB-cr-dyO"/>
+                    </layoutGuides>
+                    <view key="view" clipsSubviews="YES" contentMode="scaleToFill" id="WNd-SZ-Ifh">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="OL1-EG-pgb" customClass="SAPBrowseableProgressView" customModule="SAPhotos">
+                                <rect key="frame" x="55.5" y="104" width="240" height="240"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="240" id="RYY-aV-teJ"/>
+                                    <constraint firstAttribute="height" constant="240" id="gJj-9U-oIX"/>
+                                </constraints>
+                            </view>
+                            <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="b8D-kc-Luq">
+                                <rect key="frame" x="34" y="408" width="307" height="31"/>
+                                <connections>
+                                    <action selector="valueChanged:" destination="BeJ-Bh-XmG" eventType="valueChanged" id="iRo-ec-yvp"/>
+                                </connections>
+                            </slider>
+                            <stepper opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" maximumValue="1" stepValue="0.25" translatesAutoresizingMaskIntoConstraints="NO" id="AgG-3z-2JV">
+                                <rect key="frame" x="245" y="371" width="94" height="29"/>
+                                <connections>
+                                    <action selector="stepChanged:" destination="BeJ-Bh-XmG" eventType="valueChanged" id="xlZ-zP-QDn"/>
+                                </connections>
+                            </stepper>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Ve4-og-VW8" customClass="SAPBrowseableProgressView" customModule="SAPhotos">
+                                <rect key="frame" x="295.5" y="320" width="24" height="24"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="24" id="02U-WE-bZV"/>
+                                    <constraint firstAttribute="height" constant="24" id="6jA-CA-sGP"/>
+                                </constraints>
+                            </view>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstAttribute="trailingMargin" secondItem="b8D-kc-Luq" secondAttribute="trailing" constant="20" id="2GV-dQ-aMj"/>
+                            <constraint firstItem="b8D-kc-Luq" firstAttribute="leading" secondItem="WNd-SZ-Ifh" secondAttribute="leadingMargin" constant="20" id="5ZI-wR-k3A"/>
+                            <constraint firstItem="Ve4-og-VW8" firstAttribute="bottom" secondItem="OL1-EG-pgb" secondAttribute="bottom" id="CwQ-q9-Omu"/>
+                            <constraint firstItem="b8D-kc-Luq" firstAttribute="top" secondItem="AgG-3z-2JV" secondAttribute="bottom" constant="8" id="RKX-K1-QlR"/>
+                            <constraint firstItem="OL1-EG-pgb" firstAttribute="top" secondItem="JK4-Yc-7Vl" secondAttribute="bottom" constant="40" id="SZn-gL-FAh"/>
+                            <constraint firstItem="Ve4-og-VW8" firstAttribute="leading" secondItem="OL1-EG-pgb" secondAttribute="trailing" id="U2r-B6-Ymh"/>
+                            <constraint firstItem="AgG-3z-2JV" firstAttribute="trailing" secondItem="b8D-kc-Luq" secondAttribute="trailing" id="jtU-Z7-GMJ"/>
+                            <constraint firstItem="b8D-kc-Luq" firstAttribute="top" secondItem="OL1-EG-pgb" secondAttribute="bottom" constant="64" id="rvg-CU-ODK"/>
+                            <constraint firstItem="OL1-EG-pgb" firstAttribute="centerX" secondItem="WNd-SZ-Ifh" secondAttribute="centerX" constant="-12" id="zNh-nq-zJa"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" title="SAPBrowseableProgressView" id="mdj-2q-qVg"/>
+                    <connections>
+                        <outlet property="progressView" destination="OL1-EG-pgb" id="DxU-JY-BgB"/>
+                        <outlet property="progressView2" destination="Ve4-og-VW8" id="9eq-uq-GvD"/>
+                        <outlet property="slider" destination="b8D-kc-Luq" id="YYA-4g-zBV"/>
+                        <outlet property="stepper" destination="AgG-3z-2JV" id="f1W-p4-fg8"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="sBc-IK-AQN" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2231" y="2158"/>
+        </scene>
+        <!--SAPBrowseableDetailView-->
+        <scene sceneID="uBz-27-uep">
+            <objects>
+                <viewController hidesBottomBarWhenPushed="YES" id="gj4-8S-5k6" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="oNA-g3-S4O"/>
+                        <viewControllerLayoutGuide type="bottom" id="IOP-i1-WHf"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="7oC-SV-0PY">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="9bx-zd-1BF" customClass="SAPBrowseableDetailView" customModule="SAPhotos">
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                            </view>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstAttribute="trailing" secondItem="9bx-zd-1BF" secondAttribute="trailing" id="7xT-Xh-V04"/>
+                            <constraint firstItem="9bx-zd-1BF" firstAttribute="top" secondItem="7oC-SV-0PY" secondAttribute="top" id="Jjd-Ei-dEQ"/>
+                            <constraint firstAttribute="bottom" secondItem="9bx-zd-1BF" secondAttribute="bottom" id="ja1-SR-diX"/>
+                            <constraint firstItem="9bx-zd-1BF" firstAttribute="leading" secondItem="7oC-SV-0PY" secondAttribute="leading" id="pDH-Xp-BnQ"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" title="SAPBrowseableDetailView" id="OAZ-Le-H3O">
+                        <barButtonItem key="rightBarButtonItem" systemItem="refresh" id="ugR-Oa-3Yp">
+                            <connections>
+                                <action selector="reload" destination="9bx-zd-1BF" id="zfl-ak-bUW"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="oeC-Rm-OH0" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2835" y="2158"/>
+        </scene>
+        <!--SAPContainterView-->
+        <scene sceneID="tDB-aY-bm4">
+            <objects>
+                <viewController hidesBottomBarWhenPushed="YES" id="4hT-d3-zzh" customClass="TXPContainterViewController" customModule="Example" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="yHP-o2-dNz"/>
+                        <viewControllerLayoutGuide type="bottom" id="udJ-mh-Gqp"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="4gc-UD-hxD">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="90c-8z-uMD" customClass="SAPContainterView" customModule="SAPhotos">
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                            </view>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="oLT-rT-ELX">
+                                <rect key="frame" x="187.5" y="0.0" width="0.5" height="667"/>
+                                <color key="backgroundColor" red="1" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="0.5" id="YPo-gg-API"/>
+                                </constraints>
+                            </view>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Y2e-fs-ud9">
+                                <rect key="frame" x="0.0" y="333.5" width="375" height="0.5"/>
+                                <color key="backgroundColor" red="1" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="0.5" id="esa-lV-GfZ"/>
+                                </constraints>
+                            </view>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="oLT-rT-ELX" firstAttribute="top" secondItem="4gc-UD-hxD" secondAttribute="top" id="3fV-8l-Dpa"/>
+                            <constraint firstItem="Y2e-fs-ud9" firstAttribute="leading" secondItem="4gc-UD-hxD" secondAttribute="leading" id="3oV-lx-O7A"/>
+                            <constraint firstItem="Y2e-fs-ud9" firstAttribute="centerY" secondItem="4gc-UD-hxD" secondAttribute="centerY" id="6Bl-2F-vbd"/>
+                            <constraint firstAttribute="trailing" secondItem="90c-8z-uMD" secondAttribute="trailing" id="Ll2-nq-KsX"/>
+                            <constraint firstAttribute="trailing" secondItem="Y2e-fs-ud9" secondAttribute="trailing" id="P2i-NJ-eLm"/>
+                            <constraint firstAttribute="bottom" secondItem="oLT-rT-ELX" secondAttribute="bottom" id="SAB-Pc-aOF"/>
+                            <constraint firstItem="90c-8z-uMD" firstAttribute="top" secondItem="4gc-UD-hxD" secondAttribute="top" id="gNU-zj-49o"/>
+                            <constraint firstAttribute="bottom" secondItem="90c-8z-uMD" secondAttribute="bottom" id="lgt-9b-vll"/>
+                            <constraint firstItem="90c-8z-uMD" firstAttribute="leading" secondItem="4gc-UD-hxD" secondAttribute="leading" id="tlf-9I-Jw9"/>
+                            <constraint firstItem="oLT-rT-ELX" firstAttribute="centerX" secondItem="4gc-UD-hxD" secondAttribute="centerX" id="wec-OX-Wqf"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" title="SAPContainterView" id="tN6-w7-ClU"/>
+                    <connections>
+                        <outlet property="containterView" destination="90c-8z-uMD" id="FPp-hc-j8e"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="A7J-iF-DLL" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="3438.75" y="2157.0422535211269"/>
+        </scene>
+    </scenes>
+    <resources>
+        <image name="head" width="139" height="139"/>
+    </resources>
+</document>

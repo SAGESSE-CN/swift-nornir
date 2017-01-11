@@ -1,0 +1,10 @@
+framework module MMProgressHUD {
+    umbrella
+    header "MMHud.h"
+    header "MMProgressHUD.h"
+    header "UIViewController+ForwardOfStatusBar.h"
+    export *
+    module * {
+        export *
+    }
+}
