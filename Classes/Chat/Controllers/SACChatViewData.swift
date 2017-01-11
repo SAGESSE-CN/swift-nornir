@@ -41,29 +41,31 @@ class SACChatViewData: NSObject {
         // get remove message
         let count = _elements.count
         let removes = _convert(indexs: indexs)
-        // copy affected messages, element = element - ($0 % 2 ? 1 : -1)
-        var begin = count
-        var end = -1
-        var copyElements = removes.enumerated().map({ $1 - (($0 << 7).byteSwapped | 1) % 2 }).flatMap { index -> SACMessageType? in
-            // record reogin
-            begin = min(begin, index)
-            end = max(end, index + 1)
-            // the element is copyed?
-            if index < 0 || index < end {
-                return nil
+        // check indexs
+        guard !removes.isEmpty else {
+            return
+        }
+        // copy affected messages
+        let begin = removes.first! - 1
+        let end = removes.last! + 2
+        // processing
+        let copyElements = NSMutableArray(capacity: (end - begin) + 1)
+        let _ = (0 ..< removes.count).filter({ $0 % 2 == 0 }).reduce(nil) { p, i -> Int? in
+            // get lower bound & upper bound
+            let l = removes[i + 0]
+            let u = removes[i + 1]
+            // need to connect the last position?
+            if let p = p, l > 0, p <= l {
+                // copy top (p + 1 ..< l)
+                let result = _elements[p ..< l]
+                copyElements.addObjects(from: Array(result))
             }
-            // copying
-            return _elements[index]
-        }
-        // remove first & last
-        if begin >= 0 && !copyElements.isEmpty {
-            copyElements.removeFirst()
-        }
-        if end <= count && !copyElements.isEmpty {
-            copyElements.removeLast()
+            // move to bottom + 1
+            return u + 1
         }
         // convert messages
-        let results = _convert(messages: copyElements, first: _element(at: begin), last: _element(at: end - 1))
+        let newElements = copyElements as! [SACMessageType]
+        let results = _convert(messages: newElements, first: _element(at: begin), last: _element(at: end - 1))
         // replace all message
         _elements.replaceSubrange(max(begin, 0) ..< min(end, count), with: results)
         
