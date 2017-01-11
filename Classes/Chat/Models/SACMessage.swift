@@ -22,7 +22,6 @@ open class SACMessage: NSObject, SACMessageType {
         content.after = after
         self.init(content: content)
         self.date = after.date
-        logger.trace()
     }
     
     open var name: String = "Unknow"

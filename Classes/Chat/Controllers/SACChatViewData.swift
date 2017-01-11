@@ -58,6 +58,14 @@ class SACChatViewData: NSObject {
             if let p = p, l > 0, p <= l {
                 // copy top (p + 1 ..< l)
                 let result = _elements[p ..< l]
+                // clear first & last dependencies
+                if let content = result.first?.content as? SACMessageTimeLineContent {
+                    content.before = nil 
+                }
+                if let content = result.last?.content as? SACMessageTimeLineContent {
+                    content.after = nil
+                }
+                // merge
                 copyElements.addObjects(from: Array(result))
             }
             // move to bottom + 1
