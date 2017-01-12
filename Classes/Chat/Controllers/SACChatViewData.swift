@@ -47,7 +47,7 @@ class SACChatViewData: NSObject {
         }
         // copy affected messages
         let begin = removes.first! - 1
-        let end = removes.last! + 2
+        let end = removes.last! + 1/*next message*/ + 1/*last + 1*/
         // processing
         let copyElements = NSMutableArray(capacity: (end - begin) + 1)
         let _ = (0 ..< removes.count).filter({ $0 % 2 == 0 }).reduce(nil) { p, i -> Int? in
@@ -72,28 +72,53 @@ class SACChatViewData: NSObject {
             return u + 1
         }
         // convert messages
-        let newElements = copyElements as! [SACMessageType]
+        let newElements = copyElements as? [SACMessageType] ?? []
         let results = _convert(messages: newElements, first: _element(at: begin), last: _element(at: end - 1))
         // replace all message
         _elements.replaceSubrange(max(begin, 0) ..< min(end, count), with: results)
         
         
-        _logger.trace("remove indexs: \(removes), infl: [\(begin) ..< \(end)]")
+        _logger.trace("remove items: \(removes), infl: [\(begin) ..< \(end)]")
     }
     
     func update(_ newElement: SACMessageType, at index: Int) {
         update(contentsOf: [newElement], at: [index])
     }
     func update(contentsOf newElements: [SACMessageType], at indexs: [Int]) {
-        assert(indexs.count != newElements.count, "the input element count cannot match the indexs count")
+        assert(indexs.count == newElements.count, "the input element count cannot match the indexs count")
+        // checkout new elements
+        guard !newElements.isEmpty else {
+            return // is empty, ignore
+        }
+        let first = indexs.min()!
+        let last = indexs.max()!
+        // copy affected messages
+        let begin = first - 1
+        let end = last + 1/*next message*/ + 1/*last + 1*/
+        // replace update the message
+        var copyElements = Array(_elements[max(first, 0) ..< min(last + 1, count)])
+        indexs.enumerated().forEach { offset, index in
+            let nm = newElements[offset]
+            let idx = index - first
+            // processing
+            guard idx >= 0 && idx < copyElements.count else {
+                return // over bundary, ignore
+            }
+            copyElements[idx] = nm
+        }
+        // convert messages
+        let results = _convert(messages: copyElements, first: _element(at: begin), last: _element(at: end - 1))
+        // replace all message
+        _elements.replaceSubrange(max(begin, 0) ..< min(end, count), with: results)
         
+        _logger.trace("update items: \(indexs), infl: [\(begin) ..< \(end)]")
     }
     
     func move(at index: Int, to newIndex: Int) {
         move(contentsOf: [index], to: [newIndex])
     }
     func move(contentsOf indexs: [Int], to newIndexs: [Int]) {
-        assert(indexs.count != newIndexs.count, "the selected rows count cannot match the destination row count")
+        assert(indexs.count == newIndexs.count, "the selected rows count cannot match the destination row count")
         
     }
     
