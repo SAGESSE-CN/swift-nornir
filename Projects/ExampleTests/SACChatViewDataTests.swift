@@ -316,6 +316,35 @@ class SACChatViewDataTests: XCTestCase {
         XCTAssert(rd2._element(at: 4) === m3)
     }
     
+    func testUpdate() {
+        
+        let ud1 = SACChatViewData()
+        ud1.insert(contentsOf: [m1,m2,m3,m4], at: 0)
+        let ude1 = ud1._elements
+        XCTAssert(ud1.count == 6, "insert or convert fail")
+        XCTAssert(ud1._element(at: 0)?.content is SACMessageTimeLineContent)
+        XCTAssert(ud1._element(at: 1) === m1)
+        XCTAssert(ud1._element(at: 2) === m2)
+        XCTAssert(ud1._element(at: 3) === m3)
+        XCTAssert(ud1._element(at: 4)?.content is SACMessageTimeLineContent)
+        XCTAssert(ud1._element(at: 5) === m4)
+        
+    }
+    
+    func testMove() {
+        
+        let md1 = SACChatViewData()
+        md1.insert(contentsOf: [m1,m2,m3,m4], at: 0)
+        let mde1 = md1._elements
+        XCTAssert(md1.count == 6, "insert or convert fail")
+        XCTAssert(md1._element(at: 0)?.content is SACMessageTimeLineContent)
+        XCTAssert(md1._element(at: 1) === m1)
+        XCTAssert(md1._element(at: 2) === m2)
+        XCTAssert(md1._element(at: 3) === m3)
+        XCTAssert(md1._element(at: 4)?.content is SACMessageTimeLineContent)
+        XCTAssert(md1._element(at: 5) === m4)
+        
+    }
     
     let m1 = SACMessage(content: SACMessageTextContent(text: "m1"))
     let m2 = SACMessage(content: SACMessageTextContent(text: "m2"))
