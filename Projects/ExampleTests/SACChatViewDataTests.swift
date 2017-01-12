@@ -284,7 +284,7 @@ class SACChatViewDataTests: XCTestCase {
         // 随机删除
         rd2._elements = rde2
         rd2.remove(contentsOf: [0,4]) // 随机删除(头)
-        XCTAssert(rd2.count == 9, "insert or convert fail")
+        XCTAssert(rd2.count == 9, "remove or convert fail")
         XCTAssert(rd2._element(at: 0)?.content is SACMessageTimeLineContent)
         XCTAssert(rd2._element(at: 1) === m1)
         XCTAssert(rd2._element(at: 2) === m1)
@@ -296,8 +296,19 @@ class SACChatViewDataTests: XCTestCase {
         XCTAssert(rd2._element(at: 8) === m4)
         
         rd2._elements = rde2
+        rd2.remove(contentsOf: [1,2,6,7]) // 随机删除(中)
+        XCTAssert(rd2.count == 7, "remove or convert fail")
+        XCTAssert(rd2._element(at: 0)?.content is SACMessageTimeLineContent)
+        XCTAssert(rd2._element(at: 1) === m2)
+        XCTAssert(rd2._element(at: 2) === m2)
+        XCTAssert(rd2._element(at: 3) === m3)
+        XCTAssert(rd2._element(at: 4)?.content is SACMessageTimeLineContent)
+        XCTAssert(rd2._element(at: 5) === m4)
+        XCTAssert(rd2._element(at: 6) === m4)
+        
+        rd2._elements = rde2
         rd2.remove(contentsOf: [3,4,5,8,9]) // 随机删除(尾)
-        XCTAssert(rd2.count == 5, "insert or convert fail")
+        XCTAssert(rd2.count == 5, "remove or convert fail")
         XCTAssert(rd2._element(at: 0)?.content is SACMessageTimeLineContent)
         XCTAssert(rd2._element(at: 1) === m1)
         XCTAssert(rd2._element(at: 2) === m1)
