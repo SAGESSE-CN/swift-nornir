@@ -55,13 +55,13 @@ class SACChatViewDataTests: XCTestCase {
         // 初次添加
         let ad1 = SACChatViewData()
         ad1.insert(m1, at: 0)
-        XCTAssert(ad1.count == 2, "insert or convert error")
+        XCTAssert(ad1.count == 2, "insert error")
         XCTAssert(ad1._element(at: 0)?.content is SACMessageTimeLineContent)
         XCTAssert(ad1._element(at: 1) === m1)
         
         let ad2 = SACChatViewData()
         ad2.insert(contentsOf: [m1, m2], at: 0)
-        XCTAssert(ad2.count == 3, "insert or convert error")
+        XCTAssert(ad2.count == 3, "insert error")
         XCTAssert(ad2._element(at: 0)?.content is SACMessageTimeLineContent)
         XCTAssert(ad2._element(at: 1) === m1)
         XCTAssert(ad2._element(at: 2) === m2)
@@ -343,11 +343,12 @@ class SACChatViewDataTests: XCTestCase {
         
         ud1._elements = ude1
         ud1.update(m3, at: 5) // 普通更新(尾)
-        XCTAssert(ud1.count == 4, "update error!")
+        XCTAssert(ud1.count == 5, "update error!")
         XCTAssert(ud1._element(at: 0)?.content is SACMessageTimeLineContent)
         XCTAssert(ud1._element(at: 1) === m1)
         XCTAssert(ud1._element(at: 2) === m2)
         XCTAssert(ud1._element(at: 3) === m3)
+        XCTAssert(ud1._element(at: 4) === m3)
         
     }
     

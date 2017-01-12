@@ -19,16 +19,17 @@ class SACChatViewData: NSObject {
         insert(contentsOf: [newElement], at: index)
     }
     func insert(contentsOf newElements: [SACMessageType], at index: Int) {
-        let ipa = _convert(index: index) - 1
-        let ipb = _convert(index: index)
+        
+        // make affected region
+        let begin = _convert(index: index) - 1
+        let end = _convert(index: index) + 1
+        
         // convert new messages
         let count = _elements.count
-        let results = _convert(messages: newElements, first: _element(at: ipa), last: _element(at: ipb))
-        // check select region
-        let begin = max(ipa, 0)
-        let end = min(ipb + 1, count)
-        // replace all message
-        _elements.replaceSubrange(begin ..< end, with: results)
+        let results = _convert(messages: newElements, first: _element(at: begin), last: _element(at: end - 1))
+        
+        // replace specify message
+        _elements.replaceSubrange(max(begin, 0) ..< min(end, count), with: results)
         
         
         _logger.trace("insert region: [\(begin) ..< \(end)], new: \(results.count), total: \(_elements.count)")
@@ -41,14 +42,15 @@ class SACChatViewData: NSObject {
         // get remove message
         let count = _elements.count
         let removes = _convert(indexs: indexs)
+        
         // check indexs
         guard !removes.isEmpty else {
             return
         }
+        
         // copy affected messages
         let begin = removes.first! - 1
         let end = removes.last! + 1/*next message*/ + 1/*last + 1*/
-        // processing
         let copyElements = NSMutableArray(capacity: (end - begin) + 1)
         let _ = (0 ..< removes.count).filter({ $0 % 2 == 0 }).reduce(nil) { p, i -> Int? in
             // get lower bound & upper bound
@@ -71,10 +73,10 @@ class SACChatViewData: NSObject {
             // move to bottom + 1
             return u + 1
         }
-        // convert messages
+        
+        // convert messages and replace specify message
         let newElements = copyElements as? [SACMessageType] ?? []
         let results = _convert(messages: newElements, first: _element(at: begin), last: _element(at: end - 1))
-        // replace all message
         _elements.replaceSubrange(max(begin, 0) ..< min(end, count), with: results)
         
         
@@ -92,11 +94,13 @@ class SACChatViewData: NSObject {
         }
         let first = indexs.min()!
         let last = indexs.max()!
+        
         // copy affected messages
         let begin = first - 1
         let end = last + 1/*next message*/ + 1/*last + 1*/
-        // replace update the message
         var copyElements = Array(_elements[max(first, 0) ..< min(last + 1, count)])
+        
+        // replace update the message
         indexs.enumerated().forEach { offset, index in
             let nm = newElements[offset]
             let idx = index - first
@@ -106,10 +110,11 @@ class SACChatViewData: NSObject {
             }
             copyElements[idx] = nm
         }
-        // convert messages
+        
+        // convert messages and replace specify message
         let results = _convert(messages: copyElements, first: _element(at: begin), last: _element(at: end - 1))
-        // replace all message
         _elements.replaceSubrange(max(begin, 0) ..< min(end, count), with: results)
+        
         
         _logger.trace("update items: \(indexs), infl: [\(begin) ..< \(end)]")
     }
@@ -127,43 +132,47 @@ class SACChatViewData: NSObject {
     
     
     private func _convert(message current: SACMessageType, previous: SACMessageType?) -> [SACMessageType] {
-        // previous message is empty?
-        // previous is king of TimeLine message?
-        guard let previous = previous, !previous._isTimeLineMessage else {
-            // check current is king of TimeLine message.
+        
+        // if current and previous is lt-message
+        guard !(current._isTimeLineMessage && (previous?._isTimeLineMessage ?? false)) else {
+            // ignore the message
+            return []
+        }
+        
+        // get vaild previous and next message.
+        let vp = _fetch(before: previous)
+        let vn = _fetch(after: current)
+        
+        // check vaild previous and vaild next time interval
+        guard let next = vn, fabs(vp?._timeIntervalSince(next) ?? .greatestFiniteMagnitude) > _timeInterval else {
+            // too near, check current message type
             guard !current._isTimeLineMessage else {
-                // yes, current is TimeLine message, ignore this operator
+                // current is lt-message, but this is no need, ignore
                 return []
             }
-            // no
-            return [SACMessage(forTimeline: current, before: nil), current]
-        }
-        // current is king of TimeLine message?
-        guard !current._isTimeLineMessage else {
-            // check the interval between.
-            let next = (current.content as? SACMessageTimeLineContent)?.after
-            guard let message = next, fabs(message.date.timeIntervalSince(previous.date)) > _timeInterval else {
-                // no next message or too near, ignore
-                return []
-            }
-            // too far away
             return [current]
         }
-        // check the interval between.
-        guard fabs(current.date.timeIntervalSince(previous.date)) > _timeInterval else {
-            // too near
+        
+        // too far away, checkout current is lt-message
+        if let content = current.content as? SACMessageTimeLineContent {
+            // current is lt-message
+            content.before = previous
+            // no change, continue use
             return [current]
         }
+        
         // too far away
-        return [SACMessage(forTimeline: current, before: nil), current]
+        return [SACMessage(forTimeline: current, before: vp), current]
     }
     private func _convert(messages elements: [SACMessageType], first: SACMessageType?, last: SACMessageType?) -> [SACMessageType] {
-        let arr = NSMutableArray(capacity: elements.count * 2 + 2)
+        
         // if first is not TimeLine, add to result
+        let arr = NSMutableArray(capacity: elements.count * 2 + 2)
         if let message = first, !message._isTimeLineMessage {
             arr.add(message)
         }
-        // process
+        
+        // processing
         _ = (0 ... elements.count).reduce(first) {
             // get previous message
             let previous = ($0 as? SACMessageTimeLineContent)?.before ?? $0
@@ -181,7 +190,7 @@ class SACChatViewData: NSObject {
             // continue
             return current
         }
-        // success
+        
         return arr as! [SACMessageType]
     }
     
@@ -217,6 +226,19 @@ class SACChatViewData: NSObject {
         }.0
     }
     
+    private func _fetch(after message: SACMessageType?) -> SACMessageType? {
+        guard let content = message?.content as? SACMessageTimeLineContent else {
+            return message
+        }
+        return content.after
+    }
+    private func _fetch(before message: SACMessageType?) -> SACMessageType? {
+        guard let content = message?.content as? SACMessageTimeLineContent else {
+            return message
+        }
+        return content.before
+    }
+    
     internal func _element(at index: Int) -> SACMessageType? {
         guard index >= 0 && index < _elements.count else {
             return nil
@@ -231,7 +253,16 @@ class SACChatViewData: NSObject {
 
 fileprivate extension SACMessageType {
     
+    
     fileprivate var _isTimeLineMessage: Bool {
         return content is SACMessageTimeLineContent
     }
+    fileprivate func _timeIntervalSince(_ other: SACMessageType) -> TimeInterval {
+        // if message is lt-message, read for after message
+        let a = (self.content as? SACMessageTimeLineContent)?.after ?? self
+        let b = (other.content as? SACMessageTimeLineContent)?.after ?? other
+        // calc
+        return a.date.timeIntervalSince(b.date)
+    }
+    
 }
