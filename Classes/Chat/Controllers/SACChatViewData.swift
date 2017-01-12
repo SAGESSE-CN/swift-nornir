@@ -60,10 +60,11 @@ class SACChatViewData: NSObject {
             if let p = p, l > 0, p <= l {
                 // copy top (p + 1 ..< l)
                 let result = _elements[p ..< l]
-                // clear first & last dependencies
+                // adjust previous lt-message
                 if let content = result.first?.content as? SACMessageTimeLineContent {
-                    content.before = nil 
+                    content.before = nil
                 }
+                // adjust next lt-message
                 if let content = result.last?.content as? SACMessageTimeLineContent {
                     content.after = nil
                 }
@@ -109,6 +110,14 @@ class SACChatViewData: NSObject {
                 return // over bundary, ignore
             }
             copyElements[idx] = nm
+            // adjust previous lt-message
+            if let content = _element(at: index - 1)?.content as? SACMessageTimeLineContent {
+                content.after = nm
+            }
+            // adjust next lt-message
+            if let content = _element(at: index + 1)?.content as? SACMessageTimeLineContent {
+                content.before = nm
+            }
         }
         
         // convert messages and replace specify message
