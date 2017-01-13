@@ -490,23 +490,6 @@ class SACChatViewDataTests: XCTestCase {
         XCTAssert(ud2._element(at: 10) === m3)
     }
     
-    func testMove() {
-        
-        let md1 = SACChatViewData()
-        md1.insert(contentsOf: [m1,m2,m3,m4], at: 0)
-        let mde1 = md1._elements
-        XCTAssert(md1.count == 6, "insert error!")
-        XCTAssert(md1._element(at: 0)?.content is SACMessageTimeLineContent)
-        XCTAssert(md1._element(at: 1) === m1)
-        XCTAssert(md1._element(at: 2) === m2)
-        XCTAssert(md1._element(at: 3) === m3)
-        XCTAssert(md1._element(at: 4)?.content is SACMessageTimeLineContent)
-        XCTAssert(md1._element(at: 5) === m4)
-        
-        // 普通移动
-        md1._elements = mde1
-    }
-    
     let m1 = SACMessage(content: SACMessageTextContent(text: "m1"))
     let m2 = SACMessage(content: SACMessageTextContent(text: "m2"))
     let m3 = SACMessage(content: SACMessageTextContent(text: "m3"))

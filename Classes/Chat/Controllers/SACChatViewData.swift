@@ -128,14 +128,6 @@ class SACChatViewData: NSObject {
         _logger.trace("update items: \(indexs), infl: [\(begin) ..< \(end)]")
     }
     
-    func move(at index: Int, to newIndex: Int) {
-        move(contentsOf: [index], to: [newIndex])
-    }
-    func move(contentsOf indexs: [Int], to newIndexs: [Int]) {
-        assert(indexs.count == newIndexs.count, "the selected rows count cannot match the destination row count")
-        
-    }
-    
     func performBatchUpdates(_ updates: (() -> Swift.Void)?, completion: ((Bool) -> Swift.Void)? = nil) {
     }
     
