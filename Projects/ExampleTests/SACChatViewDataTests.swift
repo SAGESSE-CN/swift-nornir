@@ -490,6 +490,36 @@ class SACChatViewDataTests: XCTestCase {
         XCTAssert(ud2._element(at: 10) === m3)
     }
     
+    func testBatchUpdates() {
+        
+        let bd1 = SACChatViewData()
+        bd1.insert(contentsOf: [m1,m2,m3,m4], at: 0)
+        let bde1 = bd1._elements
+        XCTAssert(bd1.count == 6, "insert error!")
+        XCTAssert(bd1._element(at: 0)?.content is SACMessageTimeLineContent)
+        XCTAssert(bd1._element(at: 1) === m1)
+        XCTAssert(bd1._element(at: 2) === m2)
+        XCTAssert(bd1._element(at: 3) === m3)
+        XCTAssert(bd1._element(at: 4)?.content is SACMessageTimeLineContent)
+        XCTAssert(bd1._element(at: 5) === m4)
+        
+        // no imp
+        bd1._elements = bde1
+//        bd1.performBatchUpdates({
+//            // 移动
+//            bd1.remove(at: 1)
+//            bd1.insert(self.m1, at: 6)
+//        })
+//        XCTAssert(bd1.count == 7, "insert error!")
+//        XCTAssert(bd1._element(at: 0)?.content is SACMessageTimeLineContent)
+//        XCTAssert(bd1._element(at: 1) === m2)
+//        XCTAssert(bd1._element(at: 2) === m3)
+//        XCTAssert(bd1._element(at: 3)?.content is SACMessageTimeLineContent)
+//        XCTAssert(bd1._element(at: 4) === m4)
+//        XCTAssert(bd1._element(at: 5)?.content is SACMessageTimeLineContent)
+//        XCTAssert(bd1._element(at: 6) === m1)
+    }
+    
     let m1 = SACMessage(content: SACMessageTextContent(text: "m1"))
     let m2 = SACMessage(content: SACMessageTextContent(text: "m2"))
     let m3 = SACMessage(content: SACMessageTextContent(text: "m3"))
