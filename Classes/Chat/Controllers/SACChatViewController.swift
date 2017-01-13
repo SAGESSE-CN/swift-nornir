@@ -168,17 +168,6 @@ open class SACChatViewController: UIViewController {
         
     }
     
-    
-//    func inputBar(forSend sender: Any) {
-//        let content = SACMessageTextContent(attributedText: inputBar.attributedText)
-//        let message = SACMessage(content: content)
-//
-//        _chatView.append(message)
-//       
-//        inputBar.attributedText = nil
-//    }
-//    func inputBar(forSetting sender: Any) {
-//    }
 
     fileprivate lazy var _toolbar: SAIInputBar = SAIInputBar(type: .value1)
     fileprivate lazy var _contentView: UITableView = UITableView()

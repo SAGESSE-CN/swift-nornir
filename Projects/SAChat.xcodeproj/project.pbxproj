@@ -74,6 +74,7 @@
 		0C2770341DC8442D00FE17FC /* SACManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C2770331DC8442D00FE17FC /* SACManager.swift */; };
 		0C2770361DC8454400FE17FC /* SACConversation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C2770351DC8454300FE17FC /* SACConversation.swift */; };
 		0C2770381DC845ED00FE17FC /* SACUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C2770371DC845ED00FE17FC /* SACUser.swift */; };
+		0C3722291E28F2AD008FC94F /* SACChatViewUpdate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C3722281E28F2AD008FC94F /* SACChatViewUpdate.swift */; };
 		0C3A466E1E1C8E3C00CA2F3E /* SACChatViewLayoutAttributesInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C3A466D1E1C8E3C00CA2F3E /* SACChatViewLayoutAttributesInfo.swift */; };
 		0C3A46771E1CD21400CA2F3E /* SACMessageOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C3A46761E1CD21400CA2F3E /* SACMessageOptions.swift */; };
 		0C3F7BC11DC83C0700461848 /* SACChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C3F7BC01DC83C0700461848 /* SACChatViewController.swift */; };
@@ -188,6 +189,7 @@
 		0C2770331DC8442D00FE17FC /* SACManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SACManager.swift; sourceTree = "<group>"; };
 		0C2770351DC8454300FE17FC /* SACConversation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SACConversation.swift; sourceTree = "<group>"; };
 		0C2770371DC845ED00FE17FC /* SACUser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SACUser.swift; sourceTree = "<group>"; };
+		0C3722281E28F2AD008FC94F /* SACChatViewUpdate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SACChatViewUpdate.swift; sourceTree = "<group>"; };
 		0C3A466D1E1C8E3C00CA2F3E /* SACChatViewLayoutAttributesInfo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SACChatViewLayoutAttributesInfo.swift; sourceTree = "<group>"; };
 		0C3A46761E1CD21400CA2F3E /* SACMessageOptions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SACMessageOptions.swift; sourceTree = "<group>"; };
 		0C3F7BC01DC83C0700461848 /* SACChatViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SACChatViewController.swift; sourceTree = "<group>"; };
@@ -405,6 +407,7 @@
 				0C02A4DE1E10B7E6005DDE2A /* SACChatView.swift */,
 				0C02A4E21E10C391005DDE2A /* SACChatViewCell.swift */,
 				0CA453AA1E23880C00716536 /* SACChatViewData.swift */,
+				0C3722281E28F2AD008FC94F /* SACChatViewUpdate.swift */,
 				0C02A4E01E10B7FC005DDE2A /* SACChatViewLayout.swift */,
 				0C02A4E61E10E1A9005DDE2A /* SACChatViewLayoutAttributes.swift */,
 				0C3A466D1E1C8E3C00CA2F3E /* SACChatViewLayoutAttributesInfo.swift */,
@@ -614,6 +617,7 @@
 				0CF019DA1E1E5C5700C9B31F /* SACMessageVoiceContentView.swift in Sources */,
 				0CF019DC1E1E5C6A00C9B31F /* SACMessageVideoContent.swift in Sources */,
 				0CF019B21E1DE5C900C9B31F /* SACMessageAvatarView.swift in Sources */,
+				0C3722291E28F2AD008FC94F /* SACChatViewUpdate.swift in Sources */,
 				0CF019D21E1E579200C9B31F /* SACMessageTextContent.swift in Sources */,
 				0C2770341DC8442D00FE17FC /* SACManager.swift in Sources */,
 				0C3A466E1E1C8E3C00CA2F3E /* SACChatViewLayoutAttributesInfo.swift in Sources */,
