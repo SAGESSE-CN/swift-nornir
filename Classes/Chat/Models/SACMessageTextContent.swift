@@ -12,11 +12,16 @@ import YYText
 open class SACMessageTextContent: NSObject, SACMessageContentType {
     
     public override init() {
-        self.text = "The FFNN class contains a fully-connected, 3-layer feed-forward neural network. This neural net uses a standard backpropagation training algorithm (stochastic gradient descent), and is designed for flexibility and use in performance-critical applications."
+        let text = "The FFNN class contains a fully-connected, 3-layer feed-forward neural network. This neural net uses a standard backpropagation training algorithm (stochastic gradient descent), and is designed for flexibility and use in performance-critical applications."
+        self.text = NSAttributedString(string: text)
         super.init()
     }
     public init(text: String) {
-        self.text = text
+        self.text = NSAttributedString(string: text)
+        super.init()
+    }
+    public init(attributedText: NSAttributedString) {
+        self.text = attributedText
         super.init()
     }
     
@@ -25,7 +30,7 @@ open class SACMessageTextContent: NSObject, SACMessageContentType {
     }
     open var layoutMargins: UIEdgeInsets = .init(top: 4, left: 6, bottom: 4, right: 6)
     
-    open var text: String
+    open var text: NSAttributedString
     open var attributedText: YYTextLayout?
     
     open func sizeThatFits(_ size: CGSize) -> CGSize {
@@ -34,9 +39,12 @@ open class SACMessageTextContent: NSObject, SACMessageContentType {
         // | |   Content   | |
         // | +-------------+ |
         // +-+-------------+-+
+        
+        let mattr = NSMutableAttributedString(attributedString: text)
+        mattr.addAttribute(NSFontAttributeName, value: UIFont.systemFont(ofSize: 16), range: NSMakeRange(0, mattr.length))
+        
                          
-        let attr = NSAttributedString(string: text, attributes: [NSFontAttributeName: UIFont.systemFont(ofSize: 16) ])
-        attributedText = YYTextLayout(containerSize: size, text: attr)
+        attributedText = YYTextLayout(containerSize: size, text: mattr)
 //        @property (nonatomic, readonly) NSRange visibleRange;
 //        ///< Bounding rect (glyphs)
 //        @property (nonatomic, readonly) CGRect textBoundingRect;

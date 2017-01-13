@@ -60,28 +60,6 @@ public protocol SACChatViewDelegate: class {
     open weak var delegate: SACChatViewDelegate?
     open weak var dataSource: SACChatViewDataSource?
     
-    open dynamic var contentSize: CGSize {
-        set { return _chatContainerView.contentSize = newValue }
-        get { return _chatContainerView.contentSize }
-    }
-    open dynamic var contentOffset: CGPoint {
-        set { return _chatContainerView.contentOffset = newValue }
-        get { return _chatContainerView.contentOffset }
-    }
-    
-    open dynamic var contentInset: UIEdgeInsets {
-        set { return _chatContainerView.contentInset = newValue }
-        get { return _chatContainerView.contentInset }
-    }
-    open dynamic var scrollIndicatorInsets: UIEdgeInsets {
-        set { return _chatContainerView.scrollIndicatorInsets = newValue }
-        get { return _chatContainerView.scrollIndicatorInsets }
-    }
-    
-    open override func forwardingTarget(for aSelector: Selector!) -> Any? {
-        return _chatContainerView
-    }
-    
     func insert(_ newMessage: SACMessageType, at index: Int) {
         insert(contentsOf: [newMessage], at: index)
     }
@@ -93,6 +71,8 @@ public protocol SACChatViewDelegate: class {
         append(contentsOf: [newMessage])
     }
     func append(contentsOf newMessages: Array<SACMessageType>) {
+       logger.debug()
+        
         _chatViewData.insert(contentsOf: newMessages, at: -1)
     }
     
@@ -123,7 +103,27 @@ internal class SACChatContainerView: UICollectionView {
     
     
 }
+
+
+
 extension SACChatView: UICollectionViewDataSource, SACChatViewLayoutDelegate {
+    
+    open dynamic var contentSize: CGSize {
+        set { return _chatContainerView.contentSize = newValue }
+        get { return _chatContainerView.contentSize }
+    }
+    open dynamic var contentOffset: CGPoint {
+        set { return _chatContainerView.contentOffset = newValue }
+        get { return _chatContainerView.contentOffset }
+    }
+    open dynamic var contentInset: UIEdgeInsets {
+        set { return _chatContainerView.contentInset = newValue }
+        get { return _chatContainerView.contentInset }
+    }
+    open dynamic var scrollIndicatorInsets: UIEdgeInsets {
+        set { return _chatContainerView.scrollIndicatorInsets = newValue }
+        get { return _chatContainerView.scrollIndicatorInsets }
+    }
     
     open func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return _chatViewData.count

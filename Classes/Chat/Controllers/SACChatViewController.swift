@@ -135,16 +135,50 @@ open class SACChatViewController: UIViewController {
         _emoticonSendBtn.setTitleColor(.gray, for: .disabled)
         _emoticonSendBtn.setBackgroundImage(UIImage.sac_init(named: "chat_emoticon_btn_send_blue"), for: .normal)
         _emoticonSendBtn.setBackgroundImage(UIImage.sac_init(named: "chat_emoticon_btn_send_gray"), for: .disabled)
-        //_emoticonSendBtn.addTarget(self, action: #selector(onEmoticonSend(_:)), for: .touchUpInside)
+        _emoticonSendBtn.addTarget(self, action: #selector(_sendHandler(forEmoticon:)), for: .touchUpInside)
         _emoticonSendBtn.isEnabled = false
         
         _emoticonSettingBtn.contentEdgeInsets = UIEdgeInsetsMake(0, 10, 0, 0)
         _emoticonSettingBtn.setImage(UIImage.sac_init(named: "chat_emoticon_btn_setting"), for: .normal)
         _emoticonSettingBtn.setBackgroundImage(UIImage.sac_init(named: "chat_emoticon_btn_send_gray"), for: .normal)
         _emoticonSettingBtn.setBackgroundImage(UIImage.sac_init(named: "chat_emoticon_btn_send_gray"), for: .highlighted)
-        //_emoticonSettingBtn.addTarget(self, action: #selector(onEmoticonSetting(_:)), for: .touchUpInside)
+        _emoticonSettingBtn.addTarget(self, action: #selector(_settingHandler(forEmoticon:)), for: .touchUpInside)
     }
     
+    func send(forText text: NSAttributedString) {
+        
+        let message = SACMessage(content: SACMessageTextContent(attributedText: text))
+        _chatView.append(message)
+    }
+    func send(forLargeEmoticon emoticon: SACEmoticonLarge) {
+        _logger.trace("\(emoticon.title) \(emoticon.id)")
+        
+    }
+    
+    fileprivate dynamic func _sendHandler(forEmoticon sender: Any) {
+        _logger.trace()
+        
+        // send text message
+        send(forText: _toolbar.attributedText)
+        // clear current text
+        _toolbar.attributedText = nil
+    }
+    fileprivate dynamic func _settingHandler(forEmoticon sender: Any) {
+        _logger.trace()
+        
+    }
+    
+    
+//    func inputBar(forSend sender: Any) {
+//        let content = SACMessageTextContent(attributedText: inputBar.attributedText)
+//        let message = SACMessage(content: content)
+//
+//        _chatView.append(message)
+//       
+//        inputBar.attributedText = nil
+//    }
+//    func inputBar(forSetting sender: Any) {
+//    }
 
     fileprivate lazy var _toolbar: SAIInputBar = SAIInputBar(type: .value1)
     fileprivate lazy var _contentView: UITableView = UITableView()
@@ -289,6 +323,15 @@ extension SACChatViewController: SAIInputBarDelegate, SAIInputBarDisplayable {
     open func inputBar(didChangeText inputBar: SAIInputBar) {
         _emoticonSendBtn.isEnabled = inputBar.attributedText.length != 0
     }
+    
+    public func inputBar(shouldReturn inputBar: SAIInputBar) -> Bool {
+        // send text message
+        send(forText: inputBar.attributedText)
+        // clear current text
+        inputBar.attributedText = nil
+        // intercept return event
+        return false
+    }
 }
 
 // MARK: - SAIAudioInputViewDataSource & SAIAudioInputViewDelegate
@@ -361,26 +404,33 @@ extension SACChatViewController: SAIEmoticonInputViewDataSource, SAIEmoticonInpu
     open func emoticon(_ emoticon: SAIEmoticonInputView, didSelectFor item: SAIEmoticon) {
         _logger.debug(item)
         
-        guard !item.isBackspace else {
+        // 如果是删除, 直接回退
+        if item.isBackspace {
             _toolbar.deleteBackward()
             return
         }
-        guard let item = item as? SACEmoticon else {
+        // 如果是大表情, 直接发送
+        if let emoticon = item as? SACEmoticonLarge {
+            send(forLargeEmoticon: emoticon)
             return
         }
-        if let img = item.contents as? UIImage {
-            
+        // 如果是ID, 直接显示
+        if let code = item.contents as? String {
+            return _toolbar.insertText(code)
+        }
+        // 如果是图片, 添加
+        if let image = item.contents as? UIImage {
+            // 获取当前字体的大小
             let d = _toolbar.font?.descender ?? 0
             let h = _toolbar.font?.lineHeight ?? 0
             
             let attachment = NSTextAttachment()
             
-            attachment.image = img
+            attachment.image = image
             attachment.bounds = CGRect(x: 0, y: d, width: h, height: h)
             
             _toolbar.insertAttributedText(NSAttributedString(attachment: attachment))
-        } else {
-            _toolbar.insertText("/\(item.title)")
+            return
         }
     }
     
