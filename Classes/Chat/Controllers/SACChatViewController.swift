@@ -35,11 +35,11 @@ open class SACChatViewController: UIViewController {
     
     open override func loadView() {
         super.loadView()
-        self.view = chatView
+        self.view = _chatView
     }
     
-    lazy var chatViewLayout: SACChatViewLayout = SACChatViewLayout()
-    lazy var chatView: SACChatView = SACChatView(frame: .zero, collectionViewLayout: self.chatViewLayout)
+    fileprivate lazy var _chatViewLayout: SACChatViewLayout = SACChatViewLayout()
+    fileprivate lazy var _chatView: SACChatView = SACChatView(frame: .zero, chatViewLayout: self._chatViewLayout)
     
     open var conversation: SACConversationType
     
@@ -54,84 +54,58 @@ open class SACChatViewController: UIViewController {
 //    }
     
     
-    lazy var datas: [SACMessage] = {
-        var datas: [SACMessage] = []
-        
-        
-        var tm: TimeInterval = 0
-        
-        for alignment: SACMessageAlignment in [.left, .right] {
-            for showsAvatar: Bool in [true, false] {
-                for showsCard: Bool in [true, false] {
-                    //  time
-                    if true {
-                        let content = SACMessageTimeLineContent(date: .init(timeIntervalSinceNow: tm))
-                        let msg = SACMessage(content: content)
-                        datas.append(msg)
-                    }
-                    
-                    for contentType: Int in (0 ..< 4) {
-                        let content = { Void -> SACMessageContentType in
-                            switch contentType {
-                            case 0: return SACMessageTextContent()
-                            case 1: return SACMessageImageContent()
-                            case 2: return SACMessageVoiceContent()
-                            default: return SACMessageNoticeContent.unsupport
-                            }
-                        }()
-                        let msg = SACMessage(content: content)
-                        
-                        msg.date = .init(timeIntervalSinceNow: tm - TimeInterval(contentType) * 60)
-                        
-                        if !(content is SACMessageNoticeContent) {
-                            msg.options.style = .bubble
-                            msg.options.alignment = alignment
-                            msg.options.showsCard = showsCard
-                            msg.options.showsAvatar = showsAvatar
-                        }
-                        
-                        datas.append(msg)
-                    }
-                    
-                    tm -= 86400
-                }
-            }
-        }
-        
-        return datas
-    }()
-    
-    
     open override func viewDidLoad() {
         super.viewDidLoad()
         
-        
-        
         let color = UIColor(colorLiteralRed: 0xec / 0xff, green: 0xed / 0xff, blue: 0xf1 / 0xff, alpha: 1)
-        view.backgroundColor = color
         
         _toolbar.delegate = self
         
-        chatView.delegate = self
-        chatView.dataSource = self
-        chatView.keyboardDismissMode = .interactive
-        
-        
-        let x = SACChatViewData()
-        x.insert(contentsOf: datas, at: -1)
-        datas = x._elements as! [SACMessage]
-        
-//        contentView.frame = view.bounds
-//        contentView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-//        contentView.scrollsToTop = true
-//        contentView.keyboardDismissMode = .interactive
-//        contentView.alwaysBounceVertical = true
-//        contentView.separatorStyle = .none
-//        //contentView.showsHorizontalScrollIndicator = false
-//        contentView.showsVerticalScrollIndicator = false
-//        contentView.backgroundColor = .clear
-        
-//        view.addSubview(contentView)
+        _chatView.backgroundColor = color
+        _chatView.append(contentsOf: {
+            var datas: [SACMessageType] = []
+            
+            var tm: TimeInterval = 0
+            for alignment: SACMessageAlignment in [.left, .right] {
+                for showsAvatar: Bool in [true, false] {
+                    for showsCard: Bool in [true, false] {
+                        //  time
+                        if true {
+                            let content = SACMessageTimeLineContent(date: .init(timeIntervalSinceNow: tm))
+                            let msg = SACMessage(content: content)
+                            datas.append(msg)
+                        }
+                        
+                        for contentType: Int in (0 ..< 4) {
+                            let content = { Void -> SACMessageContentType in
+                                switch contentType {
+                                case 0: return SACMessageTextContent()
+                                case 1: return SACMessageImageContent()
+                                case 2: return SACMessageVoiceContent()
+                                default: return SACMessageNoticeContent.unsupport
+                                }
+                            }()
+                            let msg = SACMessage(content: content)
+                            
+                            msg.date = .init(timeIntervalSinceNow: tm - TimeInterval(contentType) * 60)
+                            
+                            if !(content is SACMessageNoticeContent) {
+                                msg.options.style = .bubble
+                                msg.options.alignment = alignment
+                                msg.options.showsCard = showsCard
+                                msg.options.showsAvatar = showsAvatar
+                            }
+                            
+                            datas.append(msg)
+                        }
+                        
+                        tm -= 86400
+                    }
+                }
+            }
+            
+            return datas
+        }())
         
         if let group = SACEmoticonGroup(identifier: "com.qq.classic") {
             _emoticonGroups.append(group)
@@ -141,13 +115,7 @@ open class SACChatViewController: UIViewController {
         }
     }
     
-    open override var inputAccessoryView: UIView? {
-        return _toolbar
-    }
-    open override var canBecomeFirstResponder: Bool {
-        return true
-    }
-    
+
     var isLandscape: Bool {
         // iOS 8.0+
         let io = UIScreen.main.value(forKey: "_interfaceOrientation") as! Int
@@ -185,8 +153,6 @@ open class SACChatViewController: UIViewController {
     fileprivate lazy var _emoticonSendBtn: UIButton = UIButton()
     fileprivate lazy var _emoticonSettingBtn: UIButton = UIButton()
     
-    fileprivate lazy var _allRegistedContentTypes: Set<String> = []
-    
     fileprivate weak var _inputItem: SAIInputItem?
     fileprivate lazy var _inputViews: [String: UIView] = [:]
     
@@ -217,121 +183,20 @@ open class SACChatViewController: UIViewController {
 }
 
 
-extension SACChatViewController: UICollectionViewDataSource, SACChatViewLayoutDelegate {
-    
-    public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return datas.count
-    }
-    public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let message = datas[indexPath.item]
-        let options = (message.options.showsCard.hashValue << 0) | (message.options.showsAvatar.hashValue << 1)
-        let alignment = message.options.alignment.rawValue
-        let identifier = NSStringFromClass(type(of: message.content)) + ".\(alignment)"
-        
-        if !_allRegistedContentTypes.contains(identifier) {
-            _allRegistedContentTypes.insert(identifier)
-            // register
-            chatView.register(SACChatViewCell.self, forCellWithReuseIdentifier: identifier)
-        }
-        
-        return chatView.dequeueReusableCell(withReuseIdentifier: identifier, for: indexPath)
-    }
-    
-    public func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        
-        //cell.backgroundColor = .random
-    }
-    
-    public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, itemAt indexPath: IndexPath) -> SACMessageType {
-        return datas[indexPath.item]
-    }
-    
-    public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        guard let collectionViewLayout = collectionViewLayout as? SACChatViewLayout else {
-            return .zero
-        }
-        guard let layoutAttributesInfo = collectionViewLayout.layoutAttributesInfoForItem(at: indexPath) else {
-            return .zero
-        }
-        let size = layoutAttributesInfo.layoutedBoxRect(with: .all).size
-        return .init(width: collectionView.frame.width, height: size.height)
-    }
-    public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAvatarOf style: SACMessageStyle) -> CGSize {
-        return .init(width: 40, height: 40)
-    }
-    public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemCardOf style: SACMessageStyle) -> CGSize {
-        return .init(width: 0, height: 20)
-    }
-    
-    public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForItemOf style: SACMessageStyle) -> UIEdgeInsets {
-        switch style {
-        case .bubble:
-            // bubble content edg
-            // +----10--+-+---+
-            // |        | |   |
-            // 10       2 40  10
-            // |        | |   |
-            // +----10--+-+---+
-            return .init(top: 10, left: 10, bottom: 10, right: 2 + 40 + 10)
-            
-        case .notice:
-            // default edg
-            // +----10----+
-            // 20         20
-            // +----10----+
-            return .init(top: 10, left: 20, bottom: 10, right: 20)
-            
-        default:
-            // default edg
-            // +----10----+
-            // 10         10
-            // +----10----+
-            return .init(top: 10, left: 10, bottom: 10, right: 10)
-        }
-    }
-    public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForItemCardOf style: SACMessageStyle) -> UIEdgeInsets {
-        return .init(top: 2, left: 8, bottom: 0, right: 8)
-    }
-    public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForItemAvatarOf style: SACMessageStyle) -> UIEdgeInsets {
-        return .init(top: 0, left: 0, bottom: 10, right: 2)
-    }
-    public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForItemContentOf style: SACMessageStyle) -> UIEdgeInsets {
-        switch style {
-        case .bubble:
-            // bubble image edg, scale: 2x, radius: 15
-            // /--------16-------\
-            // |  +-----04-----+ |
-            // 20 04          04 20
-            // |  +-----04-----+ |
-            // \--------16-------/
-            return .init(top: 8 + 2, left: 10 + 2, bottom: 8 + 2, right: 10 + 2)
-            
-        case .notice:
-            // notice edg
-            // /------4-------\
-            // 10             10
-            // \------4-------/
-            return .init(top: 4, left: 10, bottom: 4, right: 10)
-            
-        }
-    }
-    
-//    public func collectionView(_ collectionView: UICollectionView, shouldShowMenuForItemAt indexPath: IndexPath) -> Bool {
-//        return true
-//    }
-//    public func collectionView(_ collectionView: UICollectionView, canPerformAction action: Selector, forItemAt indexPath: IndexPath, withSender sender: Any?) -> Bool {
-//        return true
-//    }
-//    public func collectionView(_ collectionView: UICollectionView, performAction action: Selector, forItemAt indexPath: IndexPath, withSender sender: Any?) {
-//    }
-}
 
 // MARK: - SAInputBarDelegate & SAInputBarDisplayable
 
 extension SACChatViewController: SAIInputBarDelegate, SAIInputBarDisplayable {
     
-    open var scrollView: UIScrollView {
-        return chatView
+    open override var inputAccessoryView: UIView? {
+        return _toolbar
+    }
+    open var scrollView: SAIInputBarScrollViewType {
+        return _chatView
+    }
+    
+    open override var canBecomeFirstResponder: Bool {
+        return true
     }
     
     open func inputView(with item: SAIInputItem) -> UIView? {
@@ -567,5 +432,8 @@ extension SACChatViewController: SAIToolboxInputViewDataSource, SAIToolboxInputV
         
         super.present(viewControllerToPresent, animated: flag, completion: completion)
     }
+}
+
+extension SACChatView: SAIInputBarScrollViewType {
 }
 

@@ -54,7 +54,7 @@ class SACChatViewDataTests: XCTestCase {
         
         // 初次添加
         let ad1 = SACChatViewData()
-        ad1.insert(m1, at: 0)
+        ad1.insert(contentsOf: [m1], at: 0)
         XCTAssert(ad1.count == 2, "insert error")
         XCTAssert(ad1._element(at: 0)?.content is SACMessageTimeLineContent)
         XCTAssert(ad1._element(at: 1) === m1)
@@ -168,33 +168,33 @@ class SACChatViewDataTests: XCTestCase {
         
         // 普通删除
         rd1._elements = rde1
-        rd1.remove(at: 0) // 删除TimeLine(头部)
+        rd1.remove(contentsOf: [0]) // 删除TimeLine(头部)
         XCTAssert(rd1.count == 6, "remove error!")
         XCTAssert(rd1._element(at: 0)?.content is SACMessageTimeLineContent)
         XCTAssert(rd1._element(at: 1) === m1)
         
         rd1._elements = rde1
-        rd1.remove(at: 4) // 删除TimeLine(尾部)
+        rd1.remove(contentsOf: [4]) // 删除TimeLine(尾部)
         XCTAssert(rd1.count == 6, "remove error!")
         XCTAssert(rd1._element(at: 3) === m3)
         XCTAssert(rd1._element(at: 4)?.content is SACMessageTimeLineContent)
         XCTAssert(rd1._element(at: 5) === m4)
         
         rd1._elements = rde1
-        rd1.remove(at: 1) // 普通删除(头部)
+        rd1.remove(contentsOf: [1]) // 普通删除(头部)
         XCTAssert(rd1.count == 5, "remove error!")
         XCTAssert(rd1._element(at: 0)?.content is SACMessageTimeLineContent)
         XCTAssert(rd1._element(at: 1) === m2)
         
         rd1._elements = rde1
-        rd1.remove(at: 3) // 普通删除(中间)
+        rd1.remove(contentsOf: [3]) // 普通删除(中间)
         XCTAssert(rd1.count == 5, "remove error!")
         XCTAssert(rd1._element(at: 2) === m2)
         XCTAssert(rd1._element(at: 3)?.content is SACMessageTimeLineContent)
         XCTAssert(rd1._element(at: 4) === m4)
         
         rd1._elements = rde1
-        rd1.remove(at: 2) // 普通删除(中间), 产生TimeLine
+        rd1.remove(contentsOf: [2]) // 普通删除(中间), 产生TimeLine
         XCTAssert(rd1.count == 6, "remove error!")
         XCTAssert(rd1._element(at: 0)?.content is SACMessageTimeLineContent)
         XCTAssert(rd1._element(at: 1) === m1)
@@ -204,7 +204,7 @@ class SACChatViewDataTests: XCTestCase {
         XCTAssert(rd1._element(at: 5) === m4)
         
         rd1._elements = rde1
-        rd1.remove(at: 5) // 普通删除(尾部)
+        rd1.remove(contentsOf: [5]) // 普通删除(尾部)
         XCTAssert(rd1.count == 4, "remove error!")
         XCTAssert(rd1._element(at: 3) === m3)
         
@@ -331,7 +331,7 @@ class SACChatViewDataTests: XCTestCase {
         
         // 普通更新
         ud1._elements = ude1
-        ud1.update(m2, at: 0) // 普通更新(头)
+        ud1.update(contentsOf: [m2], at: [0]) // 普通更新(头)
         XCTAssert(ud1.count == 7, "update error!")
         XCTAssert(ud1._element(at: 0)?.content is SACMessageTimeLineContent)
         XCTAssert(ud1._element(at: 1) === m2)
@@ -342,7 +342,7 @@ class SACChatViewDataTests: XCTestCase {
         XCTAssert(ud1._element(at: 6) === m4)
         
         ud1._elements = ude1
-        ud1.update(m4, at: 2) // 普通更新(中)
+        ud1.update(contentsOf: [m4], at: [2]) // 普通更新(中)
         XCTAssert(ud1.count == 8, "update error!")
         XCTAssert(ud1._element(at: 0)?.content is SACMessageTimeLineContent)
         XCTAssert(ud1._element(at: 1) === m1)
@@ -354,7 +354,7 @@ class SACChatViewDataTests: XCTestCase {
         XCTAssert(ud1._element(at: 7) === m4)
         
         ud1._elements = ude1
-        ud1.update(m3, at: 5) // 普通更新(尾)
+        ud1.update(contentsOf: [m3], at: [5]) // 普通更新(尾)
         XCTAssert(ud1.count == 5, "update error!")
         XCTAssert(ud1._element(at: 0)?.content is SACMessageTimeLineContent)
         XCTAssert(ud1._element(at: 1) === m1)

@@ -15,10 +15,26 @@ import UIKit
 /// NOTE: 目前不支持`UICollectionViewController`和`UITableViewController`
 ///
 public protocol SAIInputBarDisplayable: NSObjectProtocol  {
-    var scrollView: UIScrollView { get }
+    var scrollView: SAIInputBarScrollViewType { get }
+}
+public protocol SAIInputBarScrollViewType: NSObjectProtocol {
+    
+    var frame: CGRect { get }
+    var bounds: CGRect { get }
+    
+    var contentSize: CGSize { set get }
+    var contentOffset: CGPoint { set get }
+    
+    var contentInset: UIEdgeInsets { set get }
+    var scrollIndicatorInsets: UIEdgeInsets { set get }
+    
+    func layoutSubviews()
 }
 
-// MARK: 
+extension UIScrollView: SAIInputBarScrollViewType {
+}
+
+// MARK:
 
 internal extension SAIInputBarDisplayable {
     

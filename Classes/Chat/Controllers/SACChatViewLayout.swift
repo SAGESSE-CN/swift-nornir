@@ -19,6 +19,8 @@ import UIKit
         _commonInit()
     }
     
+    internal weak var _chatView: SACChatView?
+    
     open override class var layoutAttributesClass: AnyClass {
         return SACChatViewLayoutAttributes.self
     }

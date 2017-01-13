@@ -8,16 +8,22 @@
 
 import UIKit
 
-class SACChatViewData: NSObject {
+internal class SACChatViewData: NSObject {
+    
+    internal override init() {
+        super.init()
+    }
+   
     
     var count: Int {
         return _elements.count
     }
     
-    
-    func insert(_ newElement: SACMessageType, at index: Int) {
-        insert(contentsOf: [newElement], at: index)
+    subscript(index: Int) -> SACMessageType {
+        return _elements[index]
     }
+    
+    
     func insert(contentsOf newElements: [SACMessageType], at index: Int) {
         
         // make affected region
@@ -35,9 +41,6 @@ class SACChatViewData: NSObject {
         _logger.trace("insert region: [\(begin) ..< \(end)], new: \(results.count), total: \(_elements.count)")
     }
     
-    func remove(at index: Int) {
-        remove(contentsOf: [index])
-    }
     func remove(contentsOf indexs: [Int]) {
         // get remove message
         let count = _elements.count
@@ -84,9 +87,6 @@ class SACChatViewData: NSObject {
         _logger.trace("remove items: \(removes), infl: [\(begin) ..< \(end)]")
     }
     
-    func update(_ newElement: SACMessageType, at index: Int) {
-        update(contentsOf: [newElement], at: [index])
-    }
     func update(contentsOf newElements: [SACMessageType], at indexs: [Int]) {
         assert(indexs.count == newElements.count, "the input element count cannot match the indexs count")
         // checkout new elements
@@ -250,6 +250,8 @@ class SACChatViewData: NSObject {
     
     private lazy var _timeInterval: TimeInterval = 60
      lazy var _elements: [SACMessageType] = []
+    
+    private weak var _chatView: SACChatView?
 }
 
 fileprivate extension SACMessageType {
