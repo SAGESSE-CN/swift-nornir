@@ -61,20 +61,62 @@ public protocol SACChatViewDelegate: class {
     open weak var dataSource: SACChatViewDataSource?
     
     func insert(_ newMessage: SACMessageType, at index: Int) {
-        insert(contentsOf: [newMessage], at: index)
+        _batchBegin()
+        _batchItems.append(.insert(newMessage, at: index))
+        _batchCommit()
     }
     func insert(contentsOf newMessages: Array<SACMessageType>, at index: Int) {
-        _chatViewData.insert(contentsOf: newMessages, at: index)
+        _batchBegin()
+        _batchItems.append(contentsOf: newMessages.map({ .insert($0, at: index) }))
+        _batchCommit()
+    }
+    
+    func update(_ newMessage: SACMessageType, at index: Int) {
+        _batchBegin()
+        _batchItems.append(.update(newMessage, at: index))
+        _batchCommit()
+    }
+    
+    func remove(at index: Int) {
+        _batchBegin()
+        _batchItems.append(.remove(at: index))
+        _batchCommit()
+    }
+    func remove(contentOf indexs: Array<Int>) {
+        _batchBegin()
+        _batchItems.append(contentsOf: indexs.map({ .remove(at: $0) }))
+        _batchCommit()
     }
     
     func append(_ newMessage: SACMessageType) {
-        append(contentsOf: [newMessage])
+        insert(newMessage, at: _chatViewData.count)
     }
     func append(contentsOf newMessages: Array<SACMessageType>) {
-       logger.debug()
-        
-        _chatViewData.insert(contentsOf: newMessages, at: -1)
+        insert(contentsOf: newMessages, at: _chatViewData.count)
     }
+    
+    fileprivate func _batchBegin() {
+        objc_sync_enter(_batchItems)
+        _batchRequiredCount = max(_batchRequiredCount + 1, 1)
+        objc_sync_exit(_batchItems)
+    }
+    fileprivate func _batchCommit() {
+        objc_sync_enter(_batchItems)
+        _batchRequiredCount = max(_batchRequiredCount - 1, 0)
+        guard _batchRequiredCount == 0 else {
+            objc_sync_exit(_batchItems)
+            return
+        }
+        let items = _batchItems
+        _batchItems.removeAll()
+        objc_sync_exit(_batchItems)
+        
+        let update = SACChatViewUpdate(model: _chatViewData, updateItems: items)
+        update.apply(with: self)
+    }
+    
+    fileprivate lazy var _batchItems: Array<SACChatViewUpdateItem> = []
+    fileprivate lazy var _batchRequiredCount: Int = 0
     
     private func _commonInit() {
         

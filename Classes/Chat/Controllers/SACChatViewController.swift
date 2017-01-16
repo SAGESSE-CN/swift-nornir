@@ -59,53 +59,51 @@ open class SACChatViewController: UIViewController {
         
         let color = UIColor(colorLiteralRed: 0xec / 0xff, green: 0xed / 0xff, blue: 0xf1 / 0xff, alpha: 1)
         
+        var datas: [SACMessageType] = []
+        
+        var tm: TimeInterval = 0
+        for alignment: SACMessageAlignment in [.left, .right] {
+            for showsAvatar: Bool in [true, false] {
+                for showsCard: Bool in [true, false] {
+                    //  time
+                    if true {
+                        let content = SACMessageTimeLineContent(date: .init(timeIntervalSinceNow: tm))
+                        let msg = SACMessage(content: content)
+                        datas.append(msg)
+                    }
+                    
+                    for contentType: Int in (0 ..< 4) {
+                        let content = { Void -> SACMessageContentType in
+                            switch contentType {
+                            case 0: return SACMessageTextContent()
+                            case 1: return SACMessageImageContent()
+                            case 2: return SACMessageVoiceContent()
+                            default: return SACMessageNoticeContent.unsupport
+                            }
+                        }()
+                        let msg = SACMessage(content: content)
+                        
+                        msg.date = .init(timeIntervalSinceNow: tm - TimeInterval(contentType) * 60)
+                        
+                        if !(content is SACMessageNoticeContent) {
+                            msg.options.style = .bubble
+                            msg.options.alignment = alignment
+                            msg.options.showsCard = showsCard
+                            msg.options.showsAvatar = showsAvatar
+                        }
+                        
+                        datas.append(msg)
+                    }
+                    
+                    tm -= 86400
+                }
+            }
+        }
+        
         _toolbar.delegate = self
         
         _chatView.backgroundColor = color
-        _chatView.append(contentsOf: {
-            var datas: [SACMessageType] = []
-            
-            var tm: TimeInterval = 0
-            for alignment: SACMessageAlignment in [.left, .right] {
-                for showsAvatar: Bool in [true, false] {
-                    for showsCard: Bool in [true, false] {
-                        //  time
-                        if true {
-                            let content = SACMessageTimeLineContent(date: .init(timeIntervalSinceNow: tm))
-                            let msg = SACMessage(content: content)
-                            datas.append(msg)
-                        }
-                        
-                        for contentType: Int in (0 ..< 4) {
-                            let content = { Void -> SACMessageContentType in
-                                switch contentType {
-                                case 0: return SACMessageTextContent()
-                                case 1: return SACMessageImageContent()
-                                case 2: return SACMessageVoiceContent()
-                                default: return SACMessageNoticeContent.unsupport
-                                }
-                            }()
-                            let msg = SACMessage(content: content)
-                            
-                            msg.date = .init(timeIntervalSinceNow: tm - TimeInterval(contentType) * 60)
-                            
-                            if !(content is SACMessageNoticeContent) {
-                                msg.options.style = .bubble
-                                msg.options.alignment = alignment
-                                msg.options.showsCard = showsCard
-                                msg.options.showsAvatar = showsAvatar
-                            }
-                            
-                            datas.append(msg)
-                        }
-                        
-                        tm -= 86400
-                    }
-                }
-            }
-            
-            return datas
-        }())
+        _chatView.append(contentsOf: datas)
         
         if let group = SACEmoticonGroup(identifier: "com.qq.classic") {
             _emoticonGroups.append(group)
