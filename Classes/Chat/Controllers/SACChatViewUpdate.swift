@@ -58,14 +58,12 @@ enum SACChatViewUpdateItem {
 
 internal class SACChatViewUpdate {
     
-    internal init(model: SACChatViewData, updateItems: Array<SACChatViewUpdateItem>) {
+    internal init(model: SACChatViewData) {
         _model = model
-        _updateItems = updateItems
-        _computeItemUpdates()
     }
     
-    internal func apply(with chatView: SACChatView) {
-        
+    internal func apply(with updateItems: Array<SACChatViewUpdateItem>, to chatView: SACChatView) {
+        _computeItemUpdates(updateItems)
     }
     
     private func _convert(message current: SACMessageType, previous: SACMessageType?) -> [SACMessageType] {
@@ -131,38 +129,6 @@ internal class SACChatViewUpdate {
         return arr as! [SACMessageType]
     }
     
-    internal func _convert(index: Int) -> Int {
-        // +n = 0 <= n <= count
-        // -n = 0 <= (count - n + 1) <= count
-        guard index < 0 else {
-            return min(index, _model.count)
-        }
-        return max(min(_model.count + index + 1, _model.count), 0)
-    }
-    internal func _convert(indexs: [Int]) -> [Int] {
-        // [] => []
-        // [1] => [1,1]
-        // [1,2] => [1,2]
-        // [1,2,4] => [1,2,4,4]
-        // [1,2,2,4] => [1,2,4,4]
-        guard !indexs.isEmpty else {
-            return []
-        }
-        // unique all index
-        let uniqued = Set(indexs).sorted()
-        // processing
-        return (1 ..< uniqued.count).reduce(([uniqued.first!, uniqued.last!], uniqued.first!)) { result, offset in
-            let cur = uniqued[offset]
-            if result.1 + 1 == cur {
-                return (result.0, cur)
-            }
-            var arr = result.0
-            arr.insert(uniqued[offset - 1], at: arr.count - 1)
-            arr.insert(uniqued[offset + 0], at: arr.count - 1)
-            return (arr, cur)
-        }.0
-    }
-    
     private func _fetch(after message: SACMessageType?) -> SACMessageType? {
         guard let content = message?.content as? SACMessageTimeLineContent else {
             return message
@@ -183,15 +149,14 @@ internal class SACChatViewUpdate {
         return _model[index]
     }
     
-    private func _computeItemUpdates() {
+    internal func _computeItemUpdates(_ updateItems: Array<SACChatViewUpdateItem>) {
         
-        var os: Array<Int> = [] // offsets
-        var vi: Array<SACChatViewUpdateItem> = [] // insert
-        var vr: Array<SACChatViewUpdateItem> = [] // remove
-        var vu: Array<SACChatViewUpdateItem> = [] // update
-        var vm: Array<SACChatViewUpdateItem> = [] // move
+        var allInserts: Array<(Int, SACMessageType)> = []
+        var allUpdates: Array<(Int, SACMessageType)> = []
+        var allRemoves: Array<(Int)> = []
+        var allMoves: Array<(Int, Int)> = []
         
-        let (first, last) = _updateItems.sorted(by: {
+        let (first, last) = updateItems.sorted(by: {
             guard let index1 = $0.indexBeforeUpdate ?? $0.indexAfterUpdate else {
                 return false
             }
@@ -200,116 +165,170 @@ internal class SACChatViewUpdate {
             }
             return index1 < index2
         }).reduce((.max, .min)) { result, item -> (Int, Int) in
-            guard let index = item.indexAfterUpdate ?? item.indexBeforeUpdate else {
-                return result
-            }
-            switch item {
-            case .move: vm.append(item)
-            case .insert: vi.append(item)
-            case .update: vu.append(item)
-            case .remove: vr.append(item)
-            }
+            
             switch item {
             case .move(let from, let to):
-                return (min(result.0, min(from, to)), max(result.1, max(from, to)))
-            default:
-                return (min(result.0, index), max(result.1, index))
+                
+                allMoves.append((from, to))
+                return (min(min(from, to), result.0), max(max(from, to) + 1, result.1))
+                
+            case .remove(let index):
+                
+                allRemoves.append((index))
+                return (min(index, result.0), max(index + 1, result.1))
+                
+            case .update(let message, let index):
+                
+                allUpdates.append((index, message))
+                return (min(index, result.0), max(index + 1, result.1))
+                
+            case .insert(let message, let index):
+                
+                allInserts.append((index, message))
+                return (min(index, result.0), max(index, result.1))
             }
         }
         
-        let begin = first - 1
-        let end = last + 1/*next*/ + 1/*offset*/
-        let count = _model.count
+        let lenght = _model.count
+        let begin = first - 1 // prev
+        let end = last + 1 // next
         
-        var vip: Int = 0
-        var vrp: Int = 0
-        var vup: Int = 0
-        var vmp: Int = 0
+        print("copyed: \(first) ..< \(last)")
+        print("affected: \(begin) ..< \(end)")
+        
+        var ii = allInserts.startIndex
+        var iu = allUpdates.startIndex
+        var ir = allRemoves.startIndex
+        var im = allMoves.startIndex
         
         // 优先级: 插入 => 删除 => 更新 => 移动
         
         var items: Array<SACMessageType> = []
-        // 复制受影响的消息
-        (max(first, 0) ... min(last, count)).forEach { index in
-            let p = index - first
-            // 插入
-            while vip < vi.count {
-                switch vi[vip] {
-                case .insert(let msg, let idx) where min(idx, end) == index:
-                    // copy ...
-                    items.append(msg)
-                    
-                default:
-                    // skip
-                    break
-                }
-                // next
-                vip += 1
+        var offsets: Array<Int> = []
+        
+        (first ... last).forEach { index in
+            
+            // inserting
+            while ii < allInserts.endIndex && allInserts[ii].0 == index {
+                items.append(allInserts[ii].1)
+                ii += 1
             }
-            guard index < count else {
+            // is end?
+            guard first < last else {
                 // auto remove
-                os.append(-1)
+                offsets.append(-1)
                 return
             }
-//            // 删除
-//            if vrp < vr.count {
-//                switch vr[vrp] {
-//                case .remove(let idx) where idx == index:
-//                    // removing ...
-//                    os.append(-1)
-//                    items.append(_model[index])
-//                    // next
-//                    vrp += 1
-//                    // can't update or copy
-//                    return
-//                    
-//                default:
-//                    break
-//                }
-//            }
-//            // 更新
-//            if vup <  vu.count {
-//                switch vu[vup] {
-//                case .update(let msg, let idx) where idx == index:
-//                    // updating ...
-//                    os.append(items.count)
-//                    items.append(msg)
-//                    // next
-//                    vup += 1
-//                    // can't copy
-//                    return
-//                    
-//                default:
-//                    break
-//                }
-//            }
-            // 复制
-            if first < last {
-                os.append(items.count)
-                items.append(_model[index])
+            // remove
+            while ir < allRemoves.endIndex && allRemoves[ir] == index {
+                // remove
+                offsets.append(-1)
+                ir += 1
+                // can't update or copy
+                return 
             }
+            // update
+            while iu < allUpdates.endIndex && allUpdates[iu].0 == index {
+                // remove
+                offsets.append(items.count)
+                items.append(allUpdates[iu].1)
+                iu += 1
+                // can't update or copy
+                return
+            }
+            // copy
+            offsets.append(items.count)
+            items.append(_model[index])
         }
-        // 移动消息
         
-        
-//        let (first, last) = _updateItems.reduce(()) {
-//            switch $1 {
-//            case .
+//        var vip: Int = 0
+//        var vrp: Int = 0
+//        var vup: Int = 0
+//        var vmp: Int = 0
+//        
+//        // 优先级: 插入 => 删除 => 更新 => 移动
+//        
+//        var items: Array<SACMessageType> = []
+//        // 复制受影响的消息
+//        (max(first, 0) ... min(last, count)).forEach { index in
+//            let p = index - first
+//            // 插入
+//            while vip < vi.count {
+//                switch vi[vip] {
+//                case .insert(let msg, let idx) where min(idx, end) == index:
+//                    // copy ...
+//                    items.append(msg)
+//                    
+//                default:
+//                    // skip
+//                    break
+//                }
+//                // next
+//                vip += 1
 //            }
-//            return $0
+//            guard index < count else {
+//                // auto remove
+//                os.append(-1)
+//                return
+//            }
+////            // 删除
+////            if vrp < vr.count {
+////                switch vr[vrp] {
+////                case .remove(let idx) where idx == index:
+////                    // removing ...
+////                    os.append(-1)
+////                    items.append(_model[index])
+////                    // next
+////                    vrp += 1
+////                    // can't update or copy
+////                    return
+////                    
+////                default:
+////                    break
+////                }
+////            }
+////            // 更新
+////            if vup <  vu.count {
+////                switch vu[vup] {
+////                case .update(let msg, let idx) where idx == index:
+////                    // updating ...
+////                    os.append(items.count)
+////                    items.append(msg)
+////                    // next
+////                    vup += 1
+////                    // can't copy
+////                    return
+////                    
+////                default:
+////                    break
+////                }
+////            }
+//            // 复制
+//            if first < last {
+//                os.append(items.count)
+//                items.append(_model[index])
+//            }
 //        }
-        
-        
+//        // 移动消息
+//        
+//        
+////        let (first, last) = _updateItems.reduce(()) {
+////            switch $1 {
+////            case .
+////            }
+////            return $0
+////        }
+//        
+//        
         // convert messages and replace specify message
         let newElements = items as? [SACMessageType] ?? []
         let results = _convert(messages: newElements, first: _element(at: begin), last: _element(at: end - 1))
-        _model.replaceSubrange(max(begin, 0) ..< min(end, count), with: results)
+        _model.replaceSubrange(max(begin, 0) ..< min(end, lenght), with: results)
     }
     
     private var _timeInterval: TimeInterval = 60
 
     private var _model: SACChatViewData
-    private var _updateItems: Array<SACChatViewUpdateItem>
 }
 
 fileprivate extension SACMessageType {

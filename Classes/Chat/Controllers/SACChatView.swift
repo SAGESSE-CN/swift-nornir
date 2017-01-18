@@ -111,8 +111,8 @@ public protocol SACChatViewDelegate: class {
         _batchItems.removeAll()
         objc_sync_exit(_batchItems)
         
-        let update = SACChatViewUpdate(model: _chatViewData, updateItems: items)
-        update.apply(with: self)
+        let update = SACChatViewUpdate(model: _chatViewData)
+        update.apply(with: items, to: self)
     }
     
     fileprivate lazy var _batchItems: Array<SACChatViewUpdateItem> = []

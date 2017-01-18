@@ -52,137 +52,144 @@ class SACChatViewDataTests: XCTestCase {
     
     func testInsert() {
         
+        // 初次添加
+        let ad1 = SACChatViewData()
+        let ade1 = ad1._elements
+        let up1 = SACChatViewUpdate(model: ad1)
         
-//        // 初次添加
-//        let ad1 = SACChatViewData()
-//        let _ = SACChatViewUpdate(model: ad1, updateItems: [
-//            .insert(m1, at: 0),
-//        ])
-//        XCTAssert(ad1.count == 2, "insert error")
-//        XCTAssert(ad1._element(at: 0)?.content is SACMessageTimeLineContent)
-//        XCTAssert(ad1._element(at: 1) === m1)
-//        
-//        let ad2 = SACChatViewData()
-//        let _ = SACChatViewUpdate(model: ad2, updateItems: [
-//            .insert(m1, at: 0),
-//            .insert(m2, at: 0),
-//        ])
-//        XCTAssert(ad2.count == 3, "insert error")
-//        XCTAssert(ad2._element(at: 0)?.content is SACMessageTimeLineContent)
-//        XCTAssert(ad2._element(at: 1) === m1)
-//        XCTAssert(ad2._element(at: 2) === m2)
-//        
-//        let ad3 = SACChatViewData()
-//        let _ = SACChatViewUpdate(model: ad3, updateItems: [
-//            .insert(m1, at: 0),
-//            .insert(m3, at: 0),
-//        ])
-//        XCTAssert(ad3.count == 4, "insert error!")
-//        XCTAssert(ad3._element(at: 0)?.content is SACMessageTimeLineContent)
-//        XCTAssert(ad3._element(at: 1) === m1)
-//        XCTAssert(ad3._element(at: 2)?.content is SACMessageTimeLineContent)
-//        XCTAssert(ad3._element(at: 3) === m3)
-//        
+        // head
+        ad1._elements = ade1
+        up1._computeItemUpdates([
+            .insert(m1, at: 0),
+        ])
+        XCTAssert(ad1.count == 2, "insert error")
+        XCTAssert(ad1._element(at: 0)?.content is SACMessageTimeLineContent)
+        XCTAssert(ad1._element(at: 1) === m1)
+        
+        // mid
+        ad1._elements = ade1
+        up1._computeItemUpdates([
+            .insert(m1, at: 0),
+            .insert(m2, at: 0),
+        ])
+        XCTAssert(ad1.count == 3, "insert error")
+        XCTAssert(ad1._element(at: 0)?.content is SACMessageTimeLineContent)
+        XCTAssert(ad1._element(at: 1) === m1)
+        XCTAssert(ad1._element(at: 2) === m2)
+        
+        // last
+        ad1._elements = ade1
+        up1._computeItemUpdates([
+            .insert(m1, at: 0),
+            .insert(m3, at: 0),
+        ])
+        XCTAssert(ad1.count == 4, "insert error!")
+        XCTAssert(ad1._element(at: 0)?.content is SACMessageTimeLineContent)
+        XCTAssert(ad1._element(at: 1) === m1)
+        XCTAssert(ad1._element(at: 2)?.content is SACMessageTimeLineContent)
+        XCTAssert(ad1._element(at: 3) === m3)
+        
         // 增量添加
         let ad4 = SACChatViewData()
-        let _ = SACChatViewUpdate(model: ad4, updateItems: [
+        let up4 = SACChatViewUpdate(model: ad4)
+        up4._computeItemUpdates([
             .insert(m1, at: 0),
         ])
         let ade4 = ad4._elements
         XCTAssert(ad4.count == 2, "insert error!")
         XCTAssert(ad4._element(at: 0)?.content is SACMessageTimeLineContent)
         XCTAssert(ad4._element(at: 1) === m1)
-//
-//        ad4._elements = ade4
-//        let _ = SACChatViewUpdate(model: ad4, updateItems: [
-//            .insert(m2, at: ad4.count),
-//        ])
-//        XCTAssert(ad4.count == 3, "insert error!")
-//        XCTAssert(ad4._element(at: 0)?.content is SACMessageTimeLineContent)
-//        XCTAssert(ad4._element(at: 1) === m1)
-//        XCTAssert(ad4._element(at: 2) === m2)
-//        
-//        ad4._elements = ade4
-//        let _ = SACChatViewUpdate(model: ad4, updateItems: [
-//            .insert(m2, at: ad4.count),
-//        ])
-//        XCTAssert(ad4.count == 3, "insert error!")
-//        XCTAssert(ad4._element(at: 0)?.content is SACMessageTimeLineContent)
-//        XCTAssert(ad4._element(at: 1) === m1)
-//        XCTAssert(ad4._element(at: 2) === m2)
-//        let _ = SACChatViewUpdate(model: ad4, updateItems: [
-//            .insert(m2, at: 2),
-//        ])
-//        XCTAssert(ad4.count == 4, "insert error!")
-//        XCTAssert(ad4._element(at: 0)?.content is SACMessageTimeLineContent)
-//        XCTAssert(ad4._element(at: 1) === m1)
-//        XCTAssert(ad4._element(at: 2) === m2)
-//        XCTAssert(ad4._element(at: 3) === m2)
+
+        ad4._elements = ade4
+        up4._computeItemUpdates([
+            .insert(m2, at: ad4.count),
+        ])
+        XCTAssert(ad4.count == 3, "insert error!")
+        XCTAssert(ad4._element(at: 0)?.content is SACMessageTimeLineContent)
+        XCTAssert(ad4._element(at: 1) === m1)
+        XCTAssert(ad4._element(at: 2) === m2)
         
         ad4._elements = ade4
-        let _ = SACChatViewUpdate(model: ad4, updateItems: [
+        up4._computeItemUpdates([
+            .insert(m2, at: ad4.count),
+        ])
+        XCTAssert(ad4.count == 3, "insert error!")
+        XCTAssert(ad4._element(at: 0)?.content is SACMessageTimeLineContent)
+        XCTAssert(ad4._element(at: 1) === m1)
+        XCTAssert(ad4._element(at: 2) === m2)
+        up4._computeItemUpdates([
+            .insert(m2, at: 2),
+        ])
+        XCTAssert(ad4.count == 4, "insert error!")
+        XCTAssert(ad4._element(at: 0)?.content is SACMessageTimeLineContent)
+        XCTAssert(ad4._element(at: 1) === m1)
+        XCTAssert(ad4._element(at: 2) === m2)
+        XCTAssert(ad4._element(at: 3) === m2)
+        
+        ad4._elements = ade4
+        up4._computeItemUpdates([
             .insert(m2, at: 0),
         ])
         XCTAssert(ad4.count == 3, "insert error!")
         XCTAssert(ad4._element(at: 0)?.content is SACMessageTimeLineContent)
         XCTAssert(ad4._element(at: 1) === m2)
         XCTAssert(ad4._element(at: 2) === m1)
-//
-//        ad4._elements = ade4
-//        let _ = SACChatViewUpdate(model: ad4, updateItems: [
-//            .insert(m4, at: 0),
-//        ])
-//        XCTAssert(ad4.count == 4, "insert error!")
-//        XCTAssert(ad4._element(at: 0)?.content is SACMessageTimeLineContent)
-//        XCTAssert(ad4._element(at: 1) === m4)
-//        XCTAssert(ad4._element(at: 2)?.content is SACMessageTimeLineContent)
-//        XCTAssert(ad4._element(at: 3) === m1)
-//        
-//        ad4._elements = ade4
-//        let _ = SACChatViewUpdate(model: ad4, updateItems: [
-//            .insert(m4, at: ad4.count),
-//        ])
-//        XCTAssert(ad4.count == 4, "insert error!")
-//        XCTAssert(ad4._element(at: 0)?.content is SACMessageTimeLineContent)
-//        XCTAssert(ad4._element(at: 1) === m1)
-//        XCTAssert(ad4._element(at: 2)?.content is SACMessageTimeLineContent)
-//        XCTAssert(ad4._element(at: 3) === m4)
-//        
-//        ad4._elements = ade4
-//        let _ = SACChatViewUpdate(model: ad4, updateItems: [
-//            .insert(m3, at: 2),
-//        ])
-//        XCTAssert(ad4.count == 4, "insert error!")
-//        XCTAssert(ad4._element(at: 0)?.content is SACMessageTimeLineContent)
-//        XCTAssert(ad4._element(at: 1) === m1)
-//        XCTAssert(ad4._element(at: 2)?.content is SACMessageTimeLineContent)
-//        XCTAssert(ad4._element(at: 3) === m3)
-//        let _ = SACChatViewUpdate(model: ad4, updateItems: [
-//            .insert(m2, at: 2),
-//        ])
-//        XCTAssert(ad4.count == 4, "insert error!")
-//        XCTAssert(ad4._element(at: 0)?.content is SACMessageTimeLineContent)
-//        XCTAssert(ad4._element(at: 1) === m1)
-//        XCTAssert(ad4._element(at: 2) === m2)
-//        XCTAssert(ad4._element(at: 3) === m3)
-//        
-//        ad4._elements = ade4
-//        let _ = SACChatViewUpdate(model: ad4, updateItems: [
-//            .insert(m2, at: 2),
-//        ])
-//        XCTAssert(ad4.count == 3, "insert error!")
-//        XCTAssert(ad4._element(at: 0)?.content is SACMessageTimeLineContent)
-//        XCTAssert(ad4._element(at: 1) === m1)
-//        XCTAssert(ad4._element(at: 2) === m2)
-//        let _ = SACChatViewUpdate(model: ad4, updateItems: [
-//            .insert(m3, at: 2),
-//        ])
-//        XCTAssert(ad4.count == 5, "insert error!")
-//        XCTAssert(ad4._element(at: 0)?.content is SACMessageTimeLineContent)
-//        XCTAssert(ad4._element(at: 1) === m1)
-//        XCTAssert(ad4._element(at: 2)?.content is SACMessageTimeLineContent)
-//        XCTAssert(ad4._element(at: 3) === m3)
-//        XCTAssert(ad4._element(at: 4) === m2)
+
+        ad4._elements = ade4
+        up4._computeItemUpdates([
+            .insert(m4, at: 0),
+        ])
+        XCTAssert(ad4.count == 4, "insert error!")
+        XCTAssert(ad4._element(at: 0)?.content is SACMessageTimeLineContent)
+        XCTAssert(ad4._element(at: 1) === m4)
+        XCTAssert(ad4._element(at: 2)?.content is SACMessageTimeLineContent)
+        XCTAssert(ad4._element(at: 3) === m1)
+        
+        ad4._elements = ade4
+        up4._computeItemUpdates([
+            .insert(m4, at: ad4.count),
+        ])
+        XCTAssert(ad4.count == 4, "insert error!")
+        XCTAssert(ad4._element(at: 0)?.content is SACMessageTimeLineContent)
+        XCTAssert(ad4._element(at: 1) === m1)
+        XCTAssert(ad4._element(at: 2)?.content is SACMessageTimeLineContent)
+        XCTAssert(ad4._element(at: 3) === m4)
+        
+        ad4._elements = ade4
+        up4._computeItemUpdates([
+            .insert(m3, at: 2),
+        ])
+        XCTAssert(ad4.count == 4, "insert error!")
+        XCTAssert(ad4._element(at: 0)?.content is SACMessageTimeLineContent)
+        XCTAssert(ad4._element(at: 1) === m1)
+        XCTAssert(ad4._element(at: 2)?.content is SACMessageTimeLineContent)
+        XCTAssert(ad4._element(at: 3) === m3)
+        up4._computeItemUpdates([
+            .insert(m2, at: 2),
+        ])
+        XCTAssert(ad4.count == 4, "insert error!")
+        XCTAssert(ad4._element(at: 0)?.content is SACMessageTimeLineContent)
+        XCTAssert(ad4._element(at: 1) === m1)
+        XCTAssert(ad4._element(at: 2) === m2)
+        XCTAssert(ad4._element(at: 3) === m3)
+        
+        ad4._elements = ade4
+        up4._computeItemUpdates([
+            .insert(m2, at: 2),
+        ])
+        XCTAssert(ad4.count == 3, "insert error!")
+        XCTAssert(ad4._element(at: 0)?.content is SACMessageTimeLineContent)
+        XCTAssert(ad4._element(at: 1) === m1)
+        XCTAssert(ad4._element(at: 2) === m2)
+        up4._computeItemUpdates([
+            .insert(m3, at: 2),
+        ])
+        XCTAssert(ad4.count == 5, "insert error!")
+        XCTAssert(ad4._element(at: 0)?.content is SACMessageTimeLineContent)
+        XCTAssert(ad4._element(at: 1) === m1)
+        XCTAssert(ad4._element(at: 2)?.content is SACMessageTimeLineContent)
+        XCTAssert(ad4._element(at: 3) === m3)
+        XCTAssert(ad4._element(at: 4) === m2)
     }
 //    func testRemove() {
 //        
