@@ -160,15 +160,8 @@ internal class SACChatViewUpdate {
         var allRemoves: Array<(Int)> = []
         var allMoves: Array<(Int, Int)> = []
         
-        let (first, last) = updateItems.sorted(by: {
-            guard let index1 = $0.indexBeforeUpdate ?? $0.indexAfterUpdate else {
-                return false
-            }
-            guard let index2 = $1.indexBeforeUpdate ?? $1.indexAfterUpdate else {
-                return false
-            }
-            return index1 < index2
-        }).reduce((.max, .min)) { result, item -> (Int, Int) in
+        // get max & min
+        let (first, last) = updateItems.reduce((.max, .min)) { result, item -> (Int, Int) in
             
             switch item {
             case .move(let from, let to):
@@ -192,6 +185,11 @@ internal class SACChatViewUpdate {
                 return (min(index, result.0), max(index, result.1))
             }
         }
+        // sort
+        allInserts.sort { $0.0 < $1.0 }
+        allUpdates.sort { $0.0 < $1.0 }
+        allRemoves.sort { $0 < $1 }
+        allMoves.sort { $0.0 < $1.0 }
         
         let count = _model.count
         let begin = first - 1 // prev
@@ -202,25 +200,25 @@ internal class SACChatViewUpdate {
         var ir = allRemoves.startIndex
         var im = allMoves.startIndex
         
-        // 优先级: 插入 => 删除 => 更新 => 移动
+        // priority: insert > remove > update > move
         
         var items: Array<SACMessageType> = []
         var offsets: Array<Int> = []
         
+        // processing
         (first ... last).forEach { index in
-            
-            // inserting
+            // do you need to insert the operation?
             while ii < allInserts.endIndex && allInserts[ii].0 == index {
                 items.append(allInserts[ii].1)
                 ii += 1
             }
-            // is end?
+            // do you need to do this?
             guard index < last && index < count else {
-                // auto remove
+                // no auto remove
                 offsets.append(-1)
                 return
             }
-            // removing
+            // do you need to remove the operation?
             while ir < allRemoves.endIndex && allRemoves[ir] == index {
                 // removing
                 offsets.append(-1)
@@ -231,11 +229,14 @@ internal class SACChatViewUpdate {
                 if let content = _element(at: index + 1)?.content as? SACMessageTimeLineContent {
                     content.before = nil
                 }
-                ir += 1
+                // move to next operator(prevent repeat operation)
+                while ir < allRemoves.endIndex && allRemoves[ir] == index {
+                    ir += 1
+                }
                 // can't update or copy
                 return 
             }
-            // updating
+            // do you need to update the operation?
             while iu < allUpdates.endIndex && allUpdates[iu].0 == index {
                 let message = allUpdates[iu].1
                 // updating
@@ -248,7 +249,10 @@ internal class SACChatViewUpdate {
                 if let content = _element(at: index + 1)?.content as? SACMessageTimeLineContent {
                     content.before = message
                 }
-                iu += 1
+                // move to next operator(prevent repeat operation)
+                while iu < allUpdates.endIndex && allUpdates[iu].0 == index {
+                    iu += 1
+                }
                 // can't copy
                 return
             }
@@ -256,7 +260,6 @@ internal class SACChatViewUpdate {
             offsets.append(items.count)
             items.append(_model[index])
         }
-        
         // convert messages and replace specify message
         let newElements = items as? [SACMessageType] ?? []
         let results = _convert(messages: newElements, first: _element(at: begin), last: _element(at: end - 1))
