@@ -197,9 +197,6 @@ internal class SACChatViewUpdate {
         let begin = first - 1 // prev
         let end = last + 1 // next
         
-        print("copyed: \(first) ..< \(last)")
-        print("affected: \(begin) ..< \(end)")
-        
         var ii = allInserts.startIndex
         var iu = allUpdates.startIndex
         var ir = allRemoves.startIndex
