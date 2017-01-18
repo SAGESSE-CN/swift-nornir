@@ -172,22 +172,22 @@ internal class SACChatViewUpdate {
             
             switch item {
             case .move(let from, let to):
-                
+                // move message
                 allMoves.append((from, to))
                 return (min(min(from, to), result.0), max(max(from, to) + 1, result.1))
                 
             case .remove(let index):
-                
+                // remove message
                 allRemoves.append((index))
                 return (min(index, result.0), max(index + 1, result.1))
                 
             case .update(let message, let index):
-                
+                // update message
                 allUpdates.append((index, message))
                 return (min(index, result.0), max(index + 1, result.1))
                 
             case .insert(let message, let index):
-                
+                // insert message
                 allInserts.append((index, message))
                 return (min(index, result.0), max(index, result.1))
             }
@@ -223,9 +223,9 @@ internal class SACChatViewUpdate {
                 offsets.append(-1)
                 return
             }
-            // remove
+            // removing
             while ir < allRemoves.endIndex && allRemoves[ir] == index {
-                // remove
+                // removing
                 offsets.append(-1)
                 // adjust previous tl-message & next tl-message, if needed
                 if let content = _element(at: index - 1)?.content as? SACMessageTimeLineContent {
@@ -238,10 +238,10 @@ internal class SACChatViewUpdate {
                 // can't update or copy
                 return 
             }
-            // update
+            // updating
             while iu < allUpdates.endIndex && allUpdates[iu].0 == index {
                 let message = allUpdates[iu].1
-                // update
+                // updating
                 offsets.append(items.count)
                 items.append(message)
                 // adjust previous tl-message & next tl-message, if needed
@@ -260,85 +260,6 @@ internal class SACChatViewUpdate {
             items.append(_model[index])
         }
         
-//        var vip: Int = 0
-//        var vrp: Int = 0
-//        var vup: Int = 0
-//        var vmp: Int = 0
-//        
-//        // 优先级: 插入 => 删除 => 更新 => 移动
-//        
-//        var items: Array<SACMessageType> = []
-//        // 复制受影响的消息
-//        (max(first, 0) ... min(last, count)).forEach { index in
-//            let p = index - first
-//            // 插入
-//            while vip < vi.count {
-//                switch vi[vip] {
-//                case .insert(let msg, let idx) where min(idx, end) == index:
-//                    // copy ...
-//                    items.append(msg)
-//                    
-//                default:
-//                    // skip
-//                    break
-//                }
-//                // next
-//                vip += 1
-//            }
-//            guard index < count else {
-//                // auto remove
-//                os.append(-1)
-//                return
-//            }
-////            // 删除
-////            if vrp < vr.count {
-////                switch vr[vrp] {
-////                case .remove(let idx) where idx == index:
-////                    // removing ...
-////                    os.append(-1)
-////                    items.append(_model[index])
-////                    // next
-////                    vrp += 1
-////                    // can't update or copy
-////                    return
-////                    
-////                default:
-////                    break
-////                }
-////            }
-////            // 更新
-////            if vup <  vu.count {
-////                switch vu[vup] {
-////                case .update(let msg, let idx) where idx == index:
-////                    // updating ...
-////                    os.append(items.count)
-////                    items.append(msg)
-////                    // next
-////                    vup += 1
-////                    // can't copy
-////                    return
-////                    
-////                default:
-////                    break
-////                }
-////            }
-//            // 复制
-//            if first < last {
-//                os.append(items.count)
-//                items.append(_model[index])
-//            }
-//        }
-//        // 移动消息
-//        
-//        
-////        let (first, last) = _updateItems.reduce(()) {
-////            switch $1 {
-////            case .
-////            }
-////            return $0
-////        }
-//        
-//        
         // convert messages and replace specify message
         let newElements = items as? [SACMessageType] ?? []
         let results = _convert(messages: newElements, first: _element(at: begin), last: _element(at: end - 1))
