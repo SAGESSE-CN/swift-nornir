@@ -428,180 +428,239 @@ class SACChatViewDataTests: XCTestCase {
         XCTAssert(rd2._element(at: 4) === m3)
     }
     
-//    func testUpdate() {
-//        
-//        let ud1 = SACChatViewData()
-//        ud1.insert(contentsOf: [m1,m2,m3,m4], at: 0)
-//        let ude1 = ud1._elements
-//        XCTAssert(ud1.count == 6, "insert error!")
-//        XCTAssert(ud1._element(at: 0)?.content is SACMessageTimeLineContent)
-//        XCTAssert(ud1._element(at: 1) === m1)
-//        XCTAssert(ud1._element(at: 2) === m2)
-//        XCTAssert(ud1._element(at: 3) === m3)
-//        XCTAssert(ud1._element(at: 4)?.content is SACMessageTimeLineContent)
-//        XCTAssert(ud1._element(at: 5) === m4)
-//        
-//        // 普通更新
-//        ud1._elements = ude1
-//        ud1.update(contentsOf: [m2], at: [0]) // 普通更新(头)
-//        XCTAssert(ud1.count == 7, "update error!")
-//        XCTAssert(ud1._element(at: 0)?.content is SACMessageTimeLineContent)
-//        XCTAssert(ud1._element(at: 1) === m2)
-//        XCTAssert(ud1._element(at: 2) === m1)
-//        XCTAssert(ud1._element(at: 3) === m2)
-//        XCTAssert(ud1._element(at: 4) === m3)
-//        XCTAssert(ud1._element(at: 5)?.content is SACMessageTimeLineContent)
-//        XCTAssert(ud1._element(at: 6) === m4)
-//        
-//        ud1._elements = ude1
-//        ud1.update(contentsOf: [m4], at: [2]) // 普通更新(中)
-//        XCTAssert(ud1.count == 8, "update error!")
-//        XCTAssert(ud1._element(at: 0)?.content is SACMessageTimeLineContent)
-//        XCTAssert(ud1._element(at: 1) === m1)
-//        XCTAssert(ud1._element(at: 2)?.content is SACMessageTimeLineContent)
-//        XCTAssert(ud1._element(at: 3) === m4)
-//        XCTAssert(ud1._element(at: 4)?.content is SACMessageTimeLineContent)
-//        XCTAssert(ud1._element(at: 5) === m3)
-//        XCTAssert(ud1._element(at: 6)?.content is SACMessageTimeLineContent)
-//        XCTAssert(ud1._element(at: 7) === m4)
-//        
-//        ud1._elements = ude1
-//        ud1.update(contentsOf: [m3], at: [5]) // 普通更新(尾)
-//        XCTAssert(ud1.count == 5, "update error!")
-//        XCTAssert(ud1._element(at: 0)?.content is SACMessageTimeLineContent)
-//        XCTAssert(ud1._element(at: 1) === m1)
-//        XCTAssert(ud1._element(at: 2) === m2)
-//        XCTAssert(ud1._element(at: 3) === m3)
-//        XCTAssert(ud1._element(at: 4) === m3)
-//        
-//        let ud2 = SACChatViewData()
-//        ud2.insert(contentsOf: [m1,m1,m2,m2,m3,m3,m4,m4], at: 0)
-//        let ude2 = ud2._elements
-//        XCTAssert(ud2.count == 10, "insert error!")
-//        XCTAssert(ud2._element(at: 0)?.content is SACMessageTimeLineContent)
-//        XCTAssert(ud2._element(at: 1) === m1)
-//        XCTAssert(ud2._element(at: 2) === m1)
-//        XCTAssert(ud2._element(at: 3) === m2)
-//        XCTAssert(ud2._element(at: 4) === m2)
-//        XCTAssert(ud2._element(at: 5) === m3)
-//        XCTAssert(ud2._element(at: 6) === m3)
-//        XCTAssert(ud2._element(at: 7)?.content is SACMessageTimeLineContent)
-//        XCTAssert(ud2._element(at: 8) === m4)
-//        XCTAssert(ud2._element(at: 9) === m4)
-//        
-//        // 连续更新
-//        ud2._elements = ude2
-//        ud2.update(contentsOf: [], at: []) // 连续更新(空)
-//        XCTAssert(ud2.count == 10, "update error!")
-//        XCTAssert(ud2._element(at: 0)?.content is SACMessageTimeLineContent)
-//        XCTAssert(ud2._element(at: 1) === m1)
-//        XCTAssert(ud2._element(at: 2) === m1)
-//        XCTAssert(ud2._element(at: 3) === m2)
-//        XCTAssert(ud2._element(at: 4) === m2)
-//        XCTAssert(ud2._element(at: 5) === m3)
-//        XCTAssert(ud2._element(at: 6) === m3)
-//        XCTAssert(ud2._element(at: 7)?.content is SACMessageTimeLineContent)
-//        XCTAssert(ud2._element(at: 8) === m4)
-//        XCTAssert(ud2._element(at: 9) === m4)
-//        
-//        ud2._elements = ude2
-//        ud2.update(contentsOf: [m4,m4,m4], at: [0,1,2]) // 连续更新(头)
-//        XCTAssert(ud2.count == 12, "update error!")
-//        XCTAssert(ud2._element(at: 0)?.content is SACMessageTimeLineContent)
-//        XCTAssert(ud2._element(at: 1) === m4)
-//        XCTAssert(ud2._element(at: 2) === m4)
-//        XCTAssert(ud2._element(at: 3) === m4)
-//        XCTAssert(ud2._element(at: 4)?.content is SACMessageTimeLineContent)
-//        XCTAssert(ud2._element(at: 5) === m2)
-//        XCTAssert(ud2._element(at: 6) === m2)
-//        XCTAssert(ud2._element(at: 7) === m3)
-//        XCTAssert(ud2._element(at: 8) === m3)
-//        XCTAssert(ud2._element(at: 9)?.content is SACMessageTimeLineContent)
-//        XCTAssert(ud2._element(at: 10) === m4)
-//        XCTAssert(ud2._element(at: 11) === m4)
-//        
-//        ud2._elements = ude2
-//        ud2.update(contentsOf: [m4,m4,m4,m4], at: [2,3,4,5]) // 连续更新(中)
-//        XCTAssert(ud2.count == 12, "update error!")
-//        XCTAssert(ud2._element(at: 0)?.content is SACMessageTimeLineContent)
-//        XCTAssert(ud2._element(at: 1) === m1)
-//        XCTAssert(ud2._element(at: 2)?.content is SACMessageTimeLineContent)
-//        XCTAssert(ud2._element(at: 3) === m4)
-//        XCTAssert(ud2._element(at: 4) === m4)
-//        XCTAssert(ud2._element(at: 5) === m4)
-//        XCTAssert(ud2._element(at: 6) === m4)
-//        XCTAssert(ud2._element(at: 7)?.content is SACMessageTimeLineContent)
-//        XCTAssert(ud2._element(at: 8) === m3)
-//        XCTAssert(ud2._element(at: 9)?.content is SACMessageTimeLineContent)
-//        XCTAssert(ud2._element(at: 10) === m4)
-//        XCTAssert(ud2._element(at: 11) === m4)
-//       
-//        ud2._elements = ude2
-//        ud2.update(contentsOf: [m1,m1,m1,m1], at: [6,7,8,9]) // 连续更新(尾)
-//        XCTAssert(ud2.count == 11, "update error!")
-//        XCTAssert(ud2._element(at: 0)?.content is SACMessageTimeLineContent)
-//        XCTAssert(ud2._element(at: 1) === m1)
-//        XCTAssert(ud2._element(at: 2) === m1)
-//        XCTAssert(ud2._element(at: 3) === m2)
-//        XCTAssert(ud2._element(at: 4) === m2)
-//        XCTAssert(ud2._element(at: 5) === m3)
-//        XCTAssert(ud2._element(at: 6)?.content is SACMessageTimeLineContent)
-//        XCTAssert(ud2._element(at: 7) === m1)
-//        XCTAssert(ud2._element(at: 8) === m1)
-//        XCTAssert(ud2._element(at: 9) === m1)
-//        XCTAssert(ud2._element(at: 10) === m1)
-//        
-//        // 随机更新
-//        ud2._elements = ude2
-//        ud2.update(contentsOf: [m4,m4,m4], at: [0,3,4]) // 随机更新(头)
-//        XCTAssert(ud2.count == 14, "update error!")
-//        XCTAssert(ud2._element(at: 0)?.content is SACMessageTimeLineContent)
-//        XCTAssert(ud2._element(at: 1) === m4)
-//        XCTAssert(ud2._element(at: 2)?.content is SACMessageTimeLineContent)
-//        XCTAssert(ud2._element(at: 3) === m1)
-//        XCTAssert(ud2._element(at: 4) === m1)
-//        XCTAssert(ud2._element(at: 5)?.content is SACMessageTimeLineContent)
-//        XCTAssert(ud2._element(at: 6) === m4)
-//        XCTAssert(ud2._element(at: 7) === m4)
-//        XCTAssert(ud2._element(at: 8)?.content is SACMessageTimeLineContent)
-//        XCTAssert(ud2._element(at: 9) === m3)
-//        XCTAssert(ud2._element(at: 10) === m3)
-//        XCTAssert(ud2._element(at: 11)?.content is SACMessageTimeLineContent)
-//        XCTAssert(ud2._element(at: 12) === m4)
-//        XCTAssert(ud2._element(at: 13) === m4)
-//        
-//        ud2._elements = ude2
-//        ud2.update(contentsOf: [m3,m3,m3,m3], at: [2,3,6,7]) // 随机更新(中)
-//        XCTAssert(ud2.count == 12, "update error!")
-//        XCTAssert(ud2._element(at: 0)?.content is SACMessageTimeLineContent)
-//        XCTAssert(ud2._element(at: 1) === m1)
-//        XCTAssert(ud2._element(at: 2)?.content is SACMessageTimeLineContent)
-//        XCTAssert(ud2._element(at: 3) === m3)
-//        XCTAssert(ud2._element(at: 4) === m3)
-//        XCTAssert(ud2._element(at: 5) === m2)
-//        XCTAssert(ud2._element(at: 6) === m3)
-//        XCTAssert(ud2._element(at: 7) === m3)
-//        XCTAssert(ud2._element(at: 8) === m3)
-//        XCTAssert(ud2._element(at: 9)?.content is SACMessageTimeLineContent)
-//        XCTAssert(ud2._element(at: 10) === m4)
-//        XCTAssert(ud2._element(at: 11) === m4)
-//        
-//        ud2._elements = ude2
-//        ud2.update(contentsOf: [m4,m4,m3,m3], at: [4,5,8,9]) // 随机更新(尾)
-//        XCTAssert(ud2.count == 11, "update error!")
-//        XCTAssert(ud2._element(at: 0)?.content is SACMessageTimeLineContent)
-//        XCTAssert(ud2._element(at: 1) === m1)
-//        XCTAssert(ud2._element(at: 2) === m1)
-//        XCTAssert(ud2._element(at: 3) === m2)
-//        XCTAssert(ud2._element(at: 4)?.content is SACMessageTimeLineContent)
-//        XCTAssert(ud2._element(at: 5) === m4)
-//        XCTAssert(ud2._element(at: 6) === m4)
-//        XCTAssert(ud2._element(at: 7)?.content is SACMessageTimeLineContent)
-//        XCTAssert(ud2._element(at: 8) === m3)
-//        XCTAssert(ud2._element(at: 9) === m3)
-//        XCTAssert(ud2._element(at: 10) === m3)
-//    }
-//    
+    func testUpdate() {
+        
+        let ud1 = SACChatViewData()
+        let up1 = SACChatViewUpdate(model: ud1)
+        up1._computeItemUpdates([
+            .insert(m1, at: 0),
+            .insert(m2, at: 0),
+            .insert(m3, at: 0),
+            .insert(m4, at: 0),
+        ])
+        let ude1 = ud1._elements
+        XCTAssert(ud1.count == 6, "insert error!")
+        XCTAssert(ud1._element(at: 0)?.content is SACMessageTimeLineContent)
+        XCTAssert(ud1._element(at: 1) === m1)
+        XCTAssert(ud1._element(at: 2) === m2)
+        XCTAssert(ud1._element(at: 3) === m3)
+        XCTAssert(ud1._element(at: 4)?.content is SACMessageTimeLineContent)
+        XCTAssert(ud1._element(at: 5) === m4)
+        
+        // 普通更新(头)
+        ud1._elements = ude1
+        up1._computeItemUpdates([
+            .update(m2, at: 0),
+        ])
+        XCTAssert(ud1.count == 7, "update error!")
+        XCTAssert(ud1._element(at: 0)?.content is SACMessageTimeLineContent)
+        XCTAssert(ud1._element(at: 1) === m2)
+        XCTAssert(ud1._element(at: 2) === m1)
+        XCTAssert(ud1._element(at: 3) === m2)
+        XCTAssert(ud1._element(at: 4) === m3)
+        XCTAssert(ud1._element(at: 5)?.content is SACMessageTimeLineContent)
+        XCTAssert(ud1._element(at: 6) === m4)
+        
+        // 普通更新(中)
+        ud1._elements = ude1
+        up1._computeItemUpdates([
+            .update(m4, at: 2),
+        ])
+        XCTAssert(ud1.count == 8, "update error!")
+        XCTAssert(ud1._element(at: 0)?.content is SACMessageTimeLineContent)
+        XCTAssert(ud1._element(at: 1) === m1)
+        XCTAssert(ud1._element(at: 2)?.content is SACMessageTimeLineContent)
+        XCTAssert(ud1._element(at: 3) === m4)
+        XCTAssert(ud1._element(at: 4)?.content is SACMessageTimeLineContent)
+        XCTAssert(ud1._element(at: 5) === m3)
+        XCTAssert(ud1._element(at: 6)?.content is SACMessageTimeLineContent)
+        XCTAssert(ud1._element(at: 7) === m4)
+        
+        // 普通更新(尾)
+        ud1._elements = ude1
+        up1._computeItemUpdates([
+            .update(m3, at: 5),
+        ])
+        XCTAssert(ud1.count == 5, "update error!")
+        XCTAssert(ud1._element(at: 0)?.content is SACMessageTimeLineContent)
+        XCTAssert(ud1._element(at: 1) === m1)
+        XCTAssert(ud1._element(at: 2) === m2)
+        XCTAssert(ud1._element(at: 3) === m3)
+        XCTAssert(ud1._element(at: 4) === m3)
+        
+        let ud2 = SACChatViewData()
+        let up2 = SACChatViewUpdate(model: ud2)
+        up2._computeItemUpdates([
+            .insert(m1, at: 0),
+            .insert(m1, at: 0),
+            .insert(m2, at: 0),
+            .insert(m2, at: 0),
+            .insert(m3, at: 0),
+            .insert(m3, at: 0),
+            .insert(m4, at: 0),
+            .insert(m4, at: 0),
+        ])
+        let ude2 = ud2._elements
+        XCTAssert(ud2.count == 10, "insert error!")
+        XCTAssert(ud2._element(at: 0)?.content is SACMessageTimeLineContent)
+        XCTAssert(ud2._element(at: 1) === m1)
+        XCTAssert(ud2._element(at: 2) === m1)
+        XCTAssert(ud2._element(at: 3) === m2)
+        XCTAssert(ud2._element(at: 4) === m2)
+        XCTAssert(ud2._element(at: 5) === m3)
+        XCTAssert(ud2._element(at: 6) === m3)
+        XCTAssert(ud2._element(at: 7)?.content is SACMessageTimeLineContent)
+        XCTAssert(ud2._element(at: 8) === m4)
+        XCTAssert(ud2._element(at: 9) === m4)
+        
+        // 连续更新
+        // 连续更新(空)
+        ud2._elements = ude2
+        up2._computeItemUpdates([
+        ])
+        XCTAssert(ud2.count == 10, "update error!")
+        XCTAssert(ud2._element(at: 0)?.content is SACMessageTimeLineContent)
+        XCTAssert(ud2._element(at: 1) === m1)
+        XCTAssert(ud2._element(at: 2) === m1)
+        XCTAssert(ud2._element(at: 3) === m2)
+        XCTAssert(ud2._element(at: 4) === m2)
+        XCTAssert(ud2._element(at: 5) === m3)
+        XCTAssert(ud2._element(at: 6) === m3)
+        XCTAssert(ud2._element(at: 7)?.content is SACMessageTimeLineContent)
+        XCTAssert(ud2._element(at: 8) === m4)
+        XCTAssert(ud2._element(at: 9) === m4)
+        
+        // 连续更新(头)
+        ud2._elements = ude2
+        up2._computeItemUpdates([
+            .update(m4, at: 0),
+            .update(m4, at: 1),
+            .update(m4, at: 2),
+        ])
+        XCTAssert(ud2.count == 12, "update error!")
+        XCTAssert(ud2._element(at: 0)?.content is SACMessageTimeLineContent)
+        XCTAssert(ud2._element(at: 1) === m4)
+        XCTAssert(ud2._element(at: 2) === m4)
+        XCTAssert(ud2._element(at: 3) === m4)
+        XCTAssert(ud2._element(at: 4)?.content is SACMessageTimeLineContent)
+        XCTAssert(ud2._element(at: 5) === m2)
+        XCTAssert(ud2._element(at: 6) === m2)
+        XCTAssert(ud2._element(at: 7) === m3)
+        XCTAssert(ud2._element(at: 8) === m3)
+        XCTAssert(ud2._element(at: 9)?.content is SACMessageTimeLineContent)
+        XCTAssert(ud2._element(at: 10) === m4)
+        XCTAssert(ud2._element(at: 11) === m4)
+        
+        // 连续更新(中)
+        ud2._elements = ude2
+        up2._computeItemUpdates([
+            .update(m4, at: 2),
+            .update(m4, at: 3),
+            .update(m4, at: 4),
+            .update(m4, at: 5),
+        ])
+        XCTAssert(ud2.count == 12, "update error!")
+        XCTAssert(ud2._element(at: 0)?.content is SACMessageTimeLineContent)
+        XCTAssert(ud2._element(at: 1) === m1)
+        XCTAssert(ud2._element(at: 2)?.content is SACMessageTimeLineContent)
+        XCTAssert(ud2._element(at: 3) === m4)
+        XCTAssert(ud2._element(at: 4) === m4)
+        XCTAssert(ud2._element(at: 5) === m4)
+        XCTAssert(ud2._element(at: 6) === m4)
+        XCTAssert(ud2._element(at: 7)?.content is SACMessageTimeLineContent)
+        XCTAssert(ud2._element(at: 8) === m3)
+        XCTAssert(ud2._element(at: 9)?.content is SACMessageTimeLineContent)
+        XCTAssert(ud2._element(at: 10) === m4)
+        XCTAssert(ud2._element(at: 11) === m4)
+       
+        // 连续更新(尾)
+        ud2._elements = ude2
+        up2._computeItemUpdates([
+            .update(m1, at: 6),
+            .update(m1, at: 7),
+            .update(m1, at: 8),
+            .update(m1, at: 9),
+        ])
+        XCTAssert(ud2.count == 11, "update error!")
+        XCTAssert(ud2._element(at: 0)?.content is SACMessageTimeLineContent)
+        XCTAssert(ud2._element(at: 1) === m1)
+        XCTAssert(ud2._element(at: 2) === m1)
+        XCTAssert(ud2._element(at: 3) === m2)
+        XCTAssert(ud2._element(at: 4) === m2)
+        XCTAssert(ud2._element(at: 5) === m3)
+        XCTAssert(ud2._element(at: 6)?.content is SACMessageTimeLineContent)
+        XCTAssert(ud2._element(at: 7) === m1)
+        XCTAssert(ud2._element(at: 8) === m1)
+        XCTAssert(ud2._element(at: 9) === m1)
+        XCTAssert(ud2._element(at: 10) === m1)
+        
+        // 随机更新(头)
+        ud2._elements = ude2
+        up2._computeItemUpdates([
+            .update(m4, at: 0),
+            .update(m4, at: 3),
+            .update(m4, at: 4),
+        ])
+        XCTAssert(ud2.count == 14, "update error!")
+        XCTAssert(ud2._element(at: 0)?.content is SACMessageTimeLineContent)
+        XCTAssert(ud2._element(at: 1) === m4)
+        XCTAssert(ud2._element(at: 2)?.content is SACMessageTimeLineContent)
+        XCTAssert(ud2._element(at: 3) === m1)
+        XCTAssert(ud2._element(at: 4) === m1)
+        XCTAssert(ud2._element(at: 5)?.content is SACMessageTimeLineContent)
+        XCTAssert(ud2._element(at: 6) === m4)
+        XCTAssert(ud2._element(at: 7) === m4)
+        XCTAssert(ud2._element(at: 8)?.content is SACMessageTimeLineContent)
+        XCTAssert(ud2._element(at: 9) === m3)
+        XCTAssert(ud2._element(at: 10) === m3)
+        XCTAssert(ud2._element(at: 11)?.content is SACMessageTimeLineContent)
+        XCTAssert(ud2._element(at: 12) === m4)
+        XCTAssert(ud2._element(at: 13) === m4)
+        
+        // 随机更新(中)
+        ud2._elements = ude2
+        up2._computeItemUpdates([
+            .update(m3, at: 2),
+            .update(m3, at: 3),
+            .update(m3, at: 6),
+            .update(m3, at: 7),
+        ])
+        XCTAssert(ud2.count == 12, "update error!")
+        XCTAssert(ud2._element(at: 0)?.content is SACMessageTimeLineContent)
+        XCTAssert(ud2._element(at: 1) === m1)
+        XCTAssert(ud2._element(at: 2)?.content is SACMessageTimeLineContent)
+        XCTAssert(ud2._element(at: 3) === m3)
+        XCTAssert(ud2._element(at: 4) === m3)
+        XCTAssert(ud2._element(at: 5) === m2)
+        XCTAssert(ud2._element(at: 6) === m3)
+        XCTAssert(ud2._element(at: 7) === m3)
+        XCTAssert(ud2._element(at: 8) === m3)
+        XCTAssert(ud2._element(at: 9)?.content is SACMessageTimeLineContent)
+        XCTAssert(ud2._element(at: 10) === m4)
+        XCTAssert(ud2._element(at: 11) === m4)
+        
+        // 随机更新(尾)
+        ud2._elements = ude2
+        up2._computeItemUpdates([
+            .update(m4, at: 4),
+            .update(m4, at: 5),
+            .update(m3, at: 8),
+            .update(m3, at: 9),
+        ])
+        XCTAssert(ud2.count == 11, "update error!")
+        XCTAssert(ud2._element(at: 0)?.content is SACMessageTimeLineContent)
+        XCTAssert(ud2._element(at: 1) === m1)
+        XCTAssert(ud2._element(at: 2) === m1)
+        XCTAssert(ud2._element(at: 3) === m2)
+        XCTAssert(ud2._element(at: 4)?.content is SACMessageTimeLineContent)
+        XCTAssert(ud2._element(at: 5) === m4)
+        XCTAssert(ud2._element(at: 6) === m4)
+        XCTAssert(ud2._element(at: 7)?.content is SACMessageTimeLineContent)
+        XCTAssert(ud2._element(at: 8) === m3)
+        XCTAssert(ud2._element(at: 9) === m3)
+        XCTAssert(ud2._element(at: 10) === m3)
+    }
+    
 //    func testBatchUpdates() {
 //        
 //        let bd1 = SACChatViewData()

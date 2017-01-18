@@ -151,6 +151,10 @@ internal class SACChatViewUpdate {
     
     internal func _computeItemUpdates(_ updateItems: Array<SACChatViewUpdateItem>) {
         
+        guard !updateItems.isEmpty else {
+            return
+        }
+        
         var allInserts: Array<(Int, SACMessageType)> = []
         var allUpdates: Array<(Int, SACMessageType)> = []
         var allRemoves: Array<(Int)> = []
