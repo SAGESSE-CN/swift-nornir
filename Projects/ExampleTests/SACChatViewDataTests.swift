@@ -737,6 +737,22 @@ class SACChatViewDataTests: XCTestCase {
         XCTAssert(md1._element(at: 6) === m3)
     }
     
+    func testOther() {
+        // 初次添加
+        let ad1 = SACChatViewData()
+        let up1 = SACChatViewUpdate(model: ad1)
+        
+        up1._computeItemUpdates([
+            .insert(m1, at: 0)
+        ])
+        up1._computeItemUpdates([
+            .insert(m3, at: 1)
+        ])
+        up1._computeItemUpdates([
+            .insert(m2, at: 2)
+        ])
+    }
+    
 //    func testBatchUpdates() {
 //        
 //        let bd1 = SACChatViewData()

@@ -13,53 +13,24 @@ enum SACChatViewUpdateItem {
     case update(SACMessageType, at: Int)
     case remove(at: Int)
     case move(at: Int,  to: Int)
-    
-    /// nil for insert
-    var indexBeforeUpdate: Int? {
-        switch self {
-        case .insert(_, let index):
-            return nil
-            
-        case .update(_, let index):
-            return index
-        
-        case .remove(let index):
-            return index
-            
-        case .move(let index, _):
-            return index
-            
-        default:
-            return nil
-        }
-        
-    }
-    
-    // nil for remove
-    var indexAfterUpdate: Int? {
-        switch self {
-        case .insert(_, let index):
-            return index
-            
-        case .update(_, let index):
-            return index
-            
-        case .remove(let index):
-            return nil
-            
-        case .move(_, let index):
-            return index
-            
-        default:
-            return nil
-        }
-    }
 }
-enum SACChatViewUpdateChange {
+enum SACChatViewUpdateChange: CustomStringConvertible {
+    case equal(from: Int, to: Int)
     case insert(at: Int)
-    case update(at: Int)
     case remove(at: Int)
-    case move(at: Int,  to: Int)
+    
+    var description: String {
+        switch self {
+        case .equal(let from, let to):
+            return " \(from)/\(to)"
+            
+        case .insert(let index):
+            return "+N/\(index)"
+            
+        case .remove(let index):
+            return "-\(index)/N"
+        }
+    }
 }
 
 internal class SACChatViewUpdate {
@@ -77,14 +48,7 @@ internal class SACChatViewUpdate {
     /// (+1, src.index, dest.index) // add
     /// ( 0, src.index, dest.index) // equal
     /// (-1, src.index, dest.index) // remove
-    
-    /// (A, src.index, dest.index) // add
-    /// ( , src.index, dest.index) // equal
-    /// (M, src.index, dest.index) // update
-    /// (D, src.index, dest.index) // remove
-    /// (C, src.index, dest.index) // move
-    ///
-    private func _diff(_ src: Array<SACMessageType>, _ dest: Array<SACMessageType>) -> Array<(Int, Int, Int)> {
+    private func _diff(_ src: Array<SACMessageType>, _ dest: Array<SACMessageType>) -> Array<SACChatViewUpdateChange> {
         
         let len1 = src.count
         let len2 = dest.count
@@ -102,16 +66,7 @@ internal class SACChatViewUpdate {
             }
         }
         
-        for i in 1 ..< len1 + 1 {
-            for j in 1 ..< len2 + 1 {
-                let v = String(format: "%2d", c[i][j])
-                print(v, terminator: "")
-            }
-            print()
-        }
-        
-        
-        var r = [(Int, Int, Int)]()
+        var r = [SACChatViewUpdateChange]()
         var i = len1
         var j = len2
         
@@ -120,7 +75,7 @@ internal class SACChatViewUpdate {
             guard i != 0 else {
                 // the remaining is add
                 while j > 0 {
-                    r.append((+1, i - 1, j - 1))
+                    r.append(.insert(at: j - 1))
                     j -= 1
                 }
                 break
@@ -128,14 +83,14 @@ internal class SACChatViewUpdate {
             guard j != 0 else {
                 // the remaining is remove
                 while i > 0 {
-                    r.append((-1, i - 1, j - 1))
+                    r.append(.remove(at: i - 1))
                     i -= 1
                 }
                 break
             }
             guard src[i - 1] !== dest[j - 1]  else {
-                // no change
-                r.append((0, i - 1, j - 1))
+                // no change, ignore
+                //r.append(.equal(from: i - 1, to: j - 1))
                 i -= 1
                 j -= 1
                 continue
@@ -143,11 +98,11 @@ internal class SACChatViewUpdate {
             // check the weight
             if c[i - 1][j] > c[i][j - 1] {
                 // is remove
-                r.append((-1, i - 1, j - 1))
+                r.append(.remove(at: i - 1))
                 i -= 1
             } else {
                 // is add
-                r.append((+1, i - 1, j - 1))
+                r.append(.insert(at: j - 1))
                 j -= 1
             }
         } while i > 0 || j > 0
@@ -364,15 +319,19 @@ internal class SACChatViewUpdate {
             items.append(_model[index])
         }
         // convert messages and replace specify message
-        let newElements = items as? [SACMessageType] ?? []
-        let results = _convert(messages: newElements, first: _element(at: begin), last: _element(at: end - 1))
-        let range: Range<Int> = max(begin, 0) ..< min(end, count)
+        let newItems = items as? [SACMessageType] ?? []
+        let convertedItems = _convert(messages: newItems, first: _element(at: begin), last: _element(at: end - 1))
+        let selectedRange = Range<Int>(max(begin, 0) ..< min(end, count))
+        let selectedItems = _model.subarray(with: selectedRange)
         // compute index paths
-        let sx = _diff(_model.subarray(with: range), results)
-        print(sx)
+        let diff = _diff(selectedItems, convertedItems)
+        
+        // 找移动和更新的
+        
+        print(diff)
         
         // replace
-        _model.replaceSubrange(range, with: results)
+        _model.replaceSubrange(selectedRange, with: convertedItems)
     }
     
     private var _timeInterval: TimeInterval = 60
