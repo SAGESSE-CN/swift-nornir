@@ -28,28 +28,6 @@ class SACChatViewDataTests: XCTestCase {
         super.tearDown()
     }
     
-    
-//    func testIndex() {
-//        let m = SACMessage(content: SACMessageTextContent())
-//        let d = SACChatViewData()
-//        d._elements = [m,m,m]
-//        
-//        XCTAssert(d._convert(index: -5) == 0)
-//        XCTAssert(d._convert(index: -4) == 0)
-//        XCTAssert(d._convert(index: -3) == 1)
-//        XCTAssert(d._convert(index: -1) == 3)
-//        XCTAssert(d._convert(index: +0) == 0)
-//        XCTAssert(d._convert(index: +1) == 1)
-//        XCTAssert(d._convert(index: +3) == 3)
-//        XCTAssert(d._convert(index: +4) == 3)
-//        
-//        XCTAssert(d._convert(indexs: []) == [])
-//        XCTAssert(d._convert(indexs: [1]) == [1,1])
-//        XCTAssert(d._convert(indexs: [1,2,3]) == [1,3])
-//        XCTAssert(d._convert(indexs: [1,2,4]) == [1,2,4,4])
-//        XCTAssert(d._convert(indexs: [1,2,2,4]) == [1,2,4,4])
-//    }
-    
     func testInsert() {
         
         // 初次添加
@@ -99,7 +77,8 @@ class SACChatViewDataTests: XCTestCase {
         XCTAssert(ad4.count == 2, "insert error!")
         XCTAssert(ad4._element(at: 0)?.content is SACMessageTimeLineContent)
         XCTAssert(ad4._element(at: 1) === m1)
-
+        
+        // 普通插入(尾部)
         ad4._elements = ade4
         up4._computeItemUpdates([
             .insert(m2, at: ad4.count),
@@ -117,6 +96,8 @@ class SACChatViewDataTests: XCTestCase {
         XCTAssert(ad4._element(at: 0)?.content is SACMessageTimeLineContent)
         XCTAssert(ad4._element(at: 1) === m1)
         XCTAssert(ad4._element(at: 2) === m2)
+        
+        // 普通插入(中间)
         up4._computeItemUpdates([
             .insert(m2, at: 2),
         ])
@@ -126,6 +107,7 @@ class SACChatViewDataTests: XCTestCase {
         XCTAssert(ad4._element(at: 2) === m2)
         XCTAssert(ad4._element(at: 3) === m2)
         
+        // 普通插入(头部)
         ad4._elements = ade4
         up4._computeItemUpdates([
             .insert(m2, at: 0),
@@ -134,7 +116,8 @@ class SACChatViewDataTests: XCTestCase {
         XCTAssert(ad4._element(at: 0)?.content is SACMessageTimeLineContent)
         XCTAssert(ad4._element(at: 1) === m2)
         XCTAssert(ad4._element(at: 2) === m1)
-
+        
+        // 自动添加TimeLine(头部)
         ad4._elements = ade4
         up4._computeItemUpdates([
             .insert(m4, at: 0),
@@ -145,6 +128,7 @@ class SACChatViewDataTests: XCTestCase {
         XCTAssert(ad4._element(at: 2)?.content is SACMessageTimeLineContent)
         XCTAssert(ad4._element(at: 3) === m1)
         
+        // 自动添加TimeLine(尾部)
         ad4._elements = ade4
         up4._computeItemUpdates([
             .insert(m4, at: ad4.count),
@@ -164,6 +148,8 @@ class SACChatViewDataTests: XCTestCase {
         XCTAssert(ad4._element(at: 1) === m1)
         XCTAssert(ad4._element(at: 2)?.content is SACMessageTimeLineContent)
         XCTAssert(ad4._element(at: 3) === m3)
+        
+        // 自动移除TimeLine(中间)
         up4._computeItemUpdates([
             .insert(m2, at: 2),
         ])
@@ -181,6 +167,8 @@ class SACChatViewDataTests: XCTestCase {
         XCTAssert(ad4._element(at: 0)?.content is SACMessageTimeLineContent)
         XCTAssert(ad4._element(at: 1) === m1)
         XCTAssert(ad4._element(at: 2) === m2)
+        
+        // 自动添加TimeLine(中间)
         up4._computeItemUpdates([
             .insert(m3, at: 2),
         ])
@@ -659,6 +647,94 @@ class SACChatViewDataTests: XCTestCase {
         XCTAssert(ud2._element(at: 8) === m3)
         XCTAssert(ud2._element(at: 9) === m3)
         XCTAssert(ud2._element(at: 10) === m3)
+    }
+    
+    func testMove() {
+        
+        let md1 = SACChatViewData()
+        let up1 = SACChatViewUpdate(model: md1)
+        up1._computeItemUpdates([
+            .insert(m1, at: 0),
+            .insert(m2, at: 0),
+            .insert(m3, at: 0),
+            .insert(m4, at: 0),
+        ])
+        let mde1 = md1._elements
+        XCTAssert(md1.count == 6, "insert error!")
+        XCTAssert(md1._element(at: 0)?.content is SACMessageTimeLineContent)
+        XCTAssert(md1._element(at: 1) === m1)
+        XCTAssert(md1._element(at: 2) === m2)
+        XCTAssert(md1._element(at: 3) === m3)
+        XCTAssert(md1._element(at: 4)?.content is SACMessageTimeLineContent)
+        XCTAssert(md1._element(at: 5) === m4)
+        
+        // 空移动
+        md1._elements = mde1
+        up1._computeItemUpdates([
+            .move(at: 0, to: 0),
+        ])
+        XCTAssert(md1.count == 6, "move error!")
+        XCTAssert(md1._element(at: 0)?.content is SACMessageTimeLineContent)
+        XCTAssert(md1._element(at: 1) === m1)
+        XCTAssert(md1._element(at: 2) === m2)
+        XCTAssert(md1._element(at: 3) === m3)
+        XCTAssert(md1._element(at: 4)?.content is SACMessageTimeLineContent)
+        XCTAssert(md1._element(at: 5) === m4)
+        
+        // 无效移动(TimeLine)
+        md1._elements = mde1
+        up1._computeItemUpdates([
+            .move(at: 0, to: 2),
+        ])
+        XCTAssert(md1.count == 6, "move error!")
+        XCTAssert(md1._element(at: 0)?.content is SACMessageTimeLineContent)
+        XCTAssert(md1._element(at: 1) === m1)
+        XCTAssert(md1._element(at: 2) === m2)
+        XCTAssert(md1._element(at: 3) === m3)
+        XCTAssert(md1._element(at: 4)?.content is SACMessageTimeLineContent)
+        XCTAssert(md1._element(at: 5) === m4)
+        
+        // 普通移动(头)
+        md1._elements = mde1
+        up1._computeItemUpdates([
+            .move(at: 1, to: 3),
+        ])
+        XCTAssert(md1.count == 7, "move error!")
+        XCTAssert(md1._element(at: 0)?.content is SACMessageTimeLineContent)
+        XCTAssert(md1._element(at: 1) === m2)
+        XCTAssert(md1._element(at: 2) === m1)
+        XCTAssert(md1._element(at: 3)?.content is SACMessageTimeLineContent)
+        XCTAssert(md1._element(at: 4) === m3)
+        XCTAssert(md1._element(at: 5)?.content is SACMessageTimeLineContent)
+        XCTAssert(md1._element(at: 6) === m4)
+        
+        // 普通移动(中间) - 交换位置
+        md1._elements = mde1
+        up1._computeItemUpdates([
+            .move(at: 2, to: 4),
+        ])
+        XCTAssert(md1.count == 7, "move error!")
+        XCTAssert(md1._element(at: 0)?.content is SACMessageTimeLineContent)
+        XCTAssert(md1._element(at: 1) === m1)
+        XCTAssert(md1._element(at: 2)?.content is SACMessageTimeLineContent)
+        XCTAssert(md1._element(at: 3) === m3)
+        XCTAssert(md1._element(at: 4) === m2)
+        XCTAssert(md1._element(at: 5)?.content is SACMessageTimeLineContent)
+        XCTAssert(md1._element(at: 6) === m4)
+
+        // 普通移动(尾)
+        md1._elements = mde1
+        up1._computeItemUpdates([
+            .move(at: 5, to: 3),
+        ])
+        XCTAssert(md1.count == 7, "move error!")
+        XCTAssert(md1._element(at: 0)?.content is SACMessageTimeLineContent)
+        XCTAssert(md1._element(at: 1) === m1)
+        XCTAssert(md1._element(at: 2) === m2)
+        XCTAssert(md1._element(at: 3)?.content is SACMessageTimeLineContent)
+        XCTAssert(md1._element(at: 4) === m4)
+        XCTAssert(md1._element(at: 5)?.content is SACMessageTimeLineContent)
+        XCTAssert(md1._element(at: 6) === m3)
     }
     
 //    func testBatchUpdates() {

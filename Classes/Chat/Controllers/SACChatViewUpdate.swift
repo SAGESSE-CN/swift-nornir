@@ -151,10 +151,10 @@ internal class SACChatViewUpdate {
     
     internal func _computeItemUpdates(_ updateItems: Array<SACChatViewUpdateItem>) {
         
+        // is empty?
         guard !updateItems.isEmpty else {
             return
         }
-        
         var allInserts: Array<(Int, SACMessageType)> = []
         var allUpdates: Array<(Int, SACMessageType)> = []
         var allRemoves: Array<(Int)> = []
@@ -165,9 +165,18 @@ internal class SACChatViewUpdate {
             
             switch item {
             case .move(let from, let to):
+                // ignore for source equ dest
+                guard abs(from - to) >= 2 else {
+                    return result
+                }
                 // move message
                 allMoves.append((from, to))
-                return (min(min(from, to), result.0), max(max(from, to) + 1, result.1))
+                // splite to insert & remove
+                if let message = _element(at: from) {
+                    allRemoves.append((from))
+                    allInserts.append((to, message))
+                }
+                return (min(min(from, to), result.0), max(max(from + 1, to), result.1))
                 
             case .remove(let index):
                 // remove message
@@ -184,6 +193,10 @@ internal class SACChatViewUpdate {
                 allInserts.append((index, message))
                 return (min(index, result.0), max(index, result.1))
             }
+        }
+        // is empty
+        guard first != .max && last != .min else {
+            return
         }
         // sort
         allInserts.sort { $0.0 < $1.0 }
