@@ -24,6 +24,10 @@ internal class SACChatViewData: NSObject {
     }
     
     
+    func subarray(with subrange: Range<Int>) -> Array<SACMessageType> {
+        return Array(_elements[subrange])
+    }
+    
     func replaceSubrange(_ subrange: Range<Int>, with collection: Array<SACMessageType>)  {
         _elements.replaceSubrange(subrange, with: collection)
     }

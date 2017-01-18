@@ -55,6 +55,12 @@ enum SACChatViewUpdateItem {
         }
     }
 }
+enum SACChatViewUpdateChange {
+    case insert(at: Int)
+    case update(at: Int)
+    case remove(at: Int)
+    case move(at: Int,  to: Int)
+}
 
 internal class SACChatViewUpdate {
     
@@ -64,6 +70,89 @@ internal class SACChatViewUpdate {
     
     internal func apply(with updateItems: Array<SACChatViewUpdateItem>, to chatView: SACChatView) {
         _computeItemUpdates(updateItems)
+    }
+    
+    ///
+    /// 比较数组差异
+    /// (+1, src.index, dest.index) // add
+    /// ( 0, src.index, dest.index) // equal
+    /// (-1, src.index, dest.index) // remove
+    
+    /// (A, src.index, dest.index) // add
+    /// ( , src.index, dest.index) // equal
+    /// (M, src.index, dest.index) // update
+    /// (D, src.index, dest.index) // remove
+    /// (C, src.index, dest.index) // move
+    ///
+    private func _diff(_ src: Array<SACMessageType>, _ dest: Array<SACMessageType>) -> Array<(Int, Int, Int)> {
+        
+        let len1 = src.count
+        let len2 = dest.count
+        
+        var c = [[Int]](repeating: [Int](repeating: 0, count: len2 + 1), count: len1 + 1)
+        
+        // lcs + 动态规划
+        for i in 1 ..< len1 + 1 { 
+            for j in 1 ..< len2 + 1 {
+                if src[i - 1] === dest[j - 1] {
+                    c[i][j] = c[i - 1][j - 1] + 1
+                } else {
+                    c[i][j] = max(c[i - 1][j], c[i][j - 1])
+                }
+            }
+        }
+        
+        for i in 1 ..< len1 + 1 {
+            for j in 1 ..< len2 + 1 {
+                let v = String(format: "%2d", c[i][j])
+                print(v, terminator: "")
+            }
+            print()
+        }
+        
+        
+        var r = [(Int, Int, Int)]()
+        var i = len1
+        var j = len2
+        
+        // create the optimal path
+        repeat {
+            guard i != 0 else {
+                // the remaining is add
+                while j > 0 {
+                    r.append((+1, i - 1, j - 1))
+                    j -= 1
+                }
+                break
+            }
+            guard j != 0 else {
+                // the remaining is remove
+                while i > 0 {
+                    r.append((-1, i - 1, j - 1))
+                    i -= 1
+                }
+                break
+            }
+            guard src[i - 1] !== dest[j - 1]  else {
+                // no change
+                r.append((0, i - 1, j - 1))
+                i -= 1
+                j -= 1
+                continue
+            }
+            // check the weight
+            if c[i - 1][j] > c[i][j - 1] {
+                // is remove
+                r.append((-1, i - 1, j - 1))
+                i -= 1
+            } else {
+                // is add
+                r.append((+1, i - 1, j - 1))
+                j -= 1
+            }
+        } while i > 0 || j > 0
+        
+        return r.reversed()
     }
     
     private func _convert(message current: SACMessageType, previous: SACMessageType?) -> [SACMessageType] {
@@ -176,6 +265,7 @@ internal class SACChatViewUpdate {
                     allRemoves.append((from))
                     allInserts.append((to, message))
                 }
+                // from + 1: the selected row will change
                 return (min(min(from, to), result.0), max(max(from + 1, to), result.1))
                 
             case .remove(let index):
@@ -276,7 +366,13 @@ internal class SACChatViewUpdate {
         // convert messages and replace specify message
         let newElements = items as? [SACMessageType] ?? []
         let results = _convert(messages: newElements, first: _element(at: begin), last: _element(at: end - 1))
-        _model.replaceSubrange(max(begin, 0) ..< min(end, count), with: results)
+        let range: Range<Int> = max(begin, 0) ..< min(end, count)
+        // compute index paths
+        let sx = _diff(_model.subarray(with: range), results)
+        print(sx)
+        
+        // replace
+        _model.replaceSubrange(range, with: results)
     }
     
     private var _timeInterval: TimeInterval = 60
@@ -299,3 +395,4 @@ fileprivate extension SACMessageType {
     }
     
 }
+
