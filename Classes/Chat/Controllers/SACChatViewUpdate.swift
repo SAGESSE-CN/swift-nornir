@@ -189,7 +189,7 @@ internal class SACChatViewUpdate {
             }
         }
         
-        let lenght = _model.count
+        let count = _model.count
         let begin = first - 1 // prev
         let end = last + 1 // next
         
@@ -214,7 +214,7 @@ internal class SACChatViewUpdate {
                 ii += 1
             }
             // is end?
-            guard first < last else {
+            guard index < last && index < count else {
                 // auto remove
                 offsets.append(-1)
                 return
@@ -223,17 +223,32 @@ internal class SACChatViewUpdate {
             while ir < allRemoves.endIndex && allRemoves[ir] == index {
                 // remove
                 offsets.append(-1)
+                // adjust previous tl-message & next tl-message, if needed
+                if let content = _element(at: index - 1)?.content as? SACMessageTimeLineContent {
+                    content.after = nil
+                }
+                if let content = _element(at: index + 1)?.content as? SACMessageTimeLineContent {
+                    content.before = nil
+                }
                 ir += 1
                 // can't update or copy
                 return 
             }
             // update
             while iu < allUpdates.endIndex && allUpdates[iu].0 == index {
-                // remove
+                let message = allUpdates[iu].1
+                // update
                 offsets.append(items.count)
-                items.append(allUpdates[iu].1)
+                items.append(message)
+                // adjust previous tl-message & next tl-message, if needed
+                if let content = _element(at: index - 1)?.content as? SACMessageTimeLineContent {
+                    content.after = message
+                }
+                if let content = _element(at: index + 1)?.content as? SACMessageTimeLineContent {
+                    content.before = message
+                }
                 iu += 1
-                // can't update or copy
+                // can't copy
                 return
             }
             // copy
@@ -323,7 +338,7 @@ internal class SACChatViewUpdate {
         // convert messages and replace specify message
         let newElements = items as? [SACMessageType] ?? []
         let results = _convert(messages: newElements, first: _element(at: begin), last: _element(at: end - 1))
-        _model.replaceSubrange(max(begin, 0) ..< min(end, lenght), with: results)
+        _model.replaceSubrange(max(begin, 0) ..< min(end, count), with: results)
     }
     
     private var _timeInterval: TimeInterval = 60
