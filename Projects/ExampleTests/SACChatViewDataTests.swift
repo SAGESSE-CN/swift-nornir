@@ -748,9 +748,9 @@ class SACChatViewDataTests: XCTestCase {
         up1._computeItemUpdates([
             .insert(m3, at: 1)
         ])
-        up1._computeItemUpdates([
-            .insert(m2, at: 2)
-        ])
+//        up1._computeItemUpdates([
+//            .insert(m2, at: 2)
+//        ])
     }
     
 //    func testBatchUpdates() {

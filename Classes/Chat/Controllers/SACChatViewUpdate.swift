@@ -15,99 +15,97 @@ enum SACChatViewUpdateItem {
     case move(at: Int,  to: Int)
 }
 enum SACChatViewUpdateChange: CustomStringConvertible {
-    case equal(from: Int, to: Int)
-    case insert(at: Int)
-    case remove(at: Int)
+    
+    case move(from: Int, to: Int)
+    case update(from: Int, to: Int)
+    case insert(from: Int, to: Int)
+    case remove(from: Int, to: Int)
+    
+    var from: Int {
+        switch self {
+        case .move(let from, _): return from
+        case .insert(let from, _): return from
+        case .update(let from, _): return from
+        case .remove(let from, _): return from
+        }
+    }
+    var to: Int {
+        switch self {
+        case .move(_, let to): return to
+        case .insert(_, let to): return to
+        case .update(_, let to): return to
+        case .remove(_, let to): return to
+        }
+    }
+    
+    var isMove: Bool {
+        switch self {
+        case .move: return true
+        default: return false
+        }
+    }
+    var isUpdate: Bool {
+        switch self {
+        case .update: return true
+        default: return false
+        }
+    }
+    var isRemove: Bool {
+        switch self {
+        case .remove: return true
+        default: return false
+        }
+    }
+    var isInsert: Bool {
+        switch self {
+        case .insert: return true
+        default: return false
+        }
+    }
+    
     
     var description: String {
+        let from = self.from >= 0 ? "\(self.from)" : "N"
+        let to = self.to >= 0 ? "\(self.to)" : "N"
+        
         switch self {
-        case .equal(let from, let to):
-            return " \(from)/\(to)"
-            
-        case .insert(let index):
-            return "+N/\(index)"
-            
-        case .remove(let index):
-            return "-\(index)/N"
+        case .move: return "M\(from)/\(to)"
+        case .insert: return "A\(from)/\(to)"
+        case .update: return "R\(from)/\(to)"
+        case .remove: return "D\(from)/\(to)"
         }
     }
 }
 
-internal class SACChatViewUpdate {
+internal class SACChatViewUpdate: NSObject {
     
     internal init(model: SACChatViewData) {
         _model = model
+        super.init()
     }
     
     internal func apply(with updateItems: Array<SACChatViewUpdateItem>, to chatView: SACChatView) {
         _computeItemUpdates(updateItems)
     }
     
-    ///
-    /// 比较数组差异
-    /// (+1, src.index, dest.index) // add
-    /// ( 0, src.index, dest.index) // equal
-    /// (-1, src.index, dest.index) // remove
-    private func _diff(_ src: Array<SACMessageType>, _ dest: Array<SACMessageType>) -> Array<SACChatViewUpdateChange> {
-        
-        let len1 = src.count
-        let len2 = dest.count
-        
-        var c = [[Int]](repeating: [Int](repeating: 0, count: len2 + 1), count: len1 + 1)
-        
-        // lcs + 动态规划
-        for i in 1 ..< len1 + 1 { 
-            for j in 1 ..< len2 + 1 {
-                if src[i - 1] === dest[j - 1] {
-                    c[i][j] = c[i - 1][j - 1] + 1
-                } else {
-                    c[i][j] = max(c[i - 1][j], c[i][j - 1])
-                }
-            }
+    private func _fetch(after message: SACMessageType?) -> SACMessageType? {
+        guard let content = message?.content as? SACMessageTimeLineContent else {
+            return message
         }
-        
-        var r = [SACChatViewUpdateChange]()
-        var i = len1
-        var j = len2
-        
-        // create the optimal path
-        repeat {
-            guard i != 0 else {
-                // the remaining is add
-                while j > 0 {
-                    r.append(.insert(at: j - 1))
-                    j -= 1
-                }
-                break
-            }
-            guard j != 0 else {
-                // the remaining is remove
-                while i > 0 {
-                    r.append(.remove(at: i - 1))
-                    i -= 1
-                }
-                break
-            }
-            guard src[i - 1] !== dest[j - 1]  else {
-                // no change, ignore
-                //r.append(.equal(from: i - 1, to: j - 1))
-                i -= 1
-                j -= 1
-                continue
-            }
-            // check the weight
-            if c[i - 1][j] > c[i][j - 1] {
-                // is remove
-                r.append(.remove(at: i - 1))
-                i -= 1
-            } else {
-                // is add
-                r.append(.insert(at: j - 1))
-                j -= 1
-            }
-        } while i > 0 || j > 0
-        
-        return r.reversed()
+        return content.after
+    }
+    private func _fetch(before message: SACMessageType?) -> SACMessageType? {
+        guard let content = message?.content as? SACMessageTimeLineContent else {
+            return message
+        }
+        return content.before
+    }
+    
+    internal func _element(at index: Int) -> SACMessageType? {
+        guard index >= 0 && index < _model.count else {
+            return nil
+        }
+        return _model[index]
     }
     
     private func _convert(message current: SACMessageType, previous: SACMessageType?) -> [SACMessageType] {
@@ -173,24 +171,100 @@ internal class SACChatViewUpdate {
         return arr as! [SACMessageType]
     }
     
-    private func _fetch(after message: SACMessageType?) -> SACMessageType? {
-        guard let content = message?.content as? SACMessageTimeLineContent else {
-            return message
+    private func _diff<T: SACMessageType>(_ src: Array<T>, _ dest: Array<T>) -> Array<SACChatViewUpdateChange> {
+        
+        let len1 = src.count
+        let len2 = dest.count
+        
+        var c = [[Int]](repeating: [Int](repeating: 0, count: len2 + 1), count: len1 + 1)
+        
+        // lcs + 动态规划
+        for i in 1 ..< len1 + 1 {
+            for j in 1 ..< len2 + 1 {
+                if src[i - 1] == dest[j - 1] {
+                    c[i][j] = c[i - 1][j - 1] + 1
+                } else {
+                    c[i][j] = max(c[i - 1][j], c[i][j - 1])
+                }
+            }
         }
-        return content.after
-    }
-    private func _fetch(before message: SACMessageType?) -> SACMessageType? {
-        guard let content = message?.content as? SACMessageTimeLineContent else {
-            return message
-        }
-        return content.before
-    }
-    
-    internal func _element(at index: Int) -> SACMessageType? {
-        guard index >= 0 && index < _model.count else {
-            return nil
-        }
-        return _model[index]
+        
+        var i = len1
+        var j = len2
+        
+        var rms: Array<(from: Int, to: Int)> = []
+        var adds: Array<(from: Int, to: Int)> = []
+        
+        // create the optimal path
+        repeat {
+            guard i != 0 else {
+                // the remaining is add
+                while j > 0 {
+                    adds.append((from: i - 1, to: j - 1))
+                    j -= 1
+                }
+                break
+            }
+            guard j != 0 else {
+                // the remaining is remove
+                while i > 0 {
+                    rms.append((from: i - 1, to: j - 1))
+                    i -= 1
+                }
+                break
+            }
+            guard src[i - 1] != dest[j - 1]  else {
+                // no change, ignore
+                i -= 1
+                j -= 1
+                continue
+            }
+            // check the weight
+            if c[i - 1][j] > c[i][j - 1] {
+                // is remove
+                rms.append((from: i - 1, to: j - 1))
+                i -= 1
+            } else {
+                // is add
+                adds.append((from: i - 1, to: j - 1))
+                j -= 1
+            }
+        } while i > 0 || j > 0
+        
+        var results: Array<SACChatViewUpdateChange> = []
+        results.reserveCapacity(rms.count + adds.count)
+        
+        // move(f,t): f = remove(f), t = insert(t), new move(f,t): f = remove(f), t = insert(f)
+        // update(f,t): f = remove(f), t = insert(t), new update(f,t): f = remove(f), t = insert(f)
+        
+        // automatic merge delete and update items
+        results.append(contentsOf: rms.map({ item in
+            let from = item.from
+            let delElement = src[from]
+            // can't merge to move item?
+            if let addIndex = adds.index(where: { dest[$0.to] == delElement }) {
+                let addItem = adds.remove(at: addIndex)
+                return .move(from: from, to: addItem.from)
+            }
+            // can't merge to update item?
+            if let addIndex = adds.index(where: { $0.to == from }) {
+                let addItem = adds[addIndex]
+                let addElement = dest[addItem.to]
+                // the same type is allowed to merge
+                if type(of: delElement.content) == type(of: addElement.content) {
+                    adds.remove(at: addIndex)
+                    return .update(from: from, to: addItem.from)
+                }
+            }
+            return .remove(from: item.from, to: item.to)
+        }))
+        // automatic merge insert items
+        results.append(contentsOf: adds.map({ item in
+            return .insert(from: item.from, to: item.to)
+        }))
+        
+        // sort
+        return results.sorted { $0.from < $1.from }
     }
     
     internal func _computeItemUpdates(_ updateItems: Array<SACChatViewUpdateItem>) {
@@ -261,7 +335,6 @@ internal class SACChatViewUpdate {
         // priority: insert > remove > update > move
         
         var items: Array<SACMessageType> = []
-        var offsets: Array<Int> = []
         
         // processing
         (first ... last).forEach { index in
@@ -272,14 +345,10 @@ internal class SACChatViewUpdate {
             }
             // do you need to do this?
             guard index < last && index < count else {
-                // no auto remove
-                offsets.append(-1)
                 return
             }
             // do you need to remove the operation?
             while ir < allRemoves.endIndex && allRemoves[ir] == index {
-                // removing
-                offsets.append(-1)
                 // adjust previous tl-message & next tl-message, if needed
                 if let content = _element(at: index - 1)?.content as? SACMessageTimeLineContent {
                     content.after = nil
@@ -298,7 +367,6 @@ internal class SACChatViewUpdate {
             while iu < allUpdates.endIndex && allUpdates[iu].0 == index {
                 let message = allUpdates[iu].1
                 // updating
-                offsets.append(items.count)
                 items.append(message)
                 // adjust previous tl-message & next tl-message, if needed
                 if let content = _element(at: index - 1)?.content as? SACMessageTimeLineContent {
@@ -315,7 +383,6 @@ internal class SACChatViewUpdate {
                 return
             }
             // copy
-            offsets.append(items.count)
             items.append(_model[index])
         }
         // convert messages and replace specify message
@@ -324,19 +391,25 @@ internal class SACChatViewUpdate {
         let selectedRange = Range<Int>(max(begin, 0) ..< min(end, count))
         let selectedItems = _model.subarray(with: selectedRange)
         // compute index paths
-        let diff = _diff(selectedItems, convertedItems)
-        
-        // 找移动和更新的
-        
-        print(diff)
-        
+        let start = selectedRange.lowerBound
+        let diff = _diff(selectedItems, convertedItems).map({ item -> SACChatViewUpdateChange in
+            switch item {
+            case .move(let from, let to): return .move(from: from + start, to: to + start)
+            case .insert(let from, let to): return .insert(from: from + start, to: to + start)
+            case .update(let from, let to): return .update(from: from + start, to: to + start)
+            case .remove(let from, let to): return .remove(from: from + start, to: to + start)
+            }
+        })
+        _logger.debug("select: [\(first) ..< \(last)], diff: \(diff)")
         // replace
         _model.replaceSubrange(selectedRange, with: convertedItems)
+        _changes = diff
     }
     
-    private var _timeInterval: TimeInterval = 60
-
     private var _model: SACChatViewData
+    private var _changes: Array<SACChatViewUpdateChange>?
+    
+    private var _timeInterval: TimeInterval = 60
 }
 
 fileprivate extension SACMessageType {

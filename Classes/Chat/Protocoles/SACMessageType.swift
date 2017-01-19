@@ -30,3 +30,10 @@ import Foundation
     /// 配置信息
     var options: SACMessageOptions { get }
 }
+
+public func !=(lhs: SACMessageType, rhs: SACMessageType) -> Bool {
+    return lhs !== rhs
+}
+public func ==(lhs: SACMessageType, rhs: SACMessageType) -> Bool {
+    return lhs === rhs
+}
