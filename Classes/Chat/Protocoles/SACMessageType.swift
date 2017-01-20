@@ -12,6 +12,8 @@ import Foundation
     
     var name: String { get }
     
+    var identifier: UUID { get }
+    
     // 发送/接收时间
     var date: Date { get }
     
@@ -32,8 +34,8 @@ import Foundation
 }
 
 public func !=(lhs: SACMessageType, rhs: SACMessageType) -> Bool {
-    return lhs !== rhs
+    return lhs.identifier != rhs.identifier
 }
 public func ==(lhs: SACMessageType, rhs: SACMessageType) -> Bool {
-    return lhs === rhs
+    return lhs.identifier == rhs.identifier
 }

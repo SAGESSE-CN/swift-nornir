@@ -35,11 +35,15 @@ open class SACChatViewController: UIViewController {
     
     open override func loadView() {
         super.loadView()
-        self.view = _chatView
+        
+        // create
+        _chatView = SACChatView(frame: view.frame, chatViewLayout: _chatViewLayout)
+        // up
+        view = _chatView
     }
     
-    fileprivate lazy var _chatViewLayout: SACChatViewLayout = SACChatViewLayout()
-    fileprivate lazy var _chatView: SACChatView = SACChatView(frame: .zero, chatViewLayout: self._chatViewLayout)
+    fileprivate var _chatViewLayout: SACChatViewLayout = .init()
+    fileprivate var _chatView: SACChatView!
     
     open var conversation: SACConversationType
     
@@ -146,7 +150,8 @@ open class SACChatViewController: UIViewController {
     func send(forText text: NSAttributedString) {
         
         let message = SACMessage(content: SACMessageTextContent(attributedText: text))
-        _chatView.append(message)
+        _chatView.insert(message, at: 1)
+        //_chatView.append(message)
     }
     func send(forLargeEmoticon emoticon: SACEmoticonLarge) {
         _logger.trace("\(emoticon.title) \(emoticon.id)")

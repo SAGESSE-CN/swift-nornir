@@ -11,6 +11,15 @@ import Foundation
 
 @testable import SAChat
 
+extension SACChatViewData {
+    func _element(at index: Int) -> SACMessageType? {
+        guard index >= 0 && index < self._elements.count else {
+            return nil
+        }
+        return self._elements[index]
+    }
+}
+
 class SACChatViewDataTests: XCTestCase {
     
     override func setUp() {

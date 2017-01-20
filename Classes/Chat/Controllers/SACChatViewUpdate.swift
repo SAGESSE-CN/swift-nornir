@@ -94,11 +94,12 @@ internal class SACChatViewUpdate: NSObject {
         }
         containerView.performBatchUpdates({
             
+            // apply move
             changes.filter({ $0.isMove }).forEach({ 
               containerView.moveItem(at: .init(item: max($0.from, 0), section: 0),
                                      to: .init(item: max($0.to, 0), section: 0))
             })
-            // 添加/删除/更新
+            // apply insert/remove/update
             containerView.insertItems(at: changes.filter({ $0.isInsert }).map({ .init(item: max($0.from + 1, 0), section: 0) }))
             containerView.reloadItems(at: changes.filter({ $0.isUpdate }).map({ .init(item: max($0.from, 0), section: 0) }))
             containerView.deleteItems(at: changes.filter({ $0.isRemove }).map({ .init(item: max($0.from, 0), section: 0) }))

@@ -48,11 +48,11 @@ import UIKit
             return nil
         }
         let size = CGSize(width: collectionView.frame.width, height: .greatestFiniteMagnitude)
-        if let info = _allLayoutAttributesInfo[indexPath] {
+        let message = delegate.collectionView(collectionView, layout: self, itemAt: indexPath)
+        if let info = _allLayoutAttributesInfo[message.identifier] {
             //logger.trace("\(indexPath) - hit cache - \(info.layoutedBoxRect(with: .all))")
             return info
         }
-        let message = delegate.collectionView(collectionView, layout: self, itemAt: indexPath)
         let options = message.options
         
         var allRect: CGRect = .zero
@@ -192,8 +192,8 @@ import UIKit
             .content: contentBoxRect
         ]
         let info = SACChatViewLayoutAttributesInfo(message: message, size: size, rects: rects, boxRects: boxRects)
-        _allLayoutAttributesInfo[indexPath] = info
-        logger.trace("\(indexPath) - calc - \(info.layoutedBoxRect(with: .all))")
+        _allLayoutAttributesInfo[message.identifier] = info
+        logger.trace("complute: \(indexPath), result: \(info.layoutedBoxRect(with: .all))")
         return info
     }
     
@@ -240,7 +240,7 @@ import UIKit
     private lazy var _cachedAllLayoutSize: [String: CGSize] = [:]
     private lazy var _cachedAllLayoutInset: [String: UIEdgeInsets] = [:]
     
-    private lazy var _allLayoutAttributesInfo: [IndexPath: SACChatViewLayoutAttributesInfo] = [:]
+    private lazy var _allLayoutAttributesInfo: [UUID: SACChatViewLayoutAttributesInfo] = [:]
 }
 
 @objc public protocol SACChatViewLayoutDelegate: UICollectionViewDelegateFlowLayout {
