@@ -12,17 +12,13 @@ open class SACMessageVoiceContentView: UIView, SACMessageContentViewType {
     
     public override init(frame: CGRect) {
         super.init(frame: frame)
-        _logger.trace()
         _commonInit()
     }
     public required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
-        _logger.trace()
         _commonInit()
     }
-    deinit {
-        _logger.trace()
-    }
+
     
     open func apply(_ message: SACMessageType) {
         guard let content = message.content as? SACMessageVoiceContent else {
