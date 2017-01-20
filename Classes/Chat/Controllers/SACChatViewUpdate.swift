@@ -84,8 +84,26 @@ internal class SACChatViewUpdate: NSObject {
         super.init()
     }
     
-    internal func apply(with updateItems: Array<SACChatViewUpdateItem>, to chatView: SACChatView) {
+    
+    internal func apply(with updateItems: Array<SACChatViewUpdateItem>, to containerView: SACChatContainerView) {
+        _ = containerView.numberOfItems(inSection: 0)
         _computeItemUpdates(updateItems)
+        
+        guard let changes = _changes, !changes.isEmpty else {
+            return
+        }
+        containerView.performBatchUpdates({
+            
+            changes.filter({ $0.isMove }).forEach({ 
+              containerView.moveItem(at: .init(item: max($0.from, 0), section: 0),
+                                     to: .init(item: max($0.to, 0), section: 0))
+            })
+            // 添加/删除/更新
+            containerView.insertItems(at: changes.filter({ $0.isInsert }).map({ .init(item: max($0.from + 1, 0), section: 0) }))
+            containerView.reloadItems(at: changes.filter({ $0.isUpdate }).map({ .init(item: max($0.from, 0), section: 0) }))
+            containerView.deleteItems(at: changes.filter({ $0.isRemove }).map({ .init(item: max($0.from, 0), section: 0) }))
+            
+        }, completion: nil)
     }
     
     private func _fetch(after message: SACMessageType?) -> SACMessageType? {
