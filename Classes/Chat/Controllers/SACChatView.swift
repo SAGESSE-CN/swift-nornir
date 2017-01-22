@@ -206,22 +206,23 @@ extension SACChatView: UICollectionViewDataSource, SACChatViewLayoutDelegate {
         return .init(width: collectionView.frame.width, height: size.height)
     }
     open func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAvatarOf style: SACMessageStyle) -> CGSize {
-        return .init(width: 40, height: 40)
+        // 78 * 78
+        return .init(width: 39, height: 39)
     }
     open func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemCardOf style: SACMessageStyle) -> CGSize {
-        return .init(width: 0, height: 20)
+        return .init(width: 0, height: 18)
     }
     
     open func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForItemOf style: SACMessageStyle) -> UIEdgeInsets {
         switch style {
         case .bubble:
-            // bubble content edg
-            // +----10--+-+---+
+            // bubble content edg, 2x
+            // +----12--+-+---+
             // |        | |   |
-            // 10       2 40  10
+            // 16       4 40  16
             // |        | |   |
-            // +----10--+-+---+
-            return .init(top: 10, left: 10, bottom: 10, right: 2 + 40 + 10)
+            // +----12--+-+---+
+            return .init(top: 6, left: 8, bottom: 6, right: 2 + 20 + 8)
             
         case .notice:
             // default edg
@@ -239,10 +240,13 @@ extension SACChatView: UICollectionViewDataSource, SACChatViewLayoutDelegate {
         }
     }
     open func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForItemCardOf style: SACMessageStyle) -> UIEdgeInsets {
-        return .init(top: 2, left: 8, bottom: 0, right: 8)
+        return .init(top: 0, left: 8, bottom: 0, right: 8)
     }
     open func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForItemAvatarOf style: SACMessageStyle) -> UIEdgeInsets {
-        return .init(top: 0, left: 0, bottom: 10, right: 2)
+        return .init(top: 2, left: 2, bottom: 2, right: 2)
+    }
+    open func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForItemBubbleOf style: SACMessageStyle) -> UIEdgeInsets {
+        return .init(top: -2, left: 0, bottom: -2, right: 0)
     }
     open func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForItemContentOf style: SACMessageStyle) -> UIEdgeInsets {
         switch style {

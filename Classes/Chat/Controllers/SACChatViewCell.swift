@@ -127,7 +127,8 @@ open class SACChatViewCell: UICollectionViewCell, UIGestureRecognizerDelegate {
         }
         // update bubble view layout
         if let view = _bubbleView {
-            view.frame = layoutInfo.layoutedBoxRect(with: .content)
+            view.frame = layoutInfo.layoutedRect(with: .bubble)
+            //view.frame = layoutInfo.layoutedBoxRect(with: .content)
         }
         // update visit card view layout
         if let view = _cardView as? UIView {

@@ -28,7 +28,7 @@ open class SACMessageTextContent: NSObject, SACMessageContentType {
     open class var viewType: SACMessageContentViewType.Type {
         return SACMessageTextContentView.self
     }
-    open var layoutMargins: UIEdgeInsets = .init(top: 4, left: 6, bottom: 4, right: 6)
+    open var layoutMargins: UIEdgeInsets = .init(top: 9, left: 10, bottom: 9, right: 10)
     
     open var text: NSAttributedString
     open var attributedText: YYTextLayout?
@@ -50,6 +50,8 @@ open class SACMessageTextContent: NSObject, SACMessageContentType {
 //        @property (nonatomic, readonly) CGRect textBoundingRect;
 //        ///< Bounding size (glyphs and insets, ceil to pixel)
 //        @property (nonatomic, readonly) CGSize textBoundingSize;
-        return attributedText?.textBoundingSize ?? .zero
+        let size = attributedText?.textBoundingSize ?? .zero
+        
+        return .init(width: max(size.width, 15), height: max(size.height, 15))
     }
 }

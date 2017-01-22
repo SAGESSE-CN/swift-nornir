@@ -392,7 +392,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
 //        srand(UInt32(time(nil)))
         
-        
         //-(BOOL)_canOpenURL:(id)url publicURLsOnly:(BOOL)only;
         //SBSCopyLocalizedApplicationNameForDisplayIdentifier
         

@@ -100,7 +100,7 @@ internal class SACChatViewUpdate: NSObject {
                                      to: .init(item: max($0.to, 0), section: 0))
             })
             // apply insert/remove/update
-            containerView.insertItems(at: changes.filter({ $0.isInsert }).map({ .init(item: max($0.from + 1, 0), section: 0) }))
+            containerView.insertItems(at: changes.filter({ $0.isInsert }).map({ .init(item: max($0.to, 0), section: 0) }))
             containerView.reloadItems(at: changes.filter({ $0.isUpdate }).map({ .init(item: max($0.from, 0), section: 0) }))
             containerView.deleteItems(at: changes.filter({ $0.isRemove }).map({ .init(item: max($0.from, 0), section: 0) }))
             

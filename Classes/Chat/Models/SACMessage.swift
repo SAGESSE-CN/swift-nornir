@@ -26,7 +26,7 @@ open class SACMessage: NSObject, SACMessageType {
     
     open let identifier: UUID = .init()
     
-    open var name: String = "Unknow"
+    open var name: String = "SAGESSE"
     
     // 发送/接收时间
     open var date: Date = .init()

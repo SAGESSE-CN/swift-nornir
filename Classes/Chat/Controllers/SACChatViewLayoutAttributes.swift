@@ -12,6 +12,7 @@ import UIKit
     case all
     case card
     case avatar
+    case bubble
     case content
 }
 
