@@ -273,8 +273,16 @@ extension SACChatView: UICollectionViewDataSource, SACChatViewLayoutDelegate {
         return true
     }
     open func collectionView(_ collectionView: UICollectionView, canPerformAction action: Selector, forItemAt indexPath: IndexPath, withSender sender: Any?) -> Bool {
-        logger.debug(action)
-        return true
+        if action == #selector(copy(_:)) {
+            return true
+        }
+        if action == #selector(paste(_:)) {
+            return true
+        }
+        if action == #selector(delete(_:)) {
+            return true
+        }
+        return false
     }
     open func collectionView(_ collectionView: UICollectionView, performAction action: Selector, forItemAt indexPath: IndexPath, withSender sender: Any?) {
         logger.debug(action)

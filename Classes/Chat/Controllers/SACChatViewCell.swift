@@ -207,13 +207,12 @@ open class SACChatViewCell: UICollectionViewCell, UIGestureRecognizerDelegate {
         //logger.trace()
         
         let rect = UIEdgeInsetsInsetRect(info.layoutedRect(with: .content), -content.layoutMargins)
-        
-        // 设置响应者
-        (NSClassFromString("UICalloutBar") as? AnyObject)?.setValue(self, forKeyPath: "sharedCalloutBar.responderTarget")
-        
-        // 设置菜单显示位置
         let menuController = UIMenuController.shared
         
+        // set responder
+        (NSClassFromString("UICalloutBar") as? AnyObject)?.setValue(self, forKeyPath: "sharedCalloutBar.responderTarget")
+        
+        // set menu display position
         menuController.setTargetRect(convert(rect, to: view), in: view)
         menuController.setMenuVisible(true, animated: true)
         
@@ -222,7 +221,7 @@ open class SACChatViewCell: UICollectionViewCell, UIGestureRecognizerDelegate {
             return 
         }
         
-        // set to selected
+        // set selected
         self.isHighlighted = true
         self._menuNotifyObserver = NotificationCenter.default.addObserver(forName: .UIMenuControllerWillHideMenu, object: nil, queue: nil) { [weak self] notification in
             // is release?
@@ -230,23 +229,23 @@ open class SACChatViewCell: UICollectionViewCell, UIGestureRecognizerDelegate {
                 return 
             }
             NotificationCenter.default.removeObserver(observer)
-            // process
+            // cancel select
             self?.isHighlighted = false
             self?._menuNotifyObserver = nil
         }
     }
     
     open override func canPerformAction(_ action: Selector, withSender sender: Any?) -> Bool {
-        // 只处理菜单栏
+        // menu bar only process
         guard sender is UIMenuController else {
-            // 其他的用默认处理
+            // other is default process
             return super.canPerformAction(action, withSender: sender)
         }
-        // 检查有没有collectionView和attributes
+        // check collectionView and attributes
         guard let view = _collectionView, let indexPath = _layoutAttributes?.indexPath else {
             return false
         }
-        // 转发到collectionView
+        // forward to collectionView
         guard let result = view.delegate?.collectionView?(view, canPerformAction: action, forItemAt: indexPath, withSender: sender) else {
             return false 
         }
@@ -254,16 +253,16 @@ open class SACChatViewCell: UICollectionViewCell, UIGestureRecognizerDelegate {
     }
     
     open override func perform(_ action: Selector!, with sender: Any!) -> Unmanaged<AnyObject>! {
-        // 只处理菜单栏
+        // menu bar only process
         guard sender is UIMenuController else {
-            // 其他的用默认处理
+            // other is default process
             return super.perform(action, with: sender)
         }
-        // 检查有没有collectionView和attributes
+        // check collectionView and attributes
         guard let view = _collectionView, let indexPath = _layoutAttributes?.indexPath else {
             return nil
         }
-        // 转发到collectionView
+        // forward to collectionView
         view.delegate?.collectionView?(view, performAction: action, forItemAt: indexPath, withSender: sender)
         
         return nil
