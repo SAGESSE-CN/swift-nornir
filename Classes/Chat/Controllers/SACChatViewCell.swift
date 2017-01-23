@@ -217,6 +217,11 @@ open class SACChatViewCell: UICollectionViewCell, UIGestureRecognizerDelegate {
         menuController.setTargetRect(convert(rect, to: view), in: view)
         menuController.setMenuVisible(true, animated: true)
         
+        // really show?
+        guard menuController.isMenuVisible else {
+            return 
+        }
+        
         // set to selected
         self.isHighlighted = true
         self._menuNotifyObserver = NotificationCenter.default.addObserver(forName: .UIMenuControllerWillHideMenu, object: nil, queue: nil) { [weak self] notification in
@@ -237,10 +242,17 @@ open class SACChatViewCell: UICollectionViewCell, UIGestureRecognizerDelegate {
             // 其他的用默认处理
             return super.canPerformAction(action, withSender: sender)
         }
-        
-        return super.canPerformAction(action, withSender: sender)
-        //return false
+        // 检查有没有collectionView和attributes
+        guard let view = _collectionView, let indexPath = _layoutAttributes?.indexPath else {
+            return false
+        }
+        // 转发到collectionView
+        guard let result = view.delegate?.collectionView?(view, canPerformAction: action, forItemAt: indexPath, withSender: sender) else {
+            return false 
+        }
+        return result
     }
+    
     open override func perform(_ action: Selector!, with sender: Any!) -> Unmanaged<AnyObject>! {
         // 只处理菜单栏
         guard sender is UIMenuController else {
