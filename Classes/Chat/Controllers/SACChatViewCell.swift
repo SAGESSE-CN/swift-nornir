@@ -22,6 +22,11 @@ open class SACChatViewCell: UICollectionViewCell, UIGestureRecognizerDelegate {
     }
     deinit {
         _removeObserverForMenu()
+        
+        guard let observer = _observerForMenu else{
+            return
+        }
+        NotificationCenter.default.removeObserver(observer)
     }
     
     open override func apply(_ layoutAttributes: UICollectionViewLayoutAttributes) {
@@ -192,13 +197,6 @@ open class SACChatViewCell: UICollectionViewCell, UIGestureRecognizerDelegate {
         return true
     }
     
-    private dynamic func _menuDismissed(_ sender: Notification) {
-        //logger.trace()
-        
-        isHighlighted = false
-        
-        _removeObserverForMenu()
-    }
     private dynamic func _handleMenuGesture(_ sender: UILongPressGestureRecognizer) {
         guard sender.state == .began else {
             return
@@ -209,7 +207,7 @@ open class SACChatViewCell: UICollectionViewCell, UIGestureRecognizerDelegate {
             return
         }
         //logger.trace()
-       
+        
         let rect = UIEdgeInsetsInsetRect(info.layoutedRect(with: .content), { edg -> UIEdgeInsets in
             return .init(top: -edg.top,
                          left: -edg.left,
@@ -217,40 +215,27 @@ open class SACChatViewCell: UICollectionViewCell, UIGestureRecognizerDelegate {
                          right: -edg.right)
         }(content.layoutMargins))
         
-        let mc = UIMenuController.shared
-        
         // 设置响应者
-        let cls = NSClassFromString("UICalloutBar") as? AnyObject
-        cls?.setValue(self, forKeyPath: "sharedCalloutBar.responderTarget")
+        (NSClassFromString("UICalloutBar") as? AnyObject)?.setValue(self, forKeyPath: "sharedCalloutBar.responderTarget")
         
-        mc.setTargetRect(convert(rect, to: view), in: view)
-        mc.setMenuVisible(true, animated: true)
+        // 设置菜单显示位置
+        let menuController = UIMenuController.shared
         
+        menuController.setTargetRect(convert(rect, to: view), in: view)
+        menuController.setMenuVisible(true, animated: true)
         
-        isHighlighted = true
-        
-        _addObserverForMenu()
-    }
-    
-    private func _addObserverForMenu() {
-        guard !_observingMenu else {
-            return
+        // set to selected
+        self.isHighlighted = true
+        self._observerForMenu = NotificationCenter.default.addObserver(forName: .UIMenuControllerWillHideMenu, object: nil, queue: nil) { [weak self] notification in
+            // is release?
+            guard let observer = self?._observerForMenu else {
+                return 
+            }
+            NotificationCenter.default.removeObserver(observer)
+            // process
+            self?.isHighlighted = false
+            self?._observerForMenu = nil
         }
-        //_logger.trace()
-        _observingMenu = true
-        
-        let center = NotificationCenter.default
-        center.addObserver(self, selector: #selector(_menuDismissed(_:)), name: .UIMenuControllerWillHideMenu, object: nil)
-    }
-    private func _removeObserverForMenu() {
-        guard _observingMenu else {
-            return
-        }
-        //_logger.trace()
-        _observingMenu = false
-        
-        let center = NotificationCenter.default
-        center.removeObserver(self, name: .UIMenuControllerWillHideMenu, object: nil)
     }
     
     open override func canPerformAction(_ action: Selector, withSender sender: Any?) -> Bool {
@@ -262,6 +247,18 @@ open class SACChatViewCell: UICollectionViewCell, UIGestureRecognizerDelegate {
         }
         return false
     }
+    open override func perform(_ aSelector: Selector!, with object: Any!) -> Unmanaged<AnyObject>! {
+        // 只处理菜单栏
+        guard object is UIMenuController else {
+            // 其他的用默认处理
+            return super.perform(aSelector, with: object)
+        }
+        
+        logger.debug(aSelector)
+        
+        return nil
+    }
+    
     
     private func _commonInit() {
         
@@ -276,7 +273,7 @@ open class SACChatViewCell: UICollectionViewCell, UIGestureRecognizerDelegate {
     private var _avatarView: SACMessageContentViewType?
     private var _contentView: SACMessageContentViewType?
     
-    private var _observingMenu: Bool = false
+    private var _observerForMenu: Any?
     
     private var _layoutAttributes: SACChatViewLayoutAttributes?
     

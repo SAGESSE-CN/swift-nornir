@@ -20,6 +20,10 @@ open class SACMessageTextContentView: YYLabel, SACMessageContentViewType {
         _commonInit()
     }
     
+    open override func canPerformAction(_ action: Selector, withSender sender: Any?) -> Bool {
+        return super.canPerformAction(action, withSender: sender)
+    }
+    
     open func apply(_ message: SACMessageType) {
         guard let content = message.content as? SACMessageTextContent else {
             return
