@@ -21,9 +21,7 @@ open class SACChatViewCell: UICollectionViewCell, UIGestureRecognizerDelegate {
         _commonInit()
     }
     deinit {
-        _removeObserverForMenu()
-        
-        guard let observer = _observerForMenu else{
+        guard let observer = _menuNotifyObserver else{
             return
         }
         NotificationCenter.default.removeObserver(observer)
@@ -185,7 +183,7 @@ open class SACChatViewCell: UICollectionViewCell, UIGestureRecognizerDelegate {
     }
     
     open override func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
-        guard gestureRecognizer === _menuGesture else {
+        guard gestureRecognizer == _menuGesture else {
             return super.gestureRecognizerShouldBegin(gestureRecognizer)
         }
         guard let rect = _layoutAttributes?.info?.layoutedBoxRect(with: .content) else {
@@ -208,12 +206,7 @@ open class SACChatViewCell: UICollectionViewCell, UIGestureRecognizerDelegate {
         }
         //logger.trace()
         
-        let rect = UIEdgeInsetsInsetRect(info.layoutedRect(with: .content), { edg -> UIEdgeInsets in
-            return .init(top: -edg.top,
-                         left: -edg.left,
-                         bottom: -edg.bottom,
-                         right: -edg.right)
-        }(content.layoutMargins))
+        let rect = UIEdgeInsetsInsetRect(info.layoutedRect(with: .content), -content.layoutMargins)
         
         // 设置响应者
         (NSClassFromString("UICalloutBar") as? AnyObject)?.setValue(self, forKeyPath: "sharedCalloutBar.responderTarget")
@@ -226,45 +219,46 @@ open class SACChatViewCell: UICollectionViewCell, UIGestureRecognizerDelegate {
         
         // set to selected
         self.isHighlighted = true
-        self._observerForMenu = NotificationCenter.default.addObserver(forName: .UIMenuControllerWillHideMenu, object: nil, queue: nil) { [weak self] notification in
+        self._menuNotifyObserver = NotificationCenter.default.addObserver(forName: .UIMenuControllerWillHideMenu, object: nil, queue: nil) { [weak self] notification in
             // is release?
-            guard let observer = self?._observerForMenu else {
+            guard let observer = self?._menuNotifyObserver else {
                 return 
             }
             NotificationCenter.default.removeObserver(observer)
             // process
             self?.isHighlighted = false
-            self?._observerForMenu = nil
+            self?._menuNotifyObserver = nil
         }
     }
     
     open override func canPerformAction(_ action: Selector, withSender sender: Any?) -> Bool {
-        if action == #selector(copy(_:)) {
-            return true
-        }
-        if action == #selector(delete(_:)) {
-            return true
-        }
-        return false
-    }
-    open override func perform(_ aSelector: Selector!, with object: Any!) -> Unmanaged<AnyObject>! {
         // 只处理菜单栏
-        guard object is UIMenuController else {
+        guard sender is UIMenuController else {
             // 其他的用默认处理
-            return super.perform(aSelector, with: object)
+            return super.canPerformAction(action, withSender: sender)
         }
         
-        logger.debug(aSelector)
+        return super.canPerformAction(action, withSender: sender)
+        //return false
+    }
+    open override func perform(_ action: Selector!, with sender: Any!) -> Unmanaged<AnyObject>! {
+        // 只处理菜单栏
+        guard sender is UIMenuController else {
+            // 其他的用默认处理
+            return super.perform(action, with: sender)
+        }
+        // 检查有没有collectionView和attributes
+        guard let view = _collectionView, let indexPath = _layoutAttributes?.indexPath else {
+            return nil
+        }
+        // 转发到collectionView
+        view.delegate?.collectionView?(view, performAction: action, forItemAt: indexPath, withSender: sender)
         
         return nil
     }
     
-    
     private func _commonInit() {
-        
-        _menuGesture.delegate = self
-        
-        contentView.addGestureRecognizer(_menuGesture)
+
     }
     
     private var _bubbleView: UIImageView?
@@ -273,11 +267,16 @@ open class SACChatViewCell: UICollectionViewCell, UIGestureRecognizerDelegate {
     private var _avatarView: SACMessageContentViewType?
     private var _contentView: SACMessageContentViewType?
     
-    private var _observerForMenu: Any?
+    private var _menuNotifyObserver: Any?
+    private var _menuGesture: UILongPressGestureRecognizer? {
+        return value(forKeyPath: "_menuGesture") as? UILongPressGestureRecognizer
+    }
+    
+    private var _collectionView: UICollectionView? {
+        return value(forKeyPath: "_collectionView") as? UICollectionView
+    }
     
     private var _layoutAttributes: SACChatViewLayoutAttributes?
-    
-    private lazy var _menuGesture: UILongPressGestureRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(_handleMenuGesture(_:)))
 }
 
 
@@ -293,4 +292,9 @@ fileprivate extension SACMessageContentViewType {
         }
         return ob
     }
+}
+
+fileprivate prefix func -(edg: UIEdgeInsets) -> UIEdgeInsets {
+    // 取反
+    return .init(top: -edg.top, left: -edg.left, bottom: -edg.bottom, right: edg.right)
 }
