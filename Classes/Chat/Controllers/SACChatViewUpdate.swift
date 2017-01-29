@@ -255,6 +255,8 @@ internal class SACChatViewUpdate: NSObject {
         
         // move(f,t): f = remove(f), t = insert(t), new move(f,t): f = remove(f), t = insert(f)
         // update(f,t): f = remove(f), t = insert(t), new update(f,t): f = remove(f), t = insert(f)
+        logger.debug(rms)
+        logger.debug(adds)
         
         // automatic merge delete and update items
         results.append(contentsOf: rms.map({ item in
@@ -263,7 +265,7 @@ internal class SACChatViewUpdate: NSObject {
             // can't merge to move item?
             if let addIndex = adds.index(where: { dest[$0.to] == delElement }) {
                 let addItem = adds.remove(at: addIndex)
-                return .move(from: from, to: addItem.from)
+                return .move(from: from, to: addItem.to)
             }
             // can't merge to update item?
             if let addIndex = adds.index(where: { $0.to == from }) {
@@ -303,7 +305,7 @@ internal class SACChatViewUpdate: NSObject {
             switch item {
             case .move(let from, let to):
                 // ignore for source equ dest
-                guard abs(from - to) >= 2 else {
+                guard abs(from - to) >= 1 else {
                     return result
                 }
                 // move message
@@ -311,10 +313,10 @@ internal class SACChatViewUpdate: NSObject {
                 // splite to insert & remove
                 if let message = _element(at: from) {
                     allRemoves.append((from))
-                    allInserts.append((to, message))
+                    allInserts.append((to + 1, message))
                 }
                 // from + 1: the selected row will change
-                return (min(min(from, to), result.0), max(max(from + 1, to), result.1))
+                return (min(min(from, to + 1), result.0), max(max(from + 1, to + 1), result.1))
                 
             case .remove(let index):
                 // remove message

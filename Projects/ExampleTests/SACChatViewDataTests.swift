@@ -693,7 +693,7 @@ class SACChatViewDataTests: XCTestCase {
         // 无效移动(TimeLine)
         md1._elements = mde1
         up1._computeItemUpdates([
-            .move(at: 0, to: 2),
+            .move(at: 0, to: 1),
         ])
         XCTAssert(md1.count == 6, "move error!")
         XCTAssert(md1._element(at: 0)?.content is SACMessageTimeLineContent)
@@ -706,7 +706,7 @@ class SACChatViewDataTests: XCTestCase {
         // 普通移动(头)
         md1._elements = mde1
         up1._computeItemUpdates([
-            .move(at: 1, to: 3),
+            .move(at: 1, to: 2),
         ])
         XCTAssert(md1.count == 7, "move error!")
         XCTAssert(md1._element(at: 0)?.content is SACMessageTimeLineContent)
@@ -720,7 +720,7 @@ class SACChatViewDataTests: XCTestCase {
         // 普通移动(中间) - 交换位置
         md1._elements = mde1
         up1._computeItemUpdates([
-            .move(at: 2, to: 4),
+            .move(at: 2, to: 3),
         ])
         XCTAssert(md1.count == 7, "move error!")
         XCTAssert(md1._element(at: 0)?.content is SACMessageTimeLineContent)
@@ -734,7 +734,7 @@ class SACChatViewDataTests: XCTestCase {
         // 普通移动(尾)
         md1._elements = mde1
         up1._computeItemUpdates([
-            .move(at: 5, to: 3),
+            .move(at: 5, to: 2),
         ])
         XCTAssert(md1.count == 7, "move error!")
         XCTAssert(md1._element(at: 0)?.content is SACMessageTimeLineContent)

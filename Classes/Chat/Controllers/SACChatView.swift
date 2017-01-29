@@ -88,6 +88,12 @@ public protocol SACChatViewDelegate: class {
         _batchCommit()
     }
     
+    func move(at index1: Int, to index2: Int) {
+        _batchBegin()
+        _batchItems.append(.move(at: index1, to: index2))
+        _batchCommit()
+    }
+    
     func append(_ newMessage: SACMessageType) {
         insert(newMessage, at: _chatViewData.count)
     }
@@ -289,6 +295,10 @@ extension SACChatView: UICollectionViewDataSource, SACChatViewLayoutDelegate {
         
         if action == #selector(delete(_:)) {
             remove(at: indexPath.item)
+        }
+        if action == #selector(paste(_:)) {
+            //move(at: indexPath.item, to: _chatViewData.count - 1)
+            move(at: indexPath.item, to: indexPath.item + 1)
         }
     }
 }
