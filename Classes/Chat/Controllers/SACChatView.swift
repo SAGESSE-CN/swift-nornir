@@ -285,7 +285,11 @@ extension SACChatView: UICollectionViewDataSource, SACChatViewLayoutDelegate {
         return false
     }
     open func collectionView(_ collectionView: UICollectionView, performAction action: Selector, forItemAt indexPath: IndexPath, withSender sender: Any?) {
-        logger.debug(action)
+        logger.debug("\(indexPath) \(action)")
+        
+        if action == #selector(delete(_:)) {
+            remove(at: indexPath.item)
+        }
     }
 }
 
