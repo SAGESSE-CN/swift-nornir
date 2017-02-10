@@ -306,6 +306,11 @@ internal class SAIInputAccessoryView: UIView {
         _textField.scrollIndicatorInsets = UIEdgeInsetsMake(2, 0, 2, 0)
         _textField.translatesAutoresizingMaskIntoConstraints = false
         _textField.backgroundView.translatesAutoresizingMaskIntoConstraints = false
+        _textField.typingAttributes[NSParagraphStyleAttributeName] = {
+            let style = NSMutableParagraphStyle()
+            style.lineBreakMode = .byCharWrapping
+            return style
+        }()
         
         _collectionViewLayout.minimumLineSpacing = 8
         _collectionViewLayout.minimumInteritemSpacing = 8
