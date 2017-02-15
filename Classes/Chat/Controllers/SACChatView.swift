@@ -297,8 +297,8 @@ extension SACChatView: UICollectionViewDataSource, SACChatViewLayoutDelegate {
             remove(at: indexPath.item)
         }
         if action == #selector(paste(_:)) {
-            //move(at: indexPath.item, to: _chatViewData.count - 1)
-            move(at: indexPath.item, to: indexPath.item + 1)
+            move(at: indexPath.item, to: _chatViewData.count - 1)
+            //move(at: indexPath.item, to: indexPath.item + 1)
         }
     }
 }

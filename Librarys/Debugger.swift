@@ -19,6 +19,11 @@ internal class Debugger: UIView {
         setNeedsDisplay()
     }
     
+    func addText(_ text: String, key: String = UUID().uuidString) {
+        texts[key] = text
+        setNeedsDisplay()
+    }
+    
     func color(with key: String) -> UIColor {
         if let color = colors[key] {
             return color
@@ -38,6 +43,11 @@ internal class Debugger: UIView {
         
         context?.setLineWidth(1 / UIScreen.main.scale)
         
+        
+        texts.forEach {
+            context?.setStrokeColor(color(with: $0).cgColor)
+            ($1 as NSString).draw(at: .zero)
+        }
         points.forEach {
             
             context?.setStrokeColor(color(with: $0).cgColor)
@@ -70,6 +80,8 @@ internal class Debugger: UIView {
             context?.strokePath()
         }
     }
+    
+    lazy var texts: [String: String] = [:]
     
     lazy var rects: [String: CGRect] = [:]
     lazy var points: [String: CGPoint] = [:]

@@ -16,14 +16,6 @@ open class SACMessage: NSObject, SACMessageType {
         super.init()
     }
     
-    convenience init(forTimeline after: SACMessageType, before: SACMessageType? = nil) {
-        let content = SACMessageTimeLineContent(date: after.date)
-        content.before = before
-        content.after = after
-        self.init(content: content)
-        self.date = after.date
-    }
-    
     open let identifier: UUID = .init()
     
     open var name: String = "SAGESSE"

@@ -20,7 +20,23 @@ extension SACChatViewData {
     }
 }
 
+
 class SACChatViewDataTests: XCTestCase {
+    
+    func _equal(_ lhs: [SACMessageType], _ rhs: [SACMessageType]) -> Bool {
+        guard lhs.count == rhs.count else {
+            return false
+        }
+        return lhs.elementsEqual(rhs) {
+            guard $0 !== $1 else {
+                return true
+            }
+            guard $0.content is SACMessageTimeLineContent && $1.content is SACMessageTimeLineContent else {
+                return false
+            }
+            return true
+        }
+    }
     
     override func setUp() {
         super.setUp()
@@ -36,6 +52,36 @@ class SACChatViewDataTests: XCTestCase {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
         super.tearDown()
     }
+    
+    func testConvert() {
+        let cd1 = SACChatViewData()
+        let cp1 = SACChatViewUpdate(model: cd1)
+        
+        
+        let t = SACMessage(content: SACMessageTimeLineContent(date: .init()))
+        let m = SACMessage(content: SACMessageTextContent(text: "test"))
+        
+        // case-h1: F=N, P=N, C=T, N=M, L=M
+        XCTAssert(_equal(cp1._convert(message: t, previous: nil, next: m, first: m, last: m), []))
+        
+        // case-h2: F=N, P=N, C=M, N=M, L=M
+        XCTAssert(_equal(cp1._convert(message: m, previous: nil, next: m, first: nil, last: m), [m]))
+        
+        // case-h3: F=N, P=N, C=M, N=T, L=M
+        // case-m1: F=M, P=M, C=M, N=M, L=M
+        // case-m2: F=M, P=T, C=M, N=M, L=M
+        // case-m3: F=M, P=T, C=M, N=T, L=M
+        // case-m4: F=M, P=T, C=T, N=T, L=M
+        // case-m5: F=M, P=N, C=T, N=M, L=N
+        // case-m6: F=M, P=N, C=M, N=M, L=N
+        // case-t1: F=M, P=M, C=T, N=N, L=N
+        // case-t2: F=M, P=M, C=M, N=N, L=N
+        // case-t3: F=M, P=T, C=M, N=N, L=N
+        // case-s1: F=N, P=N, C=T, N=N, L=N
+        // case-s1: F=N, P=N, C=M, N=N, L=N
+        
+    }
+    /*
     
     func testInsert() {
         
@@ -235,6 +281,9 @@ class SACChatViewDataTests: XCTestCase {
         XCTAssert(rd1.count == 5, "remove error!")
         XCTAssert(rd1._element(at: 0)?.content is SACMessageTimeLineContent)
         XCTAssert(rd1._element(at: 1) === m2)
+        XCTAssert(rd1._element(at: 2) === m3)
+        XCTAssert(rd1._element(at: 3)?.content is SACMessageTimeLineContent)
+        XCTAssert(rd1._element(at: 4) === m4)
         
         // 普通删除(中间)
         rd1._elements = rde1
@@ -744,6 +793,21 @@ class SACChatViewDataTests: XCTestCase {
         XCTAssert(md1._element(at: 4) === m4)
         XCTAssert(md1._element(at: 5)?.content is SACMessageTimeLineContent)
         XCTAssert(md1._element(at: 6) === m3)
+        
+        // ..
+        md1._elements = mde1
+        up1._computeItemUpdates([
+            .move(at: 2, to: 5),
+        ])
+        XCTAssert(md1.count == 8, "move error!")
+        XCTAssert(md1._element(at: 0)?.content is SACMessageTimeLineContent)
+        XCTAssert(md1._element(at: 1) === m1)
+        XCTAssert(md1._element(at: 2)?.content is SACMessageTimeLineContent)
+        XCTAssert(md1._element(at: 3) === m3)
+        XCTAssert(md1._element(at: 4)?.content is SACMessageTimeLineContent)
+        XCTAssert(md1._element(at: 5) === m4)
+        XCTAssert(md1._element(at: 6)?.content is SACMessageTimeLineContent)
+        XCTAssert(md1._element(at: 7) === m2)
     }
     
     func testOther() {
@@ -791,6 +855,8 @@ class SACChatViewDataTests: XCTestCase {
 ////        XCTAssert(bd1._element(at: 5)?.content is SACMessageTimeLineContent)
 ////        XCTAssert(bd1._element(at: 6) === m1)
 //    }
+ 
+ */
     
     let m1 = SACMessage(content: SACMessageTextContent(text: "m1"))
     let m2 = SACMessage(content: SACMessageTextContent(text: "m2"))

@@ -107,6 +107,17 @@ internal class SACChatViewUpdate: NSObject {
         }, completion: nil)
     }
     
+    fileprivate func _timeLine(after: SACMessageType, before: SACMessageType?) -> SACMessageType {
+        let content = SACMessageTimeLineContent(date: after.date)
+        let message = SACMessage(content: content)
+        
+        content.before = before
+        content.after = after
+        message.date = after.date
+        
+        return message
+    }
+    
     private func _fetch(after message: SACMessageType?) -> SACMessageType? {
         guard let content = message?.content as? SACMessageTimeLineContent else {
             return message
@@ -127,10 +138,105 @@ internal class SACChatViewUpdate: NSObject {
         return _model[index]
     }
     
+    internal func _convert(message current: SACMessageType, previous: SACMessageType?, next: SACMessageType?, first: SACMessageType?, last: SACMessageType?) -> [SACMessageType] {
+        
+        //     V-1         V-2         V-3         V-4
+        // +---------+ +---------+ +---------+ +---------+
+        // |    M   <| |    M    | |    M   <| |    M    |
+        // |#   T   <| |#   M   <| |#   T   <| |#   M   <|
+        // |    D    | |    D    | |    D    | |    D    |
+        // |#   T   <| |#   T   <| |#   M   <| |#   M   <|
+        // |    M   <| |    M   <| |    M    | |    M    |
+        // +---------+ +---------+ +---------+ +---------+
+        //
+        
+        // case-h1: F=N, P=N, C=T, N=M, L=M
+        // case-h2: F=N, P=N, C=M, N=M, L=M
+        // case-h3: F=N, P=N, C=M, N=T, L=M
+        // case-h4: F=T, P=N, C=T, N=T, L=M
+        // case-h5: F=M, P=N, C=M, N=T, L=M
+        // case-m1: F=M, P=M, C=M, N=M, L=M
+        // case-m2: F=M, P=T, C=M, N=M, L=M
+        // case-m3: F=M, P=T, C=M, N=T, L=M
+        // case-m4: F=M, P=T, C=T, N=T, L=M
+        // case-m5: F=M, P=N, C=T, N=M, L=N
+        // case-m6: F=M, P=N, C=M, N=M, L=N
+        // case-m7: F=M, P=M, C=M, N=N, L=M
+        // case-m8: F=M, P=M, C=T, N=N, L=T
+        // case-m9: F=M, P=T, C=M, N=N, L=M
+        // case-ma: F=M, P=T, C=T, N=N, L=T
+        // case-t1: F=M, P=M, C=T, N=N, L=N
+        // case-t2: F=M, P=M, C=M, N=N, L=N
+        // case-t3: F=M, P=T, C=M, N=N, L=N
+        // case-s1: F=N, P=N, C=T, N=N, L=N
+        // case-s1: F=N, P=N, C=M, N=N, L=N
+        
+        // case-s1: F=M, P=N, C=T, N=N, L=T // 不存在
+        // case-s1: F=N, P=N, C=T, N=N, L=T
+        
+        var requiredTimeLine = false
+        var checkTimeInterval = false
+        
+//        // match: case-s1, case-s2
+//        if previous == nil && first == nil && next == nil && last == nil {
+//            // match case-s1?
+//            guard !current._isTimeLineMessage else {
+//                return [] // yes, ignore
+//            }
+//            // required tl-message
+//            return [_timeLine(after: current, before: nil), current]
+//        }
+        
+        // this is begin.
+        if previous == nil {
+            // this is page begin
+            if first == nil {
+                // required tl-message
+                requiredTimeLine = true
+            }
+        }
+        
+        // this is end.
+        if next == nil {
+        }
+        
+        // p -> c
+        // c -> n
+        
+        let pp = _fetch(before: first)
+        let ll = _fetch(after: last)
+        
+//        // match: case-h1, case-m5, case-m4, case-m7, case-t1
+//        if let content = current.content as? SACMessageTimeLineContent {
+//            
+//            
+//            // previous is tl-message?
+//            guard !(previous?._isTimeLineMessage ?? false) else {
+//                return [] // ignore
+//            }
+//            // required checkout time interval
+//            checkTimeInterval = true
+//        }
+        
+        
+        
+        return [current]
+    }
+    
     private func _convert(message current: SACMessageType, previous: SACMessageType?) -> [SACMessageType] {
         
-        // if current and previous is lt-message
-        guard !(current._isTimeLineMessage && (previous?._isTimeLineMessage ?? false)) else {
+        //     V-1         V-2         V-3         V-4
+        // +---------+ +---------+ +---------+ +---------+
+        // |    M   <| |    M    | |    M   <| |    M    |
+        // |#   T   <| |#   M   <| |#   T   <| |#   M   <|
+        // |    D    | |    D    | |    D    | |    D    |
+        // |#   T   <| |#   T   <| |#   M   <| |#   M   <|
+        // |    M   <| |    M   <| |    M    | |    M    |
+        // +---------+ +---------+ +---------+ +---------+
+        //
+        
+        // if current or previous is not lt-message
+        guard !current._isTimeLineMessage || !(previous?._isTimeLineMessage ?? false) else {
             // ignore the message
             return []
         }
@@ -158,36 +264,51 @@ internal class SACChatViewUpdate: NSObject {
         }
         
         // too far away
-        return [SACMessage(forTimeline: current, before: vp), current]
+        return [_timeLine(after: current, before: vp), current]
     }
     private func _convert(messages elements: [SACMessageType], first: SACMessageType?, last: SACMessageType?) -> [SACMessageType] {
-        
-        // if first is not TimeLine, add to result
-        let arr = NSMutableArray(capacity: elements.count * 2 + 2)
-        if let message = first, !message._isTimeLineMessage {
-            arr.add(message)
-        }
-        
+        // merge
+        let elements = [first].flatMap({ $0 }) + elements + [last].flatMap({ $0 })
         // processing
-        _ = (0 ... elements.count).reduce(first) {
-            // get previous message
-            let previous = ($0 as? SACMessageTimeLineContent)?.before ?? $0
-            // get current message
-            guard let current = ($1 < elements.count) ? elements[$1] : last else {
-                return nil
-            }
-            // merge message
-            let results = _convert(message: current, previous: previous)
-            // is empty, ignore
-            guard !results.isEmpty else {
-                return $0
-            }
-            arr.addObjects(from: results)
+        return (0 ..< elements.count).reduce(NSMutableArray(capacity: elements.count * 2)) { result, index in
+            // get context messages
+            let previous = result.lastObject as? SACMessageType
+            let current = elements[index]
+            let next = (index + 1 < elements.count) ? elements[index + 1] : nil
+            // convert & merge message
+            result.addObjects(from: _convert(message: current, previous: previous, next: next, first: first, last: last))
             // continue
-            return current
-        }
+            return result
+        } as! [SACMessageType]
         
-        return arr as! [SACMessageType]
+        
+//        // if first is not TimeLine, add to result
+//        let arr = NSMutableArray(capacity: elements.count * 2 + 2)
+//        
+//        if let message = first, !message._isTimeLineMessage {
+//            arr.add(message)
+//        }
+//        
+//        // processing
+//        _ = (0 ... elements.count).reduce(first) {
+//            // get previous message
+//            let previous = $0
+//            // get current message
+//            guard let current = ($1 < elements.count) ? elements[$1] : last else {
+//                return nil
+//            }
+//            // merge message
+//            let results = _convert(message: current, previous: previous)
+//            // is empty, ignore
+//            guard !results.isEmpty else {
+//                return $0
+//            }
+//            arr.addObjects(from: results)
+//            // continue
+//            return results.last
+//        }
+//        
+//        return arr as! [SACMessageType]
     }
     
     private func _diff<T: SACMessageType>(_ src: Array<T>, _ dest: Array<T>) -> Array<SACChatViewUpdateChange> {
