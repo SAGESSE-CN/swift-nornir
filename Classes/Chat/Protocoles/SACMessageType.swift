@@ -33,9 +33,12 @@ import Foundation
     var options: SACMessageOptions { get }
 }
 
-public func !=(lhs: SACMessageType, rhs: SACMessageType) -> Bool {
-    return lhs.identifier != rhs.identifier
-}
-public func ==(lhs: SACMessageType, rhs: SACMessageType) -> Bool {
-    return lhs.identifier == rhs.identifier
-}
+//public func !=(lhs: SACMessageType, rhs: SACMessageType) -> Bool {
+//    return !(lhs == rhs)
+//}
+//public func ==(lhs: SACMessageType, rhs: SACMessageType) -> Bool {
+//    if let o1 = lhs as? NSObject, let o2 = rhs as? NSObject {
+//        return o1.isEqual(o2)
+//    }
+//    return lhs.identifier == rhs.identifier
+//}

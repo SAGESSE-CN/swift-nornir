@@ -150,8 +150,13 @@ internal class SACChatViewUpdate: NSObject {
         // +---------+ +---------+ +---------+ +---------+
         //
         
+        // reset the relationship
+        if let content = current.content as? SACMessageTimeLineContent, next != nil {
+            content.after = next 
+        }
+        
         // check vaild previous and vaild next time interval
-        let tprevious = _fetch(before: previous ?? first)
+        let tprevious = _fetch(before: previous)
         let tcurrent = _fetch(after: current) ?? current
         guard trunc(fabs(tprevious?._timeIntervalSince(tcurrent) ?? (_timeInterval + 1)) * 1000) > trunc(_timeInterval * 1000) else {
             // too near, check current message type
@@ -163,20 +168,27 @@ internal class SACChatViewUpdate: NSObject {
         }
         // too far away, if current is lt-message, ignore current message
         if let content = current.content as? SACMessageTimeLineContent {
-            // if next message is empty, revrese current lt-message
-            guard next == nil else {
+            // if only one lt-message, ignore current lt-message
+            if previous == nil && first == nil && next == nil && last == nil {
                 return []
             }
-            // if first message is empty, ignore current lt-message
-            guard first != nil else {
+            // if previous is empty, content lt-message is begin, reserved current lt-message
+            if previous == nil && content.before == nil {
+                return [current]
+            }
+            // if next is empty(is end), ignore current lt-message
+            if next == nil && last == nil {
                 return []
             }
-            
             // if previous is lt-message, has two lt-message, ignore current message
             if let content = previous?.content as? SACMessageTimeLineContent {
                 // reset previous lt-message for after
                 content.after = current
                 // ignore current lt-message
+                return []
+            }
+            // if next message is not empty, ignore current lt-message(can't exist two lt-message)
+            if next != nil {
                 return []
             }
             // only reserved current lt-message
@@ -198,49 +210,6 @@ internal class SACChatViewUpdate: NSObject {
         return [_timeLine(after: current, before: previous), current]
     }
     
-    private func _convert(message current: SACMessageType, previous: SACMessageType?) -> [SACMessageType] {
-        
-        //     V-1         V-2         V-3         V-4
-        // +---------+ +---------+ +---------+ +---------+
-        // |    M   <| |    M    | |    M   <| |    M    |
-        // |#   T   <| |#   M   <| |#   T   <| |#   M   <|
-        // |    D    | |    D    | |    D    | |    D    |
-        // |#   T   <| |#   T   <| |#   M   <| |#   M   <|
-        // |    M   <| |    M   <| |    M    | |    M    |
-        // +---------+ +---------+ +---------+ +---------+
-        //
-        
-        // if current or previous is not lt-message
-        guard !current._isTimeLineMessage || !(previous?._isTimeLineMessage ?? false) else {
-            // ignore the message
-            return []
-        }
-        
-        // get vaild previous and next message.
-        let vp = _fetch(before: previous)
-        let vn = _fetch(after: current)
-        
-        // check vaild previous and vaild next time interval
-        guard let next = vn, fabs(vp?._timeIntervalSince(next) ?? .greatestFiniteMagnitude) > _timeInterval else {
-            // too near, check current message type
-            guard !current._isTimeLineMessage else {
-                // current is lt-message, but this is no need, ignore
-                return []
-            }
-            return [current]
-        }
-        
-        // too far away, checkout current is lt-message
-        if let content = current.content as? SACMessageTimeLineContent {
-            // current is lt-message
-            content.before = previous
-            // no change, continue use
-            return [current]
-        }
-        
-        // too far away
-        return [_timeLine(after: current, before: vp), current]
-    }
     private func _convert(messages elements: [SACMessageType], first: SACMessageType?, last: SACMessageType?) -> [SACMessageType] {
         // merge
         let elements = [first].flatMap({ $0 }) + elements + [last].flatMap({ $0 })
@@ -255,37 +224,17 @@ internal class SACChatViewUpdate: NSObject {
             // continue
             return result
         } as! [SACMessageType]
-        
-        
-//        // if first is not TimeLine, add to result
-//        let arr = NSMutableArray(capacity: elements.count * 2 + 2)
-//        
-//        if let message = first, !message._isTimeLineMessage {
-//            arr.add(message)
-//        }
-//        
-//        // processing
-//        _ = (0 ... elements.count).reduce(first) {
-//            // get previous message
-//            let previous = $0
-//            // get current message
-//            guard let current = ($1 < elements.count) ? elements[$1] : last else {
-//                return nil
-//            }
-//            // merge message
-//            let results = _convert(message: current, previous: previous)
-//            // is empty, ignore
-//            guard !results.isEmpty else {
-//                return $0
-//            }
-//            arr.addObjects(from: results)
-//            // continue
-//            return results.last
-//        }
-//        
-//        return arr as! [SACMessageType]
     }
     
+    private func _equal<T: SACMessageType>(_ lhs: T, _ rhs: T) -> Bool {
+        // message is lt-message?
+        if let lcnt = lhs.content as? SACMessageTimeLineContent, let rcnt = rhs.content as? SACMessageTimeLineContent {
+            // check tl-message
+            return lcnt.after?.identifier == rcnt.after?.identifier
+        }
+        // check other message
+        return lhs.identifier == rhs.identifier
+    }
     private func _diff<T: SACMessageType>(_ src: Array<T>, _ dest: Array<T>) -> Array<SACChatViewUpdateChange> {
         
         let len1 = src.count
@@ -296,7 +245,7 @@ internal class SACChatViewUpdate: NSObject {
         // lcs + 动态规划
         for i in 1 ..< len1 + 1 {
             for j in 1 ..< len2 + 1 {
-                if src[i - 1] == dest[j - 1] {
+                if _equal(src[i - 1], (dest[j - 1])) {
                     c[i][j] = c[i - 1][j - 1] + 1
                 } else {
                     c[i][j] = max(c[i - 1][j], c[i][j - 1])
@@ -328,7 +277,7 @@ internal class SACChatViewUpdate: NSObject {
                 }
                 break
             }
-            guard src[i - 1] != dest[j - 1]  else {
+            guard !_equal(src[i - 1], (dest[j - 1])) else {
                 // no change, ignore
                 i -= 1
                 j -= 1
@@ -359,7 +308,7 @@ internal class SACChatViewUpdate: NSObject {
             let from = item.from
             let delElement = src[from]
             // can't merge to move item?
-            if let addIndex = adds.index(where: { dest[$0.to] == delElement }) {
+            if let addIndex = adds.index(where: { _equal(dest[$0.to], delElement) }) {
                 let addItem = adds.remove(at: addIndex)
                 return .move(from: from, to: addItem.to)
             }
@@ -538,6 +487,5 @@ fileprivate extension SACMessageType {
     fileprivate func _timeIntervalSince(_ other: SACMessageType) -> TimeInterval {
         return date.timeIntervalSince(other.date)
     }
-    
 }
 

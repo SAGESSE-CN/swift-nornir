@@ -23,6 +23,20 @@ extension SACChatViewData {
 
 class SACChatViewDataTests: XCTestCase {
     
+    func _reset(elements: Array<SACMessageType>) -> Array<SACMessageType> {
+        _ = elements.reduce(nil) { (p:SACMessageType?, n:SACMessageType) -> SACMessageType? in
+            if let content = p?.content as? SACMessageTimeLineContent {
+                content.after = n
+                content.date = n.date
+            }
+            if let content = n.content as? SACMessageTimeLineContent {
+                content.before = p
+            }
+            return n
+        }
+        return elements
+    }
+    
     func _equal(_ lhs: [SACMessageType], _ rhs: [SACMessageType]) -> Bool {
         guard lhs.count == rhs.count else {
             print(lhs, rhs)
@@ -151,8 +165,9 @@ class SACChatViewDataTests: XCTestCase {
         XCTAssert(_equal(reset()._convert(message: t0, previous: nil, next: nil, first: nil, last: nil), []))
         // case-s1: F=N, P=N, C=M, N=N, L=N
         XCTAssert(_equal(reset()._convert(message: m0, previous: nil, next: nil, first: nil, last: nil), [t0,m0]))
+        
+        // case-t1: F=T, P=N, C=T, N=M, L=M
     }
-    /*
     
     func testInsert() {
         
@@ -162,7 +177,7 @@ class SACChatViewDataTests: XCTestCase {
         let up1 = SACChatViewUpdate(model: ad1)
         
         // head
-        ad1._elements = ade1
+        ad1._elements = _reset(elements: ade1)
         up1._computeItemUpdates([
             .insert(m1, at: 0),
         ])
@@ -171,7 +186,7 @@ class SACChatViewDataTests: XCTestCase {
         XCTAssert(ad1._element(at: 1) === m1)
         
         // mid
-        ad1._elements = ade1
+        ad1._elements = _reset(elements: ade1)
         up1._computeItemUpdates([
             .insert(m1, at: 0),
             .insert(m2, at: 0),
@@ -182,7 +197,7 @@ class SACChatViewDataTests: XCTestCase {
         XCTAssert(ad1._element(at: 2) === m2)
         
         // last
-        ad1._elements = ade1
+        ad1._elements = _reset(elements: ade1)
         up1._computeItemUpdates([
             .insert(m1, at: 0),
             .insert(m3, at: 0),
@@ -205,7 +220,7 @@ class SACChatViewDataTests: XCTestCase {
         XCTAssert(ad4._element(at: 1) === m1)
         
         // 普通插入(尾部)
-        ad4._elements = ade4
+        ad4._elements = _reset(elements: ade4)
         up4._computeItemUpdates([
             .insert(m2, at: ad4.count),
         ])
@@ -214,7 +229,7 @@ class SACChatViewDataTests: XCTestCase {
         XCTAssert(ad4._element(at: 1) === m1)
         XCTAssert(ad4._element(at: 2) === m2)
         
-        ad4._elements = ade4
+        ad4._elements = _reset(elements: ade4)
         up4._computeItemUpdates([
             .insert(m2, at: ad4.count),
         ])
@@ -234,7 +249,7 @@ class SACChatViewDataTests: XCTestCase {
         XCTAssert(ad4._element(at: 3) === m2)
         
         // 普通插入(头部)
-        ad4._elements = ade4
+        ad4._elements = _reset(elements: ade4)
         up4._computeItemUpdates([
             .insert(m2, at: 0),
         ])
@@ -244,7 +259,7 @@ class SACChatViewDataTests: XCTestCase {
         XCTAssert(ad4._element(at: 2) === m1)
         
         // 自动添加TimeLine(头部)
-        ad4._elements = ade4
+        ad4._elements = _reset(elements: ade4)
         up4._computeItemUpdates([
             .insert(m4, at: 0),
         ])
@@ -255,7 +270,7 @@ class SACChatViewDataTests: XCTestCase {
         XCTAssert(ad4._element(at: 3) === m1)
         
         // 自动添加TimeLine(尾部)
-        ad4._elements = ade4
+        ad4._elements = _reset(elements: ade4)
         up4._computeItemUpdates([
             .insert(m4, at: ad4.count),
         ])
@@ -265,7 +280,7 @@ class SACChatViewDataTests: XCTestCase {
         XCTAssert(ad4._element(at: 2)?.content is SACMessageTimeLineContent)
         XCTAssert(ad4._element(at: 3) === m4)
         
-        ad4._elements = ade4
+        ad4._elements = _reset(elements: ade4)
         up4._computeItemUpdates([
             .insert(m3, at: 2),
         ])
@@ -285,7 +300,7 @@ class SACChatViewDataTests: XCTestCase {
         XCTAssert(ad4._element(at: 2) === m2)
         XCTAssert(ad4._element(at: 3) === m3)
         
-        ad4._elements = ade4
+        ad4._elements = _reset(elements: ade4)
         up4._computeItemUpdates([
             .insert(m2, at: 2),
         ])
@@ -305,6 +320,7 @@ class SACChatViewDataTests: XCTestCase {
         XCTAssert(ad4._element(at: 3) === m3)
         XCTAssert(ad4._element(at: 4) === m2)
     }
+    
     func testRemove() {
         
         let rd1 = SACChatViewData()
@@ -315,6 +331,8 @@ class SACChatViewDataTests: XCTestCase {
             .insert(m3, at: 0),
             .insert(m4, at: 0),
         ])
+        
+        
         let rde1 = rd1._elements
         XCTAssert(rd1.count == 6, "insert error!")
         XCTAssert(rd1._element(at: 0)?.content is SACMessageTimeLineContent)
@@ -326,7 +344,7 @@ class SACChatViewDataTests: XCTestCase {
         
         // 普通删除
         // 删除TimeLine(头部)
-        rd1._elements = rde1
+        rd1._elements = _reset(elements: rde1)
         up1._computeItemUpdates([
             .remove(at: 0)
         ])
@@ -335,7 +353,7 @@ class SACChatViewDataTests: XCTestCase {
         XCTAssert(rd1._element(at: 1) === m1)
         
         // 删除TimeLine(尾部)
-        rd1._elements = rde1
+        rd1._elements = _reset(elements: rde1)
         up1._computeItemUpdates([
             .remove(at: 4)
         ])
@@ -345,7 +363,7 @@ class SACChatViewDataTests: XCTestCase {
         XCTAssert(rd1._element(at: 5) === m4)
         
         // 普通删除(头部)
-        rd1._elements = rde1
+        rd1._elements = _reset(elements: rde1)
         up1._computeItemUpdates([
             .remove(at: 1)
         ])
@@ -357,7 +375,7 @@ class SACChatViewDataTests: XCTestCase {
         XCTAssert(rd1._element(at: 4) === m4)
         
         // 普通删除(中间)
-        rd1._elements = rde1
+        rd1._elements = _reset(elements: rde1)
         up1._computeItemUpdates([
             .remove(at: 3)
         ])
@@ -367,7 +385,7 @@ class SACChatViewDataTests: XCTestCase {
         XCTAssert(rd1._element(at: 4) === m4)
         
         // 普通删除(中间), 产生TimeLine
-        rd1._elements = rde1
+        rd1._elements = _reset(elements: rde1)
         up1._computeItemUpdates([
             .remove(at: 2)
         ])
@@ -380,11 +398,14 @@ class SACChatViewDataTests: XCTestCase {
         XCTAssert(rd1._element(at: 5) === m4)
         
         // 普通删除(尾部)
-        rd1._elements = rde1
+        rd1._elements = _reset(elements: rde1)
         up1._computeItemUpdates([
             .remove(at: 5)
         ])
         XCTAssert(rd1.count == 4, "remove error!")
+        XCTAssert(rd1._element(at: 0)?.content is SACMessageTimeLineContent)
+        XCTAssert(rd1._element(at: 1) === m1)
+        XCTAssert(rd1._element(at: 2) === m2)
         XCTAssert(rd1._element(at: 3) === m3)
         
         let rd2 = SACChatViewData()
@@ -414,7 +435,7 @@ class SACChatViewDataTests: XCTestCase {
 
         // 连续删除
         // 连续删除(头)
-        rd2._elements = rde2
+        rd2._elements = _reset(elements: rde2)
         up2._computeItemUpdates([
             .remove(at: 0),
             .remove(at: 1),
@@ -431,7 +452,7 @@ class SACChatViewDataTests: XCTestCase {
         XCTAssert(rd2._element(at: 5) === m4)
         
         // 连续删除(中), 自动添加TimeLine
-        rd2._elements = rde2
+        rd2._elements = _reset(elements: rde2)
         up2._computeItemUpdates([
             .remove(at: 3),
             .remove(at: 4),
@@ -448,7 +469,7 @@ class SACChatViewDataTests: XCTestCase {
         XCTAssert(rd2._element(at: 8) === m4)
         
         // 连续删除(中)
-        rd2._elements = rde2
+        rd2._elements = _reset(elements: rde2)
         up2._computeItemUpdates([
             .remove(at: 4),
             .remove(at: 5),
@@ -464,7 +485,7 @@ class SACChatViewDataTests: XCTestCase {
         XCTAssert(rd2._element(at: 7) === m4)
         
         // 连续删除(尾), 自动删除TimeLine
-        rd2._elements = rde2
+        rd2._elements = _reset(elements: rde2)
         up2._computeItemUpdates([
             .remove(at: 8),
             .remove(at: 9),
@@ -479,7 +500,7 @@ class SACChatViewDataTests: XCTestCase {
         XCTAssert(rd2._element(at: 6) === m3)
         
         // 连续删除(尾), 手动删除TimeLine
-        rd2._elements = rde2
+        rd2._elements = _reset(elements: rde2)
         up2._computeItemUpdates([
             .remove(at: 7),
             .remove(at: 8),
@@ -495,7 +516,7 @@ class SACChatViewDataTests: XCTestCase {
         XCTAssert(rd2._element(at: 6) === m3)
         
         // 随机删除(头)
-        rd2._elements = rde2
+        rd2._elements = _reset(elements: rde2)
         up2._computeItemUpdates([
             .remove(at: 0),
             .remove(at: 4),
@@ -512,7 +533,7 @@ class SACChatViewDataTests: XCTestCase {
         XCTAssert(rd2._element(at: 8) === m4)
         
         // 随机删除(中)
-        rd2._elements = rde2
+        rd2._elements = _reset(elements: rde2)
         up2._computeItemUpdates([
             .remove(at: 1),
             .remove(at: 2),
@@ -529,7 +550,7 @@ class SACChatViewDataTests: XCTestCase {
         XCTAssert(rd2._element(at: 6) === m4)
         
         // 随机删除(尾)
-        rd2._elements = rde2
+        rd2._elements = _reset(elements: rde2)
         up2._computeItemUpdates([
             .remove(at: 3),
             .remove(at: 4),
@@ -565,7 +586,7 @@ class SACChatViewDataTests: XCTestCase {
         XCTAssert(ud1._element(at: 5) === m4)
         
         // 普通更新(头)
-        ud1._elements = ude1
+        ud1._elements = _reset(elements: ude1)
         up1._computeItemUpdates([
             .update(m2, at: 0),
         ])
@@ -579,7 +600,7 @@ class SACChatViewDataTests: XCTestCase {
         XCTAssert(ud1._element(at: 6) === m4)
         
         // 普通更新(中)
-        ud1._elements = ude1
+        ud1._elements = _reset(elements: ude1)
         up1._computeItemUpdates([
             .update(m4, at: 2),
         ])
@@ -594,7 +615,7 @@ class SACChatViewDataTests: XCTestCase {
         XCTAssert(ud1._element(at: 7) === m4)
         
         // 普通更新(尾)
-        ud1._elements = ude1
+        ud1._elements = _reset(elements: ude1)
         up1._computeItemUpdates([
             .update(m3, at: 5),
         ])
@@ -632,7 +653,7 @@ class SACChatViewDataTests: XCTestCase {
         
         // 连续更新
         // 连续更新(空)
-        ud2._elements = ude2
+        ud2._elements = _reset(elements: ude2)
         up2._computeItemUpdates([
         ])
         XCTAssert(ud2.count == 10, "update error!")
@@ -648,7 +669,7 @@ class SACChatViewDataTests: XCTestCase {
         XCTAssert(ud2._element(at: 9) === m4)
         
         // 连续更新(头)
-        ud2._elements = ude2
+        ud2._elements = _reset(elements: ude2)
         up2._computeItemUpdates([
             .update(m4, at: 0),
             .update(m4, at: 1),
@@ -669,7 +690,7 @@ class SACChatViewDataTests: XCTestCase {
         XCTAssert(ud2._element(at: 11) === m4)
         
         // 连续更新(中)
-        ud2._elements = ude2
+        ud2._elements = _reset(elements: ude2)
         up2._computeItemUpdates([
             .update(m4, at: 2),
             .update(m4, at: 3),
@@ -691,7 +712,7 @@ class SACChatViewDataTests: XCTestCase {
         XCTAssert(ud2._element(at: 11) === m4)
        
         // 连续更新(尾)
-        ud2._elements = ude2
+        ud2._elements = _reset(elements: ude2)
         up2._computeItemUpdates([
             .update(m1, at: 6),
             .update(m1, at: 7),
@@ -712,7 +733,7 @@ class SACChatViewDataTests: XCTestCase {
         XCTAssert(ud2._element(at: 10) === m1)
         
         // 随机更新(头)
-        ud2._elements = ude2
+        ud2._elements = _reset(elements: ude2)
         up2._computeItemUpdates([
             .update(m4, at: 0),
             .update(m4, at: 3),
@@ -735,7 +756,7 @@ class SACChatViewDataTests: XCTestCase {
         XCTAssert(ud2._element(at: 13) === m4)
         
         // 随机更新(中)
-        ud2._elements = ude2
+        ud2._elements = _reset(elements: ude2)
         up2._computeItemUpdates([
             .update(m3, at: 2),
             .update(m3, at: 3),
@@ -757,7 +778,7 @@ class SACChatViewDataTests: XCTestCase {
         XCTAssert(ud2._element(at: 11) === m4)
         
         // 随机更新(尾)
-        ud2._elements = ude2
+        ud2._elements = _reset(elements: ude2)
         up2._computeItemUpdates([
             .update(m4, at: 4),
             .update(m4, at: 5),
@@ -798,7 +819,7 @@ class SACChatViewDataTests: XCTestCase {
         XCTAssert(md1._element(at: 5) === m4)
         
         // 空移动
-        md1._elements = mde1
+        md1._elements = _reset(elements: mde1)
         up1._computeItemUpdates([
             .move(at: 0, to: 0),
         ])
@@ -811,7 +832,7 @@ class SACChatViewDataTests: XCTestCase {
         XCTAssert(md1._element(at: 5) === m4)
         
         // 无效移动(TimeLine)
-        md1._elements = mde1
+        md1._elements = _reset(elements: mde1)
         up1._computeItemUpdates([
             .move(at: 0, to: 1),
         ])
@@ -824,7 +845,7 @@ class SACChatViewDataTests: XCTestCase {
         XCTAssert(md1._element(at: 5) === m4)
         
         // 普通移动(头)
-        md1._elements = mde1
+        md1._elements = _reset(elements: mde1)
         up1._computeItemUpdates([
             .move(at: 1, to: 2),
         ])
@@ -838,7 +859,7 @@ class SACChatViewDataTests: XCTestCase {
         XCTAssert(md1._element(at: 6) === m4)
         
         // 普通移动(中间) - 交换位置
-        md1._elements = mde1
+        md1._elements = _reset(elements: mde1)
         up1._computeItemUpdates([
             .move(at: 2, to: 3),
         ])
@@ -852,7 +873,7 @@ class SACChatViewDataTests: XCTestCase {
         XCTAssert(md1._element(at: 6) === m4)
 
         // 普通移动(尾)
-        md1._elements = mde1
+        md1._elements = _reset(elements: mde1)
         up1._computeItemUpdates([
             .move(at: 5, to: 2),
         ])
@@ -866,7 +887,7 @@ class SACChatViewDataTests: XCTestCase {
         XCTAssert(md1._element(at: 6) === m3)
         
         // ..
-        md1._elements = mde1
+        md1._elements = _reset(elements: mde1)
         up1._computeItemUpdates([
             .move(at: 2, to: 5),
         ])
@@ -880,55 +901,7 @@ class SACChatViewDataTests: XCTestCase {
         XCTAssert(md1._element(at: 6)?.content is SACMessageTimeLineContent)
         XCTAssert(md1._element(at: 7) === m2)
     }
-    
-    func testOther() {
-        // 初次添加
-        let ad1 = SACChatViewData()
-        let up1 = SACChatViewUpdate(model: ad1)
-        
-        up1._computeItemUpdates([
-            .insert(m1, at: 0)
-        ])
-        up1._computeItemUpdates([
-            .insert(m3, at: 1)
-        ])
-//        up1._computeItemUpdates([
-//            .insert(m2, at: 2)
-//        ])
-    }
-    
-//    func testBatchUpdates() {
-//        
-//        let bd1 = SACChatViewData()
-//        bd1.insert(contentsOf: [m1,m2,m3,m4], at: 0)
-//        let bde1 = bd1._elements
-//        XCTAssert(bd1.count == 6, "insert error!")
-//        XCTAssert(bd1._element(at: 0)?.content is SACMessageTimeLineContent)
-//        XCTAssert(bd1._element(at: 1) === m1)
-//        XCTAssert(bd1._element(at: 2) === m2)
-//        XCTAssert(bd1._element(at: 3) === m3)
-//        XCTAssert(bd1._element(at: 4)?.content is SACMessageTimeLineContent)
-//        XCTAssert(bd1._element(at: 5) === m4)
-//        
-//        // no imp
-//        bd1._elements = bde1
-////        bd1.performBatchUpdates({
-////            // 移动
-////            bd1.remove(at: 1)
-////            bd1.insert(self.m1, at: 6)
-////        })
-////        XCTAssert(bd1.count == 7, "insert error!")
-////        XCTAssert(bd1._element(at: 0)?.content is SACMessageTimeLineContent)
-////        XCTAssert(bd1._element(at: 1) === m2)
-////        XCTAssert(bd1._element(at: 2) === m3)
-////        XCTAssert(bd1._element(at: 3)?.content is SACMessageTimeLineContent)
-////        XCTAssert(bd1._element(at: 4) === m4)
-////        XCTAssert(bd1._element(at: 5)?.content is SACMessageTimeLineContent)
-////        XCTAssert(bd1._element(at: 6) === m1)
-//    }
  
- */
-    
     let m1 = SACMessage(content: SACMessageTextContent(text: "m1"))
     let m2 = SACMessage(content: SACMessageTextContent(text: "m2"))
     let m3 = SACMessage(content: SACMessageTextContent(text: "m3"))
