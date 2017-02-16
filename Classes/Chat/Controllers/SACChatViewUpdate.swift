@@ -150,77 +150,52 @@ internal class SACChatViewUpdate: NSObject {
         // +---------+ +---------+ +---------+ +---------+
         //
         
-        // case-h1: F=N, P=N, C=T, N=M, L=M
-        // case-h2: F=N, P=N, C=M, N=M, L=M
-        // case-h3: F=N, P=N, C=M, N=T, L=M
-        // case-h4: F=T, P=N, C=T, N=T, L=M
-        // case-h5: F=M, P=N, C=M, N=T, L=M
-        // case-m1: F=M, P=M, C=M, N=M, L=M
-        // case-m2: F=M, P=T, C=M, N=M, L=M
-        // case-m3: F=M, P=T, C=M, N=T, L=M
-        // case-m4: F=M, P=T, C=T, N=T, L=M
-        // case-m5: F=M, P=N, C=T, N=M, L=N
-        // case-m6: F=M, P=N, C=M, N=M, L=N
-        // case-m7: F=M, P=M, C=M, N=N, L=M
-        // case-m8: F=M, P=M, C=T, N=N, L=T
-        // case-m9: F=M, P=T, C=M, N=N, L=M
-        // case-ma: F=M, P=T, C=T, N=N, L=T
-        // case-t1: F=M, P=M, C=T, N=N, L=N
-        // case-t2: F=M, P=M, C=M, N=N, L=N
-        // case-t3: F=M, P=T, C=M, N=N, L=N
-        // case-s1: F=N, P=N, C=T, N=N, L=N
-        // case-s1: F=N, P=N, C=M, N=N, L=N
-        
-        // case-s1: F=M, P=N, C=T, N=N, L=T // 不存在
-        // case-s1: F=N, P=N, C=T, N=N, L=T
-        
-        var requiredTimeLine = false
-        var checkTimeInterval = false
-        
-//        // match: case-s1, case-s2
-//        if previous == nil && first == nil && next == nil && last == nil {
-//            // match case-s1?
-//            guard !current._isTimeLineMessage else {
-//                return [] // yes, ignore
-//            }
-//            // required tl-message
-//            return [_timeLine(after: current, before: nil), current]
-//        }
-        
-        // this is begin.
-        if previous == nil {
-            // this is page begin
-            if first == nil {
-                // required tl-message
-                requiredTimeLine = true
+        // check vaild previous and vaild next time interval
+        let tprevious = _fetch(before: previous ?? first)
+        let tcurrent = _fetch(after: current) ?? current
+        guard trunc(fabs(tprevious?._timeIntervalSince(tcurrent) ?? (_timeInterval + 1)) * 1000) > trunc(_timeInterval * 1000) else {
+            // too near, check current message type
+            guard current._isTimeLineMessage else {
+                return [current]
             }
+            // too near, current is lt-message, but this is no need, ignore
+            return []
         }
-        
-        // this is end.
-        if next == nil {
+        // too far away, if current is lt-message, ignore current message
+        if let content = current.content as? SACMessageTimeLineContent {
+            // if next message is empty, revrese current lt-message
+            guard next == nil else {
+                return []
+            }
+            // if first message is empty, ignore current lt-message
+            guard first != nil else {
+                return []
+            }
+            
+            // if previous is lt-message, has two lt-message, ignore current message
+            if let content = previous?.content as? SACMessageTimeLineContent {
+                // reset previous lt-message for after
+                content.after = current
+                // ignore current lt-message
+                return []
+            }
+            // only reserved current lt-message
+            return [current]
         }
-        
-        // p -> c
-        // c -> n
-        
-        let pp = _fetch(before: first)
-        let ll = _fetch(after: last)
-        
-//        // match: case-h1, case-m5, case-m4, case-m7, case-t1
-//        if let content = current.content as? SACMessageTimeLineContent {
-//            
-//            
-//            // previous is tl-message?
-//            guard !(previous?._isTimeLineMessage ?? false) else {
-//                return [] // ignore
-//            }
-//            // required checkout time interval
-//            checkTimeInterval = true
-//        }
-        
-        
-        
-        return [current]
+        // too far away, if previous is lt-message, ignore add lt-message required
+        if let content = previous?.content as? SACMessageTimeLineContent {
+                // reset previous lt-message for after
+            content.after = current
+            // only reserved current message
+            return [current]
+        }
+        // too far away, if previous is empty, but first not is empty, ignore add lt-message required
+        if previous == nil, first != nil {
+            // only reserved current message
+            return [current]
+        }
+        // too far away
+        return [_timeLine(after: current, before: previous), current]
     }
     
     private func _convert(message current: SACMessageType, previous: SACMessageType?) -> [SACMessageType] {
@@ -561,11 +536,7 @@ fileprivate extension SACMessageType {
         return content is SACMessageTimeLineContent
     }
     fileprivate func _timeIntervalSince(_ other: SACMessageType) -> TimeInterval {
-        // if message is lt-message, read for after message
-        let a = (self.content as? SACMessageTimeLineContent)?.after ?? self
-        let b = (other.content as? SACMessageTimeLineContent)?.after ?? other
-        // calc
-        return a.date.timeIntervalSince(b.date)
+        return date.timeIntervalSince(other.date)
     }
     
 }

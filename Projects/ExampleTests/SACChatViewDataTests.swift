@@ -25,10 +25,11 @@ class SACChatViewDataTests: XCTestCase {
     
     func _equal(_ lhs: [SACMessageType], _ rhs: [SACMessageType]) -> Bool {
         guard lhs.count == rhs.count else {
+            print(lhs, rhs)
             return false
         }
-        return lhs.elementsEqual(rhs) {
-            guard $0 !== $1 else {
+        let b = lhs.elementsEqual(rhs) {
+            guard $0.identifier != $1.identifier else {
                 return true
             }
             guard $0.content is SACMessageTimeLineContent && $1.content is SACMessageTimeLineContent else {
@@ -36,6 +37,11 @@ class SACChatViewDataTests: XCTestCase {
             }
             return true
         }
+        guard b else {
+            print(lhs, rhs)
+            return false
+        }
+        return true
     }
     
     override func setUp() {
@@ -56,30 +62,95 @@ class SACChatViewDataTests: XCTestCase {
     func testConvert() {
         let cd1 = SACChatViewData()
         let cp1 = SACChatViewUpdate(model: cd1)
+       
+        let m0 = SACMessage(content: SACMessageTextContent(text: "test0"))
+        let m1 = SACMessage(content: SACMessageTextContent(text: "test1"))
+        let m2 = SACMessage(content: SACMessageTextContent(text: "test2"))
+        
+        let t0 = SACMessage(content: SACMessageTimeLineContent(date: .init()))
+        let t1 = SACMessage(content: SACMessageTimeLineContent(date: .init()))
+        let t2 = SACMessage(content: SACMessageTimeLineContent(date: .init()))
         
         
-        let t = SACMessage(content: SACMessageTimeLineContent(date: .init()))
-        let m = SACMessage(content: SACMessageTextContent(text: "test"))
+        let reset = { () -> SACChatViewUpdate in
+            m0.date = .init(timeIntervalSinceNow: 0)
+            m1.date = .init(timeIntervalSinceNow: 60)
+            m2.date = .init(timeIntervalSinceNow: 61)
+            
+            t0.date = .init(timeIntervalSinceNow: 0)
+            t1.date = .init(timeIntervalSinceNow: 60)
+            t2.date = .init(timeIntervalSinceNow: 61)
+            
+            (t0.content as? SACMessageTimeLineContent)?.after = m0
+            (t0.content as? SACMessageTimeLineContent)?.before = m0
+            (t1.content as? SACMessageTimeLineContent)?.after = m1
+            (t1.content as? SACMessageTimeLineContent)?.before = m1
+            (t2.content as? SACMessageTimeLineContent)?.after = m2
+            (t2.content as? SACMessageTimeLineContent)?.before = m2
+            
+            return cp1
+        }
         
         // case-h1: F=N, P=N, C=T, N=M, L=M
-        XCTAssert(_equal(cp1._convert(message: t, previous: nil, next: m, first: m, last: m), []))
-        
+        XCTAssert(_equal(reset()._convert(message: t0, previous: nil, next: m0, first: nil, last: m0), []))
         // case-h2: F=N, P=N, C=M, N=M, L=M
-        XCTAssert(_equal(cp1._convert(message: m, previous: nil, next: m, first: nil, last: m), [m]))
-        
+        XCTAssert(_equal(reset()._convert(message: m0, previous: nil, next: m0, first: nil, last: m0), [t0,m0]))
         // case-h3: F=N, P=N, C=M, N=T, L=M
+        XCTAssert(_equal(reset()._convert(message: m0, previous: nil, next: t0, first: nil, last: m0), [t0,m0]))
+        // case-h4: F=T, P=N, C=T, N=T, L=M
+        XCTAssert(_equal(reset()._convert(message: t0, previous: nil, next: t0, first: t0, last: m0), []))
+        // case-h5: F=M, P=N, C=M, N=T, L=M
+        XCTAssert(_equal(reset()._convert(message: m0, previous: nil, next: t0, first: m0, last: m0), [m0]))
         // case-m1: F=M, P=M, C=M, N=M, L=M
+        XCTAssert(_equal(reset()._convert(message: m0, previous: m0, next: m0, first: m0, last: m0), [m0]))
+        XCTAssert(_equal(reset()._convert(message: m1, previous: m0, next: m2, first: m0, last: m2), [m1]))
+        XCTAssert(_equal(reset()._convert(message: m2, previous: m0, next: m2, first: m0, last: m2), [t0,m2]))
         // case-m2: F=M, P=T, C=M, N=M, L=M
+        XCTAssert(_equal(reset()._convert(message: m0, previous: t0, next: m2, first: m0, last: m2), [m0]))
+        XCTAssert(_equal(reset()._convert(message: m1, previous: t0, next: m2, first: m0, last: m2), [m1]))
+        XCTAssert(_equal(reset()._convert(message: m2, previous: t0, next: m2, first: m0, last: m2), [m2]))
         // case-m3: F=M, P=T, C=M, N=T, L=M
+        XCTAssert(_equal(reset()._convert(message: m0, previous: t0, next: t2, first: m0, last: m2), [m0]))
+        XCTAssert(_equal(reset()._convert(message: m1, previous: t0, next: t2, first: m0, last: m2), [m1]))
+        XCTAssert(_equal(reset()._convert(message: m2, previous: t0, next: t2, first: m0, last: m2), [m2]))
         // case-m4: F=M, P=T, C=T, N=T, L=M
+        XCTAssert(_equal(reset()._convert(message: t0, previous: t0, next: t2, first: m0, last: m2), []))
+        XCTAssert(_equal(reset()._convert(message: t1, previous: t0, next: t2, first: m0, last: m2), []))
+        XCTAssert(_equal(reset()._convert(message: t2, previous: t0, next: t2, first: m0, last: m2), []))
         // case-m5: F=M, P=N, C=T, N=M, L=N
+        XCTAssert(_equal(reset()._convert(message: t0, previous: nil, next: m2, first: m0, last: nil), []))
         // case-m6: F=M, P=N, C=M, N=M, L=N
+        XCTAssert(_equal(reset()._convert(message: m0, previous: nil, next: m2, first: m0, last: nil), [m0]))
+        // case-m7: F=M, P=M, C=M, N=N, L=M
+        XCTAssert(_equal(reset()._convert(message: m0, previous: m0, next: nil, first: m0, last: m0), [m0]))
+        XCTAssert(_equal(reset()._convert(message: m1, previous: m0, next: nil, first: m0, last: m1), [m1]))
+        XCTAssert(_equal(reset()._convert(message: m2, previous: m0, next: nil, first: m0, last: m2), [t0,m2]))
+        // case-m8: F=M, P=M, C=T, N=N, L=T
+        XCTAssert(_equal(reset()._convert(message: t0, previous: m0, next: nil, first: m0, last: t0), []))
+        XCTAssert(_equal(reset()._convert(message: t1, previous: m0, next: nil, first: m0, last: t1), []))
+        XCTAssert(_equal(reset()._convert(message: t2, previous: m0, next: nil, first: m0, last: t2), [t2]))
+        // case-m9: F=M, P=T, C=M, N=N, L=M
+        XCTAssert(_equal(reset()._convert(message: m0, previous: t0, next: nil, first: m0, last: m0), [m0]))
+        XCTAssert(_equal(reset()._convert(message: m1, previous: t0, next: nil, first: m0, last: m1), [m1]))
+        XCTAssert(_equal(reset()._convert(message: m2, previous: t0, next: nil, first: m0, last: m2), [m2])) // 上一个条己经有t了, 忽略t
+        // case-ma: F=M, P=T, C=T, N=N, L=T
+        XCTAssert(_equal(reset()._convert(message: t0, previous: t0, next: nil, first: m0, last: t0), []))
+        XCTAssert(_equal(reset()._convert(message: t1, previous: t0, next: nil, first: m0, last: t1), []))
+        XCTAssert(_equal(reset()._convert(message: t2, previous: t0, next: nil, first: m0, last: t2), []))
         // case-t1: F=M, P=M, C=T, N=N, L=N
+        XCTAssert(_equal(reset()._convert(message: t0, previous: m0, next: nil, first: m0, last: nil), []))
         // case-t2: F=M, P=M, C=M, N=N, L=N
+        XCTAssert(_equal(reset()._convert(message: m0, previous: m0, next: nil, first: m0, last: nil), [m0]))
+        XCTAssert(_equal(reset()._convert(message: m1, previous: m0, next: nil, first: m0, last: nil), [m1]))
+        XCTAssert(_equal(reset()._convert(message: m2, previous: m0, next: nil, first: m0, last: nil), [t2,m2]))
         // case-t3: F=M, P=T, C=M, N=N, L=N
+        XCTAssert(_equal(reset()._convert(message: m0, previous: t0, next: nil, first: m0, last: nil), [m0]))
+        XCTAssert(_equal(reset()._convert(message: m1, previous: t0, next: nil, first: m0, last: nil), [m1]))
+        XCTAssert(_equal(reset()._convert(message: m2, previous: t0, next: nil, first: m0, last: nil), [m2]))
         // case-s1: F=N, P=N, C=T, N=N, L=N
+        XCTAssert(_equal(reset()._convert(message: t0, previous: nil, next: nil, first: nil, last: nil), []))
         // case-s1: F=N, P=N, C=M, N=N, L=N
-        
+        XCTAssert(_equal(reset()._convert(message: m0, previous: nil, next: nil, first: nil, last: nil), [t0,m0]))
     }
     /*
     
