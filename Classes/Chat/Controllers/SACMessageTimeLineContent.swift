@@ -18,7 +18,6 @@ open class SACMessageTimeLineContent: NSObject, SACMessageContentType {
     
     public init(date: Date) {
         self.date = date
-        self.text = SACMessageTimeLineContent.dd(date)
         super.init()
     }
     
@@ -26,7 +25,9 @@ open class SACMessageTimeLineContent: NSObject, SACMessageContentType {
     internal var after: SACMessageType?
     
     open var date: Date
-    open var text: String
+    open var text: String {
+        return SACMessageTimeLineContent.dd(after?.date ?? date)
+    }
     
     static func dd(_ date: Date) -> String {
         

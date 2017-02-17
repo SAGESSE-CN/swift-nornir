@@ -180,7 +180,6 @@ open class SACChatViewCell: UICollectionViewCell, UIGestureRecognizerDelegate {
 //        if let f = _layoutAttributes?.info?.layoutedBoxRect(with: .content) {
 //            debugger.addRect(f, key: "f")
 //        }
-        
         debugger.addText("\(_layoutAttributes!.indexPath) \(message.date)", key: "text")
     }
     

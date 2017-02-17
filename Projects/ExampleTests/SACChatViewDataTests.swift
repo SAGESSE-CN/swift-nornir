@@ -106,7 +106,7 @@ class SACChatViewDataTests: XCTestCase {
         }
         
         // case-h1: F=N, P=N, C=T, N=M, L=M
-        XCTAssert(_equal(reset()._convert(message: t0, previous: nil, next: m0, first: nil, last: m0), []))
+        XCTAssert(_equal(reset()._convert(message: t0, previous: nil, next: m0, first: nil, last: m0), [t0]))
         // case-h2: F=N, P=N, C=M, N=M, L=M
         XCTAssert(_equal(reset()._convert(message: m0, previous: nil, next: m0, first: nil, last: m0), [t0,m0]))
         // case-h3: F=N, P=N, C=M, N=T, L=M
@@ -132,7 +132,7 @@ class SACChatViewDataTests: XCTestCase {
         XCTAssert(_equal(reset()._convert(message: t1, previous: t0, next: t2, first: m0, last: m2), []))
         XCTAssert(_equal(reset()._convert(message: t2, previous: t0, next: t2, first: m0, last: m2), []))
         // case-m5: F=M, P=N, C=T, N=M, L=N
-        XCTAssert(_equal(reset()._convert(message: t0, previous: nil, next: m2, first: m0, last: nil), []))
+        XCTAssert(_equal(reset()._convert(message: t0, previous: nil, next: m2, first: m0, last: nil), [t0]))
         // case-m6: F=M, P=N, C=M, N=M, L=N
         XCTAssert(_equal(reset()._convert(message: m0, previous: nil, next: m2, first: m0, last: nil), [m0]))
         // case-m7: F=M, P=M, C=M, N=N, L=M
