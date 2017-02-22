@@ -20,8 +20,13 @@ class TestLayerViewController: UIViewController {
         
         mpv.frame = CGRect(x: 40, y: 40, width: 240, height: 240)
         mpv.radius = 100
+        mpv.fillColor = UIColor.white
+        mpv.strokeColor = UIColor.lightGray
+        
         mpv2.frame = CGRect(x: mpv.frame.maxX, y: mpv.frame.maxY - 22, width: 22, height: 22)
         mpv2.radius = mpv2.frame.width / 2 - 3
+        mpv2.fillColor = UIColor.white
+        mpv2.strokeColor = UIColor.lightGray
         
         view.addSubview(mpv)
         view.addSubview(mpv2)

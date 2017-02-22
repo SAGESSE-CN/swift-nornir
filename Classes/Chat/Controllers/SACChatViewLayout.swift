@@ -25,6 +25,32 @@ import UIKit
         return SACChatViewLayoutAttributes.self
     }
     
+    var _updateItems: [UICollectionViewUpdateItem]?
+   
+    open override func prepare(forCollectionViewUpdates updateItems: [UICollectionViewUpdateItem]) {
+        super.prepare(forCollectionViewUpdates: updateItems)
+        _updateItems = updateItems
+    }
+    open override func finalizeCollectionViewUpdates() {
+        super.finalizeCollectionViewUpdates()
+        _updateItems = nil
+    }
+    
+    open override func initialLayoutAttributesForAppearingItem(at itemIndexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
+        return nil
+    }
+    open override func finalLayoutAttributesForDisappearingItem(at itemIndexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
+        guard let index = _updateItems?.index(where: { $0.indexPathBeforeUpdate == itemIndexPath }), let item = _updateItems?[index] else {
+            return super.finalLayoutAttributesForDisappearingItem(at: itemIndexPath)
+        }
+        guard let message = _message(at: itemIndexPath) else {
+            return nil
+        }
+        
+        return super.finalLayoutAttributesForDisappearingItem(at: itemIndexPath)
+    }
+    
+    
     open override func layoutAttributesForItem(at indexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
         let attributes = super.layoutAttributesForItem(at: indexPath)
         if let attributes = attributes as? SACChatViewLayoutAttributes {
@@ -44,11 +70,10 @@ import UIKit
     }
     
     open func layoutAttributesInfoForItem(at indexPath: IndexPath) -> SACChatViewLayoutAttributesInfo? {
-        guard let collectionView = collectionView, let delegate = collectionView.delegate as? SACChatViewLayoutDelegate else {
+        guard let collectionView = collectionView, let delegate = collectionView.delegate as? SACChatViewLayoutDelegate, let message = _message(at: indexPath) else {
             return nil
         }
         let size = CGSize(width: collectionView.frame.width, height: .greatestFiniteMagnitude)
-        let message = delegate.collectionView(collectionView, layout: self, itemAt: indexPath)
         if let info = _allLayoutAttributesInfo[message.identifier] {
             //logger.trace("\(indexPath) - hit cache - \(info.layoutedBoxRect(with: .all))")
             return info
@@ -269,6 +294,12 @@ import UIKit
         }
         _cachedAllLayoutInset[key] = edg ?? .zero
         return edg ?? .zero
+    }
+    private func _message(at indexPath: IndexPath) -> SACMessageType? {
+        guard let collectionView = collectionView, let delegate = collectionView.delegate as? SACChatViewLayoutDelegate else {
+            return nil
+        }
+        return delegate.collectionView(collectionView, layout: self, itemAt: indexPath)
     }
     
     private func _commonInit() {
