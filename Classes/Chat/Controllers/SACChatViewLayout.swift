@@ -29,11 +29,13 @@ import UIKit
    
     open override func prepare(forCollectionViewUpdates updateItems: [UICollectionViewUpdateItem]) {
         super.prepare(forCollectionViewUpdates: updateItems)
+        _logger.debug(updateItems)
         _updateItems = updateItems
     }
     open override func finalizeCollectionViewUpdates() {
         super.finalizeCollectionViewUpdates()
         _updateItems = nil
+        _logger.debug()
     }
     
     open override func initialLayoutAttributesForAppearingItem(at itemIndexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
@@ -46,8 +48,28 @@ import UIKit
         guard let message = _message(at: itemIndexPath) else {
             return nil
         }
+        _logger.debug()
         
-        return super.finalLayoutAttributesForDisappearingItem(at: itemIndexPath)
+        switch item.updateAction {
+        case .delete:
+            guard let attr = super.finalLayoutAttributesForDisappearingItem(at: itemIndexPath) else {
+                return nil
+            }
+            
+            //object_setClass(attr, SACChatViewLayoutAnimationAttributes.self)
+            
+            //return SACChatViewLayoutAnimationAttributes(with: attr)
+            
+            
+            attr.transform = .init(translationX: collectionView?.frame.width ?? 0, y: 0)
+            
+            
+            //return super.finalLayoutAttributesForDisappearingItem(at: itemIndexPath)
+            return attr
+            
+        default:
+            return super.finalLayoutAttributesForDisappearingItem(at: itemIndexPath)
+        }
     }
     
     

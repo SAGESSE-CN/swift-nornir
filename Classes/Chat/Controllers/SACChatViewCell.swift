@@ -27,7 +27,13 @@ open class SACChatViewCell: UICollectionViewCell, UIGestureRecognizerDelegate {
         NotificationCenter.default.removeObserver(observer)
     }
     
+    //_setLayoutAttributes
+    
     open override func apply(_ layoutAttributes: UICollectionViewLayoutAttributes) {
+        if UIView.areAnimationsEnabled {
+            UIView.setAnimationDelay(0.25)
+        }
+        
         super.apply(layoutAttributes)
         guard let layoutAttributes = layoutAttributes as? SACChatViewLayoutAttributes else {
             return
@@ -36,6 +42,16 @@ open class SACChatViewCell: UICollectionViewCell, UIGestureRecognizerDelegate {
         _updateViews()
         _updateViewLayouts()
         _updateViewValues()
+//
+//        guard let aa = layoutAttributes as? SACChatViewLayoutAnimationAttributes else {
+//            return
+//        }
+        
+        
+//
+        if UIView.areAnimationsEnabled {
+            _logger.debug("\(layoutAttributes.indexPath), \(layoutAttributes.frame)")
+        }
     }
     
     open override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {

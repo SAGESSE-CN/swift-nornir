@@ -37,3 +37,5 @@ import UIKit
     open var info: SACChatViewLayoutAttributesInfo?
 }
 
+@objc internal class SACChatViewLayoutAnimationAttributes: SACChatViewLayoutAttributes {
+}
