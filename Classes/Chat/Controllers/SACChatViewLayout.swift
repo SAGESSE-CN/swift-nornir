@@ -75,7 +75,7 @@ import UIKit
     
     open override func layoutAttributesForItem(at indexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
         let attributes = super.layoutAttributesForItem(at: indexPath)
-        if let attributes = attributes as? SACChatViewLayoutAttributes {
+        if let attributes = attributes as? SACChatViewLayoutAttributes, attributes.info == nil {
             attributes.info = layoutAttributesInfoForItem(at: indexPath)
         }
         return attributes
@@ -83,7 +83,7 @@ import UIKit
     open override func layoutAttributesForElements(in rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
         let arr = super.layoutAttributesForElements(in: rect)
         arr?.forEach({
-            guard let attributes = $0 as? SACChatViewLayoutAttributes else {
+            guard let attributes = $0 as? SACChatViewLayoutAttributes, attributes.info == nil else {
                 return
             }
             attributes.info = layoutAttributesInfoForItem(at: attributes.indexPath)

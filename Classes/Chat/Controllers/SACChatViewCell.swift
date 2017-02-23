@@ -27,17 +27,17 @@ open class SACChatViewCell: UICollectionViewCell, UIGestureRecognizerDelegate {
         NotificationCenter.default.removeObserver(observer)
     }
     
-    //_setLayoutAttributes
-    
     open override func apply(_ layoutAttributes: UICollectionViewLayoutAttributes) {
-        if UIView.areAnimationsEnabled {
-            UIView.setAnimationDelay(0.25)
-        }
         
         super.apply(layoutAttributes)
         guard let layoutAttributes = layoutAttributes as? SACChatViewLayoutAttributes else {
             return
         }
+        
+        
+        
+        _logger.debug("\(UIView.areAnimationsEnabled), \(layoutAttributes.indexPath), \(layoutAttributes.info!.message), \(layoutAttributes.frame), ")
+        
         _updateLayoutAttributes(layoutAttributes)
         _updateViews()
         _updateViewLayouts()
@@ -48,10 +48,6 @@ open class SACChatViewCell: UICollectionViewCell, UIGestureRecognizerDelegate {
 //        }
         
         
-//
-        if UIView.areAnimationsEnabled {
-            _logger.debug("\(layoutAttributes.indexPath), \(layoutAttributes.frame)")
-        }
     }
     
     open override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
@@ -68,11 +64,24 @@ open class SACChatViewCell: UICollectionViewCell, UIGestureRecognizerDelegate {
         return SACMessageAvatarView.self
     }
     
+
+//    fileprivate override func _sa_setLayoutAttributes(_ layoutAttributes: UICollectionViewLayoutAttributes) {
+//        // 读取当前布局
+//        guard let collectionViewLayout = _collectionView?.collectionViewLayout as? SACChatViewLayout, UIView.areAnimationsEnabled else {
+//            return super._sa_setLayoutAttributes(layoutAttributes)
+//        }
+//        
+//        UIView.setAnimationDelay(0.25)
+////
+////        if let index = collectionViewLayout._updateItems?.index(where: { $0.indexPathBeforeUpdate == layoutAttributes.indexPath }) {
+////        }
+//        
+//
+//        super._sa_setLayoutAttributes(layoutAttributes)
+//    }
+    
     private func _updateLayoutAttributes(_ layoutAttributes: SACChatViewLayoutAttributes) {
-        _layoutAttributes = layoutAttributes
         
-        // update touch response event
-        isUserInteractionEnabled = layoutAttributes.message?.options.isUserInteractionEnabled ?? false
     }
     
     private func _updateViews() {
@@ -289,22 +298,29 @@ open class SACChatViewCell: UICollectionViewCell, UIGestureRecognizerDelegate {
 
     }
     
-    private var _bubbleView: UIImageView?
+    fileprivate override func _setLayoutAttributes(_ layoutAttributes: UICollectionViewLayoutAttributes) {
+        // update touch response event
+        if let message = (layoutAttributes as? SACChatViewLayoutAttributes)?.message {
+            isUserInteractionEnabled = message.options.isUserInteractionEnabled
+        }
+        
+        super._setLayoutAttributes(layoutAttributes)
+    }
     
-    private var _cardView: SACMessageContentViewType?
-    private var _avatarView: SACMessageContentViewType?
-    private var _contentView: SACMessageContentViewType?
     
-    private var _menuNotifyObserver: Any?
-    private var _menuGesture: UILongPressGestureRecognizer? {
+    fileprivate var _bubbleView: UIImageView?
+    
+    fileprivate var _cardView: SACMessageContentViewType?
+    fileprivate var _avatarView: SACMessageContentViewType?
+    fileprivate var _contentView: SACMessageContentViewType?
+    
+    fileprivate var _menuNotifyObserver: Any?
+    fileprivate var _menuGesture: UILongPressGestureRecognizer? {
         return value(forKeyPath: "_menuGesture") as? UILongPressGestureRecognizer
     }
     
-    private var _collectionView: UICollectionView? {
-        return value(forKeyPath: "_collectionView") as? UICollectionView
-    }
-    
-    private var _layoutAttributes: SACChatViewLayoutAttributes?
+    @NSManaged fileprivate var _collectionView: UICollectionView?
+    @NSManaged fileprivate var _layoutAttributes: SACChatViewLayoutAttributes?
 }
 
 
@@ -321,6 +337,11 @@ fileprivate extension SACMessageContentViewType {
         return ob
     }
 }
+
+fileprivate extension UICollectionReusableView {
+    @NSManaged fileprivate func _setLayoutAttributes(_ layoutAttributes: UICollectionViewLayoutAttributes)
+}
+
 
 fileprivate prefix func -(edg: UIEdgeInsets) -> UIEdgeInsets {
     // 取反
