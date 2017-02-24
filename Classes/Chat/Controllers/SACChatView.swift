@@ -113,12 +113,32 @@ public protocol SACChatViewDelegate: class {
             objc_sync_exit(_batchItems)
             return
         }
-        let items = _batchItems
+        let oldData = _chatViewData
+        let newData = SACChatViewData()
+        let updateItems = _batchItems
         _batchItems.removeAll()
         objc_sync_exit(_batchItems)
         
-        let update = SACChatViewUpdate(model: _chatViewData)
-        update.apply(with: items, to: _chatContainerView)
+        let count = _chatContainerView.numberOfItems(inSection: 0)
+        let update = SACChatViewUpdate(newData: newData, oldData: oldData, updateItems: updateItems)
+        // read changes
+        guard let updateChanges = update.updateChanges, !updateChanges.isEmpty else {
+            return
+        }
+        _chatViewData = newData
+        _chatContainerView.performBatchUpdates({ [_chatContainerView] in
+            
+            // apply move
+            updateChanges.filter({ $0.isMove }).forEach({ 
+              _chatContainerView.moveItem(at: .init(item: max($0.from, 0), section: 0),
+                                          to: .init(item: max($0.to, 0), section: 0))
+            })
+            // apply insert/remove/update
+            _chatContainerView.insertItems(at: updateChanges.filter({ $0.isInsert }).map({ .init(item: max($0.to, 0), section: 0) }))
+            _chatContainerView.reloadItems(at: updateChanges.filter({ $0.isUpdate }).map({ .init(item: max($0.from, 0), section: 0) }))
+            _chatContainerView.deleteItems(at: updateChanges.filter({ $0.isRemove }).map({ .init(item: max($0.from, 0), section: 0) }))
+            
+        }, completion: nil)
     }
     
     fileprivate lazy var _batchItems: Array<SACChatViewUpdateItem> = []

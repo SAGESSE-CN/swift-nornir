@@ -8,30 +8,39 @@
 
 import UIKit
 
-internal class SACChatViewData: NSObject {
+internal class SACChatViewData: NSObject, NSCopying {
     
     internal override init() {
+        self.elements = []
+        super.init()
+    }
+    internal init(elements: [SACMessageType]) {
+        self.elements = elements
         super.init()
     }
    
-    
-    var count: Int {
-        return _elements.count
+    internal var count: Int {
+        return elements.count
     }
     
-    subscript(index: Int) -> SACMessageType {
-        return _elements[index]
+    func copy(with zone: NSZone? = nil) -> Any {
+        return SACChatViewData(elements: self.elements)
     }
     
     
-    func subarray(with subrange: Range<Int>) -> Array<SACMessageType> {
-        return Array(_elements[subrange])
+    internal subscript(index: Int) -> SACMessageType {
+        return elements[index]
     }
     
-    func replaceSubrange(_ subrange: Range<Int>, with collection: Array<SACMessageType>)  {
-        _elements.replaceSubrange(subrange, with: collection)
+    
+    internal func subarray(with subrange: Range<Int>) -> Array<SACMessageType> {
+        return Array(elements[subrange])
     }
     
-    private weak var _chatView: SACChatView?
-    internal lazy var _elements: [SACMessageType] = []
+    internal func replaceSubrange(_ subrange: Range<Int>, with collection: Array<SACMessageType>)  {
+        elements.replaceSubrange(subrange, with: collection)
+    }
+    
+    
+    internal var elements: [SACMessageType] 
 }
