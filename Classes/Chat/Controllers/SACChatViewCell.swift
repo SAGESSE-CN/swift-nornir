@@ -34,11 +34,8 @@ open class SACChatViewCell: UICollectionViewCell, UIGestureRecognizerDelegate {
             return
         }
         
+        //_logger.debug("\(UIView.areAnimationsEnabled), \(layoutAttributes.indexPath), \(layoutAttributes.info!.message), \(layoutAttributes.frame), ")
         
-        
-        _logger.debug("\(UIView.areAnimationsEnabled), \(layoutAttributes.indexPath), \(layoutAttributes.info!.message), \(layoutAttributes.frame), ")
-        
-        _updateLayoutAttributes(layoutAttributes)
         _updateViews()
         _updateViewLayouts()
         _updateViewValues()
@@ -79,10 +76,6 @@ open class SACChatViewCell: UICollectionViewCell, UIGestureRecognizerDelegate {
 //
 //        super._sa_setLayoutAttributes(layoutAttributes)
 //    }
-    
-    private func _updateLayoutAttributes(_ layoutAttributes: SACChatViewLayoutAttributes) {
-        
-    }
     
     private func _updateViews() {
         // prepare
@@ -299,9 +292,17 @@ open class SACChatViewCell: UICollectionViewCell, UIGestureRecognizerDelegate {
     }
     
     fileprivate override func _setLayoutAttributes(_ layoutAttributes: UICollectionViewLayoutAttributes) {
+        // is message layout attributes
+        guard let message = (layoutAttributes as? SACChatViewLayoutAttributes)?.message else {
+            // is normal
+            return super._setLayoutAttributes(layoutAttributes)
+        }
+        
         // update touch response event
-        if let message = (layoutAttributes as? SACChatViewLayoutAttributes)?.message {
-            isUserInteractionEnabled = message.options.isUserInteractionEnabled
+        isUserInteractionEnabled = message.options.isUserInteractionEnabled
+        
+        if UIView.areAnimationsEnabled {
+            _logger.debug("animation \(layoutAttributes.indexPath) \(message.identifier)")
         }
         
         super._setLayoutAttributes(layoutAttributes)

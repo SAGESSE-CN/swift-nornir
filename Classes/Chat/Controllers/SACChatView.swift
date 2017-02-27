@@ -125,7 +125,10 @@ public protocol SACChatViewDelegate: class {
         guard let updateChanges = update.updateChanges, !updateChanges.isEmpty else {
             return
         }
+        // prepare
         _chatViewData = newData
+        _chatContainerView.chatViewUpdate = update
+        // update
         _chatContainerView.performBatchUpdates({ [_chatContainerView] in
             
             // apply move
@@ -139,6 +142,8 @@ public protocol SACChatViewDelegate: class {
             _chatContainerView.deleteItems(at: updateChanges.filter({ $0.isRemove }).map({ .init(item: max($0.from, 0), section: 0) }))
             
         }, completion: nil)
+        // clean
+        _chatContainerView.chatViewUpdate = nil
     }
     
     fileprivate lazy var _batchItems: Array<SACChatViewUpdateItem> = []
@@ -168,8 +173,7 @@ public protocol SACChatViewDelegate: class {
 }
 
 internal class SACChatContainerView: UICollectionView {
-    
-    
+    var chatViewUpdate: SACChatViewUpdate?
 }
 
 
