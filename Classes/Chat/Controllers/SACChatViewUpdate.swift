@@ -8,13 +8,14 @@
 
 import UIKit
 
-enum SACChatViewUpdateItem {
+internal enum SACChatViewUpdateChangeItem {
     case insert(SACMessageType, at: Int)
     case update(SACMessageType, at: Int)
     case remove(at: Int)
     case move(at: Int,  to: Int)
 }
-enum SACChatViewUpdateChange: CustomStringConvertible {
+
+internal enum SACChatViewUpdateChange: CustomStringConvertible {
     
     case move(from: Int, to: Int)
     case update(from: Int, to: Int)
@@ -89,7 +90,6 @@ enum SACChatViewUpdateChange: CustomStringConvertible {
     }
 }
 internal class SACChatViewUpdateAnimation {
-    
     init(change: SACChatViewUpdateChange, message: SACMessageType) {
         self.change = change
         self.message = message
@@ -101,25 +101,58 @@ internal class SACChatViewUpdateAnimation {
     var delay: TimeInterval = 0
     var options: UIViewAnimationOptions = .curveEaseInOut
     var duration: TimeInterval = 0
-    
-    var prepareHandler: ((UIView) -> Void)?
-    var animationHandler: ((UIView) -> Void)?
-    var completionHandler: ((UIView, Bool) -> Void)?
 }
 
 internal class SACChatViewUpdate: NSObject {
     
     
-    internal init(newData: SACChatViewData, oldData: SACChatViewData, updateItems: Array<SACChatViewUpdateItem>) {
+    internal init(newData: SACChatViewData, oldData: SACChatViewData, updateItems: Array<SACChatViewUpdateChangeItem>) {
         self.newData = newData
         self.oldData = oldData
         self.updateItems = updateItems
         super.init()
         self.updateChanges = _computeItemUpdates(newData, oldData, updateItems)
         self.updateAnimations = _computeItemAnimations(self.updateChanges ?? [])
+        
     }
     
-    // make
+    internal func layoutAttributes(forUpdating layoutAttributes: UICollectionViewLayoutAttributes) -> UICollectionViewLayoutAttributes? {
+        // convert to SACChatViewLayoutAttributes
+        guard let layoutAttributes = layoutAttributes as? SACChatViewLayoutAttributes else {
+            return nil
+        }
+        // check layout attributes
+        if let newLayoutAttributes = layoutAttributes as? SACChatViewLayoutAnimationAttributes {
+            return newLayoutAttributes
+        }
+        
+        logger.debug("\(layoutAttributes.indexPath) => \(layoutAttributes.message!.identifier)")
+        
+        return nil
+    }
+    internal func layoutAttributes(forAppearing layoutAttributes: UICollectionViewLayoutAttributes, updateItem: UICollectionViewUpdateItem) -> UICollectionViewLayoutAttributes? {
+        // create animation layout attributes
+        guard let newLayoutAttributes = SACChatViewLayoutAnimationAttributes.animation(with: layoutAttributes, updateItem: updateItem) else {
+            return layoutAttributes
+        }
+        logger.debug("\(newLayoutAttributes.indexPath) => \(newLayoutAttributes.message!.identifier)")
+        
+        return newLayoutAttributes
+    }
+    internal func layoutAttributes(forDisappearing layoutAttributes: UICollectionViewLayoutAttributes, updateItem: UICollectionViewUpdateItem) -> UICollectionViewLayoutAttributes? {
+        // create animation layout attributes
+        guard let newLayoutAttributes = SACChatViewLayoutAnimationAttributes.animation(with: layoutAttributes, updateItem: updateItem) else {
+            return layoutAttributes
+        }
+        logger.debug("\(newLayoutAttributes.indexPath) => \(newLayoutAttributes.message!.identifier)")
+        
+        newLayoutAttributes.transform = .init(translationX: newLayoutAttributes.frame.width, y: 0)
+        
+        
+        return newLayoutAttributes
+    }
+    
+    // MARK: compute
     
     internal func _computeItemAnimations(_ updateChanges: Array<SACChatViewUpdateChange>) -> Array<SACChatViewUpdateAnimation> {
         logger.debug(updateChanges)
@@ -164,7 +197,7 @@ internal class SACChatViewUpdate: NSObject {
         // merge
         return delete + insert
     }
-    internal func _computeItemUpdates(_ newData: SACChatViewData, _ oldData: SACChatViewData, _ updateItems: Array<SACChatViewUpdateItem>) -> Array<SACChatViewUpdateChange> {
+    internal func _computeItemUpdates(_ newData: SACChatViewData, _ oldData: SACChatViewData, _ updateItems: Array<SACChatViewUpdateChangeItem>) -> Array<SACChatViewUpdateChange> {
         // is empty?
         guard !updateItems.isEmpty else {
             return []
@@ -543,13 +576,15 @@ internal class SACChatViewUpdate: NSObject {
         return results.sorted { $0.from < $1.from }
     }
     
-    internal let updateItems: Array<SACChatViewUpdateItem>
-    internal var updateChanges: Array<SACChatViewUpdateChange>?
-    internal var updateAnimations: Array<SACChatViewUpdateAnimation>?
+    // MARK: property
     
     internal let newData: SACChatViewData
     internal let oldData: SACChatViewData
  
+    internal let updateItems: Array<SACChatViewUpdateChangeItem>
+    internal var updateChanges: Array<SACChatViewUpdateChange>?
+    internal var updateAnimations: Array<SACChatViewUpdateAnimation>?
+    
     internal static var minimuxTimeInterval: TimeInterval = 60
 }
 

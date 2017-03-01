@@ -288,7 +288,6 @@ open class SACChatViewCell: UICollectionViewCell, UIGestureRecognizerDelegate {
     }
     
     private func _commonInit() {
-
     }
     
     fileprivate override func _setLayoutAttributes(_ layoutAttributes: UICollectionViewLayoutAttributes) {
@@ -297,15 +296,20 @@ open class SACChatViewCell: UICollectionViewCell, UIGestureRecognizerDelegate {
             // is normal
             return super._setLayoutAttributes(layoutAttributes)
         }
-        
         // update touch response event
         isUserInteractionEnabled = message.options.isUserInteractionEnabled
-        
-        if UIView.areAnimationsEnabled {
-            _logger.debug("animation \(layoutAttributes.indexPath) \(message.identifier)")
+        // is enable animations?
+        guard let collectionView = _collectionView as? SACChatContainerView, let collectionViewUpdate = collectionView.currentUpdate, UIView.areAnimationsEnabled else {
+            return super._setLayoutAttributes(layoutAttributes)
         }
-        
-        super._setLayoutAttributes(layoutAttributes)
+        // get current cell animation
+        guard let newLayoutAttributes = collectionViewUpdate.layoutAttributes(forUpdating: layoutAttributes) as? SACChatViewLayoutAnimationAttributes else {
+            return super._setLayoutAttributes(layoutAttributes)
+        }
+        // commit animation
+        UIView.animate(withDuration: newLayoutAttributes.duration, delay: newLayoutAttributes.delay, options: newLayoutAttributes.options, animations: {
+            super._setLayoutAttributes(newLayoutAttributes)
+        }, completion: nil)
     }
     
     

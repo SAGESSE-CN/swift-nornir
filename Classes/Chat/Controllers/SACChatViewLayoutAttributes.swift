@@ -38,4 +38,35 @@ import UIKit
 }
 
 @objc internal class SACChatViewLayoutAnimationAttributes: SACChatViewLayoutAttributes {
+    
+    internal override init() {
+        super.init()
+    }
+    internal static func animation(with layoutAttributes: UICollectionViewLayoutAttributes, updateItem: UICollectionViewUpdateItem) -> SACChatViewLayoutAnimationAttributes? {
+        // layoutAttributes must is SACChatViewLayoutAttributes
+        guard layoutAttributes is SACChatViewLayoutAttributes else {
+            return nil
+        }
+        // copy from SACChatViewLayoutAttributes
+        object_setClass(layoutAttributes, SACChatViewLayoutAnimationAttributes.self)
+        let ob = layoutAttributes.copy()
+        object_setClass(layoutAttributes, SACChatViewLayoutAttributes.self)
+        // checkout type
+        guard let newLayoutAttributes = ob as? SACChatViewLayoutAnimationAttributes else {
+            return nil
+        }
+        newLayoutAttributes.updateItem = updateItem
+        return newLayoutAttributes
+    }
+    
+    internal override func copy(with zone: NSZone? = nil) -> Any {
+        let new = super.copy(with: zone)
+        return new
+    }
+    
+    var delay: TimeInterval = 0
+    var options: UIViewAnimationOptions = .curveEaseInOut
+    var duration: TimeInterval = 0
+    
+    var updateItem: UICollectionViewUpdateItem?
 }

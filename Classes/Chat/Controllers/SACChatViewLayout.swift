@@ -25,53 +25,41 @@ import UIKit
         return SACChatViewLayoutAttributes.self
     }
     
-    var _updateItems: [UICollectionViewUpdateItem]?
+    internal var updateItems: [UICollectionViewUpdateItem]?
    
     open override func prepare(forCollectionViewUpdates updateItems: [UICollectionViewUpdateItem]) {
+        self.updateItems = updateItems
         super.prepare(forCollectionViewUpdates: updateItems)
-        _logger.debug(updateItems)
-        _updateItems = updateItems
     }
     open override func finalizeCollectionViewUpdates() {
         super.finalizeCollectionViewUpdates()
-        _updateItems = nil
-        _logger.debug()
+        self.updateItems = nil
     }
     
     open override func initialLayoutAttributesForAppearingItem(at itemIndexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
-        return nil
-    }
-    open override func finalLayoutAttributesForDisappearingItem(at itemIndexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
-        guard let index = _updateItems?.index(where: { $0.indexPathBeforeUpdate == itemIndexPath }), let item = _updateItems?[index] else {
-            return super.finalLayoutAttributesForDisappearingItem(at: itemIndexPath)
-        }
-        guard let message = _message(at: itemIndexPath) else {
+        // get current final layout attributes
+        guard let initialLayoutAttributes = super.initialLayoutAttributesForAppearingItem(at: itemIndexPath) else {
             return nil
         }
-        _logger.debug()
-        
-        switch item.updateAction {
-        case .delete:
-            guard let attr = super.finalLayoutAttributesForDisappearingItem(at: itemIndexPath) else {
-                return nil
-            }
-            
-            //object_setClass(attr, SACChatViewLayoutAnimationAttributes.self)
-            
-            //return SACChatViewLayoutAnimationAttributes(with: attr)
-            
-            
-            attr.transform = .init(translationX: collectionView?.frame.width ?? 0, y: 0)
-            
-            
-            //return super.finalLayoutAttributesForDisappearingItem(at: itemIndexPath)
-            return attr
-            
-        default:
-            return super.finalLayoutAttributesForDisappearingItem(at: itemIndexPath)
+        // get current update item
+        guard let updateItem = self.updateItems?.first(where: { $0.indexPathAfterUpdate == itemIndexPath }) else {
+            return initialLayoutAttributes
         }
+        // make animation layout attributes
+        return (collectionView as? SACChatContainerView)?.currentUpdate?.layoutAttributes(forAppearing: initialLayoutAttributes, updateItem: updateItem)
     }
-    
+    open override func finalLayoutAttributesForDisappearingItem(at itemIndexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
+        // get current final layout attributes
+        guard let finalLayoutAttributes = super.finalLayoutAttributesForDisappearingItem(at: itemIndexPath) else {
+            return nil
+        }
+        // get current update item
+        guard let updateItem = self.updateItems?.first(where: { $0.indexPathBeforeUpdate == itemIndexPath }) else {
+            return finalLayoutAttributes
+        }
+        // make animation layout attributes
+        return (collectionView as? SACChatContainerView)?.currentUpdate?.layoutAttributes(forDisappearing: finalLayoutAttributes, updateItem: updateItem)
+    }
     
     open override func layoutAttributesForItem(at indexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
         let attributes = super.layoutAttributesForItem(at: indexPath)

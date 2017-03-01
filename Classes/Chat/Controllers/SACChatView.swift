@@ -121,32 +121,12 @@ public protocol SACChatViewDelegate: class {
         
         let count = _chatContainerView.numberOfItems(inSection: 0)
         let update = SACChatViewUpdate(newData: newData, oldData: oldData, updateItems: updateItems)
-        // read changes
-        guard let updateChanges = update.updateChanges, !updateChanges.isEmpty else {
-            return
-        }
-        // prepare
+        // exec
         _chatViewData = newData
-        _chatContainerView.chatViewUpdate = update
-        // update
-        _chatContainerView.performBatchUpdates({ [_chatContainerView] in
-            
-            // apply move
-            updateChanges.filter({ $0.isMove }).forEach({ 
-              _chatContainerView.moveItem(at: .init(item: max($0.from, 0), section: 0),
-                                          to: .init(item: max($0.to, 0), section: 0))
-            })
-            // apply insert/remove/update
-            _chatContainerView.insertItems(at: updateChanges.filter({ $0.isInsert }).map({ .init(item: max($0.to, 0), section: 0) }))
-            _chatContainerView.reloadItems(at: updateChanges.filter({ $0.isUpdate }).map({ .init(item: max($0.from, 0), section: 0) }))
-            _chatContainerView.deleteItems(at: updateChanges.filter({ $0.isRemove }).map({ .init(item: max($0.from, 0), section: 0) }))
-            
-        }, completion: nil)
-        // clean
-        _chatContainerView.chatViewUpdate = nil
+        _chatContainerView.performBatchUpdates(with: update, completion: nil)
     }
     
-    fileprivate lazy var _batchItems: Array<SACChatViewUpdateItem> = []
+    fileprivate lazy var _batchItems: Array<SACChatViewUpdateChangeItem> = []
     fileprivate lazy var _batchRequiredCount: Int = 0
     
     private func _commonInit() {
@@ -173,7 +153,38 @@ public protocol SACChatViewDelegate: class {
 }
 
 internal class SACChatContainerView: UICollectionView {
-    var chatViewUpdate: SACChatViewUpdate?
+    
+    var currentUpdate: SACChatViewUpdate? {
+        return _currentUpdate
+    }
+    
+    func performBatchUpdates(with update: SACChatViewUpdate, completion:((Bool) -> Void)?) {
+        // read changes
+        guard let changes = update.updateChanges, !changes.isEmpty else {
+            return
+        }
+        _currentUpdate = update
+        // commit changes
+        performBatchUpdates({
+            // apply move
+            changes.filter({ $0.isMove }).forEach({
+                self.moveItem(at: .init(item: max($0.from, 0), section: 0),
+                              to: .init(item: max($0.to, 0), section: 0))
+            })
+            // apply insert/remove/update
+            self.insertItems(at: changes.filter({ $0.isInsert }).map({ .init(item: max($0.to, 0), section: 0) }))
+            self.reloadItems(at: changes.filter({ $0.isUpdate }).map({ .init(item: max($0.from, 0), section: 0) }))
+            self.deleteItems(at: changes.filter({ $0.isRemove }).map({ .init(item: max($0.from, 0), section: 0) }))
+            
+        }, completion: { finished in
+            // notify completion
+            completion?(finished)
+        })
+        // clean
+        _currentUpdate = nil
+    }
+    
+    private var _currentUpdate: SACChatViewUpdate?
 }
 
 
