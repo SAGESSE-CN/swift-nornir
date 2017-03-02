@@ -125,8 +125,8 @@ internal class SACChatViewUpdate: NSObject {
         if let newLayoutAttributes = layoutAttributes as? SACChatViewLayoutAnimationAttributes {
             return newLayoutAttributes
         }
-        
         logger.debug("\(layoutAttributes.indexPath) => \(layoutAttributes.message!.identifier)")
+        
         
         return nil
     }
@@ -137,6 +137,23 @@ internal class SACChatViewUpdate: NSObject {
         }
         logger.debug("\(newLayoutAttributes.indexPath) => \(newLayoutAttributes.message!.identifier)")
         
+        let data = newData[layoutAttributes.indexPath.item]
+        
+        switch data.options.alignment {
+        case .left:
+            newLayoutAttributes.transform = .init(translationX: -newLayoutAttributes.frame.width, y: 0)
+            
+        case .right:
+            newLayoutAttributes.transform = .init(translationX: newLayoutAttributes.frame.width, y: 0)
+            
+        case .center:
+            newLayoutAttributes.transform = .identity
+        }
+        
+        if updateItem.updateAction == .move {
+            newLayoutAttributes.delay = 0.25
+        }
+        
         return newLayoutAttributes
     }
     internal func layoutAttributes(forDisappearing layoutAttributes: UICollectionViewLayoutAttributes, updateItem: UICollectionViewUpdateItem) -> UICollectionViewLayoutAttributes? {
@@ -146,57 +163,25 @@ internal class SACChatViewUpdate: NSObject {
         }
         logger.debug("\(newLayoutAttributes.indexPath) => \(newLayoutAttributes.message!.identifier)")
         
-        newLayoutAttributes.transform = .init(translationX: newLayoutAttributes.frame.width, y: 0)
+        let data = oldData[layoutAttributes.indexPath.item]
         
+        
+        switch data.options.alignment {
+        case .left:
+            newLayoutAttributes.transform = .init(translationX: -newLayoutAttributes.frame.width, y: 0)
+            
+        case .right:
+            newLayoutAttributes.transform = .init(translationX: newLayoutAttributes.frame.width, y: 0)
+            
+        case .center:
+            newLayoutAttributes.transform = .identity
+        }
         
         return newLayoutAttributes
     }
     
     // MARK: compute
     
-    internal func _computeItemAnimations(_ updateChanges: Array<SACChatViewUpdateChange>) -> Array<SACChatViewUpdateAnimation> {
-        logger.debug(updateChanges)
-        
-        var delete: Array<SACChatViewUpdateAnimation> = []
-        var insert: Array<SACChatViewUpdateAnimation> = []
-        
-        // 生成动画
-        updateChanges.forEach {
-            switch $0 {
-            case .move(let from, let to):
-                delete.append(.init(change: $0, message: newData[to]))
-                insert.append(.init(change: $0, message: oldData[from]))
-                
-            case .update(let from, let to):
-                delete.append(.init(change: $0, message: newData[to]))
-                insert.append(.init(change: $0, message: oldData[from]))
-                
-            case .insert(_, let to):
-                insert.append(.init(change: $0, message: newData[to]))
-                
-            case .remove(let from, _):
-                delete.append(.init(change: $0, message: oldData[from]))
-            }
-        }
-        
-        // 0:u/d 1:n/a
-        let udt: TimeInterval = 0
-        let nat: TimeInterval = delete.isEmpty ? 0 : 0.25
-        
-        // update
-        delete.forEach {
-            $0.delay = udt
-        }
-        insert.forEach {
-            $0.delay = udt
-            if $0.change.isMove {
-                $0.delay = nat
-            }
-        }
-        
-        // merge
-        return delete + insert
-    }
     internal func _computeItemUpdates(_ newData: SACChatViewData, _ oldData: SACChatViewData, _ updateItems: Array<SACChatViewUpdateChangeItem>) -> Array<SACChatViewUpdateChange> {
         // is empty?
         guard !updateItems.isEmpty else {
@@ -329,6 +314,50 @@ internal class SACChatViewUpdate: NSObject {
         newData.replaceSubrange(selectedRange, with: convertedItems)
         
         return diff
+    }
+    internal func _computeItemAnimations(_ updateChanges: Array<SACChatViewUpdateChange>) -> Array<SACChatViewUpdateAnimation> {
+        logger.debug(updateChanges)
+        
+        
+        var delete: Array<SACChatViewUpdateAnimation> = []
+        var insert: Array<SACChatViewUpdateAnimation> = []
+        
+        // 生成动画
+        updateChanges.forEach {
+            switch $0 {
+            case .move(let from, let to):
+                delete.append(.init(change: $0, message: newData[to]))
+                insert.append(.init(change: $0, message: oldData[from]))
+                
+            case .update(let from, let to):
+                delete.append(.init(change: $0, message: newData[to]))
+                insert.append(.init(change: $0, message: oldData[from]))
+                
+            case .insert(_, let to):
+                insert.append(.init(change: $0, message: newData[to]))
+                
+            case .remove(let from, _):
+                delete.append(.init(change: $0, message: oldData[from]))
+            }
+        }
+        
+        // 0:u/d 1:n/a
+        let udt: TimeInterval = 0
+        let nat: TimeInterval = delete.isEmpty ? 0 : 0.25
+        
+        // update
+        delete.forEach {
+            $0.delay = udt
+        }
+        insert.forEach {
+            $0.delay = udt
+            if $0.change.isMove {
+                $0.delay = nat
+            }
+        }
+        
+        // merge
+        return delete + insert
     }
     
     // MARK: convert message

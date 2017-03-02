@@ -9,6 +9,13 @@
 import UIKit
 import SAChat
 
+class NSAutoScaleLayoutConstraint: NSLayoutConstraint {
+    override var constant: CGFloat {
+        set { return super.constant = newValue }
+        get { return super.constant * UIScreen.main.bounds.size.width / 320 }
+    }
+}
+
 class ContactsViewController: UITableViewController {
     
 
@@ -20,6 +27,7 @@ class ContactsViewController: UITableViewController {
 
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
         // self.navigationItem.rightBarButtonItem = self.editButtonItem()
+        
         
     }
 

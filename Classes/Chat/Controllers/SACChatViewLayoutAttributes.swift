@@ -66,7 +66,7 @@ import UIKit
     
     var delay: TimeInterval = 0
     var options: UIViewAnimationOptions = .curveEaseInOut
-    var duration: TimeInterval = 0
+    var duration: TimeInterval = 5
     
     var updateItem: UICollectionViewUpdateItem?
 }
