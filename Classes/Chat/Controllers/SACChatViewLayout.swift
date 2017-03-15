@@ -6,6 +6,9 @@
 //  Copyright © 2016-2017 SAGESSE. All rights reserved.
 //
 
+// TODO:
+// [ ] 自定义动画
+
 import UIKit
 
 @objc open class SACChatViewLayout: UICollectionViewFlowLayout {
@@ -23,42 +26,6 @@ import UIKit
     
     open override class var layoutAttributesClass: AnyClass {
         return SACChatViewLayoutAttributes.self
-    }
-    
-    internal var updateItems: [UICollectionViewUpdateItem]?
-   
-    open override func prepare(forCollectionViewUpdates updateItems: [UICollectionViewUpdateItem]) {
-        self.updateItems = updateItems
-        super.prepare(forCollectionViewUpdates: updateItems)
-    }
-    open override func finalizeCollectionViewUpdates() {
-        super.finalizeCollectionViewUpdates()
-        self.updateItems = nil
-    }
-    
-    open override func initialLayoutAttributesForAppearingItem(at itemIndexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
-        // get current final layout attributes
-        guard let initialLayoutAttributes = super.initialLayoutAttributesForAppearingItem(at: itemIndexPath) else {
-            return nil
-        }
-        // get current update item
-        guard let updateItem = self.updateItems?.first(where: { $0.indexPathAfterUpdate == itemIndexPath }) else {
-            return initialLayoutAttributes
-        }
-        // make animation layout attributes
-        return (collectionView as? SACChatContainerView)?.currentUpdate?.layoutAttributes(forAppearing: initialLayoutAttributes, updateItem: updateItem)
-    }
-    open override func finalLayoutAttributesForDisappearingItem(at itemIndexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
-        // get current final layout attributes
-        guard let finalLayoutAttributes = super.finalLayoutAttributesForDisappearingItem(at: itemIndexPath) else {
-            return nil
-        }
-        // get current update item
-        guard let updateItem = self.updateItems?.first(where: { $0.indexPathBeforeUpdate == itemIndexPath }) else {
-            return finalLayoutAttributes
-        }
-        // make animation layout attributes
-        return (collectionView as? SACChatContainerView)?.currentUpdate?.layoutAttributes(forDisappearing: finalLayoutAttributes, updateItem: updateItem)
     }
     
     open override func layoutAttributesForItem(at indexPath: IndexPath) -> UICollectionViewLayoutAttributes? {

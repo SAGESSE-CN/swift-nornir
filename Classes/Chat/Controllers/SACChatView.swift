@@ -165,23 +165,21 @@ internal class SACChatContainerView: UICollectionView {
         }
         _currentUpdate = update
         // commit changes
-        UIView.animate(withDuration: 5.0) {
-            self.performBatchUpdates({
-                // apply move
-                changes.filter({ $0.isMove }).forEach({
-                    self.moveItem(at: .init(item: max($0.from, 0), section: 0),
-                                  to: .init(item: max($0.to, 0), section: 0))
-                })
-                // apply insert/remove/update
-                self.insertItems(at: changes.filter({ $0.isInsert }).map({ .init(item: max($0.to, 0), section: 0) }))
-                self.reloadItems(at: changes.filter({ $0.isUpdate }).map({ .init(item: max($0.from, 0), section: 0) }))
-                self.deleteItems(at: changes.filter({ $0.isRemove }).map({ .init(item: max($0.from, 0), section: 0) }))
-                
-            }, completion: { finished in
-                // notify completion
-                completion?(finished)
+        self.performBatchUpdates({
+            // apply move
+            changes.filter({ $0.isMove }).forEach({
+                self.moveItem(at: .init(item: max($0.from, 0), section: 0),
+                              to: .init(item: max($0.to, 0), section: 0))
             })
-        }
+            // apply insert/remove/update
+            self.insertItems(at: changes.filter({ $0.isInsert }).map({ .init(item: max($0.to, 0), section: 0) }))
+            self.reloadItems(at: changes.filter({ $0.isUpdate }).map({ .init(item: max($0.from, 0), section: 0) }))
+            self.deleteItems(at: changes.filter({ $0.isRemove }).map({ .init(item: max($0.from, 0), section: 0) }))
+            
+        }, completion: { finished in
+            // notify completion
+            completion?(finished)
+        })
         // clean
         _currentUpdate = nil
     }

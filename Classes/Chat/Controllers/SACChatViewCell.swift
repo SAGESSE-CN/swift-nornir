@@ -30,9 +30,13 @@ open class SACChatViewCell: UICollectionViewCell, UIGestureRecognizerDelegate {
     open override func apply(_ layoutAttributes: UICollectionViewLayoutAttributes) {
         
         super.apply(layoutAttributes)
+        
         guard let layoutAttributes = layoutAttributes as? SACChatViewLayoutAttributes else {
             return
         }
+        
+        // update touch response event
+        //isUserInteractionEnabled = message.options.isUserInteractionEnabled
         
         //_logger.debug("\(UIView.areAnimationsEnabled), \(layoutAttributes.indexPath), \(layoutAttributes.info!.message), \(layoutAttributes.frame), ")
         
@@ -60,22 +64,6 @@ open class SACChatViewCell: UICollectionViewCell, UIGestureRecognizerDelegate {
     open class var avatarViewClass: SACMessageContentViewType.Type {
         return SACMessageAvatarView.self
     }
-    
-
-//    fileprivate override func _sa_setLayoutAttributes(_ layoutAttributes: UICollectionViewLayoutAttributes) {
-//        // 读取当前布局
-//        guard let collectionViewLayout = _collectionView?.collectionViewLayout as? SACChatViewLayout, UIView.areAnimationsEnabled else {
-//            return super._sa_setLayoutAttributes(layoutAttributes)
-//        }
-//        
-//        UIView.setAnimationDelay(0.25)
-////
-////        if let index = collectionViewLayout._updateItems?.index(where: { $0.indexPathBeforeUpdate == layoutAttributes.indexPath }) {
-////        }
-//        
-//
-//        super._sa_setLayoutAttributes(layoutAttributes)
-//    }
     
     private func _updateViews() {
         // prepare
@@ -289,29 +277,6 @@ open class SACChatViewCell: UICollectionViewCell, UIGestureRecognizerDelegate {
     
     private func _commonInit() {
     }
-    
-    fileprivate override func _setLayoutAttributes(_ layoutAttributes: UICollectionViewLayoutAttributes) {
-        // is message layout attributes
-        guard let message = (layoutAttributes as? SACChatViewLayoutAttributes)?.message else {
-            // is normal
-            return super._setLayoutAttributes(layoutAttributes)
-        }
-        // update touch response event
-        isUserInteractionEnabled = message.options.isUserInteractionEnabled
-        // is enable animations?
-        guard let collectionView = _collectionView as? SACChatContainerView, let collectionViewUpdate = collectionView.currentUpdate, UIView.areAnimationsEnabled else {
-            return super._setLayoutAttributes(layoutAttributes)
-        }
-        // get current cell animation
-        guard let newLayoutAttributes = collectionViewUpdate.layoutAttributes(forUpdating: layoutAttributes) as? SACChatViewLayoutAnimationAttributes else {
-            return super._setLayoutAttributes(layoutAttributes)
-        }
-        // commit animation
-        UIView.animate(withDuration: newLayoutAttributes.duration, delay: newLayoutAttributes.delay, options: newLayoutAttributes.options, animations: {
-            super._setLayoutAttributes(newLayoutAttributes)
-        }, completion: nil)
-    }
-    
     
     fileprivate var _bubbleView: UIImageView?
     
