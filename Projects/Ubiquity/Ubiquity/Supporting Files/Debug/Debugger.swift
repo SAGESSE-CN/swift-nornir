@@ -89,7 +89,12 @@ internal class Debugger: UIView {
     lazy var colors: [String: UIColor] = [:]
 }
 
+extension NSObject {
+    @NSManaged func _methodDescription() -> NSString
+}
+
 extension UIView {
+    @NSManaged func recursiveDescription() -> NSString
     
     private var _debugger: Debugger? {
         set { return objc_setAssociatedObject(self, &__DEBUGGER, newValue, .OBJC_ASSOCIATION_RETAIN) }

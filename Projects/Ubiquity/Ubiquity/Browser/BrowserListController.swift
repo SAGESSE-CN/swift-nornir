@@ -17,7 +17,7 @@ internal class BrowserListController: UICollectionViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
-    override func loadView() {
+    internal override func loadView() {
         super.loadView()
         // 配置初始状态
         collectionView?.register(BrowserListCell.self, forCellWithReuseIdentifier: "ASSET")

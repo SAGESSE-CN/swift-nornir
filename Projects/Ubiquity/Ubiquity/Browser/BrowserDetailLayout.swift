@@ -10,7 +10,7 @@ import UIKit
 
 internal class BrowserDetailLayout: UICollectionViewFlowLayout {
     
-    override func shouldInvalidateLayout(forBoundsChange newBounds: CGRect) -> Bool {
+    internal override func shouldInvalidateLayout(forBoundsChange newBounds: CGRect) -> Bool {
         guard super.shouldInvalidateLayout(forBoundsChange: newBounds) else {
             return false
         }
@@ -18,10 +18,10 @@ internal class BrowserDetailLayout: UICollectionViewFlowLayout {
         return true
     }
 
-    override func initialLayoutAttributesForAppearingItem(at itemIndexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
+    internal override func initialLayoutAttributesForAppearingItem(at itemIndexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
         return layoutAttributesForItem(at: itemIndexPath)
     }
-    override func finalLayoutAttributesForDisappearingItem(at itemIndexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
+    internal override func finalLayoutAttributesForDisappearingItem(at itemIndexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
         return layoutAttributesForItem(at: itemIndexPath)
     }
 }

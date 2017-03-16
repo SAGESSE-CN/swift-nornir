@@ -1,5 +1,5 @@
 //
-//  ContainterView.swift
+//  CanvasView.swift
 //  Ubiquity
 //
 //  Created by sagesse on 16/03/2017.
@@ -8,139 +8,139 @@
 
 import UIKit
 
-@objc public protocol ContainterViewDelegate {
+@objc public protocol CanvasViewDelegate {
     
-    @objc optional func containterViewDidScroll(_ containterView: ContainterView) // any offset changes
-    @objc optional func containterViewDidZoom(_ containterView: ContainterView) // any zoom scale changes
-    @objc optional func containterViewDidRotation(_ containterView: ContainterView) // any rotation changes
+    @objc optional func canvasViewDidScroll(_ canvasView: CanvasView) // any offset changes
+    @objc optional func canvasViewDidZoom(_ canvasView: CanvasView) // any zoom scale changes
+    @objc optional func canvasViewDidRotation(_ canvasView: CanvasView) // any rotation changes
     
-    @objc optional func viewForZooming(in containterView: ContainterView) -> UIView? // return a view that will be scaled. if delegate returns nil, nothing happens
+    @objc optional func viewForZooming(in canvasView: CanvasView) -> UIView? // return a view that will be scaled. if delegate returns nil, nothing happens
     
     // called on start of dragging (may require some time and or distance to move)
-    @objc optional func containterViewWillBeginDragging(_ containterView: ContainterView)
-
-    // called on finger up if the user dragged. velocity is in points/millisecond. targetContentOffset may be changed to adjust where the scroll view comes to rest
-    @objc optional func containterViewWillEndDragging(_ containterView: ContainterView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>)
-
-    // called on finger up if the user dragged. decelerate is true if it will continue moving afterwards
-    @objc optional func containterViewDidEndDragging(_ containterView: ContainterView, willDecelerate decelerate: Bool)
-
-    @objc optional func containterViewWillBeginDecelerating(_ containterView: ContainterView) // called on finger up as we are moving
-    @objc optional func containterViewDidEndDecelerating(_ containterView: ContainterView) // called when scroll view grinds to a halt
-
-    @objc optional func containterViewDidEndScrollingAnimation(_ containterView: ContainterView) // called when setContentOffset/scrollRectVisible:animated: finishes. not called if not animating
-
-    @objc optional func containterViewShouldScrollToTop(_ containterView: ContainterView) -> Bool // return a yes if you want to scroll to the top. if not defined, assumes YES
-    @objc optional func containterViewDidScrollToTop(_ containterView: ContainterView) // called when scrolling animation finished. may be called immediately if already at top
+    @objc optional func canvasViewWillBeginDragging(_ canvasView: CanvasView)
     
-    @objc optional func containterViewWillBeginZooming(_ containterView: ContainterView, with view: UIView?) // called before the scroll view begins zooming its content
-    @objc optional func containterViewDidEndZooming(_ containterView: ContainterView, with view: UIView?, atScale scale: CGFloat) // scale between minimum and maximum. called after any 'bounce' animations
-
-    @objc optional func containterViewShouldBeginRotationing(_ containterView: ContainterView, with view: UIView?) -> Bool // called before the scroll view begins zooming its content
-    @objc optional func containterViewWillEndRotationing(_ containterView: ContainterView, with view: UIView?, atOrientation orientation: UIImageOrientation)
-    @objc optional func containterViewDidEndRotationing(_ containterView: ContainterView, with view: UIView?, atOrientation orientation: UIImageOrientation) // scale between minimum and maximum. called after any 'bounce' animations
+    // called on finger up if the user dragged. velocity is in points/millisecond. targetContentOffset may be changed to adjust where the scroll view comes to rest
+    @objc optional func canvasViewWillEndDragging(_ canvasView: CanvasView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>)
+    
+    // called on finger up if the user dragged. decelerate is true if it will continue moving afterwards
+    @objc optional func canvasViewDidEndDragging(_ canvasView: CanvasView, willDecelerate decelerate: Bool)
+    
+    @objc optional func canvasViewWillBeginDecelerating(_ canvasView: CanvasView) // called on finger up as we are moving
+    @objc optional func canvasViewDidEndDecelerating(_ canvasView: CanvasView) // called when scroll view grinds to a halt
+    
+    @objc optional func canvasViewDidEndScrollingAnimation(_ canvasView: CanvasView) // called when setContentOffset/scrollRectVisible:animated: finishes. not called if not animating
+    
+    @objc optional func canvasViewShouldScrollToTop(_ canvasView: CanvasView) -> Bool // return a yes if you want to scroll to the top. if not defined, assumes YES
+    @objc optional func canvasViewDidScrollToTop(_ canvasView: CanvasView) // called when scrolling animation finished. may be called immediately if already at top
+    
+    @objc optional func canvasViewWillBeginZooming(_ canvasView: CanvasView, with view: UIView?) // called before the scroll view begins zooming its content
+    @objc optional func canvasViewDidEndZooming(_ canvasView: CanvasView, with view: UIView?, atScale scale: CGFloat) // scale between minimum and maximum. called after any 'bounce' animations
+    
+    @objc optional func canvasViewShouldBeginRotationing(_ canvasView: CanvasView, with view: UIView?) -> Bool // called before the scroll view begins zooming its content
+    @objc optional func canvasViewWillEndRotationing(_ canvasView: CanvasView, with view: UIView?, atOrientation orientation: UIImageOrientation)
+    @objc optional func canvasViewDidEndRotationing(_ canvasView: CanvasView, with view: UIView?, atOrientation orientation: UIImageOrientation) // scale between minimum and maximum. called after any 'bounce' animations
 }
 
 
-@objc public class ContainterView: UIView {
+@objc public class CanvasView: UIView {
     
-    public weak var delegate: ContainterViewDelegate?
+    public weak var delegate: CanvasViewDelegate?
     
     // default CGPointZero
     public var contentOffset: CGPoint {
-        set { return _scrollView.contentOffset = newValue }
-        get { return _scrollView.contentOffset }
+        set { return _containterView.contentOffset = newValue }
+        get { return _containterView.contentOffset }
     }
     // default CGSizeZero
     public var contentSize: CGSize = .zero
     // default UIEdgeInsetsZero. add additional scroll area around content
     public var contentInset: UIEdgeInsets {
-        set { return _scrollView.contentInset = newValue }
-        get { return _scrollView.contentInset }
+        set { return _containterView.contentInset = newValue }
+        get { return _containterView.contentInset }
     }
     
     // default YES. if YES, bounces past edge of content and back again
     public var bounces: Bool {
-        set { return _scrollView.bounces = newValue }
-        get { return _scrollView.bounces }
+        set { return _containterView.bounces = newValue }
+        get { return _containterView.bounces }
     }
     // default NO. if YES and bounces is YES, even if content is smaller than bounds, allow drag vertically
     public var alwaysBounceVertical: Bool {
-        set { return _scrollView.alwaysBounceVertical = newValue }
-        get { return _scrollView.alwaysBounceVertical }
+        set { return _containterView.alwaysBounceVertical = newValue }
+        get { return _containterView.alwaysBounceVertical }
     }
     // default NO. if YES and bounces is YES, even if content is smaller than bounds, allow drag horizontally
     public var alwaysBounceHorizontal: Bool {
-        set { return _scrollView.alwaysBounceHorizontal = newValue }
-        get { return _scrollView.alwaysBounceHorizontal }
+        set { return _containterView.alwaysBounceHorizontal = newValue }
+        get { return _containterView.alwaysBounceHorizontal }
     }
     
     // default YES. turn off any dragging temporarily
     public var isScrollEnabled: Bool {
-        set { return _scrollView.isScrollEnabled = newValue }
-        get { return _scrollView.isScrollEnabled }
+        set { return _containterView.isScrollEnabled = newValue }
+        get { return _containterView.isScrollEnabled }
     }
     
     // default YES. show indicator while we are tracking. fades out after tracking
     public var showsHorizontalScrollIndicator: Bool {
-        set { return _scrollView.showsHorizontalScrollIndicator = newValue }
-        get { return _scrollView.showsHorizontalScrollIndicator }
+        set { return _containterView.showsHorizontalScrollIndicator = newValue }
+        get { return _containterView.showsHorizontalScrollIndicator }
     }
     // default YES. show indicator while we are tracking. fades out after tracking
     public  var showsVerticalScrollIndicator: Bool {
-        set { return _scrollView.showsVerticalScrollIndicator = newValue }
-        get { return _scrollView.showsVerticalScrollIndicator }
+        set { return _containterView.showsVerticalScrollIndicator = newValue }
+        get { return _containterView.showsVerticalScrollIndicator }
     }
     // default is UIEdgeInsetsZero. adjust indicators inside of insets
     public var scrollIndicatorInsets: UIEdgeInsets {
-        set { return _scrollView.scrollIndicatorInsets = newValue }
-        get { return _scrollView.scrollIndicatorInsets }
+        set { return _containterView.scrollIndicatorInsets = newValue }
+        get { return _containterView.scrollIndicatorInsets }
     }
     // default is UIScrollViewIndicatorStyleDefault
     public var indicatorStyle: UIScrollViewIndicatorStyle {
-        set { return _scrollView.indicatorStyle = newValue }
-        get { return _scrollView.indicatorStyle }
+        set { return _containterView.indicatorStyle = newValue }
+        get { return _containterView.indicatorStyle }
     }
     
     public var decelerationRate: CGFloat {
-        set { return _scrollView.decelerationRate = newValue }
-        get { return _scrollView.decelerationRate }
+        set { return _containterView.decelerationRate = newValue }
+        get { return _containterView.decelerationRate }
     }
     
     // default is YES. if NO, we immediately call -touchesShouldBegin:withEvent:inContentView:. this has no effect on presses
     public var delaysContentTouches: Bool {
-        set { return _scrollView.delaysContentTouches = newValue }
-        get { return _scrollView.delaysContentTouches }
+        set { return _containterView.delaysContentTouches = newValue }
+        get { return _containterView.delaysContentTouches }
     }
     // default is YES. if NO, then once we start tracking, we don't try to drag if the touch moves. this has no effect on presses
     public var canCancelContentTouches: Bool {
-        set { return _scrollView.canCancelContentTouches = newValue }
-        get { return _scrollView.canCancelContentTouches }
+        set { return _containterView.canCancelContentTouches = newValue }
+        get { return _containterView.canCancelContentTouches }
     }
     
     // default is 1.0
     public var minimumZoomScale: CGFloat {
-        return _scrollView.minimumZoomScale
+        return _containterView.minimumZoomScale
     }
     // default is 1.0. must be > minimum zoom scale to enable zooming
     public var maximumZoomScale: CGFloat {
-        return _scrollView.maximumZoomScale
+        return _containterView.maximumZoomScale
     }
     
     // default is 1.0
     public var zoomScale: CGFloat  {
-        set { return _scrollView.zoomScale = newValue }
-        get { return _scrollView.zoomScale }
+        set { return _containterView.zoomScale = newValue }
+        get { return _containterView.zoomScale }
     }
     // default is YES. if set, user can go past min/max zoom while gesturing and the zoom will animate to the min/max value at gesture end
     public var bouncesZoom: Bool {
-        set { return _scrollView.bouncesZoom = newValue }
-        get { return _scrollView.bouncesZoom }
+        set { return _containterView.bouncesZoom = newValue }
+        get { return _containterView.bouncesZoom }
     }
     // default is YES.
     public var scrollsToTop: Bool {
-        set { return _scrollView.scrollsToTop = newValue }
-        get { return _scrollView.scrollsToTop }
+        set { return _containterView.scrollsToTop = newValue }
+        get { return _containterView.scrollsToTop }
     }
     
     // default is UIImageOrientationUp
@@ -151,15 +151,15 @@ import UIKit
     
     // animate at constant velocity to new offset
     public func setContentOffset(_ contentOffset: CGPoint, animated: Bool) {
-        _scrollView.setContentOffset(contentOffset, animated: animated)
+        _containterView.setContentOffset(contentOffset, animated: animated)
     }
     // scroll so rect is just visible (nearest edges). nothing if rect completely visible
     public func scrollRectToVisible(_ rect: CGRect, animated: Bool) {
-        _scrollView.scrollRectToVisible(rect, animated: animated)
+        _containterView.scrollRectToVisible(rect, animated: animated)
     }
     
     public func setZoomScale(_ scale: CGFloat, animated: Bool) {
-        _scrollView.setZoomScale(scale, animated: animated)
+        _containterView.setZoomScale(scale, animated: animated)
     }
     public func setZoomScale(_ scale: CGFloat, at point: CGPoint, animated: Bool) {
         guard let view = _contentView else {
@@ -172,21 +172,21 @@ import UIKit
         let ratioX = max(min(point.x, view.bounds.width), 0) / max(view.bounds.width, 1)
         let ratioY = max(min(point.y, view.bounds.height), 0) / max(view.bounds.height, 1)
         
-        // calculate the location of this point in zoomed 
-        let x = max(min(width * ratioX - _scrollView.frame.width / 2, width - _scrollView.frame.width), 0)
-        let y = max(min(height * ratioY - _scrollView.frame.height / 2, height - _scrollView.frame.height), 0)
+        // calculate the location of this point in zoomed
+        let x = max(min(width * ratioX - _containterView.frame.width / 2, width - _containterView.frame.width), 0)
+        let y = max(min(height * ratioY - _containterView.frame.height / 2, height - _containterView.frame.height), 0)
         
         guard animated else {
-            _scrollView.zoomScale = scale
-            _scrollView.contentOffset = CGPoint(x: x, y: y)
+            _containterView.zoomScale = scale
+            _containterView.contentOffset = CGPoint(x: x, y: y)
             return
         }
         
-        UIView.animate(withDuration: 0.35, animations: { [_scrollView] in
+        UIView.animate(withDuration: 0.35, animations: { [_containterView] in
             UIView.setAnimationBeginsFromCurrentState(true)
             
-            _scrollView.zoomScale = scale
-            _scrollView.contentOffset = CGPoint(x: x, y: y)
+            _containterView.zoomScale = scale
+            _containterView.contentOffset = CGPoint(x: x, y: y)
         })
     }
     public func zoom(to rect: CGRect, with orientation: UIImageOrientation, animated: Bool) {
@@ -206,17 +206,17 @@ import UIKit
         view.bounds = CGRect(x: 0, y: 0, width: _round(width * nscale), height: _round(height * nscale))
         
         // reset zoom position
-        _scrollView.minimumZoomScale = 1
-        _scrollView.maximumZoomScale = nmscale
-        _scrollView.zoomScale = max(min(oscale, _scrollView.maximumZoomScale), _scrollView.minimumZoomScale)
-        _scrollView.contentOffset = .zero
+        _containterView.minimumZoomScale = 1
+        _containterView.maximumZoomScale = nmscale
+        _containterView.zoomScale = max(min(oscale, _containterView.maximumZoomScale), _containterView.minimumZoomScale)
+        _containterView.contentOffset = .zero
         
         // reset center
         view.center = CGPoint(x: max(view.frame.width, bounds.width) / 2, y: max(view.frame.height, bounds.height) / 2)
         
         // cache
         _bounds = bounds
-        _scrollView.frame = bounds
+        _containterView.frame = bounds
         _orientation = orientation
     }
     
@@ -225,35 +225,35 @@ import UIKit
     }
     
     public var isLockContentOffset: Bool {
-        set { return _scrollView.isLockContentOffset = newValue }
-        get { return _scrollView.isLockContentOffset }
+        set { return _containterView.isLockContentOffset = newValue }
+        get { return _containterView.isLockContentOffset }
     }
     
     // displays the scroll indicators for a short time. This should be done whenever you bring the scroll view to front.
     public func flashScrollIndicators() {
-        _scrollView.flashScrollIndicators()
+        _containterView.flashScrollIndicators()
     }
-
+    
     // returns YES if user has touched. may not yet have started dragging
     public var isTracking: Bool {
-        return _scrollView.isTracking
+        return _containterView.isTracking
     }
     // returns YES if user has started scrolling. this may require some time and or distance to move to initiate dragging
     public var isDragging: Bool {
-        return _scrollView.isDragging
+        return _containterView.isDragging
     }
     // returns YES if user isn't dragging (touch up) but scroll view is still moving
     public var isDecelerating: Bool {
-        return _scrollView.isDecelerating
+        return _containterView.isDecelerating
     }
     
     // returns YES if user in zoom gesture
     public var isZooming: Bool {
-        return _scrollView.isZooming
+        return _containterView.isZooming
     }
-     // returns YES if we are in the middle of zooming back to the min/max value
+    // returns YES if we are in the middle of zooming back to the min/max value
     public var isZoomBouncing: Bool {
-        return _scrollView.isZoomBouncing
+        return _containterView.isZoomBouncing
     }
     
     // returns YES if user in rotation gesture
@@ -266,11 +266,11 @@ import UIKit
     
     // Change `panGestureRecognizer.allowedTouchTypes` to limit scrolling to a particular set of touch types.
     public var panGestureRecognizer: UIPanGestureRecognizer {
-        return _scrollView.panGestureRecognizer
+        return _containterView.panGestureRecognizer
     }
     // `pinchGestureRecognizer` will return nil when zooming is disabled.
     public var pinchGestureRecognizer: UIPinchGestureRecognizer? {
-        return _scrollView.pinchGestureRecognizer
+        return _containterView.pinchGestureRecognizer
     }
     // `pinchGestureRecognizer` will return nil when zooming is disabled.
     public var rotationGestureRecognizer: UIRotationGestureRecognizer? {
@@ -286,15 +286,14 @@ import UIKit
     
     fileprivate var _orientation: UIImageOrientation = .up {
         didSet {
-            delegate?.containterViewDidRotation?(self)
+            delegate?.canvasViewDidRotation?(self)
         }
     }
     fileprivate var _contentView: UIView? {
         return delegate?.viewForZooming?(in: self)
     }
     
-    fileprivate lazy var _scrollView: ContainterScrollView = ContainterScrollView()
-    fileprivate lazy var _backgroundView: UIImageView = UIImageView()
+    fileprivate lazy var _containterView: CanvasContainterView = CanvasContainterView()
     
     fileprivate lazy var _rotationGestureRecognizer: UIRotationGestureRecognizer = UIRotationGestureRecognizer(target: self, action: #selector(rotationHandler(_:)))
     
@@ -309,32 +308,25 @@ import UIKit
     }
 }
 
-fileprivate extension ContainterView {
+fileprivate extension CanvasView {
     
     fileprivate func _commonInit() {
         
         clipsToBounds = true
         
-        // 主要是为了阻止automaticallyAdjustsScrollViewInsets
-        _backgroundView.frame = bounds
-        _backgroundView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        _backgroundView.isHidden = true
-        _backgroundView.isUserInteractionEnabled = false
-        
-        _scrollView.frame = bounds
-        _scrollView.delegate = self
-        _scrollView.clipsToBounds = false
-        _scrollView.delaysContentTouches = false
-        _scrollView.canCancelContentTouches = false
-        _scrollView.showsVerticalScrollIndicator = false
-        _scrollView.showsHorizontalScrollIndicator = false
-        //_scrollView.alwaysBounceVertical = true
-        //_scrollView.alwaysBounceHorizontal = true
+        _containterView.frame = bounds
+        _containterView.delegate = self
+        _containterView.clipsToBounds = false
+        _containterView.delaysContentTouches = false
+        _containterView.canCancelContentTouches = false
+        _containterView.showsVerticalScrollIndicator = false
+        _containterView.showsHorizontalScrollIndicator = false
+        //_containterView.alwaysBounceVertical = true
+        //_containterView.alwaysBounceHorizontal = true
         
         _rotationGestureRecognizer.delegate = self
         
-        super.addSubview(_backgroundView)
-        super.addSubview(_scrollView)
+        super.addSubview(_containterView)
         super.addGestureRecognizer(_rotationGestureRecognizer)
     }
     
@@ -405,35 +397,35 @@ fileprivate extension ContainterView {
         let nbounds = CGRect(x: 0, y: 0, width: _round(width * nscale), height: _round(height * nscale))
         let transform = CGAffineTransform(rotationAngle: angle)
         
-        let animations: () -> Void = { [_scrollView] in
+        let animations: () -> Void = { [_containterView] in
             // orientation is change?
             if oldOrientation != newOrientation {
                 // changed
-                _scrollView.transform = transform
-                _scrollView.frame = self.bounds
+                _containterView.transform = transform
+                _containterView.frame = self.bounds
                 
-                _scrollView.minimumZoomScale = 1
-                _scrollView.maximumZoomScale = nmscale
-                _scrollView.zoomScale = 1
-                _scrollView.contentOffset = .zero
+                _containterView.minimumZoomScale = 1
+                _containterView.maximumZoomScale = nmscale
+                _containterView.zoomScale = 1
+                _containterView.contentOffset = .zero
                 
                 view?.frame = nbounds.applying(transform)
-                view?.center = CGPoint(x: _scrollView.bounds.midX, y: _scrollView.bounds.midY)
+                view?.center = CGPoint(x: _containterView.bounds.midX, y: _containterView.bounds.midY)
                 
             } else {
                 // not change
-                _scrollView.transform = .identity
+                _containterView.transform = .identity
             }
         }
-        let completion: (Bool) -> Void = { [_scrollView] isFinished in
+        let completion: (Bool) -> Void = { [_containterView] isFinished in
             
             if oldOrientation != newOrientation {
                 
-                _scrollView.transform = .identity
-                _scrollView.frame = self.bounds
+                _containterView.transform = .identity
+                _containterView.frame = self.bounds
                 
                 view?.frame = nbounds
-                view?.center = CGPoint(x: _scrollView.bounds.midX, y: _scrollView.bounds.midY)
+                view?.center = CGPoint(x: _containterView.bounds.midX, y: _containterView.bounds.midY)
             }
             
             handler?(isFinished)
@@ -454,28 +446,28 @@ fileprivate extension ContainterView {
     dynamic func rotationHandler(_ sender: UIRotationGestureRecognizer) {
         // is opened rotation?
         guard _isRotationing else {
-            return 
+            return
         }
-        _scrollView.transform = CGAffineTransform(rotationAngle: sender.rotation)
+        _containterView.transform = CGAffineTransform(rotationAngle: sender.rotation)
         // state is end?
         guard sender.state == .ended || sender.state == .cancelled || sender.state == .failed else {
-            //delegate?.containterViewDidRotation?(self)
+            //delegate?.canvasViewDidRotation?(self)
             return
         }
         // call update orientation
         _isRotationing = false
         _updateOrientation(with: round(sender.rotation / CGFloat(M_PI_2)) * CGFloat(M_PI_2), animated: true) { f in
             // callback notifi user
-            self.delegate?.containterViewDidEndRotationing?(self, with: self._contentView, atOrientation: self._orientation)
+            self.delegate?.canvasViewDidEndRotationing?(self, with: self._contentView, atOrientation: self._orientation)
         }
     }
 }
 
-extension ContainterView: UIGestureRecognizerDelegate, UIScrollViewDelegate {
+extension CanvasView: UIGestureRecognizerDelegate, UIScrollViewDelegate {
     
     public override func addSubview(_ view: UIView) {
         // always allows add to self
-        _scrollView.addSubview(view)
+        _containterView.addSubview(view)
     }
     
     public override func layoutSubviews() {
@@ -489,9 +481,9 @@ extension ContainterView: UIGestureRecognizerDelegate, UIScrollViewDelegate {
             return
         }
         // get current offset
-        let offset = _scrollView.contentOffset
+        let offset = _containterView.contentOffset
         // update frame(can't use autoresingmask, becase get current offset before change)
-        _scrollView.frame = bounds
+        _containterView.frame = bounds
         // get contentView widht and height
         let width = max(_contentSize(for: _orientation).width, 1)
         let height = max(_contentSize(for: _orientation).height, 1)
@@ -502,10 +494,10 @@ extension ContainterView: UIGestureRecognizerDelegate, UIScrollViewDelegate {
         var oscale = max(view.frame.width / (width * nscale), view.frame.height / (height * nscale))
         
         // check boundary
-        if _scrollView.zoomScale >= _scrollView.maximumZoomScale {
+        if _containterView.zoomScale >= _containterView.maximumZoomScale {
             oscale = nmscale // max
         }
-        if _scrollView.zoomScale <= _scrollView.minimumZoomScale {
+        if _containterView.zoomScale <= _containterView.minimumZoomScale {
             oscale = 1 // min
         }
         
@@ -513,13 +505,13 @@ extension ContainterView: UIGestureRecognizerDelegate, UIScrollViewDelegate {
         view.bounds = CGRect(x: 0, y: 0, width: _round(width * nscale), height: _round(height * nscale))
         
         // reset zoom position
-        _scrollView.minimumZoomScale = 1
-        _scrollView.maximumZoomScale = nmscale
-        _scrollView.zoomScale = max(min(oscale, _scrollView.maximumZoomScale), _scrollView.minimumZoomScale)
-        _scrollView.contentOffset = {
+        _containterView.minimumZoomScale = 1
+        _containterView.maximumZoomScale = nmscale
+        _containterView.zoomScale = max(min(oscale, _containterView.maximumZoomScale), _containterView.minimumZoomScale)
+        _containterView.contentOffset = {
             
-            let x = max(min(offset.x + ((_bounds?.width ?? 0) - bounds.width) / 2, _scrollView.contentSize.width - bounds.width), 0)
-            let y = max(min(offset.y + ((_bounds?.height ?? 0) - bounds.height) / 2, _scrollView.contentSize.height - bounds.height), 0)
+            let x = max(min(offset.x + ((_bounds?.width ?? 0) - bounds.width) / 2, _containterView.contentSize.width - bounds.width), 0)
+            let y = max(min(offset.y + ((_bounds?.height ?? 0) - bounds.height) / 2, _containterView.contentSize.height - bounds.height), 0)
             
             return CGPoint(x: x, y: y)
         }()
@@ -535,12 +527,12 @@ extension ContainterView: UIGestureRecognizerDelegate, UIScrollViewDelegate {
     
     public override func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
         if _rotationGestureRecognizer === gestureRecognizer {
-            // if no found contentView, can't roation 
+            // if no found contentView, can't roation
             guard let view = _contentView else {
                 return false
             }
             // can rotation?
-            guard delegate?.containterViewShouldBeginRotationing?(self, with: view) ?? true else {
+            guard delegate?.canvasViewShouldBeginRotationing?(self, with: view) ?? true else {
                 return false
             }
             _isRotationing = true
@@ -549,7 +541,7 @@ extension ContainterView: UIGestureRecognizerDelegate, UIScrollViewDelegate {
     }
     
     public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
-        if otherGestureRecognizer.view === _scrollView {
+        if otherGestureRecognizer.view === _containterView {
             return true
         }
         return false
@@ -559,69 +551,69 @@ extension ContainterView: UIGestureRecognizerDelegate, UIScrollViewDelegate {
     
     // any offset changes
     public func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        delegate?.containterViewDidScroll?(self)
+        delegate?.canvasViewDidScroll?(self)
     }
-
+    
     // any zoom scale changes
     public func scrollViewDidZoom(_ scrollView: UIScrollView) {
         if let view = _contentView {
             view.center = CGPoint(x: max(view.frame.width, bounds.width) / 2, y: max(view.frame.height, bounds.height) / 2)
         }
-        delegate?.containterViewDidZoom?(self)
+        delegate?.canvasViewDidZoom?(self)
     }
-
+    
     // called on start of dragging (may require some time and or distance to move)
     public func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-        delegate?.containterViewWillBeginDragging?(self)
+        delegate?.canvasViewWillBeginDragging?(self)
     }
-
+    
     // called on finger up if the user dragged. velocity is in points/millisecond. targetContentOffset may be changed to adjust where the scroll view comes to rest
     public func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
-        delegate?.containterViewWillEndDragging?(self, withVelocity: velocity, targetContentOffset: targetContentOffset)
+        delegate?.canvasViewWillEndDragging?(self, withVelocity: velocity, targetContentOffset: targetContentOffset)
     }
     // called on finger up if the user dragged. decelerate is true if it will continue moving afterwards
     public func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
-        delegate?.containterViewDidEndDragging?(self, willDecelerate: decelerate)
+        delegate?.canvasViewDidEndDragging?(self, willDecelerate: decelerate)
     }
     
     // called on finger up as we are moving
     public func scrollViewWillBeginDecelerating(_ scrollView: UIScrollView)  {
-        delegate?.containterViewWillBeginDecelerating?(self)
+        delegate?.canvasViewWillBeginDecelerating?(self)
     }
     // called when scroll view grinds to a halt
     public func scrollViewDidEndDecelerating(_ scrollView: UIScrollView)  {
-        delegate?.containterViewDidEndDecelerating?(self)
+        delegate?.canvasViewDidEndDecelerating?(self)
     }
     
     // called when setContentOffset/scrollRectVisible:animated: finishes. not called if not animating
     public func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
-        delegate?.containterViewDidEndScrollingAnimation?(self)
+        delegate?.canvasViewDidEndScrollingAnimation?(self)
     }
-
+    
     // return a view that will be scaled. if delegate returns nil, nothing happens
     public func viewForZooming(in scrollView: UIScrollView) -> UIView?  {
         return _contentView
     }
     // called before the scroll view begins zooming its content
     public func scrollViewWillBeginZooming(_ scrollView: UIScrollView, with view: UIView?) {
-        delegate?.containterViewWillBeginZooming?(self, with: view)
+        delegate?.canvasViewWillBeginZooming?(self, with: view)
     }
     // scale between minimum and maximum. called after any 'bounce' animations
     public func scrollViewDidEndZooming(_ scrollView: UIScrollView, with view: UIView?, atScale scale: CGFloat) {
-        delegate?.containterViewDidEndZooming?(self, with: view, atScale: scale)
+        delegate?.canvasViewDidEndZooming?(self, with: view, atScale: scale)
     }
-
+    
     // return a yes if you want to scroll to the top. if not defined, assumes YES
     public func scrollViewShouldScrollToTop(_ scrollView: UIScrollView) -> Bool {
-        return delegate?.containterViewShouldScrollToTop?(self) ?? true
+        return delegate?.canvasViewShouldScrollToTop?(self) ?? true
     }
     // called when scrolling animation finished. may be called immediately if already at top
     public func scrollViewDidScrollToTop(_ scrollView: UIScrollView) {
-        delegate?.containterViewDidScrollToTop?(self)
+        delegate?.canvasViewDidScrollToTop?(self)
     }
 }
 
-internal class ContainterScrollView: UIScrollView {
+fileprivate class CanvasContainterView: UIScrollView {
     
     override var contentOffset: CGPoint {
         set {
@@ -634,7 +626,7 @@ internal class ContainterScrollView: UIScrollView {
             return super.contentOffset
         }
     }
-        
+    
     var isLockContentOffset: Bool = false {
         willSet {
             guard isLockContentOffset != newValue else {

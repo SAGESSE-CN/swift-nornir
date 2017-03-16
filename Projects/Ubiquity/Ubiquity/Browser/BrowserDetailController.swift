@@ -10,59 +10,88 @@ import UIKit
 
 //@objc protocol BrowseDetailViewDelegate {
 //    
-//    @objc optional func browseDetailView(_ browseDetailView: Any, _ containterView: IBContainterView, shouldBeginRotationing view: UIView?) -> Bool
-//    @objc optional func browseDetailView(_ browseDetailView: Any, _ containterView: IBContainterView, didEndRotationing view: UIView?, atOrientation orientation: UIImageOrientation) // scale between minimum and maximum. called after any 'bounce' animations
+//    @objc optional func browseDetailView(_ browseDetailView: Any, _ containterView: IBScrollView, shouldBeginRotationing view: UIView?) -> Bool
+//    @objc optional func browseDetailView(_ browseDetailView: Any, _ containterView: IBScrollView, didEndRotationing view: UIView?, atOrientation orientation: UIImageOrientation) // scale between minimum and maximum. called after any 'bounce' animations
 //}
 
 internal class BrowserDetailController: UICollectionViewController {
     
+    internal let extraContentInset = UIEdgeInsetsMake(0, -20, 0, -20)
+    internal let interactiveDismissGestureRecognizer = UIPanGestureRecognizer()
+    
     internal init() {
-        super.init(collectionViewLayout: BrowserDetailLayout())
+        let collectionViewLayout = BrowserDetailLayout()
+        
+        collectionViewLayout.scrollDirection = .horizontal
+        collectionViewLayout.minimumLineSpacing = -extraContentInset.left * 2
+        collectionViewLayout.minimumInteritemSpacing = -extraContentInset.right * 2
+        collectionViewLayout.headerReferenceSize = CGSize(width: -extraContentInset.left, height: 0)
+        collectionViewLayout.footerReferenceSize = CGSize(width: -extraContentInset.right, height: 0)
+        
+        
+        super.init(collectionViewLayout: collectionViewLayout)
     }
     internal required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    override func loadView() {
+    internal override func loadView() {
+        self.automaticallyAdjustsScrollViewInsets = false
         super.loadView()
         // 配置初始状态
-        collectionView?.register(BrowserListCell.self, forCellWithReuseIdentifier: "ASSET")
+        
+        //interactiveDismissGestureRecognizer.delegate = self
+        //interactiveDismissGestureRecognizer.maximumNumberOfTouches = 1
+        //interactiveDismissGestureRecognizer.addTarget(self, action: #selector(dismissHandler(_:)))
+        
+        collectionView?.frame = UIEdgeInsetsInsetRect(view.bounds, extraContentInset)
+        collectionView?.scrollsToTop = false
+        collectionView?.isPagingEnabled = true
+        collectionView?.alwaysBounceVertical = false
+        collectionView?.alwaysBounceHorizontal = true
+        collectionView?.showsVerticalScrollIndicator = false
+        collectionView?.showsHorizontalScrollIndicator = false
+        collectionView?.allowsMultipleSelection = false
+        collectionView?.allowsSelection = false
         collectionView?.backgroundColor = .white
-        collectionView?.alwaysBounceVertical = true
+        collectionView?.register(BrowserDetailCell.self, forCellWithReuseIdentifier: "ASSET-DETAIL")
+        
+        //collectionView?.addGestureRecognizer(interactiveDismissGestureRecognizer)
+        
+        view.clipsToBounds = true
     }
     
 }
 
 extension BrowserDetailController: UICollectionViewDelegateFlowLayout {
-//    required init?(coder aDecoder: NSCoder) {
-//        super.init(coder: aDecoder)
-//        _commonInit()
-//    }
-//    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
-//        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
-//        _commonInit()
-//    }
-//    
-//    weak var delegate: BrowseDelegate? {
-//        willSet {
-////            indicatorView.delegate = delegate
-//        }
-//    }
-//    weak var dataSource: BrowseDataSource? {
-//        willSet {
-//            indicatorView.dataSource = newValue
-//        }
-//    }
-//    
-//    lazy var extraContentInset = UIEdgeInsetsMake(0, -20, 0, -20)
-//    lazy var interactiveDismissGestureRecognizer = UIPanGestureRecognizer()
+    
+    internal override func numberOfSections(in collectionView: UICollectionView) -> Int {
+        return 1
+    }
+    internal override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return 1000
+    }
+    
+    internal override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        return collectionView.dequeueReusableCell(withReuseIdentifier: "ASSET-DETAIL", for: indexPath)
+    }
+    internal override func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+        cell.backgroundColor = .random
+    }
+    
+    internal func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        return view.frame.size
+    }
+    
+    internal override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        //showDetail(at: indexPath, animated: true)
+        show(BrowserDetailController(), sender: nil)
+    }
+    
 //    
 //    lazy var indicatorView: IBIndicatorView = IBIndicatorView()
 //    
-//    lazy var collectionViewLayout: BrowseDetailViewLayout = BrowseDetailViewLayout()
-//    lazy var collectionView: UICollectionView = UICollectionView(frame: .zero, collectionViewLayout: self.collectionViewLayout)
-//    
-//    var browseIndexPath: IndexPath? { 
+//    var browseIndexPath: IndexPath? {
 //        return collectionView.indexPathsForVisibleItems.last
 //    }
 //    var browseInteractiveDismissGestureRecognizer: UIGestureRecognizer? {
@@ -226,32 +255,11 @@ extension BrowserDetailController: UICollectionViewDelegateFlowLayout {
 //      
 //        //UIActivityIndicatorView
 //        
-//       
-//        automaticallyAdjustsScrollViewInsets = false
-//        
 //        indicatorView.delegate = self
 //        
 //        interactiveDismissGestureRecognizer.delegate = self
 //        interactiveDismissGestureRecognizer.maximumNumberOfTouches = 1
 //        interactiveDismissGestureRecognizer.addTarget(self, action: #selector(dismissHandler(_:)))
-//        
-//        collectionViewLayout.scrollDirection = .horizontal
-//        collectionViewLayout.minimumLineSpacing = -extraContentInset.left * 2
-//        collectionViewLayout.minimumInteritemSpacing = -extraContentInset.right * 2
-//        collectionViewLayout.headerReferenceSize = CGSize(width: -extraContentInset.left, height: 0)
-//        collectionViewLayout.footerReferenceSize = CGSize(width: -extraContentInset.right, height: 0)
-//        
-//        collectionView.delegate = self
-//        collectionView.dataSource = self
-//        collectionView.backgroundColor = .clear
-//        collectionView.showsVerticalScrollIndicator = false
-//        collectionView.showsHorizontalScrollIndicator = false
-//        collectionView.isPagingEnabled = true
-//        collectionView.alwaysBounceHorizontal = true
-//        collectionView.scrollsToTop = false
-//        collectionView.allowsSelection = false
-//        collectionView.allowsMultipleSelection = false
-//        collectionView.addGestureRecognizer(interactiveDismissGestureRecognizer)
 //        
 //        collectionView.register(BrowseDetailViewCell.self, forCellWithReuseIdentifier: "Asset")
 ////        collectionView.register(SAPPreviewerCell.self, forCellWithReuseIdentifier: "Image")
@@ -279,11 +287,11 @@ extension BrowserDetailController: UICollectionViewDelegateFlowLayout {
 //        return true
 //    }
 //    
-//    func browseDetailView(_ browseDetailView: Any, _ containterView: IBContainterView, shouldBeginRotationing view: UIView?) -> Bool {
+//    func browseDetailView(_ browseDetailView: Any, _ containterView: IBScrollView, shouldBeginRotationing view: UIView?) -> Bool {
 //        collectionView.isScrollEnabled = false
 //        return true
 //    }
-//    func browseDetailView(_ browseDetailView: Any, _ containterView: IBContainterView, didEndRotationing view: UIView?, atOrientation orientation: UIImageOrientation) {
+//    func browseDetailView(_ browseDetailView: Any, _ containterView: IBScrollView, didEndRotationing view: UIView?, atOrientation orientation: UIImageOrientation) {
 //        collectionView.isScrollEnabled = true
 //    }
 //}
@@ -319,7 +327,7 @@ extension BrowserDetailController: UICollectionViewDelegateFlowLayout {
 //            guard let panGestureRecognizer = otherGestureRecognizer as? UIPanGestureRecognizer else {
 //                return true
 //            }
-//            guard let view = panGestureRecognizer.view, view.superview is IBContainterView else {
+//            guard let view = panGestureRecognizer.view, view.superview is IBScrollView else {
 //                return false
 //            }
 //            return true
@@ -460,10 +468,7 @@ extension BrowserDetailController: UICollectionViewDelegateFlowLayout {
 //        cell.apply(nil)
 //    }
 //    
-//    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-//        return view.frame.size
-//    }
-//    
+//
 //    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
 //        //dismissHandler(indexPath)
 //    }

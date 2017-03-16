@@ -9,7 +9,12 @@
 import UIKit
 
 internal class BrowserDetailCell: UICollectionViewCell {
-//    
+    
+    // provide content view of class, iOS 8+
+    internal dynamic class var _contentViewClass: AnyClass {
+        return CanvasView.self
+    }
+
 //    override init(frame: CGRect) {
 //        super.init(frame: frame)
 //        _commonInit()
@@ -25,14 +30,14 @@ internal class BrowserDetailCell: UICollectionViewCell {
 //    
 //    weak var delegate: BrowseDetailViewDelegate?
 //    
+    
+    //internal var containterView: ScrollView
+    
 //    lazy var detailView: UIImageView = UIImageView()
-//    lazy var containterView: IBContainterView = IBContainterView()
+//    lazy var containterView: CanvasView = CanvasView()
 //    lazy var doubleTapGestureRecognizer: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(doubleTapHandler(_:)))
 //    
-//    override var contentView: UIView {
-//        return containterView
-//    }
-//    
+//
 //    var contentInset: UIEdgeInsets = .zero {
 //        didSet {
 //            guard contentInset != oldValue else {
@@ -334,8 +339,8 @@ internal class BrowserDetailCell: UICollectionViewCell {
 //        
 //        containterView.frame = bounds
 //        containterView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-//        containterView.delegate = self
 //        containterView.addSubview(detailView)
+//        containterView.delegate = self
 //        containterView.addGestureRecognizer(doubleTapGestureRecognizer)
 //        
 //        _typeView.frame = CGRect(x: 0, y: 0, width: 60, height: 26)
@@ -380,6 +385,60 @@ internal class BrowserDetailCell: UICollectionViewCell {
 //    fileprivate lazy var _progressView = IBOverlayProgressView(frame: CGRect(x: 0, y: 0, width: 22, height: 22))
 }
 
+extension BrowserDetailCell: CanvasViewDelegate {
+    
+    func viewForZooming(in canvasView: CanvasView) -> UIView? {
+//        return detailView
+        return nil
+    }
+    
+    func canvasViewDidScroll(_ canvasView: CanvasView) {
+//        _updateProgressLayoutIfNeeded()
+    }
+    func canvasViewDidZoom(_ canvasView: CanvasView) {
+//        _updateProgressLayoutIfNeeded()
+    }
+    
+    func canvasViewWillBeginDragging(_ canvasView: CanvasView) {
+//        _updateConsoleLock(true, animated: true)
+    }
+    func canvasViewWillBeginZooming(_ canvasView: CanvasView, with view: UIView?) {
+//        _updateConsoleLock(true, animated: true)
+    }
+    func canvasViewShouldBeginRotationing(_ canvasView: CanvasView, with view: UIView?) -> Bool {
+//        guard delegate?.browseDetailView?(self, canvasView, shouldBeginRotationing: view) ?? true else {
+//            return false
+//        }
+//        
+//        _updateConsoleLock(true, animated: true)
+//        _updateProgressLock(true, animated: false)
+//        
+        return true
+    }
+    
+    func canvasViewDidEndDecelerating(_ canvasView: CanvasView) {
+//        _updateConsoleLock(false, animated: true)
+    }
+    func canvasViewDidEndDragging(_ canvasView: CanvasView, willDecelerate decelerate: Bool) {
+//        guard !decelerate else {
+//            return
+//        }
+//        _updateConsoleLock(false, animated: true)
+    }
+    func canvasViewDidEndZooming(_ canvasView: CanvasView, with view: UIView?, atScale scale: CGFloat) {
+//        _updateConsoleLock(false, animated: true)
+    }
+    func canvasViewDidEndRotationing(_ canvasView: CanvasView, with view: UIView?, atOrientation orientation: UIImageOrientation) {
+//        self.orientation = orientation
+//        self.detailView.image = detailView.image?.withOrientation(orientation)
+//        
+//        delegate?.browseDetailView?(self, canvasView, didEndRotationing: view, atOrientation: orientation)
+//        
+//        _updateProgressLock(false, animated: true)
+//        _updateConsoleLock(false, animated: true)
+    }
+}
+
 //extension BrowserDetailCell: IBVideoConsoleViewDelegate {
 //    
 //    func progressView(willRetry sender: Any) {
@@ -402,63 +461,8 @@ internal class BrowserDetailCell: UICollectionViewCell {
 //    }
 //}
 //
-//extension BrowserDetailCell: ContainterViewDelegate {
+//extension BrowserDetailCell: ScrollViewDelegate {
 //   
-//    func viewForZooming(in containterView: IBContainterView) -> UIView? {
-//        return detailView
-//    }
-//    
-//    func containterViewDidScroll(_ containterView: IBContainterView) {
-//        _updateProgressLayoutIfNeeded()
-//    }
-//    
-//    func containterViewDidZoom(_ containterView: IBContainterView) {
-//        _updateProgressLayoutIfNeeded()
-//    }
-//    
-//    func containterViewWillBeginDragging(_ containterView: IBContainterView) {
-//        _updateConsoleLock(true, animated: true)
-//    }
-//    
-//    func containterViewWillBeginZooming(_ containterView: IBContainterView, with view: UIView?) {
-//        _updateConsoleLock(true, animated: true)
-//    }
-//    
-//    func containterViewShouldBeginRotationing(_ containterView: IBContainterView, with view: UIView?) -> Bool {
-//        guard delegate?.browseDetailView?(self, containterView, shouldBeginRotationing: view) ?? true else {
-//            return false
-//        }
-//        
-//        _updateConsoleLock(true, animated: true)
-//        _updateProgressLock(true, animated: false)
-//        
-//        return true
-//    }
-//    
-//    func containterViewDidEndDragging(_ containterView: IBContainterView, willDecelerate decelerate: Bool) {
-//        guard !decelerate else {
-//            return
-//        }
-//        _updateConsoleLock(false, animated: true)
-//    }
-//    
-//    func containterViewDidEndDecelerating(_ containterView: IBContainterView) {
-//        _updateConsoleLock(false, animated: true)
-//    }
-//    
-//    func containterViewDidEndZooming(_ containterView: IBContainterView, with view: UIView?, atScale scale: CGFloat) {
-//        _updateConsoleLock(false, animated: true)
-//    }
-//    
-//    func containterViewDidEndRotationing(_ containterView: IBContainterView, with view: UIView?, atOrientation orientation: UIImageOrientation) {
-//        self.orientation = orientation
-//        self.detailView.image = detailView.image?.withOrientation(orientation)
-//        
-//        delegate?.browseDetailView?(self, containterView, didEndRotationing: view, atOrientation: orientation)
-//        
-//        _updateProgressLock(false, animated: true)
-//        _updateConsoleLock(false, animated: true)
-//    }
 //}
 
 extension UIImage {
