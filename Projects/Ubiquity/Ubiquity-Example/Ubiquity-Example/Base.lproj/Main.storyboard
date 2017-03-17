@@ -25,7 +25,11 @@
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     </view>
                     <toolbarItems>
-                        <barButtonItem systemItem="action" id="cPQ-4N-UCb"/>
+                        <barButtonItem systemItem="action" id="cPQ-4N-UCb">
+                            <connections>
+                                <segue destination="bCH-wR-wLF" kind="show" id="KQq-lF-dfr"/>
+                            </connections>
+                        </barButtonItem>
                     </toolbarItems>
                     <navigationItem key="navigationItem" id="XLf-HT-uE4">
                         <barButtonItem key="rightBarButtonItem" title="Show" id="HhU-Tf-gGK">
@@ -42,7 +46,7 @@
         <!--Item-->
         <scene sceneID="8Gy-61-9f9">
             <objects>
-                <viewController storyboardIdentifier="X2" useStoryboardIdentifierAsRestorationIdentifier="YES" id="k0D-XX-Dpp" customClass="TestLayoutViewController" customModule="Ubiquity_Example" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="X2" useStoryboardIdentifierAsRestorationIdentifier="YES" id="k0D-XX-Dpp" customClass="TestLayoutViewController" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="LYm-jo-ueB"/>
                         <viewControllerLayoutGuide type="bottom" id="BcD-Nc-MTW"/>
@@ -211,6 +215,59 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="8Nk-Ke-QMM" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="972" y="38.23088455772114"/>
+        </scene>
+        <!--SAPContainterView-->
+        <scene sceneID="u1y-ED-pFi">
+            <objects>
+                <viewController hidesBottomBarWhenPushed="YES" id="bCH-wR-wLF" customClass="TestCanvasViewController" customModule="Ubiquity_Example" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="og9-Jn-iul"/>
+                        <viewControllerLayoutGuide type="bottom" id="Pk2-Wl-0Uq"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="bt8-il-y4h">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="TSZ-6D-3DX" customClass="CanvasView" customModule="Ubiquity">
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                            </view>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="d3b-3b-6PV">
+                                <rect key="frame" x="188" y="0.0" width="0.0" height="667"/>
+                                <color key="backgroundColor" red="1" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="0.5" id="Men-cw-r12"/>
+                                </constraints>
+                            </view>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="t7t-uO-g8O">
+                                <rect key="frame" x="0.0" y="334" width="375" height="0.0"/>
+                                <color key="backgroundColor" red="1" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="0.5" id="pui-L7-635"/>
+                                </constraints>
+                            </view>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstAttribute="bottom" secondItem="TSZ-6D-3DX" secondAttribute="bottom" id="2Kf-5W-KoD"/>
+                            <constraint firstAttribute="trailing" secondItem="t7t-uO-g8O" secondAttribute="trailing" id="Cof-Y6-MzZ"/>
+                            <constraint firstAttribute="trailing" secondItem="TSZ-6D-3DX" secondAttribute="trailing" id="GNN-Dt-kha"/>
+                            <constraint firstItem="t7t-uO-g8O" firstAttribute="centerY" secondItem="bt8-il-y4h" secondAttribute="centerY" id="USu-4y-TTB"/>
+                            <constraint firstItem="d3b-3b-6PV" firstAttribute="centerX" secondItem="bt8-il-y4h" secondAttribute="centerX" id="Yby-wE-18c"/>
+                            <constraint firstItem="d3b-3b-6PV" firstAttribute="top" secondItem="bt8-il-y4h" secondAttribute="top" id="c56-aM-7wK"/>
+                            <constraint firstItem="t7t-uO-g8O" firstAttribute="leading" secondItem="bt8-il-y4h" secondAttribute="leading" id="eZr-zo-eeO"/>
+                            <constraint firstItem="TSZ-6D-3DX" firstAttribute="top" secondItem="bt8-il-y4h" secondAttribute="top" id="ez7-Aw-TZE"/>
+                            <constraint firstItem="TSZ-6D-3DX" firstAttribute="leading" secondItem="bt8-il-y4h" secondAttribute="leading" id="v8m-vo-vsu"/>
+                            <constraint firstAttribute="bottom" secondItem="d3b-3b-6PV" secondAttribute="bottom" id="vfw-bp-IjW"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" title="SAPContainterView" id="h40-hZ-Dbt"/>
+                    <connections>
+                        <outlet property="containterView" destination="TSZ-6D-3DX" id="FJy-Q0-mvK"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="aOL-8L-679" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2719" y="38"/>
         </scene>
     </scenes>
 </document>

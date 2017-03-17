@@ -613,7 +613,7 @@ extension CanvasView: UIGestureRecognizerDelegate, UIScrollViewDelegate {
     }
 }
 
-fileprivate class CanvasContainterView: UIScrollView {
+internal class CanvasContainterView: UIScrollView {
     
     override var contentOffset: CGPoint {
         set {

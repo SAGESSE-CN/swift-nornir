@@ -28,7 +28,6 @@ internal class BrowserDetailController: UICollectionViewController {
         collectionViewLayout.headerReferenceSize = CGSize(width: -extraContentInset.left, height: 0)
         collectionViewLayout.footerReferenceSize = CGSize(width: -extraContentInset.right, height: 0)
         
-        
         super.init(collectionViewLayout: collectionViewLayout)
     }
     internal required init?(coder aDecoder: NSCoder) {
@@ -54,13 +53,34 @@ internal class BrowserDetailController: UICollectionViewController {
         collectionView?.allowsMultipleSelection = false
         collectionView?.allowsSelection = false
         collectionView?.backgroundColor = .white
-        collectionView?.register(BrowserDetailCell.self, forCellWithReuseIdentifier: "ASSET-DETAIL")
+        collectionView?.register(BrowserDetailCell.dynamic(with: UIImageView.self), forCellWithReuseIdentifier: "ASSET-DETAIL-IMAGE")
         
         //collectionView?.addGestureRecognizer(interactiveDismissGestureRecognizer)
         
         view.clipsToBounds = true
     }
     
+//    internal override func viewWillLayoutSubviews() {
+//        super.viewWillLayoutSubviews()
+////
+////        _updateVisableCellContentInsetIfNeeded()
+////        
+////        let nframe = UIEdgeInsetsInsetRect(view.bounds, extraContentInset)
+////        guard collectionView.frame != nframe else {
+////            return
+////        }
+////        _performWithoutContentOffsetChange {
+//
+//        
+////            let indexPath = collectionView.indexPathsForVisibleItems.first
+////            collectionView.frame = nframe
+////            if let indexPath = indexPath, let cell = cell {
+////                collectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: false)
+////                collectionView.layoutIfNeeded()
+////                collectionView.bringSubview(toFront: cell)
+////            }
+////        }
+//    }
 }
 
 extension BrowserDetailController: UICollectionViewDelegateFlowLayout {
@@ -73,10 +93,13 @@ extension BrowserDetailController: UICollectionViewDelegateFlowLayout {
     }
     
     internal override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        return collectionView.dequeueReusableCell(withReuseIdentifier: "ASSET-DETAIL", for: indexPath)
+        return collectionView.dequeueReusableCell(withReuseIdentifier: "ASSET-DETAIL-IMAGE", for: indexPath)
     }
     internal override func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        cell.backgroundColor = .random
+        guard let cell = cell as? BrowserDetailCell else {
+            return
+        }
+        cell.apply()
     }
     
     internal func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
@@ -142,27 +165,6 @@ extension BrowserDetailController: UICollectionViewDelegateFlowLayout {
 //        view.addSubview(collectionView)
 //        
 //        view.addGestureRecognizer(interactiveDismissGestureRecognizer)
-//    }
-//    
-//    override func viewWillLayoutSubviews() {
-//        super.viewWillLayoutSubviews()
-//        
-//        _updateVisableCellContentInsetIfNeeded()
-//        
-//        let nframe = UIEdgeInsetsInsetRect(view.bounds, extraContentInset)
-//        guard collectionView.frame != nframe else {
-//            return
-//        }
-//        _performWithoutContentOffsetChange {
-//            let cell = collectionView.visibleCells.first
-//            let indexPath = collectionView.indexPathsForVisibleItems.first
-//            collectionView.frame = nframe
-//            if let indexPath = indexPath, let cell = cell {
-//                collectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: false)
-//                collectionView.layoutIfNeeded()
-//                collectionView.bringSubview(toFront: cell)
-//            }
-//        }
 //    }
 //    
 //    override func viewWillAppear(_ animated: Bool) {

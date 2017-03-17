@@ -10,34 +10,29 @@ import UIKit
 
 internal class BrowserDetailCell: UICollectionViewCell {
     
-    // provide content view of class, iOS 8+
-    internal dynamic class var _contentViewClass: AnyClass {
-        return CanvasView.self
+    internal override init(frame: CGRect) {
+        super.init(frame: frame)
+        self.setup()
     }
-
-//    override init(frame: CGRect) {
-//        super.init(frame: frame)
-//        _commonInit()
-//    }
-//    required init?(coder aDecoder: NSCoder) {
-//        super.init(coder: aDecoder)
-//        _commonInit()
-//    }
-//    
-//    var asset: Browseable? 
+    internal required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+        self.setup()
+    }
+    
+    internal var detailView: UIView? {
+        return _detailView
+    }
+    internal var containterView: CanvasView? {
+        return _containterView
+    }
+    
+//    var asset: Browseable?
 //    
 //    var orientation: UIImageOrientation = .up
 //    
 //    weak var delegate: BrowseDetailViewDelegate?
-//    
-    
-    //internal var containterView: ScrollView
-    
-//    lazy var detailView: UIImageView = UIImageView()
-//    lazy var containterView: CanvasView = CanvasView()
-//    lazy var doubleTapGestureRecognizer: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(doubleTapHandler(_:)))
-//    
 //
+    
 //    var contentInset: UIEdgeInsets = .zero {
 //        didSet {
 //            guard contentInset != oldValue else {
@@ -47,23 +42,11 @@ internal class BrowserDetailCell: UICollectionViewCell {
 //            _updateProgressLayoutIfNeeded()
 //        }
 //    }
-//    
-//    dynamic func doubleTapHandler(_ sender: UITapGestureRecognizer) {
-//        let location = sender.location(in: detailView)
-//        
-//        DispatchQueue.main.async {
-//            let containterView = self.containterView
-//            if containterView.zoomScale != containterView.minimumZoomScale {
-//                containterView.setZoomScale(containterView.minimumZoomScale, at: location, animated: true)
-//            } else {
-//                containterView.setZoomScale(containterView.maximumZoomScale, at: location, animated: true)
-//            }
-//        }
-//    }
-//    
-//    override func prepareForReuse() {
-//        super.prepareForReuse()
-//        
+//
+//
+    internal override func prepareForReuse() {
+        super.prepareForReuse()
+        
 //        // 重置
 //        _progressOfHidden = true
 //        _progressOfLock = nil
@@ -71,8 +54,100 @@ internal class BrowserDetailCell: UICollectionViewCell {
 //        _progressView.removeFromSuperview()
 //        _progressView.alpha = 0
 //        _progress = 0
-//    }
-//    
+        
+        //detailView?.backgroundColor
+        
+    }
+    
+    internal func apply() {
+        logger.trace()
+        
+        //super.apply(layoutAttributes)
+        
+//        detailView.backgroundColor = newValue.backgroundColor
+//        detailView.image = newValue.browseImage?.withOrientation(orientation)
+        
+        if let imageView = detailView as? UIImageView {
+            imageView.image = UIImage(named: "t1_g")
+        }
+        
+        containterView?.contentSize = .init(width: 1600, height: 1200)
+        containterView?.zoom(to: bounds , with: .up, animated: false)
+//        containterView.contentSize = newValue.browseContentSize
+//        containterView.zoom(to: bounds, with: orientation, animated: false)
+//        //containterView.setZoomScale(containterView.maximumZoomScale, animated: false)
+    }
+    
+    internal override func layoutSubviews() {
+        super.layoutSubviews()
+//        guard _cachedBounds != bounds else {
+//            return
+//        }
+//        _cachedBounds = bounds
+        //_updateIconLayoutIfNeeded()
+        //_updateConsoleLayoutIfNeeded()
+        //_updateProgressLayoutIfNeeded()
+    }
+    
+    internal func setup() {
+        
+        // setup cell
+        backgroundColor = .white
+        
+        // make detail & containter view
+        _detailView = (type(of: self).detailViewClass as? UIView.Type)?.init()
+        _containterView = contentView as? CanvasView
+        
+        // setup containter view if needed
+        if let containterView = _containterView {
+            containterView.delegate = self
+            // add double tap recognizer
+            let doubleTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(doubleTapHandler(_:)))
+            doubleTapRecognizer.numberOfTapsRequired = 2
+            containterView.addGestureRecognizer(doubleTapRecognizer)
+        }
+        // setup detail view if needed
+        if let detailView = _detailView {
+            _detailView = detailView
+            _detailView?.backgroundColor = UIColor(white: 0.94, alpha: 1)
+            _containterView?.addSubview(detailView)
+        }
+        
+//        _typeView.frame = CGRect(x: 0, y: 0, width: 60, height: 26)
+//        _typeView.titleLabel?.font = UIFont.systemFont(ofSize: 14)
+//        _typeView.titleEdgeInsets = UIEdgeInsetsMake(0, 4, 0, -4)
+//        _typeView.isUserInteractionEnabled = false
+//        _typeView.backgroundColor = UIColor.white.withAlphaComponent(0.25)
+//        _typeView.tintColor = UIColor.black.withAlphaComponent(0.6)
+//        _typeView.layer.cornerRadius = 3
+//        _typeView.layer.masksToBounds = true
+//        
+//        _typeView.setTitle("HDR", for: .normal)
+//        _typeView.setImage(UIImage(named: "browse_badge_hdr"), for: .normal)
+//
+//        _consoleView.delegate = self
+//        
+//        _progressView.radius = (_progressView.bounds.width / 2) - 3
+//        _progressView.fillColor = UIColor.white
+//        _progressView.strokeColor = UIColor.lightGray
+//        _progressView.addTarget(self, action: #selector(progressView(willRetry: )), for: .touchUpInside)
+    }
+    
+    internal dynamic func doubleTapHandler(_ sender: UITapGestureRecognizer) {
+        guard let containterView = containterView else {
+            return
+        }
+        let location = sender.location(in: self.detailView)
+        // zoome operator wait to next run loop
+        DispatchQueue.main.async {
+            if containterView.zoomScale != containterView.minimumZoomScale {
+                containterView.setZoomScale(containterView.minimumZoomScale, at: location, animated: true)
+            } else {
+                containterView.setZoomScale(containterView.maximumZoomScale, at: location, animated: true)
+            }
+        }
+    }
+//
 //    func apply(_ asset: Browseable?) {
 //        guard let newValue = asset else {
 //            // 清除
@@ -130,16 +205,6 @@ internal class BrowserDetailCell: UICollectionViewCell {
 //        //})
 //    }
 //    
-//    override func layoutSubviews() {
-//        super.layoutSubviews()
-//        guard _cachedBounds != bounds else {
-//            return
-//        }
-//        _cachedBounds = bounds
-//        _updateIconLayoutIfNeeded()
-//        _updateConsoleLayoutIfNeeded()
-//        _updateProgressLayoutIfNeeded()
-//    }
 //    
 //    fileprivate var _asset: Browseable?
 //    
@@ -333,36 +398,6 @@ internal class BrowserDetailCell: UICollectionViewCell {
 //    
 //    private func _commonInit() {
 //        
-//        doubleTapGestureRecognizer.numberOfTapsRequired = 2
-//        
-//        detailView.backgroundColor = UIColor(white: 0.94, alpha: 1)
-//        
-//        containterView.frame = bounds
-//        containterView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-//        containterView.addSubview(detailView)
-//        containterView.delegate = self
-//        containterView.addGestureRecognizer(doubleTapGestureRecognizer)
-//        
-//        _typeView.frame = CGRect(x: 0, y: 0, width: 60, height: 26)
-//        _typeView.titleLabel?.font = UIFont.systemFont(ofSize: 14)
-//        _typeView.titleEdgeInsets = UIEdgeInsetsMake(0, 4, 0, -4)
-//        _typeView.isUserInteractionEnabled = false
-//        _typeView.backgroundColor = UIColor.white.withAlphaComponent(0.25)
-//        _typeView.tintColor = UIColor.black.withAlphaComponent(0.6)
-//        _typeView.layer.cornerRadius = 3
-//        _typeView.layer.masksToBounds = true
-//        
-//        _typeView.setTitle("HDR", for: .normal)
-//        _typeView.setImage(UIImage(named: "browse_badge_hdr"), for: .normal)
-//        
-//        _consoleView.delegate = self
-//        
-//        _progressView.radius = (_progressView.bounds.width / 2) - 3
-//        _progressView.fillColor = UIColor.white
-//        _progressView.strokeColor = UIColor.lightGray
-//        _progressView.addTarget(self, action: #selector(progressView(willRetry: )), for: .touchUpInside)
-//        
-//        super.addSubview(containterView)
 //    }
 //    
 //    // MARK: Ivar
@@ -383,13 +418,56 @@ internal class BrowserDetailCell: UICollectionViewCell {
 //    fileprivate lazy var _typeView = UIButton(type: .system)
 //    fileprivate lazy var _consoleView = IBVideoConsoleView(frame: CGRect(x: 0, y: 0, width: 70, height: 70))
 //    fileprivate lazy var _progressView = IBOverlayProgressView(frame: CGRect(x: 0, y: 0, width: 22, height: 22))
+    
+    private var _detailView: UIView?
+    private var _containterView: CanvasView?
+    
 }
 
+/// dynamic class support
+internal extension BrowserDetailCell {
+    // dynamically generated class
+    internal dynamic class func `dynamic`(with detalViewClass: AnyClass) -> AnyClass {
+        let detalName = NSStringFromClass(detalViewClass)
+        let name = NSStringFromClass(self) + "." + (detalName.components(separatedBy: ".").last ?? detalName)
+        // if the class has been registered, ignore
+        if let newClass = objc_getClass(name) as? AnyClass {
+            return newClass
+        }
+        // if you have not registered this, dynamically generate it
+        let newClass: AnyClass = objc_allocateClassPair(self, name, 0)
+        let method: Method = class_getClassMethod(self, #selector(getter: detailViewClass))
+        objc_registerClassPair(newClass)
+        // because it is a class method, it can not used class, need to use meta class
+        guard let metaClass = objc_getMetaClass(name) as? AnyClass else {
+            return newClass
+        }
+        let getter: @convention(block) () -> AnyClass = {
+            return detalViewClass
+        }
+        // add class method
+        class_addMethod(metaClass, #selector(getter: detailViewClass), imp_implementationWithBlock(unsafeBitCast(getter, to: AnyObject.self)), method_getTypeEncoding(method))
+        return newClass
+    }
+    // provide content view of class
+    internal dynamic class var contentViewClass: AnyClass {
+        return CanvasView.self
+    }
+    // provide detail view of class
+    internal dynamic class var detailViewClass: AnyClass {
+        return UIView.self
+    }
+    // provide content view of class, iOS 8+
+    fileprivate dynamic class var _contentViewClass: AnyClass {
+        return contentViewClass
+    }
+}
+
+/// canvas view support
 extension BrowserDetailCell: CanvasViewDelegate {
     
     func viewForZooming(in canvasView: CanvasView) -> UIView? {
-//        return detailView
-        return nil
+        return detailView
     }
     
     func canvasViewDidScroll(_ canvasView: CanvasView) {
@@ -430,8 +508,11 @@ extension BrowserDetailCell: CanvasViewDelegate {
     }
     func canvasViewDidEndRotationing(_ canvasView: CanvasView, with view: UIView?, atOrientation orientation: UIImageOrientation) {
 //        self.orientation = orientation
-//        self.detailView.image = detailView.image?.withOrientation(orientation)
-//        
+        
+        if let imageView = detailView as? UIImageView {
+            imageView.image = imageView.image?.withOrientation(orientation)
+        }
+//
 //        delegate?.browseDetailView?(self, canvasView, didEndRotationing: view, atOrientation: orientation)
 //        
 //        _updateProgressLock(false, animated: true)

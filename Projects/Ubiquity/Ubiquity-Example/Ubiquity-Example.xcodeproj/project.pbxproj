@@ -8,12 +8,13 @@
 
 /* Begin PBXBuildFile section */
 		0CE49E221E7A3F690058F5F8 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE49E211E7A3F690058F5F8 /* AppDelegate.swift */; };
-		0CE49E241E7A3F690058F5F8 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE49E231E7A3F690058F5F8 /* ViewController.swift */; };
 		0CE49E271E7A3F690058F5F8 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0CE49E251E7A3F690058F5F8 /* Main.storyboard */; };
 		0CE49E291E7A3F690058F5F8 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0CE49E281E7A3F690058F5F8 /* Assets.xcassets */; };
 		0CE49E2C1E7A3F690058F5F8 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0CE49E2A1E7A3F690058F5F8 /* LaunchScreen.storyboard */; };
 		0CE49E4D1E7A411D0058F5F8 /* Ubiquity.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0CE49E4C1E7A411D0058F5F8 /* Ubiquity.framework */; };
 		0CE49E4E1E7A411D0058F5F8 /* Ubiquity.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 0CE49E4C1E7A411D0058F5F8 /* Ubiquity.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		0CE49EA71E7B978E0058F5F8 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE49EA61E7B978E0058F5F8 /* ViewController.swift */; };
+		0CE49EA91E7B97CE0058F5F8 /* TestCanvasViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE49EA81E7B97CE0058F5F8 /* TestCanvasViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -33,12 +34,13 @@
 /* Begin PBXFileReference section */
 		0CE49E1E1E7A3F690058F5F8 /* Ubiquity-Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Ubiquity-Example.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		0CE49E211E7A3F690058F5F8 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		0CE49E231E7A3F690058F5F8 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		0CE49E261E7A3F690058F5F8 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		0CE49E281E7A3F690058F5F8 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		0CE49E2B1E7A3F690058F5F8 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		0CE49E2D1E7A3F690058F5F8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		0CE49E4C1E7A411D0058F5F8 /* Ubiquity.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Ubiquity.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		0CE49EA61E7B978E0058F5F8 /* ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		0CE49EA81E7B97CE0058F5F8 /* TestCanvasViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestCanvasViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -73,12 +75,13 @@
 		0CE49E201E7A3F690058F5F8 /* Example */ = {
 			isa = PBXGroup;
 			children = (
+				0CE49EA81E7B97CE0058F5F8 /* TestCanvasViewController.swift */,
 				0CE49E211E7A3F690058F5F8 /* AppDelegate.swift */,
-				0CE49E231E7A3F690058F5F8 /* ViewController.swift */,
 				0CE49E251E7A3F690058F5F8 /* Main.storyboard */,
 				0CE49E281E7A3F690058F5F8 /* Assets.xcassets */,
 				0CE49E2A1E7A3F690058F5F8 /* LaunchScreen.storyboard */,
 				0CE49E2D1E7A3F690058F5F8 /* Info.plist */,
+				0CE49EA61E7B978E0058F5F8 /* ViewController.swift */,
 			);
 			name = Example;
 			path = "Ubiquity-Example";
@@ -166,7 +169,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0CE49E241E7A3F690058F5F8 /* ViewController.swift in Sources */,
+				0CE49EA71E7B978E0058F5F8 /* ViewController.swift in Sources */,
+				0CE49EA91E7B97CE0058F5F8 /* TestCanvasViewController.swift in Sources */,
 				0CE49E221E7A3F690058F5F8 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
