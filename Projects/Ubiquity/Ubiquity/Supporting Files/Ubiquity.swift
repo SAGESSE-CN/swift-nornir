@@ -8,18 +8,24 @@
 
 import UIKit
 
+///
+/// displayable the item abstract class
+///
 public protocol Item {
 }
 
+///
+/// displayable the container abstract class
+///
 public protocol Container {
     
 //    var view: UIView { get }
     var viewController: UIViewController { get }
 }
 
-/////
-///// 提供Container支持
-/////
+///
+/// Provide the container display support
+///
 //public extension UIView {
 //    public func addSubview(_ container: Container) {
 //        addSubview(container.view)
@@ -27,7 +33,7 @@ public protocol Container {
 //}
 
 ///
-/// 提供Container支持
+/// Provide the container display support
 ///
 public extension UIViewController {
 //    public func show(_ container: Container, sender: Any?) {
@@ -43,7 +49,7 @@ public extension UIViewController {
 }
 
 ///
-/// 提供Container支持
+/// Provide the container display support
 ///
 public extension UINavigationController {
 //    public convenience init(rootViewController container: Container)  {

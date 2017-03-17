@@ -12,11 +12,11 @@ internal class BrowserListLayout: UICollectionViewFlowLayout {
     
     internal override func prepare() {
         super.prepare()
-        
+        // must be attached to the collection view
         guard let collectionView = collectionView else {
             return
         }
-        // 重新计算
+        // recompute
         let rect = UIEdgeInsetsInsetRect(collectionView.bounds, collectionView.contentInset)
         
         let minimumSpacing = CGFloat(2)
@@ -26,15 +26,18 @@ internal class BrowserListLayout: UICollectionViewFlowLayout {
         let width = trunc(((rect.width + minimumSpacing) / column - minimumSpacing) * 2) / 2
         let spacing = (rect.width - width * column) / (column - 1)
         
-        self.itemSize = CGSize(width: width, height: width)
-        self.minimumLineSpacing = spacing
-        self.minimumInteritemSpacing = spacing
+        // setup
+        itemSize = CGSize(width: width, height: width)
+        minimumLineSpacing = spacing
+        minimumInteritemSpacing = spacing
     }
     
-    override func initialLayoutAttributesForAppearingItem(at itemIndexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
-        return layoutAttributesForItem(at: itemIndexPath)
+    internal override func initialLayoutAttributesForAppearingItem(at itemIndexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
+        logger.trace(itemIndexPath)
+        return super.initialLayoutAttributesForAppearingItem(at: itemIndexPath)
     }
-    override func finalLayoutAttributesForDisappearingItem(at itemIndexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
-        return layoutAttributesForItem(at: itemIndexPath)
+    internal override func finalLayoutAttributesForDisappearingItem(at itemIndexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
+        logger.trace(itemIndexPath)
+        return super.finalLayoutAttributesForDisappearingItem(at: itemIndexPath)
     }
 }

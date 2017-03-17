@@ -42,8 +42,7 @@ internal class BrowserDetailCell: UICollectionViewCell {
 //            _updateProgressLayoutIfNeeded()
 //        }
 //    }
-//
-//
+    
     internal override func prepareForReuse() {
         super.prepareForReuse()
         
@@ -55,16 +54,12 @@ internal class BrowserDetailCell: UICollectionViewCell {
 //        _progressView.alpha = 0
 //        _progress = 0
         
-        //detailView?.backgroundColor
-        
     }
     
     internal override func apply(_ layoutAttributes: UICollectionViewLayoutAttributes) {
         super.apply(layoutAttributes)
         
-        logger.trace()
-        
-        //super.apply(layoutAttributes)
+        logger.trace(layoutAttributes.indexPath)
         
 //        detailView.backgroundColor = newValue.backgroundColor
 //        detailView.image = newValue.browseImage?.withOrientation(orientation)

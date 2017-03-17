@@ -23,13 +23,15 @@ class ViewController: UIViewController, UIActionSheetDelegate {
 
     @IBAction func show(_ sender: Any) {
         let sheet = UIActionSheet(title: nil, delegate: self, cancelButtonTitle: "Cancel", destructiveButtonTitle: nil)
+//        
+//        sheet.addButton(withTitle: "Browser")
+//        sheet.addButton(withTitle: "Picker")
+//        sheet.addButton(withTitle: "Editor")
+//        
+//        sheet.show(in: self.view)
         
-        sheet.addButton(withTitle: "Browser")
-        sheet.addButton(withTitle: "Picker")
-        sheet.addButton(withTitle: "Editor")
-        
-        sheet.show(in: self.view)
-        
+        // skip
+        actionSheet(sheet, clickedButtonAt: 1)
     }
     
     func actionSheet(_ actionSheet: UIActionSheet, clickedButtonAt buttonIndex: Int) {

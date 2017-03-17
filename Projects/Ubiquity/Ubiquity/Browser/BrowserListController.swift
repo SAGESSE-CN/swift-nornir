@@ -19,27 +19,33 @@ internal class BrowserListController: UICollectionViewController {
     
     internal override func loadView() {
         super.loadView()
-        // 配置初始状态
-        collectionView?.register(BrowserListCell.self, forCellWithReuseIdentifier: "ASSET")
+        // setup controller
+        title = "Collection"
+        
+        // setup colleciton view
+        collectionView?.register(BrowserListCell.self, forCellWithReuseIdentifier: "ASSET-IMAGE")
         collectionView?.backgroundColor = .white
         collectionView?.alwaysBounceVertical = true
     }
 }
 
+///
+/// Provide collection view display support
+///
 extension BrowserListController: UICollectionViewDelegateFlowLayout {
     
     internal override func numberOfSections(in collectionView: UICollectionView) -> Int {
         return 1
     }
     internal override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 1000
+        return Browser.colors.count
     }
     
     internal override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        return collectionView.dequeueReusableCell(withReuseIdentifier: "ASSET", for: indexPath)
+        return collectionView.dequeueReusableCell(withReuseIdentifier: "ASSET-IMAGE", for: indexPath)
     }
     internal override func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        cell.backgroundColor = .random
+        cell.backgroundColor = Browser.colors[indexPath.item]
     }
     
     internal func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
@@ -143,17 +149,7 @@ extension BrowserListController: UICollectionViewDelegateFlowLayout {
 //        
 //        delegate = browser
 //        dataSource = browser
-//        
-//        collectionView.frame = view.bounds
-//        collectionView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-//        collectionView.backgroundColor = .white
-//        collectionView.alwaysBounceVertical = true
-//        
-//        collectionView.delegate = self
-//        collectionView.dataSource = self
-//        
-//        collectionView.register(BrowseViewCell.self, forCellWithReuseIdentifier: "Asset")
-//        
+//
 //        view.addSubview(collectionView)
 //    }
 //    
@@ -178,7 +174,5 @@ extension BrowserListController: UICollectionViewDelegateFlowLayout {
 //    fileprivate var _browseIndexPath: IndexPath?
 //    
 //    
-//    lazy var collectionViewLayout: BrowseViewLayout = BrowseViewLayout()
-//    lazy var collectionView: UICollectionView = UICollectionView(frame: .zero, collectionViewLayout: self.collectionViewLayout)
 //}
 //

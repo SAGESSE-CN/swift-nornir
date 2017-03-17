@@ -40,7 +40,7 @@ internal class BrowserDetailLayout: UICollectionViewFlowLayout {
     }
 
     internal override func initialLayoutAttributesForAppearingItem(at itemIndexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
-        logger.debug(itemIndexPath)
+        logger.trace(itemIndexPath)
         // special handling of update operations
         guard invaildIndexPath == itemIndexPath else {
             // use the original method

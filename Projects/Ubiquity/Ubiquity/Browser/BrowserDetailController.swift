@@ -17,6 +17,8 @@ import UIKit
 internal class BrowserDetailController: UICollectionViewController {
     
     internal let extraContentInset = UIEdgeInsetsMake(0, -20, 0, -20)
+    
+    internal let indicatorItem = IndicatorItem()
     internal let interactiveDismissGestureRecognizer = UIPanGestureRecognizer()
     
     internal init() {
@@ -27,7 +29,7 @@ internal class BrowserDetailController: UICollectionViewController {
         collectionViewLayout.minimumInteritemSpacing = -extraContentInset.right * 2
         collectionViewLayout.headerReferenceSize = CGSize(width: -extraContentInset.left, height: 0)
         collectionViewLayout.footerReferenceSize = CGSize(width: -extraContentInset.right, height: 0)
-        
+
         super.init(collectionViewLayout: collectionViewLayout)
     }
     internal required init?(coder aDecoder: NSCoder) {
@@ -35,14 +37,21 @@ internal class BrowserDetailController: UICollectionViewController {
     }
     
     internal override func loadView() {
-        self.automaticallyAdjustsScrollViewInsets = false
         super.loadView()
-        // 配置初始状态
+        // setup controller
+        title = "Detail"
+        automaticallyAdjustsScrollViewInsets = false
         
+        // setup view
+        view.clipsToBounds = true
+        
+        // setup gesture recognizer
         //interactiveDismissGestureRecognizer.delegate = self
         //interactiveDismissGestureRecognizer.maximumNumberOfTouches = 1
         //interactiveDismissGestureRecognizer.addTarget(self, action: #selector(dismissHandler(_:)))
+        //view.addGestureRecognizer(interactiveDismissGestureRecognizer)
         
+        // setup colleciton view
         collectionView?.frame = UIEdgeInsetsInsetRect(view.bounds, extraContentInset)
         collectionView?.scrollsToTop = false
         collectionView?.isPagingEnabled = true
@@ -55,9 +64,17 @@ internal class BrowserDetailController: UICollectionViewController {
         collectionView?.backgroundColor = .white
         collectionView?.register(BrowserDetailCell.dynamic(with: UIImageView.self), forCellWithReuseIdentifier: "ASSET-DETAIL-IMAGE")
         
-        //collectionView?.addGestureRecognizer(interactiveDismissGestureRecognizer)
+        // setup indicator 
+        indicatorItem.delegate = self
+        indicatorItem.dataSource = self
         
-        view.clipsToBounds = true
+        // setup toolbar items
+        toolbarItems = [
+            indicatorItem,
+            UIBarButtonItem(barButtonSystemItem: .action, target: nil, action: nil),
+            UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil),
+            UIBarButtonItem(barButtonSystemItem: .trash, target: nil, action: nil)
+        ]
     }
     
 //    internal override func viewWillLayoutSubviews() {
@@ -81,100 +98,7 @@ internal class BrowserDetailController: UICollectionViewController {
 ////            }
 ////        }
 //    }
-}
-
-extension BrowserDetailController: UICollectionViewDelegateFlowLayout {
     
-    internal override func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return 1
-    }
-    internal override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 1000
-    }
-    
-    internal override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        return collectionView.dequeueReusableCell(withReuseIdentifier: "ASSET-DETAIL-IMAGE", for: indexPath)
-    }
-    internal override func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-    }
-    
-    internal func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return view.frame.size
-    }
-    
-    internal override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        //showDetail(at: indexPath, animated: true)
-        show(BrowserDetailController(), sender: nil)
-    }
-    
-//    
-//    lazy var indicatorView: IBIndicatorView = IBIndicatorView()
-//    
-//    var browseIndexPath: IndexPath? {
-//        return collectionView.indexPathsForVisibleItems.last
-//    }
-//    var browseInteractiveDismissGestureRecognizer: UIGestureRecognizer? {
-//        return interactiveDismissGestureRecognizer
-//    }
-//    
-//    func browseContentSize(at indexPath: IndexPath) -> CGSize {
-//        return dataSource?.browser(self, assetForItemAt: indexPath).browseContentSize ?? .zero
-//    }
-//    func browseContentMode(at indexPath: IndexPath) -> UIViewContentMode {
-//        return .scaleAspectFill
-//    }
-//    func browseContentOrientation(at indexPath: IndexPath) -> UIImageOrientation {
-//        guard let cell = collectionView.cellForItem(at: indexPath) as? BrowseDetailViewCell else {
-//            return .up
-//        }
-//        return cell.orientation
-//    }
-//    
-//    func browseTransitioningView(at indexPath: IndexPath, forKey key: UITransitionContextViewKey) -> UIView? {
-//        if let cell = collectionView.cellForItem(at: indexPath) as? BrowseDetailViewCell {
-//            return cell.detailView
-//        }
-//        _performWithoutContentOffsetChange {
-//            _currentIndexPath = indexPath
-//            // update indicator
-//            indicatorView.indexPath = indexPath
-//            indicatorView.frame = CGRect(x: 0, y: 0, width: view.bounds.width, height: 40)
-//            indicatorView.layoutIfNeeded()
-//            // update content
-//            collectionView.frame = UIEdgeInsetsInsetRect(view.bounds, extraContentInset)
-//            collectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: false)
-//            collectionView.layoutIfNeeded()
-//        }
-//        if let cell = collectionView.cellForItem(at: indexPath) as? BrowseDetailViewCell {
-//            return cell.detailView
-//        }
-//        return nil
-//    }
-//    
-//    
-//    override func viewDidLoad() {
-//        super.viewDidLoad()
-//        
-//        title = "Detail"
-//        
-//        view.backgroundColor = .white
-//        view.addSubview(collectionView)
-//        
-//        view.addGestureRecognizer(interactiveDismissGestureRecognizer)
-//    }
-//    
-//    override func viewWillAppear(_ animated: Bool) {
-//        super.viewWillAppear(animated)
-//        
-//        navigationController?.navigationBar.pop_delegate = self
-//    }
-//    
-//    override func viewWillDisappear(_ animated: Bool) {
-//        super.viewWillDisappear(animated)
-//        
-//        navigationController?.navigationBar.pop_delegate = nil
-//    }
-//    
 //    func dismissHandler(_ sender: UIPanGestureRecognizer) {
 //        
 //        if !_isInteractiving {
@@ -226,7 +150,193 @@ extension BrowserDetailController: UICollectionViewDelegateFlowLayout {
 //            }
 //        }
 //    }
+}
+
+///
+/// Provide collection view display support
+///
+extension BrowserDetailController: UICollectionViewDelegateFlowLayout {
+    
+    internal override func numberOfSections(in collectionView: UICollectionView) -> Int {
+        return 1
+    }
+    internal override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return Browser.colors.count
+    }
+    
+    internal override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        return collectionView.dequeueReusableCell(withReuseIdentifier: "ASSET-DETAIL-IMAGE", for: indexPath)
+    }
+    internal override func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+        cell.backgroundColor = Browser.colors[indexPath.item]
+    }
+    
+    internal func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        return view.frame.size
+    }
+    
+//    fileprivate func _updateCurrentItem(_ offset: CGPoint) {
+//        // 检查是否存在变更
+//        let x = offset.x + collectionView.bounds.width / 2
+//        if let item = _currentItem, item.frame.minX <= x && x < item.frame.maxX {
+//            return // hit cache
+//        }
+//        guard let indexPath = collectionView.indexPathForItem(at: CGPoint(x: x, y: 0)) else {
+//            return // not found, use old
+//        }
+//        //let oldValue = _currentItem
+//        let newValue = collectionView.layoutAttributesForItem(at: indexPath)
+//        // up
+//        _currentItem = newValue
+//        _currentIndexPath = newValue?.indexPath
+//    }
+//    fileprivate func _updateCurrentIndexForIndicator(_ offset: CGPoint) {
+//        let value = offset.x / collectionView.bounds.width
+//        let percent = modf(value + 1).1
+//        
+//        let fromIndex = Int(floor(value))
+//        var fromIndexPath = _interactivingFromIndexPath
+//        
+//        let toIndex = Int(ceil(value))
+//        var toIndexPath = _interactivingToIndexPath
+//        
+//        if _interactivingFromIndex != fromIndex {
+//            fromIndexPath = collectionView.indexPathForItem(at: CGPoint(x: (CGFloat(fromIndex) + 0.5) * collectionView.bounds.width , y: 0))
+//            _interactivingToIndex = fromIndex
+//            _interactivingToIndexPath = fromIndexPath
+//        }
+//        if _interactivingToIndex != toIndex {
+//            toIndexPath = collectionView.indexPathForItem(at: CGPoint(x: (CGFloat(toIndex) + 0.5) * collectionView.bounds.width , y: 0))
+//            _interactivingToIndex = toIndex
+//            _interactivingToIndexPath = toIndexPath
+//        }
+//        // 使用百分比更新index
+//        indicatorView.updateIndexPath(from: fromIndexPath, to: toIndexPath, percent: percent)
+//    }
+//    fileprivate func _updateVisableCellContentInsetIfNeeded() {
+//        let top = topLayoutGuide.length
+//        let bottom = (navigationController?.toolbar?.sizeThatFits(.zero).height ?? 0) + indicatorView.frame.height
+//        
+//        guard _currentContentInset.top != top || _currentContentInset.bottom != bottom else {
+//            return // no change
+//        }
+//        _currentContentInset.top = top
+//        _currentContentInset.bottom = bottom
+//        
+//        collectionView.visibleCells.forEach { 
+//            ($0 as? BrowseDetailViewCell)?.contentInset =  _currentContentInset
+//        }
+//    }
 //    
+    internal override func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        logger.debug(scrollView.contentOffset)
+//        guard !_ignoreContentOffsetChange else {
+//            return
+//        }
+//        _updateCurrentItem(scrollView.contentOffset)
+//        _updateCurrentIndexForIndicator(scrollView.contentOffset)
+    }
+//    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+//        indicatorView.beginInteractiveMovement()
+//    }
+//    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+//        guard !decelerate else {
+//            return
+//        }
+//        indicatorView.endInteractiveMovement()
+//    }
+//    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+//        indicatorView.endInteractiveMovement()
+//    }
+//    
+//    func numberOfSections(in collectionView: UICollectionView) -> Int {
+//        return dataSource?.numberOfSections(in: self) ?? 0
+//    }
+//    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+//        return dataSource?.browser(self, numberOfItemsInSection: section) ?? 0
+//    }
+//    
+//    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+//        return collectionView.dequeueReusableCell(withReuseIdentifier: "Asset", for: indexPath)
+//    }
+//    func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+//        guard let cell = cell as? BrowseDetailViewCell else {
+//            return
+//        }
+//        // 更新属性
+//        cell.apply(dataSource?.browser(self, assetForItemAt: indexPath))
+//        
+//        cell.delegate = self
+//        cell.contentInset = _currentContentInset
+//    }
+//    func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+//        guard let cell = cell as? BrowseDetailViewCell else {
+//            return
+//        }
+//        // 清除属性
+//        cell.apply(nil)
+//    }
+//    
+//
+//    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+//        //dismissHandler(indexPath)
+//    }
+    
+//
+//    var browseIndexPath: IndexPath? {
+//        return collectionView.indexPathsForVisibleItems.last
+//    }
+//    var browseInteractiveDismissGestureRecognizer: UIGestureRecognizer? {
+//        return interactiveDismissGestureRecognizer
+//    }
+//    
+//    func browseContentSize(at indexPath: IndexPath) -> CGSize {
+//        return dataSource?.browser(self, assetForItemAt: indexPath).browseContentSize ?? .zero
+//    }
+//    func browseContentMode(at indexPath: IndexPath) -> UIViewContentMode {
+//        return .scaleAspectFill
+//    }
+//    func browseContentOrientation(at indexPath: IndexPath) -> UIImageOrientation {
+//        guard let cell = collectionView.cellForItem(at: indexPath) as? BrowseDetailViewCell else {
+//            return .up
+//        }
+//        return cell.orientation
+//    }
+//    
+//    func browseTransitioningView(at indexPath: IndexPath, forKey key: UITransitionContextViewKey) -> UIView? {
+//        if let cell = collectionView.cellForItem(at: indexPath) as? BrowseDetailViewCell {
+//            return cell.detailView
+//        }
+//        _performWithoutContentOffsetChange {
+//            _currentIndexPath = indexPath
+//            // update indicator
+//            indicatorView.indexPath = indexPath
+//            indicatorView.frame = CGRect(x: 0, y: 0, width: view.bounds.width, height: 40)
+//            indicatorView.layoutIfNeeded()
+//            // update content
+//            collectionView.frame = UIEdgeInsetsInsetRect(view.bounds, extraContentInset)
+//            collectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: false)
+//            collectionView.layoutIfNeeded()
+//        }
+//        if let cell = collectionView.cellForItem(at: indexPath) as? BrowseDetailViewCell {
+//            return cell.detailView
+//        }
+//        return nil
+//    }
+//    
+//    override func viewWillAppear(_ animated: Bool) {
+//        super.viewWillAppear(animated)
+//        
+//        navigationController?.navigationBar.pop_delegate = self
+//    }
+//    
+//    override func viewWillDisappear(_ animated: Bool) {
+//        super.viewWillDisappear(animated)
+//        
+//        navigationController?.navigationBar.pop_delegate = nil
+//    }
+//    
+//
 //    func _performWithoutContentOffsetChange(_ actionsWithoutAnimation: () -> Void) {
 //        _ignoreContentOffsetChange = true
 //        actionsWithoutAnimation()
@@ -253,8 +363,6 @@ extension BrowserDetailController: UICollectionViewDelegateFlowLayout {
 //      
 //        //UIActivityIndicatorView
 //        
-//        indicatorView.delegate = self
-//        
 //        interactiveDismissGestureRecognizer.delegate = self
 //        interactiveDismissGestureRecognizer.maximumNumberOfTouches = 1
 //        interactiveDismissGestureRecognizer.addTarget(self, action: #selector(dismissHandler(_:)))
@@ -263,14 +371,6 @@ extension BrowserDetailController: UICollectionViewDelegateFlowLayout {
 ////        collectionView.register(SAPPreviewerCell.self, forCellWithReuseIdentifier: "Image")
 ////        collectionView.register(SAPPreviewerCell.self, forCellWithReuseIdentifier: "Video")
 //        
-//        toolbarItems = [
-//            IBExtendedItem(height: 40, view: indicatorView),
-//            
-//            UIBarButtonItem(barButtonSystemItem: .action, target: nil, action: nil),
-//            UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil),
-//            UIBarButtonItem(barButtonSystemItem: .trash, target: nil, action: nil)
-//        ]
-//    //public convenience init(title: String?, style: UIBarButtonItemStyle, target: Any?, action: Selector?)
 //    }
 //}
 //
@@ -332,142 +432,56 @@ extension BrowserDetailController: UICollectionViewDelegateFlowLayout {
 //        }
 //        return false
 //    }
-//}
-//
-//extension BrowseDetailViewController: IBIndicatorViewDelegate {
-//    
-//    func indicatorWillBeginDragging(_ indicator: IBIndicatorView) {
-//        logger.trace()
-//        
-////        collectionView.isScrollEnabled = false
-////        interactiveDismissGestureRecognizer.isEnabled = false
-//    }
-//    func indicatorDidEndDragging(_ indicator: IBIndicatorView) {
-//        logger.trace()
-//        
-////        collectionView.isScrollEnabled = true
-////        interactiveDismissGestureRecognizer.isEnabled = true
-//    }
-//    
-//    func indicator(_ indicator: IBIndicatorView, didSelectItemAt indexPath: IndexPath) {
-////        _logger.debug(indexPath)
-////        guard !_isInteractiving else {
-////            return // 正在交互
-////        }
+}
+
+///
+/// Provide indicator view display support
+///
+extension BrowserDetailController: IndicatorViewDataSource, IndicatorViewDelegate {
+    
+    // MARK: IndicatorViewDataSource
+    
+    internal func numberOfSections(in indicator: IndicatorView) -> Int {
+        return collectionView?.numberOfSections ?? 1
+    }
+    internal func indicator(_ indicator: IndicatorView, numberOfItemsInSection section: Int) -> Int {
+        return collectionView?.numberOfItems(inSection: section) ?? 0
+    }
+    
+    internal func indicator(_ indicator: IndicatorView, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        return .init(width: 80, height: 160)
+    }
+    
+    // MARK: IndicatorViewDelegate
+    
+    internal func indicator(_ indicator: IndicatorView, willDisplay cell: IndicatorViewCell, forItemAt indexPath: IndexPath) {
+        cell.backgroundColor = Browser.colors[indexPath.item]
+    }
+    
+    internal func indicatorWillBeginDragging(_ indicator: IndicatorView) {
+        logger.trace()
+        
+        collectionView?.isScrollEnabled = false
+        interactiveDismissGestureRecognizer.isEnabled = false
+    }
+    internal func indicatorDidEndDragging(_ indicator: IndicatorView) {
+        logger.trace()
+        
+        collectionView?.isScrollEnabled = true
+        interactiveDismissGestureRecognizer.isEnabled = true
+    }
+
+    internal func indicator(_ indicator: IndicatorView, didSelectItemAt indexPath: IndexPath) {
+        logger.trace(indexPath)
+        
+//        guard !_isInteractiving else {
+//            return // 正在交互
+//        }
 //        UIView.performWithoutAnimation {
 //            _performWithoutContentOffsetChange {
 //                // 可能会产生动画 
 //                collectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: false)
 //            }
 //        }
-//    }
-//}
-//
-//extension BrowseDetailViewController: UICollectionViewDelegateFlowLayout, UICollectionViewDataSource {
-//    
-//    fileprivate func _updateCurrentItem(_ offset: CGPoint) {
-//        // 检查是否存在变更
-//        let x = offset.x + collectionView.bounds.width / 2
-//        if let item = _currentItem, item.frame.minX <= x && x < item.frame.maxX {
-//            return // hit cache
-//        }
-//        guard let indexPath = collectionView.indexPathForItem(at: CGPoint(x: x, y: 0)) else {
-//            return // not found, use old
-//        }
-//        //let oldValue = _currentItem
-//        let newValue = collectionView.layoutAttributesForItem(at: indexPath)
-//        // up
-//        _currentItem = newValue
-//        _currentIndexPath = newValue?.indexPath
-//    }
-//    fileprivate func _updateCurrentIndexForIndicator(_ offset: CGPoint) {
-//        let value = offset.x / collectionView.bounds.width
-//        let percent = modf(value + 1).1
-//        
-//        let fromIndex = Int(floor(value))
-//        var fromIndexPath = _interactivingFromIndexPath
-//        
-//        let toIndex = Int(ceil(value))
-//        var toIndexPath = _interactivingToIndexPath
-//        
-//        if _interactivingFromIndex != fromIndex {
-//            fromIndexPath = collectionView.indexPathForItem(at: CGPoint(x: (CGFloat(fromIndex) + 0.5) * collectionView.bounds.width , y: 0))
-//            _interactivingToIndex = fromIndex
-//            _interactivingToIndexPath = fromIndexPath
-//        }
-//        if _interactivingToIndex != toIndex {
-//            toIndexPath = collectionView.indexPathForItem(at: CGPoint(x: (CGFloat(toIndex) + 0.5) * collectionView.bounds.width , y: 0))
-//            _interactivingToIndex = toIndex
-//            _interactivingToIndexPath = toIndexPath
-//        }
-//        // 使用百分比更新index
-//        indicatorView.updateIndexPath(from: fromIndexPath, to: toIndexPath, percent: percent)
-//    }
-//    fileprivate func _updateVisableCellContentInsetIfNeeded() {
-//        let top = topLayoutGuide.length
-//        let bottom = (navigationController?.toolbar?.sizeThatFits(.zero).height ?? 0) + indicatorView.frame.height
-//        
-//        guard _currentContentInset.top != top || _currentContentInset.bottom != bottom else {
-//            return // no change
-//        }
-//        _currentContentInset.top = top
-//        _currentContentInset.bottom = bottom
-//        
-//        collectionView.visibleCells.forEach { 
-//            ($0 as? BrowseDetailViewCell)?.contentInset =  _currentContentInset
-//        }
-//    }
-//    
-//    public func scrollViewDidScroll(_ scrollView: UIScrollView) {
-//        guard !_ignoreContentOffsetChange else {
-//            return
-//        }
-//        _updateCurrentItem(scrollView.contentOffset)
-//        _updateCurrentIndexForIndicator(scrollView.contentOffset)
-//    }
-//    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-//        indicatorView.beginInteractiveMovement()
-//    }
-//    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
-//        guard !decelerate else {
-//            return
-//        }
-//        indicatorView.endInteractiveMovement()
-//    }
-//    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-//        indicatorView.endInteractiveMovement()
-//    }
-//    
-//    func numberOfSections(in collectionView: UICollectionView) -> Int {
-//        return dataSource?.numberOfSections(in: self) ?? 0
-//    }
-//    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-//        return dataSource?.browser(self, numberOfItemsInSection: section) ?? 0
-//    }
-//    
-//    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-//        return collectionView.dequeueReusableCell(withReuseIdentifier: "Asset", for: indexPath)
-//    }
-//    func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-//        guard let cell = cell as? BrowseDetailViewCell else {
-//            return
-//        }
-//        // 更新属性
-//        cell.apply(dataSource?.browser(self, assetForItemAt: indexPath))
-//        
-//        cell.delegate = self
-//        cell.contentInset = _currentContentInset
-//    }
-//    func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-//        guard let cell = cell as? BrowseDetailViewCell else {
-//            return
-//        }
-//        // 清除属性
-//        cell.apply(nil)
-//    }
-//    
-//
-//    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-//        //dismissHandler(indexPath)
-//    }
+    }
 }

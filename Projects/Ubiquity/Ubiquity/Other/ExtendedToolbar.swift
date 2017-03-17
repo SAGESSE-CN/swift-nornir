@@ -15,7 +15,7 @@ internal class ExtendedToolbar: UIToolbar {
         get { return _items }
     }
     
-    open override func setItems(_ items: [UIBarButtonItem]?, animated: Bool) {
+    internal override func setItems(_ items: [UIBarButtonItem]?, animated: Bool) {
         _items = items
         let lines = items?.reduce([], { result, item -> [[UIBarButtonItem]] in
             if item is ExtendedItem {

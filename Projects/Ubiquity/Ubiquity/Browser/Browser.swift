@@ -8,12 +8,18 @@
 
 import UIKit
 
+///
+/// a media browser
+///
 public class Browser: NSObject, Container {
     
     public var viewController: UIViewController {
         return BrowserListController()
     }
+    
+    static var colors: Array<UIColor> = (0 ..< 1400).map { _ in .random }
 }
+
 
 //public class Ubiquity: BrowseDataSource, BrowseDelegate {
 //    

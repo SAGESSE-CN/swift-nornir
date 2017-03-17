@@ -9,7 +9,5 @@
 import UIKit
 
 internal class TilingViewCell: UIView {
-    
-    var reuseIdentifier: String? 
-    
+    internal var reuseIdentifier: String?
 }
