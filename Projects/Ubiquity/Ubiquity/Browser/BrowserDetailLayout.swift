@@ -33,13 +33,10 @@ internal class BrowserDetailLayout: UICollectionViewFlowLayout {
         return .init(x: CGFloat(indexPath.item) * collectionView.bounds.width, y: offset.y)
     }
     
-    override func prepare(forCollectionViewUpdates updateItems: [UICollectionViewUpdateItem]) {
+    internal override func prepare(forCollectionViewUpdates updateItems: [UICollectionViewUpdateItem]) {
+        // clear invaild index path on collection view update animation
         invaildIndexPath = nil
         super.prepare(forCollectionViewUpdates: updateItems)
-    }
-    override func finalizeCollectionViewUpdates() {
-        super.finalizeCollectionViewUpdates()
-        invaildIndexPath = nil
     }
 
     internal override func initialLayoutAttributesForAppearingItem(at itemIndexPath: IndexPath) -> UICollectionViewLayoutAttributes? {

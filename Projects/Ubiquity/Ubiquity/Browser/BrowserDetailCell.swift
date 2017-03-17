@@ -59,7 +59,9 @@ internal class BrowserDetailCell: UICollectionViewCell {
         
     }
     
-    internal func apply() {
+    internal override func apply(_ layoutAttributes: UICollectionViewLayoutAttributes) {
+        super.apply(layoutAttributes)
+        
         logger.trace()
         
         //super.apply(layoutAttributes)
