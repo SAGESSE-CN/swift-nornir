@@ -32,12 +32,57 @@ internal class BrowserListLayout: UICollectionViewFlowLayout {
         minimumInteritemSpacing = spacing
     }
     
+    internal override func shouldInvalidateLayout(forBoundsChange newBounds: CGRect) -> Bool {
+        guard super.shouldInvalidateLayout(forBoundsChange: newBounds) else {
+            return false
+        }
+        guard let collectionView = collectionView else {
+            return false
+        }
+        let location = collectionView.convert(collectionView.center, from: collectionView.superview)
+        // get center index path
+        invaildCenterIndexPath = collectionView.indexPathsForVisibleItems.reduce((nil, Int.max)) {
+            // get the cell center
+            guard let center = collectionView.layoutAttributesForItem(at: $1)?.center else {
+                return $0
+            }
+            // compute the cell to point the disance
+            let disance = Int(fabs(sqrt(pow((center.x - location.x), 2) + pow((center.y - location.y), 2))))
+            // if the cell is more close to update it
+            guard disance < $0.1 else {
+                return $0
+            }
+            return ($1, disance)
+        }.0
+        // update layout 
+        invalidateLayout()
+        
+        return true
+    }
+    
+    internal override func targetContentOffset(forProposedContentOffset proposedContentOffset: CGPoint) -> CGPoint {
+        let offset = super.targetContentOffset(forProposedContentOffset: proposedContentOffset)
+        // only the process screen rotation
+        guard let indexPath = invaildCenterIndexPath else {
+            return offset
+        }
+        // must get the center on new layout
+        guard let collectionView = collectionView, let location = collectionView.layoutAttributesForItem(at: indexPath)?.center else {
+            return offset
+        }
+        let frame = collectionView.frame
+        let size = collectionViewContentSize
+        let edg = collectionView.contentInset
+        // check top boundary & bottom boundary
+        return .init(x: offset.x, y: min(max(location.y - frame.midY, -edg.top),  size.height - frame.maxY + edg.bottom))
+    }
+    
     internal override func initialLayoutAttributesForAppearingItem(at itemIndexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
-        logger.trace(itemIndexPath)
         return super.initialLayoutAttributesForAppearingItem(at: itemIndexPath)
     }
     internal override func finalLayoutAttributesForDisappearingItem(at itemIndexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
-        logger.trace(itemIndexPath)
         return super.finalLayoutAttributesForDisappearingItem(at: itemIndexPath)
     }
+    
+    private var invaildCenterIndexPath: IndexPath?
 }

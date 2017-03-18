@@ -10,16 +10,19 @@ import UIKit
 
 internal class Debugger: UIView {
     
-    func addRect(_ rect: CGRect, key: String = UUID().uuidString) {
+    func addRect(_ rect: CGRect, file: String = #file, at line: Int = #line) {
+        let key = "\(file.hash)-\(line)"
         rects[key] = rect
         setNeedsDisplay()
     }
-    func addPoint(_ point: CGPoint, key: String = UUID().uuidString) {
+    func addPoint(_ point: CGPoint, file: String = #file, at line: Int = #line) {
+        let key = "\(file.hash)-\(line)"
         points[key] = point
         setNeedsDisplay()
     }
     
-    func addText(_ text: String, key: String = UUID().uuidString) {
+    func addText(_ text: String, file: String = #file, at line: Int = #line) {
+        let key = "\(file.hash)-\(line)"
         texts[key] = text
         setNeedsDisplay()
     }

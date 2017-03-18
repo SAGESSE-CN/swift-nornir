@@ -46,6 +46,7 @@ extension BrowserListController: UICollectionViewDelegateFlowLayout {
     }
     internal override func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         cell.backgroundColor = Browser.colors[indexPath.item]
+        cell.debugger.addText("\(indexPath)")
     }
     
     internal func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
@@ -56,8 +57,11 @@ extension BrowserListController: UICollectionViewDelegateFlowLayout {
     }
     
     internal override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        logger.trace(indexPath)
+        
+        
         //showDetail(at: indexPath, animated: true)
-        show(BrowserDetailController(), sender: nil)
+        //show(BrowserDetailController(), sender: nil)
     }
 }
 
