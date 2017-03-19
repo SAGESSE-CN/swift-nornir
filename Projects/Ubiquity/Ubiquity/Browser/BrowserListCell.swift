@@ -57,3 +57,37 @@ internal class BrowserListCell: UICollectionViewCell {
 //    private lazy var _previewView = UIImageView(frame: .zero)
 //    private lazy var _badgeBar = IBBadgeBar(frame: .zero)
 }
+
+/// dynamic class support
+internal extension BrowserListCell {
+    // dynamically generated class
+    internal dynamic class func `dynamic`(with viewClass: AnyClass) -> AnyClass {
+        let name = "\(NSStringFromClass(self))<\(NSStringFromClass(viewClass))>"
+        // if the class has been registered, ignore
+        if let newClass = objc_getClass(name) as? AnyClass {
+            return newClass
+        }
+        // if you have not registered this, dynamically generate it
+        let newClass: AnyClass = objc_allocateClassPair(self, name, 0)
+        let method: Method = class_getClassMethod(self, #selector(getter: contentViewClass))
+        objc_registerClassPair(newClass)
+        // because it is a class method, it can not used class, need to use meta class
+        guard let metaClass = objc_getMetaClass(name) as? AnyClass else {
+            return newClass
+        }
+        let getter: @convention(block) () -> AnyClass = {
+            return viewClass
+        }
+        // add class method
+        class_addMethod(metaClass, #selector(getter: contentViewClass), imp_implementationWithBlock(unsafeBitCast(getter, to: AnyObject.self)), method_getTypeEncoding(method))
+        return newClass
+    }
+    // provide content view of class
+    internal dynamic class var contentViewClass: AnyClass {
+        return CanvasView.self
+    }
+    // provide content view of class, iOS 8+
+    fileprivate dynamic class var _contentViewClass: AnyClass {
+        return contentViewClass
+    }
+}

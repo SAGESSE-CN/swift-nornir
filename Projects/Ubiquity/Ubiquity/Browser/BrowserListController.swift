@@ -10,7 +10,8 @@ import UIKit
 
 internal class BrowserListController: UICollectionViewController {
     
-    internal init() {
+    internal init(container: Container) {
+        self.container = container
         super.init(collectionViewLayout: BrowserListLayout())
     }
     internal required init?(coder aDecoder: NSCoder) {
@@ -23,10 +24,14 @@ internal class BrowserListController: UICollectionViewController {
         title = "Collection"
         
         // setup colleciton view
-        collectionView?.register(BrowserListCell.self, forCellWithReuseIdentifier: "ASSET-IMAGE")
+        collectionView?.register(BrowserListCell.dynamic(with: UIImageView.self), forCellWithReuseIdentifier: "ASSET-IMAGE")
         collectionView?.backgroundColor = .white
         collectionView?.alwaysBounceVertical = true
     }
+    
+    internal let container: Container
+    
+    fileprivate var _detailAnimator: BrowserAnimator?
 }
 
 ///
@@ -46,7 +51,6 @@ extension BrowserListController: UICollectionViewDelegateFlowLayout {
     }
     internal override func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         cell.backgroundColor = Browser.colors[indexPath.item]
-        cell.debugger.addText("\(indexPath)")
     }
     
     internal func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
@@ -59,9 +63,14 @@ extension BrowserListController: UICollectionViewDelegateFlowLayout {
     internal override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         logger.trace(indexPath)
         
+        //BrowserAnimator
         
-        //showDetail(at: indexPath, animated: true)
-        //show(BrowserDetailController(), sender: nil)
+        let vc = BrowserDetailController(container: container)
+        let animator = BrowserAnimator()
+        vc.transitioningDelegate = animator
+        //show(vc, sender: indexPath)
+        navigationController?.pushViewController(vc, animated: true)
+        _detailAnimator = animator
     }
 }
 
@@ -142,19 +151,6 @@ extension BrowserListController: UICollectionViewDelegateFlowLayout {
 //            controller.transitioningDelegate = _browseAnimator
 //            root?.present(controller, animated: true, completion: nil)
 //        }
-//    }
-//    
-//    let browser = Ubiquity()
-//    
-//    override func viewDidLoad() {
-//        super.viewDidLoad()
-//        
-//        title = "Collection"
-//        
-//        delegate = browser
-//        dataSource = browser
-//
-//        view.addSubview(collectionView)
 //    }
 //    
 //    func showDetail(_ asset: Browseable, animated: Bool) {

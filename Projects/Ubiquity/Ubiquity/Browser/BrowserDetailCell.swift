@@ -64,10 +64,9 @@ internal class BrowserDetailCell: UICollectionViewCell {
 //        detailView.backgroundColor = newValue.backgroundColor
 //        detailView.image = newValue.browseImage?.withOrientation(orientation)
         
-        if let imageView = detailView as? UIImageView {
-            imageView.image = UIImage(named: "t1_g")
-        }
-        
+//        if let imageView = detailView as? UIImageView {
+//            imageView.image = UIImage(named: "t1_g")
+//        }
         containterView?.contentSize = .init(width: 1600, height: 1200)
         containterView?.zoom(to: bounds , with: .up, animated: false)
 //        containterView.contentSize = newValue.browseContentSize
@@ -424,9 +423,8 @@ internal class BrowserDetailCell: UICollectionViewCell {
 /// dynamic class support
 internal extension BrowserDetailCell {
     // dynamically generated class
-    internal dynamic class func `dynamic`(with detalViewClass: AnyClass) -> AnyClass {
-        let detalName = NSStringFromClass(detalViewClass)
-        let name = NSStringFromClass(self) + "." + (detalName.components(separatedBy: ".").last ?? detalName)
+    internal dynamic class func `dynamic`(with viewClass: AnyClass) -> AnyClass {
+        let name = "\(NSStringFromClass(self))<\(NSStringFromClass(viewClass))>"
         // if the class has been registered, ignore
         if let newClass = objc_getClass(name) as? AnyClass {
             return newClass
@@ -440,7 +438,7 @@ internal extension BrowserDetailCell {
             return newClass
         }
         let getter: @convention(block) () -> AnyClass = {
-            return detalViewClass
+            return viewClass
         }
         // add class method
         class_addMethod(metaClass, #selector(getter: detailViewClass), imp_implementationWithBlock(unsafeBitCast(getter, to: AnyObject.self)), method_getTypeEncoding(method))

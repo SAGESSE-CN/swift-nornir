@@ -7,7 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0C0405EC1E7EF2C6000A8939 /* BrowserAnimator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C0405EB1E7EF2C6000A8939 /* BrowserAnimator.swift */; };
 		0C72B7631E7C372B00877797 /* IndicatorItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C72B7621E7C372B00877797 /* IndicatorItem.swift */; };
+		0C879F291E7EB63F00E55741 /* UINavigationController+Transitioning.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C879F281E7EB63F00E55741 /* UINavigationController+Transitioning.swift */; };
 		0CE49DC11E7A3E570058F5F8 /* Browser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE49D8A1E7A3E570058F5F8 /* Browser.swift */; };
 		0CE49E001E7A3EE00058F5F8 /* ubiquity_background_gradient@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 0CE49DEF1E7A3EE00058F5F8 /* ubiquity_background_gradient@2x.png */; };
 		0CE49E011E7A3EE00058F5F8 /* ubiquity_badge_allPhotos@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 0CE49DF01E7A3EE00058F5F8 /* ubiquity_badge_allPhotos@2x.png */; };
@@ -65,7 +67,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		0C0405EB1E7EF2C6000A8939 /* BrowserAnimator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BrowserAnimator.swift; sourceTree = "<group>"; };
 		0C72B7621E7C372B00877797 /* IndicatorItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IndicatorItem.swift; sourceTree = "<group>"; };
+		0C879F281E7EB63F00E55741 /* UINavigationController+Transitioning.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UINavigationController+Transitioning.swift"; sourceTree = "<group>"; };
 		0CE49D781E7A3DAA0058F5F8 /* Ubiquity.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Ubiquity.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		0CE49D8A1E7A3E570058F5F8 /* Browser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Browser.swift; sourceTree = "<group>"; };
 		0CE49DEF1E7A3EE00058F5F8 /* ubiquity_background_gradient@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "ubiquity_background_gradient@2x.png"; sourceTree = "<group>"; };
@@ -92,7 +96,7 @@
 		0CE49E3B1E7A3FE50058F5F8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		0CE49E601E7A7D900058F5F8 /* BrowserController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BrowserController.swift; sourceTree = "<group>"; };
 		0CE49E621E7A983A0058F5F8 /* BrowserDetailController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BrowserDetailController.swift; sourceTree = "<group>"; };
-		0CE49E641E7A99180058F5F8 /* BrowserListController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BrowserListController.swift; sourceTree = "<group>"; };
+		0CE49E641E7A99180058F5F8 /* BrowserListController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BrowserListController.swift; sourceTree = "<group>"; wrapsLines = 0; };
 		0CE49E661E7A9BA80058F5F8 /* BrowserListLayout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BrowserListLayout.swift; sourceTree = "<group>"; };
 		0CE49E681E7A9CE50058F5F8 /* BrowserListCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BrowserListCell.swift; sourceTree = "<group>"; };
 		0CE49E7C1E7AAD5D0058F5F8 /* BrowserDetailLayout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BrowserDetailLayout.swift; sourceTree = "<group>"; };
@@ -176,6 +180,7 @@
 				0CE49E7E1E7AAEB70058F5F8 /* BrowserDetailCell.swift */,
 				0CE49E7C1E7AAD5D0058F5F8 /* BrowserDetailLayout.swift */,
 				0CE49E621E7A983A0058F5F8 /* BrowserDetailController.swift */,
+				0C0405EB1E7EF2C6000A8939 /* BrowserAnimator.swift */,
 			);
 			path = Browser;
 			sourceTree = "<group>";
@@ -263,6 +268,7 @@
 		0CE49E9A1E7AB1130058F5F8 /* Extension */ = {
 			isa = PBXGroup;
 			children = (
+				0C879F281E7EB63F00E55741 /* UINavigationController+Transitioning.swift */,
 				0CE49E9B1E7AB1130058F5F8 /* UINavigationBar+Pop.swift */,
 				0CE49E9C1E7AB1130058F5F8 /* UIView+Animation.swift */,
 			);
@@ -431,9 +437,11 @@
 				0CE49E8E1E7AAF760058F5F8 /* IndicatorViewCell.swift in Sources */,
 				0CE49E691E7A9CE50058F5F8 /* BrowserListCell.swift in Sources */,
 				0CE49E991E7AB0200058F5F8 /* Ubiquity.swift in Sources */,
+				0C879F291E7EB63F00E55741 /* UINavigationController+Transitioning.swift in Sources */,
 				0CE49E8B1E7AAF760058F5F8 /* ExtendedItem.swift in Sources */,
 				0CE49E141E7A3F0B0058F5F8 /* Picker.swift in Sources */,
 				0CE49DC11E7A3E570058F5F8 /* Browser.swift in Sources */,
+				0C0405EC1E7EF2C6000A8939 /* BrowserAnimator.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

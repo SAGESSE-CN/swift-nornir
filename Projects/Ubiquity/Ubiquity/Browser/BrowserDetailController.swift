@@ -16,12 +16,7 @@ import UIKit
 
 internal class BrowserDetailController: UICollectionViewController {
     
-    internal let extraContentInset = UIEdgeInsetsMake(0, -20, 0, -20)
-    
-    internal let indicatorItem = IndicatorItem()
-    internal let interactiveDismissGestureRecognizer = UIPanGestureRecognizer()
-    
-    internal init() {
+    internal init(container: Container) {
         let collectionViewLayout = BrowserDetailLayout()
         
         collectionViewLayout.scrollDirection = .horizontal
@@ -30,6 +25,7 @@ internal class BrowserDetailController: UICollectionViewController {
         collectionViewLayout.headerReferenceSize = CGSize(width: -extraContentInset.left, height: 0)
         collectionViewLayout.footerReferenceSize = CGSize(width: -extraContentInset.right, height: 0)
 
+        self.container = container
         super.init(collectionViewLayout: collectionViewLayout)
     }
     internal required init?(coder aDecoder: NSCoder) {
@@ -75,6 +71,15 @@ internal class BrowserDetailController: UICollectionViewController {
             UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil),
             UIBarButtonItem(barButtonSystemItem: .trash, target: nil, action: nil)
         ]
+    }
+    
+    internal override func viewWillAppear(_ animated: Bool) {
+        navigationController?.interactivePopGestureRecognizer?.isEnabled = false
+        super.viewWillAppear(animated)
+    }
+    internal override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        navigationController?.interactivePopGestureRecognizer?.isEnabled = true
     }
     
 //    internal override func viewWillLayoutSubviews() {
@@ -150,6 +155,13 @@ internal class BrowserDetailController: UICollectionViewController {
 //            }
 //        }
 //    }
+    
+    internal let container: Container
+    
+    internal let indicatorItem = IndicatorItem()
+    internal let interactiveDismissGestureRecognizer = UIPanGestureRecognizer()
+    
+    internal let extraContentInset = UIEdgeInsetsMake(0, -20, 0, -20)
 }
 
 ///
@@ -168,7 +180,10 @@ extension BrowserDetailController: UICollectionViewDelegateFlowLayout {
         return collectionView.dequeueReusableCell(withReuseIdentifier: "ASSET-DETAIL-IMAGE", for: indexPath)
     }
     internal override func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        cell.backgroundColor = Browser.colors[indexPath.item]
+        guard let cell =  cell as? BrowserDetailCell else {
+            return
+        }
+        cell.detailView?.backgroundColor = Browser.colors[indexPath.item]
     }
     
     internal func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
