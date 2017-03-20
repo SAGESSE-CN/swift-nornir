@@ -30,8 +30,6 @@ internal class BrowserListController: UICollectionViewController {
     }
     
     internal let container: Container
-    
-    fileprivate var _detailAnimator: BrowserAnimator?
 }
 
 ///
@@ -63,21 +61,22 @@ extension BrowserListController: UICollectionViewDelegateFlowLayout {
     internal override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         logger.trace(indexPath)
         
-        //BrowserAnimator
+        let controller = BrowserDetailController(container: container, at: indexPath)
+        let animator = BrowserAnimator(to: controller, from: self, at: indexPath)
         
-        let vc = BrowserDetailController(container: container)
-        let animator = BrowserAnimator()
-        vc.transitioningDelegate = animator
-        //show(vc, sender: indexPath)
-        navigationController?.pushViewController(vc, animated: true)
-        _detailAnimator = animator
+        controller.animator = animator
+        controller.transitioningDelegate = animator
+        
+        show(controller, sender: indexPath)
     }
 }
 
-//    weak var delegate: BrowseDelegate?
-//    weak var dataSource: BrowseDataSource?
+///
+/// Provide animatable transitioning support
+///
+extension BrowserListController: BrowserAnimatableTransitioning {
 //
-//    var browseIndexPath: IndexPath? { 
+//    var browseIndexPath: IndexPath? {
 //        return _browseIndexPath
 //    }
 //    
@@ -130,6 +129,8 @@ extension BrowserListController: UICollectionViewDelegateFlowLayout {
 //        
 //        return cell.previewView
 //    }
+    
+}
 //    
 //    func showDetail(at indexPath: IndexPath, animated: Bool) {
 //        let controller = BrowseDetailViewController()
@@ -172,7 +173,4 @@ extension BrowserListController: UICollectionViewDelegateFlowLayout {
 //    
 //    fileprivate var _browseAnimator: IBControllerAnimator?
 //    fileprivate var _browseIndexPath: IndexPath?
-//    
-//    
-//}
-//
+

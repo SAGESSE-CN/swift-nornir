@@ -216,7 +216,7 @@
             </objects>
             <point key="canvasLocation" x="972" y="38.23088455772114"/>
         </scene>
-        <!--SAPContainterView-->
+        <!--CanvasView-->
         <scene sceneID="u1y-ED-pFi">
             <objects>
                 <viewController hidesBottomBarWhenPushed="YES" id="bCH-wR-wLF" customClass="TestCanvasViewController" customModule="Ubiquity_Example" customModuleProvider="target" sceneMemberID="viewController">
@@ -260,7 +260,7 @@
                             <constraint firstAttribute="bottom" secondItem="d3b-3b-6PV" secondAttribute="bottom" id="vfw-bp-IjW"/>
                         </constraints>
                     </view>
-                    <navigationItem key="navigationItem" title="SAPContainterView" id="h40-hZ-Dbt"/>
+                    <navigationItem key="navigationItem" title="CanvasView" id="h40-hZ-Dbt"/>
                     <connections>
                         <outlet property="containterView" destination="TSZ-6D-3DX" id="FJy-Q0-mvK"/>
                     </connections>

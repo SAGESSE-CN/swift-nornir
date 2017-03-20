@@ -53,7 +53,9 @@ import UIKit
                 _tilingView.contentOffset.x = attr.frame.midX - _tilingView.contentInset.left - estimatedItemSize.width / 2
             }
         }
-        get { return _currentIndexPath }
+        get {
+            return _currentIndexPath
+        }
     }
     
     internal var estimatedItemSize: CGSize = CGSize(width: 19, height: 38)
@@ -72,7 +74,7 @@ import UIKit
     }
     
     internal func updateIndexPath(_ indexPath: IndexPath?, animated: Bool) {
-        logger.debug("\(indexPath)")
+        logger.trace("\(indexPath)")
         
         let oldValue = _currentIndexPath 
         let newValue = indexPath
@@ -219,13 +221,15 @@ import UIKit
         nframe.size.width = bounds.width
         nframe.size.height = estimatedItemSize.height
         
-        _tilingView.frame = nframe
-        _tilingView.contentInset.left = bounds.width / 2 - estimatedItemSize.width / 2
-        _tilingView.contentInset.right = bounds.width / 2 - estimatedItemSize.width / 2
-        
-        _tilingView.contentOffset.x = offset - _tilingView.contentInset.left
-        
-        _tilingView.layoutIfNeeded()
+        _performWithoutContentOffsetChange {
+            _tilingView.frame = nframe
+            _tilingView.contentInset.left = bounds.width / 2 - estimatedItemSize.width / 2
+            _tilingView.contentInset.right = bounds.width / 2 - estimatedItemSize.width / 2
+            
+            _tilingView.contentOffset.x = offset - _tilingView.contentInset.left
+            _tilingView.layoutIfNeeded()
+        }
+        _updateCurrentItem(_tilingView.contentOffset)
     }
     
     fileprivate func _performWithoutContentOffsetChange(_ actionsWithoutAnimation: () -> Void) {

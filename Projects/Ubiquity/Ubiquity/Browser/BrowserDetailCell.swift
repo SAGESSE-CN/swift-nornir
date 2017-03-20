@@ -22,8 +22,8 @@ internal class BrowserDetailCell: UICollectionViewCell {
     internal var detailView: UIView? {
         return _detailView
     }
-    internal var containterView: CanvasView? {
-        return _containterView
+    internal var containerView: CanvasView? {
+        return _containerView
     }
     
 //    var asset: Browseable?
@@ -59,19 +59,17 @@ internal class BrowserDetailCell: UICollectionViewCell {
     internal override func apply(_ layoutAttributes: UICollectionViewLayoutAttributes) {
         super.apply(layoutAttributes)
         
-        logger.trace(layoutAttributes.indexPath)
-        
 //        detailView.backgroundColor = newValue.backgroundColor
 //        detailView.image = newValue.browseImage?.withOrientation(orientation)
         
 //        if let imageView = detailView as? UIImageView {
 //            imageView.image = UIImage(named: "t1_g")
 //        }
-        containterView?.contentSize = .init(width: 1600, height: 1200)
-        containterView?.zoom(to: bounds , with: .up, animated: false)
-//        containterView.contentSize = newValue.browseContentSize
-//        containterView.zoom(to: bounds, with: orientation, animated: false)
-//        //containterView.setZoomScale(containterView.maximumZoomScale, animated: false)
+        containerView?.contentSize = .init(width: 1600, height: 1200)
+        containerView?.zoom(to: bounds , with: .up, animated: false)
+//        containerView.contentSize = newValue.browseContentSize
+//        containerView.zoom(to: bounds, with: orientation, animated: false)
+//        //containerView.setZoomScale(containerView.maximumZoomScale, animated: false)
     }
     
     internal override func layoutSubviews() {
@@ -90,23 +88,23 @@ internal class BrowserDetailCell: UICollectionViewCell {
         // setup cell
         backgroundColor = .white
         
-        // make detail & containter view
+        // make detail & container view
         _detailView = (type(of: self).detailViewClass as? UIView.Type)?.init()
-        _containterView = contentView as? CanvasView
+        _containerView = contentView as? CanvasView
         
-        // setup containter view if needed
-        if let containterView = _containterView {
-            containterView.delegate = self
+        // setup container view if needed
+        if let containerView = _containerView {
+            containerView.delegate = self
             // add double tap recognizer
             let doubleTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(doubleTapHandler(_:)))
             doubleTapRecognizer.numberOfTapsRequired = 2
-            containterView.addGestureRecognizer(doubleTapRecognizer)
+            containerView.addGestureRecognizer(doubleTapRecognizer)
         }
         // setup detail view if needed
         if let detailView = _detailView {
             _detailView = detailView
             _detailView?.backgroundColor = UIColor(white: 0.94, alpha: 1)
-            _containterView?.addSubview(detailView)
+            _containerView?.addSubview(detailView)
         }
         
 //        _typeView.frame = CGRect(x: 0, y: 0, width: 60, height: 26)
@@ -130,16 +128,16 @@ internal class BrowserDetailCell: UICollectionViewCell {
     }
     
     internal dynamic func doubleTapHandler(_ sender: UITapGestureRecognizer) {
-        guard let containterView = containterView else {
+        guard let containerView = containerView else {
             return
         }
         let location = sender.location(in: self.detailView)
         // zoome operator wait to next run loop
         DispatchQueue.main.async {
-            if containterView.zoomScale != containterView.minimumZoomScale {
-                containterView.setZoomScale(containterView.minimumZoomScale, at: location, animated: true)
+            if containerView.zoomScale != containerView.minimumZoomScale {
+                containerView.setZoomScale(containerView.minimumZoomScale, at: location, animated: true)
             } else {
-                containterView.setZoomScale(containterView.maximumZoomScale, at: location, animated: true)
+                containerView.setZoomScale(containerView.maximumZoomScale, at: location, animated: true)
             }
         }
     }
@@ -181,9 +179,9 @@ internal class BrowserDetailCell: UICollectionViewCell {
 //        
 //        detailView.backgroundColor = newValue.backgroundColor
 //        detailView.image = newValue.browseImage?.withOrientation(orientation)
-//        containterView.contentSize = newValue.browseContentSize
-//        containterView.zoom(to: bounds, with: orientation, animated: false)
-//        //containterView.setZoomScale(containterView.maximumZoomScale, animated: false)
+//        containerView.contentSize = newValue.browseContentSize
+//        containerView.zoom(to: bounds, with: orientation, animated: false)
+//        //containerView.setZoomScale(containerView.maximumZoomScale, animated: false)
 //        
 //        _updateType(newValue.browseType, animated: false)
 //        _updateSubtype(newValue.browseSubtype, animated: false)
@@ -358,7 +356,7 @@ internal class BrowserDetailCell: UICollectionViewCell {
 //        guard _typeView.superview != nil else {
 //            return
 //        }
-//        let edg = _containterInset
+//        let edg = _containerInset
 //        let bounds = UIEdgeInsetsInsetRect(self.bounds, contentInset)
 //       
 //        var nframe = _typeView.frame
@@ -377,9 +375,9 @@ internal class BrowserDetailCell: UICollectionViewCell {
 //        guard !_progressOfHidden else {
 //            return
 //        }
-//        //logger.debug(containterView.contentSize)
+//        //logger.debug(containerView.contentSize)
 //        
-//        let edg = _containterInset
+//        let edg = _containerInset
 //        let size = _progressView.frame.size
 //        let frame = convert(detailView.frame, from: detailView.superview)
 //        let bounds = UIEdgeInsetsInsetRect(self.bounds, contentInset)
@@ -400,7 +398,7 @@ internal class BrowserDetailCell: UICollectionViewCell {
 //    
 //    private var _cachedBounds: CGRect?
 //    
-//    private var _containterInset: UIEdgeInsets = UIEdgeInsetsMake(8, 8, 8, 8)
+//    private var _containerInset: UIEdgeInsets = UIEdgeInsetsMake(8, 8, 8, 8)
 //    
 //    private var _type: IBAssetType = .unknow
 //    private var _subtype: IBAssetSubtype = .unknow
@@ -416,7 +414,7 @@ internal class BrowserDetailCell: UICollectionViewCell {
 //    fileprivate lazy var _progressView = IBOverlayProgressView(frame: CGRect(x: 0, y: 0, width: 22, height: 22))
     
     private var _detailView: UIView?
-    private var _containterView: CanvasView?
+    private var _containerView: CanvasView?
     
 }
 

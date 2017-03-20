@@ -48,99 +48,99 @@ import UIKit
     
     /// default CGPointZero
     public var contentOffset: CGPoint {
-        set { return _containterView.contentOffset = newValue }
-        get { return _containterView.contentOffset }
+        set { return _containerView.contentOffset = newValue }
+        get { return _containerView.contentOffset }
     }
     /// default CGSizeZero
     public var contentSize: CGSize = .zero
     /// default UIEdgeInsetsZero. add additional scroll area around content
     public var contentInset: UIEdgeInsets {
-        set { return _containterView.contentInset = newValue }
-        get { return _containterView.contentInset }
+        set { return _containerView.contentInset = newValue }
+        get { return _containerView.contentInset }
     }
     
     /// default YES. if YES, bounces past edge of content and back again
     public var bounces: Bool {
-        set { return _containterView.bounces = newValue }
-        get { return _containterView.bounces }
+        set { return _containerView.bounces = newValue }
+        get { return _containerView.bounces }
     }
     /// default NO. if YES and bounces is YES, even if content is smaller than bounds, allow drag vertically
     public var alwaysBounceVertical: Bool {
-        set { return _containterView.alwaysBounceVertical = newValue }
-        get { return _containterView.alwaysBounceVertical }
+        set { return _containerView.alwaysBounceVertical = newValue }
+        get { return _containerView.alwaysBounceVertical }
     }
     /// default NO. if YES and bounces is YES, even if content is smaller than bounds, allow drag horizontally
     public var alwaysBounceHorizontal: Bool {
-        set { return _containterView.alwaysBounceHorizontal = newValue }
-        get { return _containterView.alwaysBounceHorizontal }
+        set { return _containerView.alwaysBounceHorizontal = newValue }
+        get { return _containerView.alwaysBounceHorizontal }
     }
     
     /// default YES. turn off any dragging temporarily
     public var isScrollEnabled: Bool {
-        set { return _containterView.isScrollEnabled = newValue }
-        get { return _containterView.isScrollEnabled }
+        set { return _containerView.isScrollEnabled = newValue }
+        get { return _containerView.isScrollEnabled }
     }
     
     /// default YES. show indicator while we are tracking. fades out after tracking
     public var showsHorizontalScrollIndicator: Bool {
-        set { return _containterView.showsHorizontalScrollIndicator = newValue }
-        get { return _containterView.showsHorizontalScrollIndicator }
+        set { return _containerView.showsHorizontalScrollIndicator = newValue }
+        get { return _containerView.showsHorizontalScrollIndicator }
     }
     /// default YES. show indicator while we are tracking. fades out after tracking
     public  var showsVerticalScrollIndicator: Bool {
-        set { return _containterView.showsVerticalScrollIndicator = newValue }
-        get { return _containterView.showsVerticalScrollIndicator }
+        set { return _containerView.showsVerticalScrollIndicator = newValue }
+        get { return _containerView.showsVerticalScrollIndicator }
     }
     /// default is UIEdgeInsetsZero. adjust indicators inside of insets
     public var scrollIndicatorInsets: UIEdgeInsets {
-        set { return _containterView.scrollIndicatorInsets = newValue }
-        get { return _containterView.scrollIndicatorInsets }
+        set { return _containerView.scrollIndicatorInsets = newValue }
+        get { return _containerView.scrollIndicatorInsets }
     }
     /// default is UIScrollViewIndicatorStyleDefault
     public var indicatorStyle: UIScrollViewIndicatorStyle {
-        set { return _containterView.indicatorStyle = newValue }
-        get { return _containterView.indicatorStyle }
+        set { return _containerView.indicatorStyle = newValue }
+        get { return _containerView.indicatorStyle }
     }
     
     public var decelerationRate: CGFloat {
-        set { return _containterView.decelerationRate = newValue }
-        get { return _containterView.decelerationRate }
+        set { return _containerView.decelerationRate = newValue }
+        get { return _containerView.decelerationRate }
     }
     
     /// default is YES. if NO, we immediately call -touchesShouldBegin:withEvent:inContentView:. this has no effect on presses
     public var delaysContentTouches: Bool {
-        set { return _containterView.delaysContentTouches = newValue }
-        get { return _containterView.delaysContentTouches }
+        set { return _containerView.delaysContentTouches = newValue }
+        get { return _containerView.delaysContentTouches }
     }
     /// default is YES. if NO, then once we start tracking, we don't try to drag if the touch moves. this has no effect on presses
     public var canCancelContentTouches: Bool {
-        set { return _containterView.canCancelContentTouches = newValue }
-        get { return _containterView.canCancelContentTouches }
+        set { return _containerView.canCancelContentTouches = newValue }
+        get { return _containerView.canCancelContentTouches }
     }
     
     /// default is 1.0
     public var minimumZoomScale: CGFloat {
-        return _containterView.minimumZoomScale
+        return _containerView.minimumZoomScale
     }
     /// default is 1.0. must be > minimum zoom scale to enable zooming
     public var maximumZoomScale: CGFloat {
-        return _containterView.maximumZoomScale
+        return _containerView.maximumZoomScale
     }
     
     /// default is 1.0
     public var zoomScale: CGFloat  {
-        set { return _containterView.zoomScale = newValue }
-        get { return _containterView.zoomScale }
+        set { return _containerView.zoomScale = newValue }
+        get { return _containerView.zoomScale }
     }
     /// default is YES. if set, user can go past min/max zoom while gesturing and the zoom will animate to the min/max value at gesture end
     public var bouncesZoom: Bool {
-        set { return _containterView.bouncesZoom = newValue }
-        get { return _containterView.bouncesZoom }
+        set { return _containerView.bouncesZoom = newValue }
+        get { return _containerView.bouncesZoom }
     }
     /// default is YES.
     public var scrollsToTop: Bool {
-        set { return _containterView.scrollsToTop = newValue }
-        get { return _containterView.scrollsToTop }
+        set { return _containerView.scrollsToTop = newValue }
+        get { return _containerView.scrollsToTop }
     }
     
     /// default is UIImageOrientationUp
@@ -151,15 +151,15 @@ import UIKit
     
     /// animate at constant velocity to new offset
     public func setContentOffset(_ contentOffset: CGPoint, animated: Bool) {
-        _containterView.setContentOffset(contentOffset, animated: animated)
+        _containerView.setContentOffset(contentOffset, animated: animated)
     }
     /// scroll so rect is just visible (nearest edges). nothing if rect completely visible
     public func scrollRectToVisible(_ rect: CGRect, animated: Bool) {
-        _containterView.scrollRectToVisible(rect, animated: animated)
+        _containerView.scrollRectToVisible(rect, animated: animated)
     }
     
     public func setZoomScale(_ scale: CGFloat, animated: Bool) {
-        _containterView.setZoomScale(scale, animated: animated)
+        _containerView.setZoomScale(scale, animated: animated)
     }
     public func setZoomScale(_ scale: CGFloat, at point: CGPoint, animated: Bool) {
         guard let view = _contentView else {
@@ -173,20 +173,20 @@ import UIKit
         let ratioY = max(min(point.y, view.bounds.height), 0) / max(view.bounds.height, 1)
         
         // calculate the location of this point in zoomed
-        let x = max(min(width * ratioX - _containterView.frame.width / 2, width - _containterView.frame.width), 0)
-        let y = max(min(height * ratioY - _containterView.frame.height / 2, height - _containterView.frame.height), 0)
+        let x = max(min(width * ratioX - _containerView.frame.width / 2, width - _containerView.frame.width), 0)
+        let y = max(min(height * ratioY - _containerView.frame.height / 2, height - _containerView.frame.height), 0)
         
         guard animated else {
-            _containterView.zoomScale = scale
-            _containterView.contentOffset = CGPoint(x: x, y: y)
+            _containerView.zoomScale = scale
+            _containerView.contentOffset = CGPoint(x: x, y: y)
             return
         }
         
-        UIView.animate(withDuration: 0.35, animations: { [_containterView] in
+        UIView.animate(withDuration: 0.35, animations: { [_containerView] in
             UIView.setAnimationBeginsFromCurrentState(true)
             
-            _containterView.zoomScale = scale
-            _containterView.contentOffset = CGPoint(x: x, y: y)
+            _containerView.zoomScale = scale
+            _containerView.contentOffset = CGPoint(x: x, y: y)
         })
     }
     public func zoom(to rect: CGRect, with orientation: UIImageOrientation, animated: Bool) {
@@ -206,17 +206,17 @@ import UIKit
         view.bounds = CGRect(x: 0, y: 0, width: _round(width * nscale), height: _round(height * nscale))
         
         // reset zoom position
-        _containterView.minimumZoomScale = 1
-        _containterView.maximumZoomScale = nmscale
-        _containterView.zoomScale = max(min(oscale, _containterView.maximumZoomScale), _containterView.minimumZoomScale)
-        _containterView.contentOffset = .zero
+        _containerView.minimumZoomScale = 1
+        _containerView.maximumZoomScale = nmscale
+        _containerView.zoomScale = max(min(oscale, _containerView.maximumZoomScale), _containerView.minimumZoomScale)
+        _containerView.contentOffset = .zero
         
         // reset center
         view.center = CGPoint(x: max(view.frame.width, bounds.width) / 2, y: max(view.frame.height, bounds.height) / 2)
         
         // cache
         _bounds = bounds
-        _containterView.frame = bounds
+        _containerView.frame = bounds
         _orientation = orientation
     }
     
@@ -225,35 +225,35 @@ import UIKit
     }
     
     public var isLockContentOffset: Bool {
-        set { return _containterView.isLockContentOffset = newValue }
-        get { return _containterView.isLockContentOffset }
+        set { return _containerView.isLockContentOffset = newValue }
+        get { return _containerView.isLockContentOffset }
     }
     
     /// displays the scroll indicators for a short time. This should be done whenever you bring the scroll view to front.
     public func flashScrollIndicators() {
-        _containterView.flashScrollIndicators()
+        _containerView.flashScrollIndicators()
     }
     
     /// returns YES if user has touched. may not yet have started dragging
     public var isTracking: Bool {
-        return _containterView.isTracking
+        return _containerView.isTracking
     }
     /// returns YES if user has started scrolling. this may require some time and or distance to move to initiate dragging
     public var isDragging: Bool {
-        return _containterView.isDragging
+        return _containerView.isDragging
     }
     /// returns YES if user isn't dragging (touch up) but scroll view is still moving
     public var isDecelerating: Bool {
-        return _containterView.isDecelerating
+        return _containerView.isDecelerating
     }
     
     /// returns YES if user in zoom gesture
     public var isZooming: Bool {
-        return _containterView.isZooming
+        return _containerView.isZooming
     }
     /// returns YES if we are in the middle of zooming back to the min/max value
     public var isZoomBouncing: Bool {
-        return _containterView.isZoomBouncing
+        return _containerView.isZoomBouncing
     }
     
     /// returns YES if user in rotation gesture
@@ -266,11 +266,11 @@ import UIKit
     
     /// Change `panGestureRecognizer.allowedTouchTypes` to limit scrolling to a particular set of touch types.
     public var panGestureRecognizer: UIPanGestureRecognizer {
-        return _containterView.panGestureRecognizer
+        return _containerView.panGestureRecognizer
     }
     /// `pinchGestureRecognizer` will return nil when zooming is disabled.
     public var pinchGestureRecognizer: UIPinchGestureRecognizer? {
-        return _containterView.pinchGestureRecognizer
+        return _containerView.pinchGestureRecognizer
     }
     /// `pinchGestureRecognizer` will return nil when zooming is disabled.
     public var rotationGestureRecognizer: UIRotationGestureRecognizer? {
@@ -293,7 +293,7 @@ import UIKit
         return delegate?.viewForZooming?(in: self)
     }
     
-    fileprivate lazy var _containterView: CanvasContainterView = CanvasContainterView()
+    fileprivate lazy var _containerView: CanvasContainerView = CanvasContainerView()
     
     fileprivate lazy var _rotationGestureRecognizer: UIRotationGestureRecognizer = UIRotationGestureRecognizer(target: self, action: #selector(rotationHandler(_:)))
     
@@ -314,19 +314,19 @@ fileprivate extension CanvasView {
         
         clipsToBounds = true
         
-        _containterView.frame = bounds
-        _containterView.delegate = self
-        _containterView.clipsToBounds = false
-        _containterView.delaysContentTouches = false
-        _containterView.canCancelContentTouches = false
-        _containterView.showsVerticalScrollIndicator = false
-        _containterView.showsHorizontalScrollIndicator = false
-        //_containterView.alwaysBounceVertical = true
-        //_containterView.alwaysBounceHorizontal = true
+        _containerView.frame = bounds
+        _containerView.delegate = self
+        _containerView.clipsToBounds = false
+        _containerView.delaysContentTouches = false
+        _containerView.canCancelContentTouches = false
+        _containerView.showsVerticalScrollIndicator = false
+        _containerView.showsHorizontalScrollIndicator = false
+        //_containerView.alwaysBounceVertical = true
+        //_containerView.alwaysBounceHorizontal = true
         
         _rotationGestureRecognizer.delegate = self
         
-        super.addSubview(_containterView)
+        super.addSubview(_containerView)
         super.addGestureRecognizer(_rotationGestureRecognizer)
     }
     
@@ -397,35 +397,35 @@ fileprivate extension CanvasView {
         let nbounds = CGRect(x: 0, y: 0, width: _round(width * nscale), height: _round(height * nscale))
         let transform = CGAffineTransform(rotationAngle: angle)
         
-        let animations: () -> Void = { [_containterView] in
+        let animations: () -> Void = { [_containerView] in
             // orientation is change?
             if oldOrientation != newOrientation {
                 // changed
-                _containterView.transform = transform
-                _containterView.frame = self.bounds
+                _containerView.transform = transform
+                _containerView.frame = self.bounds
                 
-                _containterView.minimumZoomScale = 1
-                _containterView.maximumZoomScale = nmscale
-                _containterView.zoomScale = 1
-                _containterView.contentOffset = .zero
+                _containerView.minimumZoomScale = 1
+                _containerView.maximumZoomScale = nmscale
+                _containerView.zoomScale = 1
+                _containerView.contentOffset = .zero
                 
                 view?.frame = nbounds.applying(transform)
-                view?.center = CGPoint(x: _containterView.bounds.midX, y: _containterView.bounds.midY)
+                view?.center = CGPoint(x: _containerView.bounds.midX, y: _containerView.bounds.midY)
                 
             } else {
                 // not change
-                _containterView.transform = .identity
+                _containerView.transform = .identity
             }
         }
-        let completion: (Bool) -> Void = { [_containterView] isFinished in
+        let completion: (Bool) -> Void = { [_containerView] isFinished in
             
             if oldOrientation != newOrientation {
                 
-                _containterView.transform = .identity
-                _containterView.frame = self.bounds
+                _containerView.transform = .identity
+                _containerView.frame = self.bounds
                 
                 view?.frame = nbounds
-                view?.center = CGPoint(x: _containterView.bounds.midX, y: _containterView.bounds.midY)
+                view?.center = CGPoint(x: _containerView.bounds.midX, y: _containerView.bounds.midY)
             }
             
             handler?(isFinished)
@@ -448,7 +448,7 @@ fileprivate extension CanvasView {
         guard _isRotationing else {
             return
         }
-        _containterView.transform = CGAffineTransform(rotationAngle: sender.rotation)
+        _containerView.transform = CGAffineTransform(rotationAngle: sender.rotation)
         // state is end?
         guard sender.state == .ended || sender.state == .cancelled || sender.state == .failed else {
             //delegate?.canvasViewDidRotation?(self)
@@ -464,7 +464,7 @@ fileprivate extension CanvasView {
     
     public override func addSubview(_ view: UIView) {
         // always allows add to self
-        _containterView.addSubview(view)
+        _containerView.addSubview(view)
     }
     
     public override func layoutSubviews() {
@@ -478,9 +478,9 @@ fileprivate extension CanvasView {
             return
         }
         // get current offset
-        let offset = _containterView.contentOffset
+        let offset = _containerView.contentOffset
         // update frame(can't use autoresingmask, becase get current offset before change)
-        _containterView.frame = bounds
+        _containerView.frame = bounds
         // get contentView widht and height
         let width = max(_contentSize(for: _orientation).width, 1)
         let height = max(_contentSize(for: _orientation).height, 1)
@@ -491,10 +491,10 @@ fileprivate extension CanvasView {
         var oscale = max(view.frame.width / (width * nscale), view.frame.height / (height * nscale))
         
         // check boundary
-        if _containterView.zoomScale >= _containterView.maximumZoomScale {
+        if _containerView.zoomScale >= _containerView.maximumZoomScale {
             oscale = nmscale // max
         }
-        if _containterView.zoomScale <= _containterView.minimumZoomScale {
+        if _containerView.zoomScale <= _containerView.minimumZoomScale {
             oscale = 1 // min
         }
         
@@ -502,13 +502,13 @@ fileprivate extension CanvasView {
         view.bounds = CGRect(x: 0, y: 0, width: _round(width * nscale), height: _round(height * nscale))
         
         // reset zoom position
-        _containterView.minimumZoomScale = 1
-        _containterView.maximumZoomScale = nmscale
-        _containterView.zoomScale = max(min(oscale, _containterView.maximumZoomScale), _containterView.minimumZoomScale)
-        _containterView.contentOffset = {
+        _containerView.minimumZoomScale = 1
+        _containerView.maximumZoomScale = nmscale
+        _containerView.zoomScale = max(min(oscale, _containerView.maximumZoomScale), _containerView.minimumZoomScale)
+        _containerView.contentOffset = {
             
-            let x = max(min(offset.x + ((_bounds?.width ?? 0) - bounds.width) / 2, _containterView.contentSize.width - bounds.width), 0)
-            let y = max(min(offset.y + ((_bounds?.height ?? 0) - bounds.height) / 2, _containterView.contentSize.height - bounds.height), 0)
+            let x = max(min(offset.x + ((_bounds?.width ?? 0) - bounds.width) / 2, _containerView.contentSize.width - bounds.width), 0)
+            let y = max(min(offset.y + ((_bounds?.height ?? 0) - bounds.height) / 2, _containerView.contentSize.height - bounds.height), 0)
             
             return CGPoint(x: x, y: y)
         }()
@@ -542,7 +542,7 @@ extension CanvasView: UIGestureRecognizerDelegate {
     }
     
     public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
-        if otherGestureRecognizer.view === _containterView {
+        if otherGestureRecognizer.view === _containerView {
             return true
         }
         return false
@@ -619,7 +619,7 @@ extension CanvasView: UIScrollViewDelegate {
     }
 }
 
-internal class CanvasContainterView: UIScrollView {
+internal class CanvasContainerView: UIScrollView {
     
     override var contentOffset: CGPoint {
         set {

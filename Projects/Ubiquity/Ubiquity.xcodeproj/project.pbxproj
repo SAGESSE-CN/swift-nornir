@@ -49,7 +49,6 @@
 		0CE49E911E7AAF760058F5F8 /* TilingViewLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE49E881E7AAF760058F5F8 /* TilingViewLayout.swift */; };
 		0CE49E921E7AAF760058F5F8 /* TilingViewLayoutAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE49E891E7AAF760058F5F8 /* TilingViewLayoutAttributes.swift */; };
 		0CE49E991E7AB0200058F5F8 /* Ubiquity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE49E961E7AB0200058F5F8 /* Ubiquity.swift */; };
-		0CE49E9D1E7AB1130058F5F8 /* UINavigationBar+Pop.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE49E9B1E7AB1130058F5F8 /* UINavigationBar+Pop.swift */; };
 		0CE49E9E1E7AB1130058F5F8 /* UIView+Animation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE49E9C1E7AB1130058F5F8 /* UIView+Animation.swift */; };
 		0CE49EA31E7AB11D0058F5F8 /* Debugger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE49EA01E7AB11D0058F5F8 /* Debugger.swift */; };
 		0CE49EA41E7AB11D0058F5F8 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE49EA11E7AB11D0058F5F8 /* Logger.swift */; };
@@ -113,7 +112,6 @@
 		0CE49E941E7AB0200058F5F8 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		0CE49E951E7AB0200058F5F8 /* Ubiquity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Ubiquity.h; sourceTree = "<group>"; };
 		0CE49E961E7AB0200058F5F8 /* Ubiquity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Ubiquity.swift; sourceTree = "<group>"; };
-		0CE49E9B1E7AB1130058F5F8 /* UINavigationBar+Pop.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UINavigationBar+Pop.swift"; sourceTree = "<group>"; };
 		0CE49E9C1E7AB1130058F5F8 /* UIView+Animation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIView+Animation.swift"; sourceTree = "<group>"; };
 		0CE49EA01E7AB11D0058F5F8 /* Debugger.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Debugger.swift; sourceTree = "<group>"; };
 		0CE49EA11E7AB11D0058F5F8 /* Logger.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
@@ -269,7 +267,6 @@
 			isa = PBXGroup;
 			children = (
 				0C879F281E7EB63F00E55741 /* UINavigationController+Transitioning.swift */,
-				0CE49E9B1E7AB1130058F5F8 /* UINavigationBar+Pop.swift */,
 				0CE49E9C1E7AB1130058F5F8 /* UIView+Animation.swift */,
 			);
 			path = Extension;
@@ -425,7 +422,6 @@
 				0CE49EA41E7AB11D0058F5F8 /* Logger.swift in Sources */,
 				0CE49E121E7A3F010058F5F8 /* Editor.swift in Sources */,
 				0CE49E8F1E7AAF760058F5F8 /* TilingView.swift in Sources */,
-				0CE49E9D1E7AB1130058F5F8 /* UINavigationBar+Pop.swift in Sources */,
 				0C72B7631E7C372B00877797 /* IndicatorItem.swift in Sources */,
 				0CE49E9E1E7AB1130058F5F8 /* UIView+Animation.swift in Sources */,
 				0CE49E7F1E7AAEB70058F5F8 /* BrowserDetailCell.swift in Sources */,

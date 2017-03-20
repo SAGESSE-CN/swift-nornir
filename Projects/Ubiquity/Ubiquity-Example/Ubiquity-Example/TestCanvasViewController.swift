@@ -1,5 +1,5 @@
 //
-//  TXPContainterViewController.swift
+//  TXPContainerViewController.swift
 //  Example
 //
 //  Created by SAGESSE on 03/11/2016.
@@ -22,29 +22,29 @@ class TestCanvasViewController: UIViewController, Ubiquity.CanvasViewDelegate {
         imageView.image = UIImage(named: "t1_g.jpg")
         imageView.frame = .init(x: 0, y: 0, width: 1600, height: 1200)
         
-        containterView.delegate = self
-        //containterView.contentSize = CGSize(width: 240, height: 180)
-        containterView.contentSize = CGSize(width: 1600, height: 1200)
-        containterView.addSubview(imageView)
+        containerView.delegate = self
+        //containerView.contentSize = CGSize(width: 240, height: 180)
+        containerView.contentSize = CGSize(width: 1600, height: 1200)
+        containerView.addSubview(imageView)
         
         let tap = UITapGestureRecognizer(target: self, action: #selector(tapHandler(_:)))
         
         tap.numberOfTapsRequired = 2
         
-        containterView.addGestureRecognizer(tap)
+        containerView.addGestureRecognizer(tap)
     }
     
     func tapHandler(_ sender: UITapGestureRecognizer) {
         
         let pt = sender.location(in: imageView)
         
-        if containterView.zoomScale != containterView.minimumZoomScale {
+        if containerView.zoomScale != containerView.minimumZoomScale {
             // min
-            containterView.setZoomScale(containterView.minimumZoomScale, at: pt, animated: true)
+            containerView.setZoomScale(containerView.minimumZoomScale, at: pt, animated: true)
             
         } else {
             // max
-            containterView.setZoomScale(containterView.maximumZoomScale, at: pt, animated: true)
+            containerView.setZoomScale(containerView.maximumZoomScale, at: pt, animated: true)
         }
     }
     
@@ -68,5 +68,5 @@ class TestCanvasViewController: UIViewController, Ubiquity.CanvasViewDelegate {
     lazy var imageView: UIImageView = UIImageView()
     
     
-    @IBOutlet weak var containterView: Ubiquity.CanvasView!
+    @IBOutlet weak var containerView: Ubiquity.CanvasView!
 }

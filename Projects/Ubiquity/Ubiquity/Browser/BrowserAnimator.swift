@@ -8,12 +8,32 @@
 
 import UIKit
 
-internal class BrowserAnimator: NSObject {
-
+internal protocol BrowserAnimatableTransitioning: class {
 }
 
+internal protocol BrowserInteractivableTransitioning: BrowserAnimatableTransitioning {
+    // the gesture recognizer responsible for top or dismiss view controller.
+    var interactiveDismissGestureRecognizer: UIPanGestureRecognizer { get }
+}
+
+internal class BrowserAnimator: NSObject {
+    
+    internal init(to: BrowserAnimatableTransitioning, from: BrowserAnimatableTransitioning, at indexPath: IndexPath) {
+        self.indexPath = indexPath
+        super.init()
+    }
+
+    internal var indexPath: IndexPath
+}
+
+//UIViewControllerAnimatedTransitioning
+//UIViewControllerInteractiveTransitioning
+
+//UIViewControllerContextTransitioning
+
+
 ///
-/// custom transition support
+/// Provide custom transition delegate forward support
 ///
 extension BrowserAnimator: UINavigationControllerTransitioningDelegate {
     
@@ -55,5 +75,4 @@ extension BrowserAnimator: UINavigationControllerTransitioningDelegate {
         return nil
     }
 }
-
 
