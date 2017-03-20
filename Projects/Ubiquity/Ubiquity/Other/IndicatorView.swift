@@ -43,19 +43,19 @@ import UIKit
     internal weak var dataSource: IndicatorViewDataSource?
     
     internal var indexPath: IndexPath? {
-        set { 
-            // 设置为选中状态
-            _currentIndexPath = newValue 
-            
-            if let indexPath = newValue, let attr = _tilingView.layoutAttributesForItem(at: indexPath) {
-                _currentItem = attr
-                // 更新offset
-                _tilingView.contentOffset.x = attr.frame.midX - _tilingView.contentInset.left - estimatedItemSize.width / 2
-            }
-        }
-        get {
+//        set { 
+//            // 设置为选中状态
+//            _currentIndexPath = newValue 
+//            
+//            if let indexPath = newValue, let attr = _tilingView.layoutAttributesForItem(at: indexPath) {
+//                _currentItem = attr
+//                // 更新offset
+//                _tilingView.contentOffset.x = attr.frame.midX - _tilingView.contentInset.left - estimatedItemSize.width / 2
+//            }
+//        }
+//        get {
             return _currentIndexPath
-        }
+//        }
     }
     
     internal var estimatedItemSize: CGSize = CGSize(width: 19, height: 38)
@@ -71,6 +71,10 @@ import UIKit
             return
         }
         _isInteractiving = false
+    }
+    
+    internal func scrollToItem(at indexPath: IndexPath, animated: Bool) {
+        updateIndexPath(indexPath, animated: animated)
     }
     
     internal func updateIndexPath(_ indexPath: IndexPath?, animated: Bool) {
@@ -93,8 +97,7 @@ import UIKit
         let size = estimatedItemSize
         let indexPaths = Set([ofidx, otidx, oldValue, newValue].flatMap({ $0 })).sorted()
         
-        UIView.animate(withDuration: 0.25, animations: {
-            
+        let animations = { () -> Void in
             self._tilingView.reloadItems(at: indexPaths)
             self._tilingView.contentOffset.x = indexPaths.reduce(0) { offset, indexPath -> CGFloat in
                 guard let attr = self._tilingView.layoutAttributesForItem(at: indexPath) else {
@@ -108,7 +111,13 @@ import UIKit
                 }
                 return offset
             }
-        })
+        }
+        
+        guard animated else {
+            animations()
+            return
+        }
+        UIView.animate(withDuration: 0.25, animations: animations)
     }
     
     

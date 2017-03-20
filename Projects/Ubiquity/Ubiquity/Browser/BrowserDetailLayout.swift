@@ -40,7 +40,6 @@ internal class BrowserDetailLayout: UICollectionViewFlowLayout {
     }
 
     internal override func initialLayoutAttributesForAppearingItem(at itemIndexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
-        logger.trace(itemIndexPath)
         // special handling of update operations
         guard invaildIndexPath == itemIndexPath else {
             // use the original method
@@ -50,8 +49,7 @@ internal class BrowserDetailLayout: UICollectionViewFlowLayout {
         return layoutAttributesForItem(at: itemIndexPath)
     }
     internal override func finalLayoutAttributesForDisappearingItem(at itemIndexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
-        logger.trace(itemIndexPath)
-        // special handling of update operations 
+        // special handling of update operations
         guard invaildIndexPath == itemIndexPath else {
             // use the original method
             return super.finalLayoutAttributesForDisappearingItem(at: itemIndexPath)

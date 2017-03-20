@@ -27,6 +27,8 @@ internal class BrowserDetailController: UICollectionViewController {
 
         self.container = container
         super.init(collectionViewLayout: collectionViewLayout)
+        // setup some default
+        _currentIndexPath = indexPath
     }
     internal required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -71,6 +73,16 @@ internal class BrowserDetailController: UICollectionViewController {
             UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil),
             UIBarButtonItem(barButtonSystemItem: .trash, target: nil, action: nil)
         ]
+    }
+    
+    internal override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        guard let indexPath = _currentIndexPath else {
+            return
+        }
+        collectionView?.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: false)
+        indicatorItem.scrollToItem(at: indexPath, animated: false)
     }
     
     internal override func viewWillAppear(_ animated: Bool) {
@@ -482,7 +494,7 @@ extension BrowserDetailController: IndicatorViewDataSource, IndicatorViewDelegat
     }
     
     internal func indicator(_ indicator: IndicatorView, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return .init(width: 80, height: 160)
+        return .init(width: 1600, height: 1200)
     }
     
     // MARK: IndicatorViewDelegate
@@ -507,11 +519,10 @@ extension BrowserDetailController: IndicatorViewDataSource, IndicatorViewDelegat
     internal func indicator(_ indicator: IndicatorView, didSelectItemAt indexPath: IndexPath) {
         logger.trace(indexPath)
         
-//        guard !_isInteractiving else {
+//        guard !isInteractiving else {
 //            return // 正在交互
 //        }
-        
-        // is changed
+        // index path is changed
         guard indexPath != _currentIndexPath else {
             return
         }
