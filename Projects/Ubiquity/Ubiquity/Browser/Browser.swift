@@ -17,7 +17,23 @@ public class Browser: NSObject, Container {
         return BrowserListController(container: self)
     }
     
-    static var colors: Array<UIColor> = (0 ..< 1400).map { _ in .random }
+    public var numberOfSections: Int {
+        return 1
+    }
+    public func numberOfItems(inSection section: Int) -> Int {
+        return items.count
+    }
+    public func item(at indexPath: IndexPath) -> Item {
+        return items[indexPath.item]
+    }
+    
+    public var items: Array<Item> =  (0 ..< 240).map { _ in BrowserItem() }
+}
+
+internal class BrowserItem: Item {
+    //var size: CGSize = .init(width: 1600, height: 1200)
+    var size: CGSize = .init(width: 640, height: 1136)
+    var backgroundColor: UIColor? = .random
 }
 
 ///

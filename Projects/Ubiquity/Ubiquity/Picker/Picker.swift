@@ -8,12 +8,12 @@
 
 import UIKit
 
-///
-/// a media picker
-///
-public class Picker: NSObject, Container {
-    
-    public var viewController: UIViewController {
-        return UIViewController()
-    }
-}
+/////
+///// a media picker
+/////
+//public class Picker: NSObject, Container {
+//    
+//    public var viewController: UIViewController {
+//        return UIViewController()
+//    }
+//}

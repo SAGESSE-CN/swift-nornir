@@ -56,6 +56,11 @@ internal class BrowserListCell: UICollectionViewCell {
 //    
 //    private lazy var _previewView = UIImageView(frame: .zero)
 //    private lazy var _badgeBar = IBBadgeBar(frame: .zero)
+    
+    internal func apply(for item: Item) {
+        
+        backgroundColor = item.backgroundColor
+    }
 }
 
 /// dynamic class support

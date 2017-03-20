@@ -12,12 +12,19 @@ import UIKit
 /// displayable the item abstract class
 ///
 public protocol Item {
+    var size: CGSize { get }
+    var backgroundColor: UIColor? { get }
 }
 
 ///
 /// displayable the container abstract class
 ///
 public protocol Container {
+    
+    var numberOfSections: Int { get }
+    func numberOfItems(inSection section: Int) -> Int
+    
+    func item(at indexPath: IndexPath) -> Item
     
 //    var view: UIView { get }
     var viewController: UIViewController { get }

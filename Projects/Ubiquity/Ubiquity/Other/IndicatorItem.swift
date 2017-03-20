@@ -36,9 +36,17 @@ internal class IndicatorItem: ExtendedItem {
         _indicatorView.endInteractiveMovement()
     }
     
+    internal func setNeedsLayout() {
+        _indicatorView.setNeedsLayout()
+    }
+    internal func layoutIfNeeded() {
+        _indicatorView.layoutIfNeeded()
+    }
+    
     internal func scrollToItem(at indexPath: IndexPath, animated: Bool) {
         _indicatorView.scrollToItem(at: indexPath, animated: animated)
     }
+    
     
     private var _indicatorView: IndicatorView
 }

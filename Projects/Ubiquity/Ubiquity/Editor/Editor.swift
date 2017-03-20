@@ -8,12 +8,12 @@
 
 import UIKit
 
-///
-/// a media editor
-///
-public class Editor: NSObject, Container {
-    
-    public var viewController: UIViewController {
-        return UIViewController()
-    }
-}
+/////
+///// a media editor
+/////
+//public class Editor: NSObject, Container {
+//    
+//    public var viewController: UIViewController {
+//        return UIViewController()
+//    }
+//}

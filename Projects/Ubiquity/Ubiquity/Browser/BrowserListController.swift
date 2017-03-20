@@ -38,17 +38,20 @@ internal class BrowserListController: UICollectionViewController {
 extension BrowserListController: UICollectionViewDelegateFlowLayout {
     
     internal override func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return 1
+        return container.numberOfSections
     }
     internal override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return Browser.colors.count
+        return container.numberOfItems(inSection: section)
     }
     
     internal override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         return collectionView.dequeueReusableCell(withReuseIdentifier: "ASSET-IMAGE", for: indexPath)
     }
     internal override func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        cell.backgroundColor = Browser.colors[indexPath.item]
+        guard let cell =  cell as? BrowserListCell else {
+            return
+        }
+        return cell.apply(for: container.item(at: indexPath))
     }
     
     internal func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
@@ -62,7 +65,7 @@ extension BrowserListController: UICollectionViewDelegateFlowLayout {
         logger.trace(indexPath)
         
         let controller = BrowserDetailController(container: container, at: indexPath)
-        let animator = BrowserAnimator(to: controller, from: self, at: indexPath)
+        let animator = BrowserAnimator(destination: controller, source: self, at: indexPath)
         
         controller.animator = animator
         controller.transitioningDelegate = animator
@@ -75,61 +78,54 @@ extension BrowserListController: UICollectionViewDelegateFlowLayout {
 /// Provide animatable transitioning support
 ///
 extension BrowserListController: BrowserAnimatableTransitioning {
-//
-//    var browseIndexPath: IndexPath? {
-//        return _browseIndexPath
-//    }
-//    
-//    func browseContentSize(at indexPath: IndexPath) -> CGSize {
-//        return dataSource?.browser(self, assetForItemAt: indexPath).browseContentSize ?? .zero
-//    }
-//    func browseContentMode(at indexPath: IndexPath) -> UIViewContentMode {
-//        return .scaleAspectFill
-//    }
-//    func browseContentOrientation(at indexPath: IndexPath) -> UIImageOrientation {
-//        return .up
-//    }
-//    
-//    func browseTransitioningView(at indexPath: IndexPath, forKey key: UITransitionContextViewKey) -> UIView? {
-//        // self => controller
-//        if key == .from {
-//            let cell = collectionView.cellForItem(at: indexPath) as? BrowseViewCell
-//            return cell?.previewView
-//        }
-//        // self <= conroller
-//        if !collectionView.indexPathsForVisibleItems.contains(indexPath) {
-//            // 没有包含indexPath, 说明这个cell并没有正在显示中, 滚动到这个cell里面
-//            collectionView.scrollToItem(at: indexPath, at: .centeredVertically, animated: false)
-//            // 重置偏移
-//            var pt = collectionView.contentOffset 
-//            pt.y += collectionViewLayout.itemSize.height / 2
-//            collectionView.contentOffset = pt
-//            // 必须调用layoutIfNeeded, 否则cell并没有创建
-//            collectionView.layoutIfNeeded()
-//        }
-//        // 检查这个indexPath是不是正在显示
-//        guard let cell = collectionView.cellForItem(at: indexPath) as? BrowseViewCell else {
-//            return nil
-//        }
-//        let edg = collectionView.contentInset
-//        let frame = cell.convert(cell.bounds, to: view)
-//        let height = view.frame.height - topLayoutGuide.length - bottomLayoutGuide.length 
-//      
-//        let y1 = -edg.top + frame.minY
-//        let y2 = -edg.top + frame.maxY
-//        
-//        // reset content offset if needed
-//        if y2 > height {
-//            // bottom over boundary, reset to y2(bottom)
-//            collectionView.contentOffset.y += y2 - height
-//        } else if y1 < 0 {
-//            // top over boundary, rest to y1(top)
-//            collectionView.contentOffset.y += y1
-//        }
-//        
-//        return cell.previewView
-//    }
     
+    // generate transitioning context for key and index path
+    internal func transitioningContext(using animator: BrowserAnimator, for key: UITransitionContextViewControllerKey, at indexPath: IndexPath) -> BrowserContextTransitioning? {
+        logger.trace(indexPath)
+        // must be attached to the collection view
+        guard let collectionView = collectionView, let collectionViewLayout = collectionView.collectionViewLayout as? UICollectionViewFlowLayout  else {
+            return nil
+        }
+        // check the index path is displaying
+        if !collectionView.indexPathsForVisibleItems.contains(indexPath) {
+            // no, scroll to the cell at index path
+            collectionView.scrollToItem(at: indexPath, at: .centeredVertically, animated: false)
+            // reset offset
+            collectionView.contentOffset.y += collectionViewLayout.itemSize.height / 2
+            // must call the layoutIfNeeded method, otherwise cell may not create
+            collectionView.layoutIfNeeded()
+        }
+        // fetch cell at index path, if is displayed
+        guard let cell = collectionView.cellForItem(at: indexPath) as? BrowserListCell else {
+            return nil
+        }
+        // generate transitioning context
+        let context = BrowserContextTransitioning(container: container, view: cell, at: indexPath)
+        // setup transitioning context
+        context.contentMode = .scaleAspectFill
+        context.contentOrientation = .up
+        // if it is to, reset cell boundary
+        guard key == .to else {
+            return context
+        }
+        let edg = collectionView.contentInset
+        let frame = cell.convert(cell.bounds, to: view)
+        let height = view.frame.height - topLayoutGuide.length - bottomLayoutGuide.length 
+      
+        let y1 = -edg.top + frame.minY
+        let y2 = -edg.top + frame.maxY
+        
+        // reset content offset if needed
+        if y2 > height {
+            // bottom over boundary, reset to y2(bottom)
+            collectionView.contentOffset.y += y2 - height
+        } else if y1 < 0 {
+            // top over boundary, rest to y1(top)
+            collectionView.contentOffset.y += y1
+        }
+        
+        return context
+    }
 }
 //    
 //    func showDetail(at indexPath: IndexPath, animated: Bool) {
@@ -161,16 +157,3 @@ extension BrowserListController: BrowserAnimatableTransitioning {
 //        
 //        show(controller, sender: self)
 //    }
-//    
-//    lazy var _assets:[Browseable] = {
-//        return (0 ..< 140).map{ _ in
-//            return LocalImageAsset()
-//        }
-////        return (0 ..< 1400).map{ _ in
-////            return LocalImageAsset()
-////        }
-//    }()
-//    
-//    fileprivate var _browseAnimator: IBControllerAnimator?
-//    fileprivate var _browseIndexPath: IndexPath?
-

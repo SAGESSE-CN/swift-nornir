@@ -56,21 +56,28 @@ internal class BrowserDetailCell: UICollectionViewCell {
         
     }
     
-    internal override func apply(_ layoutAttributes: UICollectionViewLayoutAttributes) {
-        super.apply(layoutAttributes)
+    internal func apply(for item: Item) {
         
+        containerView?.contentSize = item.size
+        containerView?.zoom(to: bounds , with: .up, animated: false)
+        detailView?.backgroundColor = item.backgroundColor
+    }
+    
+//    internal override func apply(_ layoutAttributes: UICollectionViewLayoutAttributes) {
+//        super.apply(layoutAttributes)
+//
 //        detailView.backgroundColor = newValue.backgroundColor
 //        detailView.image = newValue.browseImage?.withOrientation(orientation)
         
 //        if let imageView = detailView as? UIImageView {
 //            imageView.image = UIImage(named: "t1_g")
 //        }
-        containerView?.contentSize = .init(width: 1600, height: 1200)
-        containerView?.zoom(to: bounds , with: .up, animated: false)
+//        containerView?.contentSize = .init(width: 1600, height: 1200)
+//        containerView?.zoom(to: bounds , with: .up, animated: false)
 //        containerView.contentSize = newValue.browseContentSize
 //        containerView.zoom(to: bounds, with: orientation, animated: false)
 //        //containerView.setZoomScale(containerView.maximumZoomScale, animated: false)
-    }
+//    }
     
     internal override func layoutSubviews() {
         super.layoutSubviews()
