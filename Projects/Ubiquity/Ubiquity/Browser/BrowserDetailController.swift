@@ -83,8 +83,10 @@ internal class BrowserDetailController: UICollectionViewController {
         guard let indexPath = _currentIndexPath else {
             return
         }
-        collectionView?.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: false)
-        indicatorItem.scrollToItem(at: indexPath, animated: false)
+        UIView.performWithoutAnimation {
+            indicatorItem.scrollToItem(at: indexPath, animated: false)
+            collectionView?.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: false)
+        }
     }
     
     internal override func viewWillAppear(_ animated: Bool) {
