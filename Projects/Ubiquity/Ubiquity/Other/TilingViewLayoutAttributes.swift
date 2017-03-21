@@ -16,7 +16,8 @@ internal class TilingViewLayoutAttributes: NSObject {
     }
     
     var indexPath: IndexPath
+    var version: Int = 0
+    
     var frame: CGRect = .zero
     var fromFrame: CGRect = .zero
-    var version: Int = 0
 }

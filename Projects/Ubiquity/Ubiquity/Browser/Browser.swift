@@ -34,7 +34,12 @@ internal class BrowserItem: Item {
     var size: CGSize = .init(width: 1600, height: 1200)
 //    var size: CGSize = .init(width: 640, height: 1136)
     var backgroundColor: UIColor? = .random
+    
+    var image: UIImage? {
+        return __image
+    }
 }
+fileprivate var __image = UIImage(named: "t1")
 
 ///
 /// data fetch & update

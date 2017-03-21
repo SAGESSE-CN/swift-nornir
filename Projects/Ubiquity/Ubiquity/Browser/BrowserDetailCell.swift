@@ -61,6 +61,10 @@ internal class BrowserDetailCell: UICollectionViewCell {
         containerView?.contentSize = item.size
         containerView?.zoom(to: bounds , with: .up, animated: false)
         detailView?.backgroundColor = item.backgroundColor
+        
+        if let imageView = detailView as? UIImageView {
+            imageView.image = item.image
+        }
     }
     
 //    internal override func apply(_ layoutAttributes: UICollectionViewLayoutAttributes) {

@@ -18,6 +18,19 @@ internal enum TransitioningOperation: Int {
 internal enum TransitioningContextKey: Int {
     case from
     case to
+    
+    static func source(for operation: TransitioningOperation) -> TransitioningContextKey {
+        switch operation {
+        case .push, .present: return .from
+        case .pop, .dismiss: return .to
+        }
+    }
+    static func destination(for operation: TransitioningOperation) -> TransitioningContextKey {
+        switch operation {
+        case .push, .present: return .to
+        case .pop, .dismiss: return .from
+        }
+    }
 }
 
 internal class Animator: NSObject {
@@ -29,7 +42,7 @@ internal class Animator: NSObject {
         self.destination = destination
     }
     
-    internal var duration: TimeInterval = 0.5
+    internal var duration: TimeInterval = 0.35
     internal var indexPath: IndexPath
     
     internal weak var source: AnimatableTransitioningDelegate?
@@ -55,6 +68,7 @@ internal protocol TransitioningContext: class {
     
     var operation: TransitioningOperation { get }
     
+    var indexPath: IndexPath { get }
     var containerView: UIView { get }
     
     // This indicates whether the transition is animatable
@@ -69,6 +83,8 @@ internal protocol TransitioningContext: class {
     
     func view(for key: UITransitionContextViewKey) -> UIView?
     func viewController(for key: UITransitionContextViewControllerKey) -> UIViewController?
+    
+    func completeTransition(_ didComplete: Bool)
 }
 
 internal protocol AnimatableTransitioningDelegate: class {
@@ -83,10 +99,11 @@ internal protocol AnimatableTransitioningDelegate: class {
 internal extension AnimatableTransitioningDelegate {
     // generate transitioning animation
     internal func animateTransition(using animator: Animator, context: TransitioningContext) {
-        // no thing
+        context.completeTransition(true)
     }
     // transitioning animation end
     internal func animationEnded(using animator: Animator, transitionCompleted: Bool) {
+        // nothing
     }
 }
 
@@ -102,17 +119,35 @@ internal extension Animator {
     
     internal func animate(for context: TransitioningContext, options: UIViewAnimationOptions, animations: @escaping () -> Void, completion: ((Bool) -> Void)?) {
         
-        if let delegate = context.delegate(for: .from) {
-            delegate.animateTransition(using: self, context: context)
-        }
-        if let delegate = context.delegate(for: .to) {
-            delegate.animateTransition(using: self, context: context)
-        }
+        var state = true
+        var group = DispatchGroup()
         
-        // perfrom system animation
+        // set transition animation complete callback
+        (context as? AnimatorTransitioningContext)?.setCompleteHandler { finished in
+            // :)
+            state = finished && state
+            group.leave()
+        }
+        // perfrom transition animation for source
+        if let delegate = context.delegate(for: .from) {
+            group.enter()
+            delegate.animateTransition(using: self, context: context)
+        }
+        // perform transition animation for destination
+        if let delegate = context.delegate(for: .to) {
+            group.enter()
+            delegate.animateTransition(using: self, context: context)
+        }
+        // perfrom transition animation for default
+        group.enter()
         UIView.animate(withDuration: duration, delay: 0, options: options, animations: animations) { finished in
             // :)
-            completion?(finished)
+            state = finished && state
+            group.leave()
+        }
+        // wait all animation finish
+        group.notify(queue: .main) {
+            completion?(state)
         }
     }
     
@@ -223,22 +258,15 @@ internal class AnimatorShowTransition: AnimatorTransition {
             return
         }
         let containerView = UIView()
-        let contentView = UIView()
         let animator = self.animator
-        let context = AnimatorTransitioningContext(self, contentView: contentView, transition: transitionContext)
+        let context = AnimatorTransitioningContext(self, contentView: containerView, transition: transitionContext)
         
         // setup transitioning context
         toView.isHidden = true
         
-        // setup content view
-        contentView.layer.borderColor = UIColor.random.cgColor
-        contentView.layer.borderWidth = 1
-        contentView.frame = transitionContext.containerView.convert(self.from.view.bounds, from: self.from.view)
-        
         // setup container view
         containerView.frame = transitionContext.containerView.convert(toView.bounds, from: toView)
         containerView.backgroundColor = .clear
-        containerView.addSubview(contentView)
         
         // add to transitioning context
         transitionContext.containerView.insertSubview(toView, aboveSubview: fromView)
@@ -248,99 +276,17 @@ internal class AnimatorShowTransition: AnimatorTransition {
         animator.animate(for: context, options: .curveEaseIn, animations: {
             
             containerView.backgroundColor = toView.backgroundColor
-            contentView.frame = transitionContext.containerView.convert(self.to.view.bounds, from: self.to.view)
             
         }, completion: { finished in
             
             // restore transitioning context
             toView.isHidden = false
             
-            contentView.removeFromSuperview()
             containerView.removeFromSuperview()
             
             transitionContext.completeTransition(!context.transitionWasCancelled)
             animator.animationEnded(for: context, transitionCompleted: !transitionContext.transitionWasCancelled)
         })
-        
-//        let containerView = transitionContext.containerView
-        
-        // add context view
-        
-        //let superview = toContext.view
-        //let transitionView = toContext.view
-        //let transitionSuperview = UIView()
-        
-//        containerView.addSubview(transitionSuperview)
-//        // refresh layout
-//        fromView.frame = containerView.bounds
-//        fromView.layoutIfNeeded()
-//        
-//        let toColor = toView.backgroundColor
-//        let fromColor = UIColor.clear
-//        
-//        // convert rect to containerView
-//        let toSuperviewFrame = containerView.convert(toContext.view.bounds, from: toContext.view)
-//        let fromSuperviewFrame = containerView.convert(fromContext.view.superview?.bounds ?? .zero, from: fromContext.view.superview)
-//        
-//        let toViewFrame = containerView.convert(toContext.view.bounds, from: toContext.view)
-//        let fromViewFrame = containerView.convert(fromContext.align(rect: fromContext.view.bounds), from: fromContext.view)
-//        
-//        let toAngle = toContext.angle()
-//        let fromAngle = fromContext.angle()
-//
-//        transitionSuperview.frame = fromSuperviewFrame
-//        transitionSuperview.clipsToBounds = true
-//        transitionSuperview.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-//        transitionSuperview.addSubview(transitionView)
-//        transitionView.transform = transitionView.transform.rotated(by: (fromAngle - toAngle))
-//        transitionView.frame = containerView.convert(fromViewFrame, to: transitionSuperview)
-//        
-//        backgroundView.backgroundColor = fromColor
-//        
-//        toView.isHidden = true
-//        fromContext.view.isHidden = true
-//
-//        //UIView.animate(withDuration: transitionDuration(using: transitionContext), animations: {
-        
-        
-//        animator.transition(for: transitionContext, from: fromContext, to: toContext, duration: transitionDuration(using: transitionContext), options: .curveEaseOut) { _ in
-//            // restore context
-//            toView.isHidden = false
-////            superview?.addSubview(transitionView)
-////            
-////            fromContext.view.isHidden = false
-////            
-////            transitionView.frame = containerView.convert(toViewFrame, to: superview) 
-////            transitionContext.completeTransition(!transitionContext.transitionWasCancelled)
-////            
-////            backgroundView.removeFromSuperview()
-////            transitionSuperview.removeFromSuperview()
-//            
-//            transitionContext.completeTransition(!transitionContext.transitionWasCancelled)
-//        }
-        
-//        UIView.animate(withDuration: transitionDuration(using: transitionContext), delay: 0, usingSpringWithDamping: 0.75, initialSpringVelocity: 16, options: .curveEaseOut, animations: {
-//            
-//            backgroundView.backgroundColor = toColor
-//            
-//            transitionSuperview.frame = toSuperviewFrame
-//            transitionView.transform = transitionView.transform.rotated(by: -(fromAngle - toAngle))
-//            transitionView.frame = containerView.convert(toViewFrame, to: transitionSuperview) 
-//            
-//        }, completion: { _ in
-//            
-//            // restore context
-//            toView.isHidden = false
-//            superview?.addSubview(transitionView)
-//            
-//            fromContext.view.isHidden = false
-//            
-//            transitionView.frame = containerView.convert(toViewFrame, to: superview) 
-//            transitionContext.completeTransition(!transitionContext.transitionWasCancelled)
-//            
-//            backgroundView.removeFromSuperview()
-//            transitionSuperview.removeFromSuperview()
-//        })
     }
 }
 
@@ -355,22 +301,15 @@ internal class AnimatorDismissTransition: AnimatorTransition {
             return
         }
         let containerView = UIView()
-        let contentView = UIView()
         let animator = self.animator
-        let context = AnimatorTransitioningContext(self, contentView: contentView, transition: transitionContext)
+        let context = AnimatorTransitioningContext(self, contentView: containerView, transition: transitionContext)
         
         // setup transitioning context
         fromView.isHidden = true
         
-        // setup content view
-        contentView.layer.borderColor = UIColor.random.cgColor
-        contentView.layer.borderWidth = 1
-        contentView.frame = transitionContext.containerView.convert(self.from.view.bounds, from: self.from.view)
-        
         // setup container view
         containerView.frame = transitionContext.containerView.convert(toView.bounds, from: toView)
         containerView.backgroundColor = fromView.backgroundColor
-        containerView.addSubview(contentView)
         
         // add to transitioning context
         transitionContext.containerView.insertSubview(toView, aboveSubview: fromView)
@@ -380,94 +319,23 @@ internal class AnimatorDismissTransition: AnimatorTransition {
         animator.animate(for: context, options: .curveEaseIn, animations: {
             
             containerView.backgroundColor = .clear
-            contentView.frame = transitionContext.containerView.convert(self.to.view.bounds, from: self.to.view)
             
         }, completion: { finished in
             
             // restore transitioning context
             fromView.isHidden = false
             
-            contentView.removeFromSuperview()
             containerView.removeFromSuperview()
             
             transitionContext.completeTransition(!transitionContext.transitionWasCancelled)
             animator.animationEnded(for: context, transitionCompleted: !transitionContext.transitionWasCancelled)
         })
-        
-//        let containerView = transitionContext.containerView
-//
-//        let superview = fromContext.view.superview
-//        let transitionView = fromContext.view
-//        let transitionSuperview = UIView()
-//        let backgroundView = UIView()
-//        
-//        // add context view
-//        containerView.insertSubview(toView, belowSubview: fromView)
-//        containerView.addSubview(backgroundView)
-//        containerView.addSubview(transitionSuperview)
-//        
-//        // refresh layout
-//        toView.frame = containerView.bounds
-//        toView.layoutIfNeeded()
-//        
-//        let toColor = UIColor.clear
-//        let fromColor = fromView.backgroundColor
-//        
-//        // convert rect to containerView
-//        let toSuperviewFrame = containerView.convert(toContext.view.superview?.bounds ?? .zero, from: toContext.view.superview)
-//        let fromSuperviewFrame = containerView.convert(fromContext.view.bounds, from: fromContext.view)
-//        
-//        let toViewFrame = containerView.convert(toContext.align(rect: toContext.view.bounds), from: toContext.view)
-//        let fromViewFrame = containerView.convert(fromContext.view.bounds, from: fromContext.view)
-//        
-//        let toAngle = toContext.angle()
-//        let fromAngle = fromContext.angle()
-//        
-//        backgroundView.frame = fromView.frame
-//        backgroundView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-//        
-//        transitionSuperview.frame = fromSuperviewFrame
-//        transitionSuperview.clipsToBounds = true
-//        transitionSuperview.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-//        transitionSuperview.addSubview(transitionView)
-//        transitionView.frame = containerView.convert(fromViewFrame, to: transitionSuperview)
-//        
-//        fromView.isHidden = true
-//        toContext.view.isHidden = true
-//        backgroundView.backgroundColor = fromColor
-//        
-//        //UIView.animate(withDuration: transitionDuration(using: transitionContext), animations: { 
-//        UIView.animate(withDuration: transitionDuration(using: transitionContext), delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 10, options: .curveEaseIn, animations: { 
-//            
-//            backgroundView.backgroundColor = toColor
-//            
-//            transitionSuperview.frame = toSuperviewFrame
-//            transitionView.transform = transitionView.transform.rotated(by: (toAngle - fromAngle))
-//            transitionView.frame = containerView.convert(toViewFrame, to: transitionSuperview) 
-//            
-//        }, completion: { _ in
-//            
-//            // restore context
-//            fromView.isHidden = false
-//            
-//            superview?.addSubview(transitionView)
-//            
-//            toContext.view.isHidden = false
-//            
-//            transitionView.transform = transitionView.transform.rotated(by: -(toAngle - fromAngle))
-//            transitionView.frame = containerView.convert(fromViewFrame, to: superview) 
-//            transitionContext.completeTransition(!transitionContext.transitionWasCancelled)
-//            
-//            backgroundView.removeFromSuperview()
-//            transitionSuperview.removeFromSuperview()
-//        })
-        
     }
 }
 
 fileprivate class AnimatorTransitioningContext: NSObject, TransitioningContext {
     
-    fileprivate init(_ animationController: AnimatorTransition, contentView: UIView, transition: UIViewControllerContextTransitioning) {
+    init(_ animationController: AnimatorTransition, contentView: UIView, transition: UIViewControllerContextTransitioning) {
         _controller = animationController
         _contentView = contentView
         _transitionContext = transition
@@ -476,6 +344,10 @@ fileprivate class AnimatorTransitioningContext: NSObject, TransitioningContext {
     
     var operation: TransitioningOperation {
         return _controller.operation
+    }
+    
+    var indexPath: IndexPath {
+        return _controller.animator.indexPath
     }
     
     var containerView: UIView {
@@ -519,8 +391,18 @@ fileprivate class AnimatorTransitioningContext: NSObject, TransitioningContext {
         return _transitionContext.viewController(forKey: key)
     }
     
+    func completeTransition(_ didComplete: Bool) {
+        _completeHandler?(didComplete)
+    }
+    
+    func setCompleteHandler(_ handler: @escaping ((Bool) -> Void)) {
+        _completeHandler = handler
+    }
+    
     private var _controller: AnimatorTransition
     private var _contentView: UIView
     private var _transitionContext: UIViewControllerContextTransitioning
+    
+    private var _completeHandler: ((Bool) -> Void)?
 }
 

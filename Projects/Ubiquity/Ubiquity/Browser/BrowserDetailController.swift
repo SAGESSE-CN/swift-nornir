@@ -132,7 +132,14 @@ internal class BrowserDetailController: UICollectionViewController {
     fileprivate var _interactivingToIndexPath: IndexPath?
     
     fileprivate var _currentItem: UICollectionViewLayoutAttributes?
-    fileprivate var _currentIndexPath: IndexPath?
+    fileprivate var _currentIndexPath: IndexPath? {
+        willSet {
+            guard let newValue = newValue else {
+                return 
+            }
+            animator?.indexPath = newValue
+        }
+    }
     
     fileprivate var _ignoreContentOffsetChange = false
 }
@@ -458,11 +465,11 @@ extension BrowserDetailController: AnimatableTransitioningDelegate, Interactivab
             }
         }
         // fetch cell at index path, if is displayed
-        guard let cell = collectionView.cellForItem(at: indexPath) as? BrowserDetailCell else {
+        guard let cell = collectionView.cellForItem(at: indexPath) as? BrowserDetailCell, let detailView = cell.detailView else {
             return nil
         }
         // generate transitioning context
-        let scene = TransitioningScene(view: cell, at: indexPath)
+        let scene = TransitioningScene(view: detailView, at: indexPath)
         // setup transitioning context
         scene.contentMode = .scaleAspectFill
         scene.contentOrientation = .up
@@ -472,6 +479,116 @@ extension BrowserDetailController: AnimatableTransitioningDelegate, Interactivab
     // generate transitioning animation
     internal func animateTransition(using animator: Animator, context: TransitioningContext) {
         logger.debug()
+        
+        let to = context.scene(for: .to)
+        let from = context.scene(for: .from)
+        let container = context.containerView
+        let dest = context.scene(for: .destination(for: context.operation))
+        let src = context.scene(for: .source(for: context.operation))
+        
+//        guard let cell = dest.view as? BrowserDetailCell, let detailView = cell.detailView else {
+//            context.completeTransition(true)
+//            return
+//        }
+//        logger.debug("\(cell) => \(detailView)")
+        
+//        context.completeTransition(true)
+//
+//        let superview = fromContext.view.superview
+//        let transitionView = fromContext.view
+//        let transitionSuperview = UIView()
+//        let backgroundView = UIView()
+//        
+//        // add context view
+//        containerView.addSubview(transitionSuperview)
+//
+//        // refresh layout
+//        toView.frame = containerView.bounds
+//        toView.layoutIfNeeded()
+//        
+//        let toColor = UIColor.clear
+//        let fromColor = fromView.backgroundColor
+//        
+        let contentView = UIImageView()
+        
+        // convert rect to containerView
+        let sframe = container.convert(from.view.bounds, from: from.view)
+        let dframe = container.convert(to.view.bounds, from: to.view)
+        
+        // setup content view begin context
+        contentView.frame = sframe
+        contentView.contentMode = .scaleAspectFill
+        contentView.clipsToBounds = true
+        contentView.image = self.container.item(at: dest.indexPath).image
+        contentView.backgroundColor = self.container.item(at: dest.indexPath).backgroundColor
+        
+        // setup source context
+        src.view.isHidden = true
+        
+        // setup container
+        container.addSubview(contentView)
+        
+        UIView.animate(withDuration: animator.duration, animations: {
+            
+            contentView.frame = dframe
+            
+            
+        }, completion: { finished in
+            
+            // restore source context
+            src.view.isHidden = false
+            
+            context.completeTransition(true)
+        })
+        
+//        let toSuperviewFrame = containerView.convert(toContext.view.superview?.bounds ?? .zero, from: toContext.view.superview)
+//        let fromSuperviewFrame = containerView.convert(fromContext.view.bounds, from: fromContext.view)
+//        
+//        let toViewFrame = containerView.convert(toContext.align(rect: toContext.view.bounds), from: toContext.view)
+//        let fromViewFrame = containerView.convert(fromContext.view.bounds, from: fromContext.view)
+//        
+//        let toAngle = toContext.angle()
+//        let fromAngle = fromContext.angle()
+//        
+//        backgroundView.frame = fromView.frame
+//        backgroundView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+//        
+//        transitionSuperview.frame = fromSuperviewFrame
+//        transitionSuperview.clipsToBounds = true
+//        transitionSuperview.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+//        transitionSuperview.addSubview(transitionView)
+//        transitionView.frame = containerView.convert(fromViewFrame, to: transitionSuperview)
+//        
+//        fromView.isHidden = true
+//        toContext.view.isHidden = true
+//        backgroundView.backgroundColor = fromColor
+//        
+//        //UIView.animate(withDuration: transitionDuration(using: transitionContext), animations: { 
+//        UIView.animate(withDuration: transitionDuration(using: transitionContext), delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 10, options: .curveEaseIn, animations: { 
+//            
+//            backgroundView.backgroundColor = toColor
+//            
+//            transitionSuperview.frame = toSuperviewFrame
+//            transitionView.transform = transitionView.transform.rotated(by: (toAngle - fromAngle))
+//            transitionView.frame = containerView.convert(toViewFrame, to: transitionSuperview) 
+//            
+//        }, completion: { _ in
+//            
+//            // restore context
+//            fromView.isHidden = false
+//            
+//            superview?.addSubview(transitionView)
+//            
+//            toContext.view.isHidden = false
+//            
+//            transitionView.transform = transitionView.transform.rotated(by: -(toAngle - fromAngle))
+//            transitionView.frame = containerView.convert(fromViewFrame, to: superview) 
+//            transitionContext.completeTransition(!transitionContext.transitionWasCancelled)
+//            
+//            backgroundView.removeFromSuperview()
+//            transitionSuperview.removeFromSuperview()
+//        })
+        
     }
     // transitioning animation end
     internal func animationEnded(using animator: Animator, transitionCompleted: Bool) {
@@ -521,6 +638,11 @@ extension BrowserDetailController: IndicatorViewDataSource, IndicatorViewDelegat
     
     internal func indicator(_ indicator: IndicatorView, willDisplay cell: IndicatorViewCell, forItemAt indexPath: IndexPath) {
         cell.backgroundColor = container.item(at: indexPath).backgroundColor
+        
+        if let imageView = cell.contentView as? UIImageView {
+            imageView.contentMode = .scaleAspectFill
+            imageView.image = container.item(at: indexPath).image
+        }
     }
     
     internal func indicatorWillBeginDragging(_ indicator: IndicatorView) {
@@ -547,6 +669,7 @@ extension BrowserDetailController: IndicatorViewDataSource, IndicatorViewDelegat
             return
         }
         // prevent possible animations
+        _currentIndexPath = indexPath
         _performWithoutContentOffsetChange {
             // prevent possible animations
             UIView.performWithoutAnimation {

@@ -53,8 +53,8 @@ import UIKit
         return tilingDataSource?.tilingView(self, numberOfItemsInSection: section) ?? 0
     }
     
-    func register(_ cellClass: TilingViewCell.Type?, forCellWithReuseIdentifier identifier: String) {
-        _registedCellClass[identifier] = cellClass
+    func register(_ cellClass: AnyClass?, forCellWithReuseIdentifier identifier: String) {
+        _registedCellClass[identifier] = cellClass as? TilingViewCell.Type
     }
     
     func dequeueReusableCell(withReuseIdentifier identifier: String, for indexPath: IndexPath) -> TilingViewCell {

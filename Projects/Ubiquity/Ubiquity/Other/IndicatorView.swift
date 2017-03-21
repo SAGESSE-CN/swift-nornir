@@ -222,7 +222,6 @@ import UIKit
         
         let offset = _tilingView.contentOffset.x + _tilingView.contentInset.left
         
-        
         var nframe = bounds
         
         nframe.origin.x = 0
@@ -237,6 +236,10 @@ import UIKit
             
             _tilingView.contentOffset.x = offset - _tilingView.contentInset.left
             _tilingView.layoutIfNeeded()
+        }
+        // 如果原来就有, 主动更新他, 否则是初始化, 忽略该事件
+        guard _currentItem != nil else {
+            return
         }
         _updateCurrentItem(_tilingView.contentOffset)
     }
@@ -274,7 +277,7 @@ import UIKit
         _tilingView.showsVerticalScrollIndicator = false
         _tilingView.showsHorizontalScrollIndicator = false
         
-        _tilingView.register(IndicatorViewCell.self, forCellWithReuseIdentifier: "ASSET")
+        _tilingView.register(IndicatorViewCell.dynamic(with: UIImageView.self), forCellWithReuseIdentifier: "ASSET-IMAGE")
         
         addSubview(_tilingView)
         clipsToBounds = true
@@ -358,7 +361,7 @@ extension IndicatorView: UIScrollViewDelegate, TilingViewDataSource, TilingViewD
         return dataSource?.indicator(self, numberOfItemsInSection: section) ?? 0
     }
     internal func tilingView(_ tilingView: TilingView, cellForItemAt indexPath: IndexPath) -> TilingViewCell {
-        return tilingView.dequeueReusableCell(withReuseIdentifier: "ASSET", for: indexPath)
+        return tilingView.dequeueReusableCell(withReuseIdentifier: "ASSET-IMAGE", for: indexPath)
     }
     
     internal func tilingView(_ tilingView: TilingView, willDisplay cell: TilingViewCell, forItemAt indexPath: IndexPath) {
