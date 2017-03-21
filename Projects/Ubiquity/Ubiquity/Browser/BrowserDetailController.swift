@@ -105,7 +105,7 @@ internal class BrowserDetailController: UICollectionViewController {
     
     // MARK: internal var
     
-    internal var animator: BrowserAnimator?
+    internal var animator: Animator?
     internal var container: Container
     
     internal let indicatorItem = IndicatorItem()
@@ -440,9 +440,10 @@ extension BrowserDetailController: UIGestureRecognizerDelegate {
 ///
 /// Provide interactivable transitioning support
 ///
-extension BrowserDetailController: BrowserInteractivableTransitioning {
-    // generate transitioning context for key and index path
-    internal func transitioningContext(using animator: BrowserAnimator, for key: UITransitionContextViewControllerKey, at indexPath: IndexPath) -> BrowserContextTransitioning? {
+extension BrowserDetailController: AnimatableTransitioningDelegate, InteractivableTransitioningDelegate {
+    
+    // generate transition object for key and index path
+    internal func transitioningScene(using animator: Animator, operation: TransitioningOperation, at indexPath: IndexPath) -> TransitioningScene? {
         logger.trace(indexPath)
         // must be attached to the collection view
         guard let collectionView = collectionView else {
@@ -461,12 +462,20 @@ extension BrowserDetailController: BrowserInteractivableTransitioning {
             return nil
         }
         // generate transitioning context
-        let context = BrowserContextTransitioning(container: container, view: cell, at: indexPath)
+        let scene = TransitioningScene(view: cell, at: indexPath)
         // setup transitioning context
-        context.contentMode = .scaleAspectFill
-        context.contentOrientation = .up
-        
-        return context
+        scene.contentMode = .scaleAspectFill
+        scene.contentOrientation = .up
+        // setup
+        return scene
+    }
+    // generate transitioning animation
+    internal func animateTransition(using animator: Animator, context: TransitioningContext) {
+        logger.debug()
+    }
+    // transitioning animation end
+    internal func animationEnded(using animator: Animator, transitionCompleted: Bool) {
+        logger.debug()
     }
     
 //    var browseIndexPath: IndexPath? {

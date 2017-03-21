@@ -65,7 +65,8 @@ extension BrowserListController: UICollectionViewDelegateFlowLayout {
         logger.trace(indexPath)
         
         let controller = BrowserDetailController(container: container, at: indexPath)
-        let animator = BrowserAnimator(destination: controller, source: self, at: indexPath)
+        let animator = Animator(destination: controller, source: self, at: indexPath)
+            //BrowserAnimator(destination: controller, source: self, at: indexPath)
         
         controller.animator = animator
         controller.transitioningDelegate = animator
@@ -77,10 +78,10 @@ extension BrowserListController: UICollectionViewDelegateFlowLayout {
 ///
 /// Provide animatable transitioning support
 ///
-extension BrowserListController: BrowserAnimatableTransitioning {
+extension BrowserListController: AnimatableTransitioningDelegate {
     
-    // generate transitioning context for key and index path
-    internal func transitioningContext(using animator: BrowserAnimator, for key: UITransitionContextViewControllerKey, at indexPath: IndexPath) -> BrowserContextTransitioning? {
+    // generate transition object for key and index path
+    internal func transitioningScene(using animator: Animator, operation: TransitioningOperation, at indexPath: IndexPath) -> TransitioningScene? {
         logger.trace(indexPath)
         // must be attached to the collection view
         guard let collectionView = collectionView, let collectionViewLayout = collectionView.collectionViewLayout as? UICollectionViewFlowLayout  else {
@@ -100,13 +101,13 @@ extension BrowserListController: BrowserAnimatableTransitioning {
             return nil
         }
         // generate transitioning context
-        let context = BrowserContextTransitioning(container: container, view: cell, at: indexPath)
+        let scene = TransitioningScene(view: cell, at: indexPath)
         // setup transitioning context
-        context.contentMode = .scaleAspectFill
-        context.contentOrientation = .up
+        scene.contentMode = .scaleAspectFill
+        scene.contentOrientation = .up
         // if it is to, reset cell boundary
-        guard key == .to else {
-            return context
+        guard operation == .pop || operation == .dismiss else {
+            return scene
         }
         let edg = collectionView.contentInset
         let frame = cell.convert(cell.bounds, to: view)
@@ -124,10 +125,10 @@ extension BrowserListController: BrowserAnimatableTransitioning {
             collectionView.contentOffset.y += y1
         }
         
-        return context
+        return scene
     }
 }
-//    
+//
 //    func showDetail(at indexPath: IndexPath, animated: Bool) {
 //        let controller = BrowseDetailViewController()
 //        
