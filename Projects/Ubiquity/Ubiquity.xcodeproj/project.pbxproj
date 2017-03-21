@@ -66,7 +66,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		0C0405EB1E7EF2C6000A8939 /* BrowserAnimator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BrowserAnimator.swift; sourceTree = "<group>"; };
+		0C0405EB1E7EF2C6000A8939 /* BrowserAnimator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BrowserAnimator.swift; sourceTree = "<group>"; wrapsLines = 0; };
 		0C72B7621E7C372B00877797 /* IndicatorItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IndicatorItem.swift; sourceTree = "<group>"; };
 		0C879F281E7EB63F00E55741 /* UINavigationController+Transitioning.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UINavigationController+Transitioning.swift"; sourceTree = "<group>"; };
 		0CE49D781E7A3DAA0058F5F8 /* Ubiquity.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Ubiquity.framework; sourceTree = BUILT_PRODUCTS_DIR; };

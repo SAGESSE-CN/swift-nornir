@@ -31,8 +31,8 @@ public class Browser: NSObject, Container {
 }
 
 internal class BrowserItem: Item {
-    //var size: CGSize = .init(width: 1600, height: 1200)
-    var size: CGSize = .init(width: 640, height: 1136)
+    var size: CGSize = .init(width: 1600, height: 1200)
+//    var size: CGSize = .init(width: 640, height: 1136)
     var backgroundColor: UIColor? = .random
 }
 

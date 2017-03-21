@@ -130,7 +130,8 @@ internal class BrowserAnimator: NSObject {
         self.sourceTransitioning = source
         self.destinationTransitioning = destination
     }
-
+    
+    internal var duration: TimeInterval = 0.35
     internal var indexPath: IndexPath
     
     internal weak var sourceTransitioning: BrowserAnimatableTransitioning?
@@ -161,8 +162,7 @@ extension BrowserAnimator: UINavigationControllerTransitioningDelegate {
             return nil
         }
         // generation of transitioning animator
-        //return BrowserShowTransition(animator: self, from: fromContext, to: toContext)
-        return nil
+        return BrowserShowTransition(animator: self, from: fromContext, to: toContext)
     }
     
     internal func animationController(forPop poped: UIViewController, from: UIViewController, source: UINavigationController) -> UIViewControllerAnimatedTransitioning? {
@@ -175,8 +175,7 @@ extension BrowserAnimator: UINavigationControllerTransitioningDelegate {
             return nil
         }
         // generation of transitioning animator
-        //return BrowserDismissTransition(animator: self, from: fromContext, to: toContext)
-        return nil
+        return BrowserDismissTransition(animator: self, from: fromContext, to: toContext)
     }
     
     func interactionControllerForPresentation(using animator: UIViewControllerAnimatedTransitioning) -> UIViewControllerInteractiveTransitioning? {
@@ -199,6 +198,9 @@ extension BrowserAnimator: UINavigationControllerTransitioningDelegate {
     }
 }
 
+///
+/// implementation show transition animation
+///
 internal class BrowserShowTransition: NSObject, UIViewControllerAnimatedTransitioning {
     
     internal init(animator: BrowserAnimator, from: BrowserContextTransitioning, to: BrowserContextTransitioning) {
@@ -208,29 +210,56 @@ internal class BrowserShowTransition: NSObject, UIViewControllerAnimatedTransiti
         super.init()
     }
     
-    internal func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
-        return 0.35
-    }
     internal func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
+        // get from view & to view , if is empty, is an unknow error
+        guard let fromView = transitionContext.view(forKey: .from), let toView = transitionContext.view(forKey: .to) else {
+            return
+        }
+        let containerView = UIView()
+        let contentView = UIView()
+        
+        // setup transitioning context
+        toView.isHidden = true
+        
+        // setup content view
+        contentView.layer.borderColor = UIColor.random.cgColor
+        contentView.layer.borderWidth = 1
+        contentView.frame = transitionContext.containerView.convert(self.fromContext.view.bounds, from: self.fromContext.view)
+        
+        // setup container view
+        containerView.frame = transitionContext.containerView.convert(toView.bounds, from: toView)
+        containerView.backgroundColor = .clear
+        containerView.addSubview(contentView)
+        
+        // add to transitioning context
+        transitionContext.containerView.insertSubview(toView, aboveSubview: fromView)
+        transitionContext.containerView.addSubview(containerView)
+        
+        UIView.animate(withDuration: transitionDuration(using: transitionContext), animations: {
+            
+            containerView.backgroundColor = toView.backgroundColor
+            contentView.frame = transitionContext.containerView.convert(self.toContext.view.bounds, from: self.toContext.view)
+            
+        }, completion: { finished in
+            
+            // restore transitioning context
+            toView.isHidden = false
+            
+            contentView.removeFromSuperview()
+            containerView.removeFromSuperview()
+            
+            transitionContext.completeTransition(!transitionContext.transitionWasCancelled)
+        })
+        
 //        let containerView = transitionContext.containerView
-//        let fromContext = self.fromContext
-//        let toContext = self.toContext
-//        
-//        guard let fromView = transitionContext.view(forKey: .from), let toView = transitionContext.view(forKey: .to) else {
-//            super.animateTransition(using: transitionContext)
-//            return
-//        }
-//        
-//        let superview = toContext.view.superview
-//        let transitionView = toContext.view
-//        let transitionSuperview = UIView()
-//        let backgroundView = UIView()
-//        
-//        // add context view
-//        containerView.insertSubview(toView, aboveSubview: fromView)
-//        containerView.addSubview(backgroundView)
+        
+        // add context view
+        
+        //let superview = toContext.view
+        //let transitionView = toContext.view
+        //let transitionSuperview = UIView()
+        
 //        containerView.addSubview(transitionSuperview)
-//        
 //        // refresh layout
 //        fromView.frame = containerView.bounds
 //        fromView.layoutIfNeeded()
@@ -247,10 +276,7 @@ internal class BrowserShowTransition: NSObject, UIViewControllerAnimatedTransiti
 //        
 //        let toAngle = toContext.angle()
 //        let fromAngle = fromContext.angle()
-//        
-//        backgroundView.frame = toView.frame
-//        backgroundView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-//        
+//
 //        transitionSuperview.frame = fromSuperviewFrame
 //        transitionSuperview.clipsToBounds = true
 //        transitionSuperview.autoresizingMask = [.flexibleWidth, .flexibleHeight]
@@ -262,9 +288,27 @@ internal class BrowserShowTransition: NSObject, UIViewControllerAnimatedTransiti
 //        
 //        toView.isHidden = true
 //        fromContext.view.isHidden = true
-//        
+//
 //        //UIView.animate(withDuration: transitionDuration(using: transitionContext), animations: {
-//        UIView.animate(withDuration: transitionDuration(using: transitionContext), delay: 0, usingSpringWithDamping: 0.75, initialSpringVelocity: 16, options: .curveEaseOut, animations: { 
+        
+        
+//        animator.transition(for: transitionContext, from: fromContext, to: toContext, duration: transitionDuration(using: transitionContext), options: .curveEaseOut) { _ in
+//            // restore context
+//            toView.isHidden = false
+////            superview?.addSubview(transitionView)
+////            
+////            fromContext.view.isHidden = false
+////            
+////            transitionView.frame = containerView.convert(toViewFrame, to: superview) 
+////            transitionContext.completeTransition(!transitionContext.transitionWasCancelled)
+////            
+////            backgroundView.removeFromSuperview()
+////            transitionSuperview.removeFromSuperview()
+//            
+//            transitionContext.completeTransition(!transitionContext.transitionWasCancelled)
+//        }
+        
+//        UIView.animate(withDuration: transitionDuration(using: transitionContext), delay: 0, usingSpringWithDamping: 0.75, initialSpringVelocity: 16, options: .curveEaseOut, animations: {
 //            
 //            backgroundView.backgroundColor = toColor
 //            
@@ -287,6 +331,9 @@ internal class BrowserShowTransition: NSObject, UIViewControllerAnimatedTransiti
 //            transitionSuperview.removeFromSuperview()
 //        })
     }
+    internal func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
+        return animator.duration
+    }
     
     internal let animator: BrowserAnimator
     
@@ -294,6 +341,9 @@ internal class BrowserShowTransition: NSObject, UIViewControllerAnimatedTransiti
     internal let toContext: BrowserContextTransitioning
 }
 
+///
+/// implementation dismiss transition animation
+///
 internal class BrowserDismissTransition: NSObject, UIViewControllerAnimatedTransitioning {
     
     internal init(animator: BrowserAnimator, from: BrowserContextTransitioning, to: BrowserContextTransitioning) {
@@ -303,19 +353,49 @@ internal class BrowserDismissTransition: NSObject, UIViewControllerAnimatedTrans
         super.init()
     }
     
-    
-    internal func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
-        return 0.35
-    }
     internal func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
+        // get from view & to view , if is empty, is an unknow error
+        guard let fromView = transitionContext.view(forKey: .from), let toView = transitionContext.view(forKey: .to) else {
+            return
+        }
+        let containerView = UIView()
+        let contentView = UIView()
+        
+        // setup transitioning context
+        fromView.isHidden = true
+        
+        // setup content view
+        contentView.layer.borderColor = UIColor.random.cgColor
+        contentView.layer.borderWidth = 1
+        contentView.frame = transitionContext.containerView.convert(self.fromContext.view.bounds, from: self.fromContext.view)
+        
+        // setup container view
+        containerView.frame = transitionContext.containerView.convert(toView.bounds, from: toView)
+        containerView.backgroundColor = fromView.backgroundColor
+        containerView.addSubview(contentView)
+        
+        // add to transitioning context
+        transitionContext.containerView.insertSubview(toView, aboveSubview: fromView)
+        transitionContext.containerView.addSubview(containerView)
+        
+        UIView.animate(withDuration: transitionDuration(using: transitionContext), animations: {
+            
+            containerView.backgroundColor = .clear
+            contentView.frame = transitionContext.containerView.convert(self.toContext.view.bounds, from: self.toContext.view)
+            
+        }, completion: { finished in
+            
+            // restore transitioning context
+            fromView.isHidden = false
+            
+            contentView.removeFromSuperview()
+            containerView.removeFromSuperview()
+            
+            transitionContext.completeTransition(!transitionContext.transitionWasCancelled)
+        })
+        
 //        let containerView = transitionContext.containerView
-//        let fromContext = self.fromContext
-//        let toContext = self.toContext
-//        
-//        guard let fromView = transitionContext.view(forKey: .from), let toView = transitionContext.view(forKey: .to) else {
-//            super.animateTransition(using: transitionContext)
-//            return
-//        }
+//
 //        let superview = fromContext.view.superview
 //        let transitionView = fromContext.view
 //        let transitionSuperview = UIView()
@@ -381,6 +461,10 @@ internal class BrowserDismissTransition: NSObject, UIViewControllerAnimatedTrans
 //            backgroundView.removeFromSuperview()
 //            transitionSuperview.removeFromSuperview()
 //        })
+        
+    }
+    internal func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
+        return animator.duration
     }
     
     internal let animator: BrowserAnimator

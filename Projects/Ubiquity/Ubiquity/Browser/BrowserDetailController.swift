@@ -42,6 +42,7 @@ internal class BrowserDetailController: UICollectionViewController {
         
         // setup view
         view.clipsToBounds = true
+        view.backgroundColor = .white
         
         // setup gesture recognizer
         interactiveDismissGestureRecognizer.delegate = self
@@ -67,12 +68,13 @@ internal class BrowserDetailController: UICollectionViewController {
         indicatorItem.dataSource = self
         
         // setup toolbar items
-        toolbarItems = [
+        let toolbarItems = [
             indicatorItem,
             UIBarButtonItem(barButtonSystemItem: .action, target: nil, action: nil),
             UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil),
             UIBarButtonItem(barButtonSystemItem: .trash, target: nil, action: nil)
         ]
+        setToolbarItems(toolbarItems, animated: true)
     }
     
     internal override func viewDidLoad() {
@@ -447,8 +449,10 @@ extension BrowserDetailController: BrowserInteractivableTransitioning {
         // check the index path is displaying
         if !collectionView.indexPathsForVisibleItems.contains(indexPath) {
             // must call the layoutIfNeeded method, otherwise cell may not create
-            indicatorItem.layoutIfNeeded()
-            collectionView.layoutIfNeeded()
+            UIView.performWithoutAnimation {
+                indicatorItem.layoutIfNeeded()
+                collectionView.layoutIfNeeded()
+            }
         }
         // fetch cell at index path, if is displayed
         guard let cell = collectionView.cellForItem(at: indexPath) as? BrowserDetailCell else {

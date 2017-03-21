@@ -92,9 +92,6 @@ internal class BrowserDetailCell: UICollectionViewCell {
     
     internal func setup() {
         
-        // setup cell
-        backgroundColor = .white
-        
         // make detail & container view
         _detailView = (type(of: self).detailViewClass as? UIView.Type)?.init()
         _containerView = contentView as? CanvasView
