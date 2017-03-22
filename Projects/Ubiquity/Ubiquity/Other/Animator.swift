@@ -18,19 +18,8 @@ internal enum TransitioningOperation: Int {
 internal enum TransitioningContextKey: Int {
     case from
     case to
-    
-    static func source(for operation: TransitioningOperation) -> TransitioningContextKey {
-        switch operation {
-        case .push, .present: return .from
-        case .pop, .dismiss: return .to
-        }
-    }
-    static func destination(for operation: TransitioningOperation) -> TransitioningContextKey {
-        switch operation {
-        case .push, .present: return .to
-        case .pop, .dismiss: return .from
-        }
-    }
+    case source
+    case destination
 }
 
 internal class Animator: NSObject {
@@ -51,14 +40,7 @@ internal class Animator: NSObject {
 
 internal class TransitioningScene: NSObject {
     
-    internal init(view: UIView, at indexPath: IndexPath) {
-        self.view = view
-        self.indexPath = indexPath
-        super.init()
-    }
-    
-    internal let view: UIView
-    internal let indexPath: IndexPath
+    internal var view: UIView?
     
     internal var contentMode: UIViewContentMode = .scaleAspectFill
     internal var contentOrientation: UIImageOrientation = .up
@@ -91,12 +73,17 @@ internal protocol AnimatableTransitioningDelegate: class {
     // generate transition object for key and index path
     func transitioningScene(using animator: Animator, operation: TransitioningOperation, at indexPath: IndexPath) -> TransitioningScene?
     
+    // prepare transition animation
+    func animationPreparing(using animator: Animator, context: TransitioningContext)
     // generate transitioning animation
     func animateTransition(using animator: Animator, context: TransitioningContext)
     // transitioning animation end
     func animationEnded(using animator: Animator, transitionCompleted: Bool)
 }
 internal extension AnimatableTransitioningDelegate {
+    // prepare transition animation
+    internal func animationPreparing(using animator: Animator, context: TransitioningContext) {
+    }
     // generate transitioning animation
     internal func animateTransition(using animator: Animator, context: TransitioningContext) {
         context.completeTransition(true)
@@ -122,6 +109,12 @@ internal extension Animator {
         var state = true
         var group = DispatchGroup()
         
+        let to = context.delegate(for: .to)
+        let from = context.delegate(for: .from)
+        
+        // prepare transition animation
+        from?.animationPreparing(using: self, context: context)
+        to?.animationPreparing(using: self, context: context)
         // set transition animation complete callback
         (context as? AnimatorTransitioningContext)?.setCompleteHandler { finished in
             // :)
@@ -129,12 +122,12 @@ internal extension Animator {
             group.leave()
         }
         // perfrom transition animation for source
-        if let delegate = context.delegate(for: .from) {
+        if let delegate = from {
             group.enter()
             delegate.animateTransition(using: self, context: context)
         }
         // perform transition animation for destination
-        if let delegate = context.delegate(for: .to) {
+        if let delegate = to {
             group.enter()
             delegate.animateTransition(using: self, context: context)
         }
@@ -380,19 +373,27 @@ fileprivate class AnimatorTransitioningContext: NSObject, TransitioningContext {
     }
     
     func scene(for key: TransitioningContextKey) -> TransitioningScene {
-        switch key {
-        case .from: return _controller.from
-        case .to: return _controller.to
+        switch (operation, key) {
+        case (.push, .source), (.present, .source): return _controller.from
+        case (.push, .destination), (.present, .destination): return _controller.to
+            
+        case (.pop, .source), (.dismiss, .source): return _controller.to
+        case (.pop, .destination), (.dismiss, .destination): return _controller.from
+            
+        case (_, .from): return _controller.from
+        case (_, .to): return _controller.to
         }
     }
     func delegate(for key: TransitioningContextKey) -> AnimatableTransitioningDelegate? {
         switch (operation, key) {
-        case (.push, .from), (.present, .from), (.pop, .to), (.dismiss, .to):
-            return _controller.animator.source
+        case (.push, .from), (.present, .from): return _controller.animator.source
+        case (.push, .to), (.present, .to): return _controller.animator.destination
             
-        case (.push, .to), (.present, .to), (.pop, .from), (.dismiss, .from):
-            return _controller.animator.destination
+        case (.pop, .from), (.dismiss, .from): return _controller.animator.destination
+        case (.pop, .to), (.dismiss, .to): return _controller.animator.source
             
+        case (_, .source): return _controller.animator.source
+        case (_, .destination): return _controller.animator.destination
         }
     }
     

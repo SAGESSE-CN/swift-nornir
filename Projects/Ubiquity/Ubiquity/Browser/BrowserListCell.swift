@@ -60,6 +60,7 @@ internal class BrowserListCell: UICollectionViewCell {
     internal func apply(for item: Item) {
         
         backgroundColor = item.backgroundColor
+        
         if let imageView = contentView as? UIImageView {
             imageView.clipsToBounds = true
             imageView.contentMode = .scaleAspectFill

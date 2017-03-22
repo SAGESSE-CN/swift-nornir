@@ -24,20 +24,35 @@ public class Browser: NSObject, Container {
         return items.count
     }
     public func item(at indexPath: IndexPath) -> Item {
-        return items[indexPath.item]
+        if (indexPath.section == 0) {
+            return items[indexPath.item]
+        } else {
+            return items2[indexPath.item]
+        }
     }
     
-    public var items: Array<Item> =  (0 ..< 240).map { _ in BrowserItem() }
+    public var items: Array<Item> =  (0 ..< 120).map { BrowserItem($0) }
+    public var items2: Array<Item> =  (0 ..< 120).map { _ in BrowserItem(-1) }
 }
 
 internal class BrowserItem: Item {
-    var size: CGSize = .init(width: 1600, height: 1200)
-//    var size: CGSize = .init(width: 640, height: 1136)
-    var backgroundColor: UIColor? = .random
     
-    var image: UIImage? {
-        return __image
+    init(_ index: Int) {
+        
+        if (index == -1) {
+            size = .init(width: 1600, height: 1200)
+            image = UIImage(named: "t1")
+        } else {
+            size = .init(width: 640, height: 1136)
+            image = UIImage(named: "cl_\((index % 12) + 1)")
+        }
+        backgroundColor = .random
     }
+    
+    var size: CGSize
+    var backgroundColor: UIColor? 
+    
+    var image: UIImage?
 }
 fileprivate var __image = UIImage(named: "t1")
 

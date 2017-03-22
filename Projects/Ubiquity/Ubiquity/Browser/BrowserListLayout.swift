@@ -73,6 +73,7 @@ internal class BrowserListLayout: UICollectionViewFlowLayout {
         let frame = collectionView.frame
         let size = collectionViewContentSize
         let edg = collectionView.contentInset
+        
         // check top boundary & bottom boundary
         return .init(x: offset.x, y: min(max(location.y - frame.midY, -edg.top),  size.height - frame.maxY + edg.bottom))
     }

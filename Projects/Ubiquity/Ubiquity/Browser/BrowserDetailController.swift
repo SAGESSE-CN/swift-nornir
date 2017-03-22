@@ -228,6 +228,8 @@ extension BrowserDetailController: UICollectionViewDelegateFlowLayout {
         guard let indexPath = collectionView.indexPathForItem(at: CGPoint(x: x, y: 0)) else {
             return // not found, use old
         }
+        logger.debug("\(x) => \(indexPath)")
+        
         let newValue = collectionView.layoutAttributesForItem(at: indexPath)
         // update to current context
         _currentItem = newValue
@@ -451,13 +453,20 @@ extension BrowserDetailController: AnimatableTransitioningDelegate, Interactivab
     
     // generate transition object for key and index path
     internal func transitioningScene(using animator: Animator, operation: TransitioningOperation, at indexPath: IndexPath) -> TransitioningScene? {
-        logger.trace(indexPath)
+        let scene = TransitioningScene()
+        scene.contentMode = .scaleAspectFill
+        scene.contentOrientation = .up
+        return scene
+    }
+    // prepare transition animation
+    internal func animationPreparing(using animator: Animator, context: TransitioningContext) {
+        logger.debug("\(collectionView!.contentInset)")
         // must be attached to the collection view
         guard let collectionView = collectionView else {
-            return nil
+            return
         }
         // check the index path is displaying
-        if !collectionView.indexPathsForVisibleItems.contains(indexPath) {
+        if !collectionView.indexPathsForVisibleItems.contains(context.indexPath) {
             // must call the layoutIfNeeded method, otherwise cell may not create
             UIView.performWithoutAnimation {
                 indicatorItem.layoutIfNeeded()
@@ -465,16 +474,11 @@ extension BrowserDetailController: AnimatableTransitioningDelegate, Interactivab
             }
         }
         // fetch cell at index path, if is displayed
-        guard let cell = collectionView.cellForItem(at: indexPath) as? BrowserDetailCell, let detailView = cell.detailView else {
-            return nil
+        guard let cell = collectionView.cellForItem(at: context.indexPath) as? BrowserDetailCell, let detailView = cell.detailView else {
+            return
         }
-        // generate transitioning context
-        let scene = TransitioningScene(view: detailView, at: indexPath)
-        // setup transitioning context
-        scene.contentMode = .scaleAspectFill
-        scene.contentOrientation = .up
-        // setup
-        return scene
+        let destination = context.scene(for: .destination)
+        destination.view = detailView
     }
     // generate transitioning animation
     internal func animateTransition(using animator: Animator, context: TransitioningContext) {
@@ -483,8 +487,8 @@ extension BrowserDetailController: AnimatableTransitioningDelegate, Interactivab
         let to = context.scene(for: .to)
         let from = context.scene(for: .from)
         let container = context.containerView
-        let dest = context.scene(for: .destination(for: context.operation))
-        let src = context.scene(for: .source(for: context.operation))
+        let dest = context.scene(for: .destination)
+        let src = context.scene(for: .source)
         
 //        guard let cell = dest.view as? BrowserDetailCell, let detailView = cell.detailView else {
 //            context.completeTransition(true)
@@ -508,22 +512,23 @@ extension BrowserDetailController: AnimatableTransitioningDelegate, Interactivab
 //        
 //        let toColor = UIColor.clear
 //        let fromColor = fromView.backgroundColor
-//        
+        
         let contentView = UIImageView()
         
-        // convert rect to containerView
-        let sframe = container.convert(from.view.bounds, from: from.view)
-        let dframe = container.convert(to.view.bounds, from: to.view)
         
+        // convert rect to containerView
+        let sframe = container.convert(from.view?.bounds ?? .zero, from: from.view)
+        let dframe = container.convert(to.view?.bounds ?? .zero, from: to.view)
+
         // setup content view begin context
         contentView.frame = sframe
         contentView.contentMode = .scaleAspectFill
         contentView.clipsToBounds = true
-        contentView.image = self.container.item(at: dest.indexPath).image
-        contentView.backgroundColor = self.container.item(at: dest.indexPath).backgroundColor
+        contentView.image = self.container.item(at: context.indexPath).image
+        contentView.backgroundColor = self.container.item(at: context.indexPath).backgroundColor
         
         // setup source context
-        src.view.isHidden = true
+        src.view?.isHidden = true
         
         // setup container
         container.addSubview(contentView)
@@ -532,11 +537,10 @@ extension BrowserDetailController: AnimatableTransitioningDelegate, Interactivab
             
             contentView.frame = dframe
             
-            
         }, completion: { finished in
             
             // restore source context
-            src.view.isHidden = false
+            src.view?.isHidden = false
             
             context.completeTransition(true)
         })
@@ -637,7 +641,8 @@ extension BrowserDetailController: IndicatorViewDataSource, IndicatorViewDelegat
     // MARK: IndicatorViewDelegate
     
     internal func indicator(_ indicator: IndicatorView, willDisplay cell: IndicatorViewCell, forItemAt indexPath: IndexPath) {
-        cell.backgroundColor = container.item(at: indexPath).backgroundColor
+        
+        cell.contentView.backgroundColor = container.item(at: indexPath).backgroundColor
         
         if let imageView = cell.contentView as? UIImageView {
             imageView.contentMode = .scaleAspectFill
@@ -669,6 +674,7 @@ extension BrowserDetailController: IndicatorViewDataSource, IndicatorViewDelegat
             return
         }
         // prevent possible animations
+        _currentItem = collectionView?.layoutAttributesForItem(at: indexPath)
         _currentIndexPath = indexPath
         _performWithoutContentOffsetChange {
             // prevent possible animations

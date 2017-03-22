@@ -30,7 +30,12 @@ internal class BrowserDetailLayout: UICollectionViewFlowLayout {
             collectionView.bringSubview(toFront: $0)
         }
         // adjust x
-        return .init(x: CGFloat(indexPath.item) * collectionView.bounds.width, y: offset.y)
+        guard let attr = collectionView.layoutAttributesForItem(at: indexPath) else {
+            return offset
+        }
+        let count = trunc(attr.center.x / collectionView.frame.width)
+        
+        return .init(x: count * collectionView.frame.width, y: offset.y)
     }
     
     internal override func prepare(forCollectionViewUpdates updateItems: [UICollectionViewUpdateItem]) {

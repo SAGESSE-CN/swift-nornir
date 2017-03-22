@@ -257,12 +257,21 @@ import UIKit
         return _sizeForItem(indexPath)
     }
     fileprivate func _sizeForItem(_ indexPath: IndexPath) -> CGSize {
-        guard let size = dataSource?.indicator(self, sizeForItemAt: indexPath) else {
+        // get content size
+        guard let size = _contentSizeForItem(indexPath)  else {
             return estimatedItemSize
         }
         let height = estimatedItemSize.height
         let width = size.width * (height / size.height)
-        return CGSize(width: width + 20, height: height)
+        return CGSize(width: width + 24, height: height)
+    }
+    fileprivate func _contentSizeForItem(_ indexPath: IndexPath) -> CGSize? {
+        if let size = _cachedContentSizes[indexPath] {
+            return size
+        }
+        let size = dataSource?.indicator(self, sizeForItemAt: indexPath)
+        _cachedContentSizes[indexPath] = size
+        return size
     }
     
     fileprivate func _commonInit() {
@@ -293,6 +302,8 @@ import UIKit
     
     fileprivate var _interactivingToIndexPath: IndexPath?
     fileprivate var _interactivingFromIndexPath: IndexPath?
+    
+    fileprivate lazy var _cachedContentSizes: [IndexPath: CGSize?] = [:]
     
     fileprivate lazy var _tilingView: TilingView = TilingView()
 }
@@ -368,6 +379,9 @@ extension IndicatorView: UIScrollViewDelegate, TilingViewDataSource, TilingViewD
         guard let cell = cell as? IndicatorViewCell else {
             return
         }
+        // get the cel content size
+        cell.contentSize = _contentSizeForItem(indexPath)
+        // notifi user modifi cell
         delegate?.indicator?(self, willDisplay: cell, forItemAt: indexPath)
     }
     func tilingView(_ tilingView: TilingView, didEndDisplaying cell: TilingViewCell, forItemAt indexPath: IndexPath) {

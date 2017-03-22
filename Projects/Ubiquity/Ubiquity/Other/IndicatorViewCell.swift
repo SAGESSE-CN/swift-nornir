@@ -23,16 +23,23 @@ internal class IndicatorViewCell: TilingViewCell {
         self.setup()
     }
     
+    
     internal var contentView: UIView {
         return _contentView
+    }
+    
+    internal var contentSize: CGSize? {
+        willSet {
+            setNeedsLayout()
+        }
     }
     
     internal func setup() {
         
         _contentView.frame = bounds
         _contentView.clipsToBounds = true
-        _contentView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         
+        clipsToBounds = true
         addSubview(_contentView)
     }
     
@@ -50,48 +57,44 @@ internal class IndicatorViewCell: TilingViewCell {
     
     internal override func layoutSubviews() {
         super.layoutSubviews()
-//
-//        guard let size = _contentSize else {
-//            return
-//        }
-//        var nframe = CGRect(origin: .zero, size: _fitContentSize ?? .zero)
-//        if _cacheContentSize != size || _fitContentSize == nil {
-//            let fit = _convert(size, from: bounds)
-//            nframe.size = fit
-//            _fitContentSize = fit
-//            _cacheContentSize = size
-//            _cacheBounds = nil
-//        }
-//        if _cacheBounds != bounds {
-//            
-//            nframe.size.width = min(nframe.width, bounds.width)
-//            nframe.size.height = min(nframe.height, bounds.height)
-//            nframe.origin.x = (bounds.width - nframe.width) / 2
-//            nframe.origin.y = (bounds.height - nframe.height) / 2
-//            
-//            _imageView.frame = nframe
-//            _cacheBounds = bounds
-//        }
+        
+        guard let contentSize = contentSize else {
+            return
+        }
+        
+        var nframe = CGRect(origin: .zero, size: _fitContentSize ?? .zero)
+        if _cacheContentSize != contentSize || _fitContentSize == nil {
+            let fit = _convert(contentSize, from: bounds)
+            nframe.size = fit
+            _fitContentSize = fit
+            _cacheContentSize = contentSize
+            _cacheBounds = nil
+        }
+        if _cacheBounds != bounds {
+            
+            nframe.size.width = min(nframe.width, bounds.width)
+            nframe.size.height = min(nframe.height, bounds.height)
+            nframe.origin.x = (bounds.width - nframe.width) / 2
+            nframe.origin.y = (bounds.height - nframe.height) / 2
+            
+            contentView.frame = nframe
+            
+            _cacheBounds = bounds
+        }
     }
-//    
-//    private func _convert(_ size: CGSize, from rect: CGRect) -> CGSize {
-//        guard size.height > 0 && rect.height > 0 else {
-//            return .zero
-//        }
-//        let scale = rect.height / size.height
-//        return CGSize(width: size.width * scale, height: size.height * scale)
-//    }
-//    
-//    private var _fitContentSize: CGSize?
-//    private var _contentSize: CGSize? {
-//        didSet {
-//            setNeedsLayout()
-//        }
-//    }
-//    
-//    private var _cacheBounds: CGRect?
-//    private var _cacheContentSize: CGSize?
-//
+    
+    private func _convert(_ size: CGSize, from rect: CGRect) -> CGSize {
+        guard size.height > 0 && rect.height > 0 else {
+            return .zero
+        }
+        let scale = rect.height / size.height
+        return CGSize(width: size.width * scale, height: size.height * scale)
+    }
+
+    private var _cacheBounds: CGRect?
+    private var _cacheContentSize: CGSize?
+    private var _fitContentSize: CGSize?
+    
     private var _contentView: UIView
 }
 
