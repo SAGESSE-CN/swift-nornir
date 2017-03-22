@@ -264,6 +264,12 @@ internal class AnimatorShowTransition: AnimatorTransition {
         // setup transitioning context
         toView.isHidden = true
         
+        // refresh layout, fix layout of the screen after the rotation error issue
+        if toView.frame != transitionContext.containerView.bounds {
+            toView.frame = transitionContext.containerView.bounds
+            toView.layoutIfNeeded()
+        }
+        
         // setup container view
         containerView.frame = transitionContext.containerView.convert(toView.bounds, from: toView)
         containerView.backgroundColor = .clear
@@ -306,6 +312,12 @@ internal class AnimatorDismissTransition: AnimatorTransition {
         
         // setup transitioning context
         fromView.isHidden = true
+        
+        // refresh layout, fix layout of the screen after the rotation error issue
+        if toView.frame != transitionContext.containerView.bounds {
+            toView.frame = transitionContext.containerView.bounds
+            toView.layoutIfNeeded()
+        }
         
         // setup container view
         containerView.frame = transitionContext.containerView.convert(toView.bounds, from: toView)
