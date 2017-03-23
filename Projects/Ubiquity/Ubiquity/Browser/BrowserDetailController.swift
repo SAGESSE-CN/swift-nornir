@@ -455,12 +455,11 @@ extension BrowserDetailController: AnimatableTransitioningDelegate, Interactivab
     internal func transitioningScene(using animator: Animator, operation: TransitioningOperation, at indexPath: IndexPath) -> TransitioningScene? {
         let scene = TransitioningScene()
         scene.contentMode = .scaleAspectFill
-        scene.contentOrientation = .up
+        scene.orientation = .up
         return scene
     }
     // prepare transition animation
     internal func animationPreparing(using animator: Animator, context: TransitioningContext) {
-        logger.debug("\(collectionView!.contentInset)")
         // must be attached to the collection view
         guard let collectionView = collectionView else {
             return
@@ -479,6 +478,12 @@ extension BrowserDetailController: AnimatableTransitioningDelegate, Interactivab
         }
         let destination = context.scene(for: .destination)
         destination.view = detailView
+        destination.frame = cell.convert(cell.bounds, to: view)
+        destination.contentSize = container.item(at: context.indexPath).size
+        destination.bounds = detailView.superview?.bounds ?? .zero
+        destination.center = detailView.superview?.center ?? .zero
+        destination.transform = detailView.superview?.transform ?? .identity
+        destination.orientation = cell.orientation
     }
     // generate transitioning animation
     internal func animateTransition(using animator: Animator, context: TransitioningContext) {
@@ -486,9 +491,7 @@ extension BrowserDetailController: AnimatableTransitioningDelegate, Interactivab
         
         let to = context.scene(for: .to)
         let from = context.scene(for: .from)
-        let container = context.containerView
-        let dest = context.scene(for: .destination)
-        let src = context.scene(for: .source)
+        let containerView = context.containerView
         
 //        guard let cell = dest.view as? BrowserDetailCell, let detailView = cell.detailView else {
 //            context.completeTransition(true)
@@ -513,35 +516,70 @@ extension BrowserDetailController: AnimatableTransitioningDelegate, Interactivab
 //        let toColor = UIColor.clear
 //        let fromColor = fromView.backgroundColor
         
-        let contentView = UIImageView()
+//        guard let fromView = from.view as? UICollectionViewCell, let toView = to.view as? UICollectionViewCell else {
+//            context.completeTransition(true)
+//            return 
+//        }
         
+        let contentView = UIView()
+        let canvasView = UIView()
+        let zoomView = context.scene(for: .destination).view
         
-        // convert rect to containerView
-        let sframe = container.convert(from.view?.bounds ?? .zero, from: from.view)
-        let dframe = container.convert(to.view?.bounds ?? .zero, from: to.view)
+        // save zoom view context
+        let originSuprview = zoomView?.superview
+        let originFrame = zoomView?.frame
+        let toFrame = to.view?.frame
 
-        // setup content view begin context
-        contentView.frame = sframe
-        contentView.contentMode = .scaleAspectFill
+        // setup begin context
+        contentView.frame = containerView.convert(from.frame, from: context.view(for: .from))
+        contentView.addSubview(canvasView)
         contentView.clipsToBounds = true
-        contentView.image = self.container.item(at: context.indexPath).image
-        contentView.backgroundColor = self.container.item(at: context.indexPath).backgroundColor
         
-        // setup source context
-        src.view?.isHidden = true
+        let o = context.scene(for: .destination).angle
+        
+        canvasView.bounds = from.bounds
+        canvasView.center = from.center
+        canvasView.transform = from.transform.rotated(by: from.angle - o)
+        
+            let dest = context.scene(for: .destination)
+        
+        if let zoomView = zoomView {
+            canvasView.addSubview(zoomView)
+            zoomView.frame = dest.align(rect: from.view?.frame ?? .zero)
+        }
         
         // setup container
-        container.addSubview(contentView)
+        containerView.addSubview(contentView)
         
+        // setup context
+        context.scene(for: .source).view?.isHidden = true
+        context.view(for: .destination)?.isHidden = true
+        
+        // perform
         UIView.animate(withDuration: animator.duration, animations: {
             
-            contentView.frame = dframe
+            contentView.frame = containerView.convert(to.frame, from: context.view(for: .to))
+            
+            canvasView.bounds = to.bounds
+            canvasView.center = to.center
+            canvasView.transform = to.transform.rotated(by: to.angle - o)
+            
+            zoomView?.frame = dest.align(rect: toFrame ?? .zero)
             
         }, completion: { finished in
             
-            // restore source context
-            src.view?.isHidden = false
+            // restore zoom view context
+            if let zoomView = zoomView {
+                zoomView.frame = originFrame ?? .zero
+                zoomView.removeFromSuperview()
+                originSuprview?.addSubview(zoomView)
+            }
             
+            // restore source context
+            context.scene(for: .source).view?.isHidden = false
+            context.view(for: .destination)?.isHidden = false
+            
+            contentView.removeFromSuperview()
             context.completeTransition(true)
         })
         

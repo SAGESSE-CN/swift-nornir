@@ -83,13 +83,12 @@ extension BrowserListController: AnimatableTransitioningDelegate {
     // generate transition object for key and index path
     internal func transitioningScene(using animator: Animator, operation: TransitioningOperation, at indexPath: IndexPath) -> TransitioningScene? {
         let scene = TransitioningScene()
+        //scene.orientation = .left
         scene.contentMode = .scaleAspectFill
-        scene.contentOrientation = .up
         return scene
     }
     // prepare transition animation
     internal func animationPreparing(using animator: Animator, context: TransitioningContext) {
-        logger.debug("\(collectionView!.contentInset)")
         // must be attached to the collection view
         guard let collectionView = collectionView, let collectionViewLayout = collectionView.collectionViewLayout as? UICollectionViewFlowLayout  else {
             return
@@ -105,28 +104,32 @@ extension BrowserListController: AnimatableTransitioningDelegate {
         guard let cell = collectionView.cellForItem(at: context.indexPath) as? BrowserListCell else {
             return
         }
-        let source = context.scene(for: .source)
-        source.view = cell
         // if it is to, reset cell boundary
-        guard context.operation == .pop || context.operation == .dismiss else {
-            return
+        if context.operation == .pop || context.operation == .dismiss {
+            let edg = collectionView.contentInset
+            let frame = cell.convert(cell.bounds, to: view)
+            let height = view.frame.height - topLayoutGuide.length - bottomLayoutGuide.length
+            
+            let y1 = -edg.top + frame.minY
+            let y2 = -edg.top + frame.maxY
+            
+            // reset content offset if needed
+            if y2 > height {
+                // bottom over boundary, reset to y2(bottom)
+                collectionView.contentOffset.y += y2 - height
+            } else if y1 < 0 {
+                // top over boundary, rest to y1(top)
+                collectionView.contentOffset.y += y1
+            }
         }
-        let edg = collectionView.contentInset
-        let frame = cell.convert(cell.bounds, to: view)
-        let height = view.frame.height - topLayoutGuide.length - bottomLayoutGuide.length
-      
-        let y1 = -edg.top + frame.minY
-        let y2 = -edg.top + frame.maxY
-        
-        // reset content offset if needed
-        if y2 > height {
-            // bottom over boundary, reset to y2(bottom)
-            collectionView.contentOffset.y += y2 - height
-        } else if y1 < 0 {
-            // top over boundary, rest to y1(top)
-            collectionView.contentOffset.y += y1
-        }
-
+        // setup
+        let source = context.scene(for: .source)
+        source.view = cell.contentView
+        source.frame = cell.convert(cell.bounds, to: view)
+        source.contentSize = container.item(at: context.indexPath).size
+        source.bounds = cell.contentView.bounds
+        source.center = cell.contentView.center
+        source.orientation = cell.orientation
     }
 //    internal func animateTransition(using animator: Animator, context: TransitioningContext) {
 //        context.completeTransition(true)

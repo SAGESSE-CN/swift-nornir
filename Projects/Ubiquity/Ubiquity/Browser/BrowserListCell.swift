@@ -18,6 +18,9 @@ internal class BrowserListCell: UICollectionViewCell {
 //        super.init(coder: aDecoder)
 //        _commonInit()
 //    }
+    
+    internal var orientation: UIImageOrientation = .up
+    
 //    
 //    var asset: Browseable? {
 //        willSet {
@@ -59,12 +62,12 @@ internal class BrowserListCell: UICollectionViewCell {
     
     internal func apply(for item: Item) {
         
-        backgroundColor = item.backgroundColor
+        //backgroundColor = item.backgroundColor
         
         if let imageView = contentView as? UIImageView {
             imageView.clipsToBounds = true
             imageView.contentMode = .scaleAspectFill
-            imageView.image = item.image
+            imageView.image = item.image?.withOrientation(orientation)
         }
     }
 }

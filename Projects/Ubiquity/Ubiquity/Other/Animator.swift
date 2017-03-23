@@ -42,8 +42,88 @@ internal class TransitioningScene: NSObject {
     
     internal var view: UIView?
     
+    internal var frame: CGRect = .zero
+    internal var transform: CGAffineTransform = .identity
+    
+    internal var bounds: CGRect = .zero
+    internal var center: CGPoint = .zero
+    
+    internal var orientation: UIImageOrientation = .up
+    
+    internal var contentSize: CGSize = .zero
     internal var contentMode: UIViewContentMode = .scaleAspectFill
-    internal var contentOrientation: UIImageOrientation = .up
+    
+    internal func align(rect: CGRect) -> CGRect {
+        var size = contentSize
+        if isLandscape {
+            swap(&size.width, &size.height)
+        }
+        // if contentMode is scale is used in all rect
+        if contentMode == .scaleToFill {
+            return rect
+        }
+        var x = rect.minX
+        var y = rect.minY
+        var width = size.width
+        var height = size.height
+        // if contentMode is aspect scale to fit, calculate the zoom ratio
+        if contentMode == .scaleAspectFit {
+            let scale = min(rect.width / max(size.width, 1), rect.height / max(size.height, 1))
+            
+            width = size.width * scale
+            height = size.height * scale
+        }
+        // if contentMode is aspect scale to fill, calculate the zoom ratio
+        if contentMode == .scaleAspectFill {
+            let scale = max(rect.width / max(size.width, 1), rect.height / max(size.height, 1))
+            
+            width = size.width * scale
+            height = size.height * scale
+        }
+        // horizontal alignment
+        if [.left, .topLeft, .bottomLeft].contains(contentMode) {
+            // align left
+            x += (0)
+            
+        } else if [.right, .topRight, .bottomRight].contains(contentMode) {
+            // align right
+            x += (rect.width - width)
+            
+        } else {
+            // algin center
+            x += (rect.width - width) / 2
+        }
+        // vertical alignment
+        if [.top, .topLeft, .topRight].contains(contentMode) {
+            // align top
+            y += (0)
+            
+        } else if [.bottom, .bottomLeft, .bottomRight].contains(contentMode) {
+            // align bottom
+            y += (rect.height - width)
+            
+        } else {
+            // algin center
+            y += (rect.height - height) / 2
+        }
+        return CGRect(x: x, y: y, width: width, height: height)
+    }
+    var angle: CGFloat {
+        switch orientation {
+        case .up, .upMirrored:  return 0 * CGFloat(M_PI_2)
+        case .right, .rightMirrored: return 1 * CGFloat(M_PI_2)
+        case .down, .downMirrored: return 2 * CGFloat(M_PI_2)
+        case .left, .leftMirrored: return 3 * CGFloat(M_PI_2)
+        }
+    }
+    var isLandscape: Bool {
+        switch orientation {
+        case .left, .leftMirrored: return true
+        case .right, .rightMirrored: return true
+        case .up, .upMirrored: return false
+        case .down, .downMirrored: return false
+        }
+    }
 }
 
 internal protocol TransitioningContext: class {
@@ -63,8 +143,8 @@ internal protocol TransitioningContext: class {
     func scene(for key: TransitioningContextKey) -> TransitioningScene
     func delegate(for key: TransitioningContextKey) -> AnimatableTransitioningDelegate?
     
-    func view(for key: UITransitionContextViewKey) -> UIView?
-    func viewController(for key: UITransitionContextViewControllerKey) -> UIViewController?
+    func view(for key: TransitioningContextKey) -> UIView?
+    func viewController(for key: TransitioningContextKey) -> UIViewController?
     
     func completeTransition(_ didComplete: Bool)
 }
@@ -254,9 +334,6 @@ internal class AnimatorShowTransition: AnimatorTransition {
         let animator = self.animator
         let context = AnimatorTransitioningContext(self, contentView: containerView, transition: transitionContext)
         
-        // setup transitioning context
-        toView.isHidden = true
-        
         // refresh layout, fix layout of the screen after the rotation error issue
         if toView.frame != transitionContext.containerView.bounds {
             toView.frame = transitionContext.containerView.bounds
@@ -268,8 +345,8 @@ internal class AnimatorShowTransition: AnimatorTransition {
         containerView.backgroundColor = .clear
         
         // add to transitioning context
-        transitionContext.containerView.insertSubview(toView, aboveSubview: fromView)
-        transitionContext.containerView.addSubview(containerView)
+        transitionContext.containerView.insertSubview(toView, aboveSubview: containerView)
+        transitionContext.containerView.insertSubview(containerView, belowSubview: toView)
         
         // perform with animate
         animator.animate(for: context, options: .curveEaseIn, animations: {
@@ -277,9 +354,6 @@ internal class AnimatorShowTransition: AnimatorTransition {
             containerView.backgroundColor = toView.backgroundColor
             
         }, completion: { finished in
-            
-            // restore transitioning context
-            toView.isHidden = false
             
             containerView.removeFromSuperview()
             
@@ -303,9 +377,6 @@ internal class AnimatorDismissTransition: AnimatorTransition {
         let animator = self.animator
         let context = AnimatorTransitioningContext(self, contentView: containerView, transition: transitionContext)
         
-        // setup transitioning context
-        fromView.isHidden = true
-        
         // refresh layout, fix layout of the screen after the rotation error issue
         if toView.frame != transitionContext.containerView.bounds {
             toView.frame = transitionContext.containerView.bounds
@@ -326,9 +397,6 @@ internal class AnimatorDismissTransition: AnimatorTransition {
             containerView.backgroundColor = .clear
             
         }, completion: { finished in
-            
-            // restore transitioning context
-            fromView.isHidden = false
             
             containerView.removeFromSuperview()
             
@@ -397,11 +465,29 @@ fileprivate class AnimatorTransitioningContext: NSObject, TransitioningContext {
         }
     }
     
-    func view(for key: UITransitionContextViewKey) -> UIView? {
-        return _transitionContext.view(forKey: key)
+    func view(for key: TransitioningContextKey) -> UIView? {
+        switch (operation, key) {
+        case (.push, .source), (.present, .source): return _transitionContext.view(forKey: .from)
+        case (.push, .destination), (.present, .destination): return _transitionContext.view(forKey: .to)
+            
+        case (.pop, .source), (.dismiss, .source): return _transitionContext.view(forKey: .to)
+        case (.pop, .destination), (.dismiss, .destination): return _transitionContext.view(forKey: .from)
+            
+        case (_, .from): return _transitionContext.view(forKey: .from)
+        case (_, .to): return _transitionContext.view(forKey: .to)
+        }
     }
-    func viewController(for key: UITransitionContextViewControllerKey) -> UIViewController? {
-        return _transitionContext.viewController(forKey: key)
+    func viewController(for key: TransitioningContextKey) -> UIViewController? {
+        switch (operation, key) {
+        case (.push, .source), (.present, .source): return _transitionContext.viewController(forKey: .from)
+        case (.push, .destination), (.present, .destination): return _transitionContext.viewController(forKey: .to)
+            
+        case (.pop, .source), (.dismiss, .source): return _transitionContext.viewController(forKey: .to)
+        case (.pop, .destination), (.dismiss, .destination): return _transitionContext.viewController(forKey: .from)
+            
+        case (_, .from): return _transitionContext.viewController(forKey: .from)
+        case (_, .to): return _transitionContext.viewController(forKey: .to)
+        }
     }
     
     func completeTransition(_ didComplete: Bool) {

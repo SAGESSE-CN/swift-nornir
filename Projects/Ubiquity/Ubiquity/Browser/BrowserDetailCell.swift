@@ -26,6 +26,8 @@ internal class BrowserDetailCell: UICollectionViewCell {
         return _containerView
     }
     
+    internal var orientation: UIImageOrientation = .up
+    
 //    var asset: Browseable?
 //    
 //    var orientation: UIImageOrientation = .up
@@ -59,11 +61,11 @@ internal class BrowserDetailCell: UICollectionViewCell {
     internal func apply(for item: Item) {
         
         containerView?.contentSize = item.size
-        containerView?.zoom(to: bounds , with: .up, animated: false)
+        containerView?.zoom(to: bounds , with: orientation, animated: false)
         detailView?.backgroundColor = item.backgroundColor
         
         if let imageView = detailView as? UIImageView {
-            imageView.image = item.image
+            imageView.image = item.image?.withOrientation(orientation)
         }
     }
     
@@ -508,8 +510,8 @@ extension BrowserDetailCell: CanvasViewDelegate {
 //        _updateConsoleLock(false, animated: true)
     }
     func canvasViewDidEndRotationing(_ canvasView: CanvasView, with view: UIView?, atOrientation orientation: UIImageOrientation) {
-//        self.orientation = orientation
-        
+        // update content orientation
+        self.orientation = orientation
         if let imageView = detailView as? UIImageView {
             imageView.image = imageView.image?.withOrientation(orientation)
         }

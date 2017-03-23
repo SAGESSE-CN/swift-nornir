@@ -281,6 +281,10 @@ import UIKit
         return _rotationGestureRecognizer
     }
     
+    public var contentTransform: CGAffineTransform {
+        return _containerView.transform
+    }
+    
     fileprivate var _bounds: CGRect?
     fileprivate var _isRotationing: Bool = false
     

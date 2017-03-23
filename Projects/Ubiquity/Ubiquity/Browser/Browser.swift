@@ -18,34 +18,29 @@ public class Browser: NSObject, Container {
     }
     
     public var numberOfSections: Int {
-        return 1
+        return 2
     }
     public func numberOfItems(inSection section: Int) -> Int {
         return items.count
     }
     public func item(at indexPath: IndexPath) -> Item {
-        if (indexPath.section == 0) {
-            return items[indexPath.item]
-        } else {
-            return items2[indexPath.item]
-        }
+        return items[indexPath.item]
     }
     
     public var items: Array<Item> =  (0 ..< 120).map { BrowserItem($0) }
-    public var items2: Array<Item> =  (0 ..< 120).map { _ in BrowserItem(-1) }
 }
 
 internal class BrowserItem: Item {
     
     init(_ index: Int) {
         
-        if (index == -1) {
+//        if (index == -1) {
             size = .init(width: 1600, height: 1200)
             image = UIImage(named: "t1")
-        } else {
-            size = .init(width: 640, height: 1136)
-            image = UIImage(named: "cl_\((index % 12) + 1)")
-        }
+//        } else {
+//            size = .init(width: 640, height: 1136)
+//            image = UIImage(named: "cl_\((index % 12) + 1)")
+//        }
         backgroundColor = .random
     }
     
