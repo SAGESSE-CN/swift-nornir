@@ -62,50 +62,62 @@ extension BrowserListController: UICollectionViewDelegateFlowLayout {
     }
     
     internal override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        logger.trace(indexPath)
+        logger.trace?.write(indexPath)
         
         let controller = BrowserDetailController(container: container, at: indexPath)
-        let animator = Animator(destination: controller, source: self, at: indexPath)
-            //BrowserAnimator(destination: controller, source: self, at: indexPath)
-        
-        controller.animator = animator
-        controller.transitioningDelegate = animator
-        
+        controller.animator = Animator(source: self, destination: controller)
         show(controller, sender: indexPath)
+       
+//        let animator = Animator(destination: controller, source: self, at: indexPath)
+            //BrowserAnimator(destination: controller, source: self, at: indexPath)
+//        controller.animator = animator
     }
 }
 
 ///
 /// Provide animatable transitioning support
 ///
-extension BrowserListController: AnimatableTransitioningDelegate {
+extension BrowserListController: TransitioningDataSource {
     
-    // generate transition object for key and index path
-    internal func transitioningScene(using animator: Animator, operation: TransitioningOperation, at indexPath: IndexPath) -> TransitioningScene? {
-        let scene = TransitioningScene()
-        //scene.orientation = .left
-        scene.contentMode = .scaleAspectFill
-        return scene
+    internal func ub_transitionView(using animator: Animator, for operation: Animator.Operation) -> TransitioningView? {
+        logger.trace?.write()
+        
+        guard let indexPath = animator.indexPath else {
+            return nil
+        }
+        // get at current index path the cell
+        return collectionView?.cellForItem(at: indexPath) as? BrowserListCell
     }
-    // prepare transition animation
-    internal func animationPreparing(using animator: Animator, context: TransitioningContext) {
+    
+    internal func ub_transitionShouldStart(using animator: Animator, for operation: Animator.Operation) -> Bool {
+        logger.trace?.write()
+        return true
+    }
+    internal func ub_transitionShouldStartInteractive(using animator: Animator, for operation: Animator.Operation) -> Bool {
+        logger.trace?.write()
+        return false
+    }
+    
+    internal func ub_transitionDidPrepare(using animator: Animator, context: TransitioningContext) {
+        logger.trace?.write()
+        
         // must be attached to the collection view
-        guard let collectionView = collectionView, let collectionViewLayout = collectionView.collectionViewLayout as? UICollectionViewFlowLayout  else {
+        guard let collectionView = collectionView, let indexPath = animator.indexPath  else {
             return
         }
         // check the index path is displaying
-        if !collectionView.indexPathsForVisibleItems.contains(context.indexPath) {
+        if !collectionView.indexPathsForVisibleItems.contains(indexPath) {
             // no, scroll to the cell at index path
-            collectionView.scrollToItem(at: context.indexPath, at: .centeredVertically, animated: false)
+            collectionView.scrollToItem(at: indexPath, at: .centeredVertically, animated: false)
             // must call the layoutIfNeeded method, otherwise cell may not create
             collectionView.layoutIfNeeded()
         }
         // fetch cell at index path, if is displayed
-        guard let cell = collectionView.cellForItem(at: context.indexPath) as? BrowserListCell else {
+        guard let cell = collectionView.cellForItem(at: indexPath) as? BrowserListCell else {
             return
         }
         // if it is to, reset cell boundary
-        if context.operation == .pop || context.operation == .dismiss {
+        if context.ub_operation == .pop || context.ub_operation == .dismiss {
             let edg = collectionView.contentInset
             let frame = cell.convert(cell.bounds, to: view)
             let height = view.frame.height - topLayoutGuide.length - bottomLayoutGuide.length
@@ -122,20 +134,19 @@ extension BrowserListController: AnimatableTransitioningDelegate {
                 collectionView.contentOffset.y += y1
             }
         }
-        // setup
-        let source = context.scene(for: .source)
-        source.view = cell.contentView
-        source.frame = cell.convert(cell.bounds, to: view)
-        source.contentSize = container.item(at: context.indexPath).size
-        source.bounds = cell.contentView.bounds
-        source.center = cell.contentView.center
-        source.orientation = cell.orientation
+        cell.isHidden = true
     }
-//    internal func animateTransition(using animator: Animator, context: TransitioningContext) {
-//        context.completeTransition(true)
-//    }
+    internal func ub_transitionDidEnd(using animator: Animator, transitionCompleted: Bool) {
+        guard let indexPath = animator.indexPath else {
+            return
+        }
+        guard let cell = collectionView?.cellForItem(at: indexPath) as? BrowserListCell else {
+            return
+        }
+        cell.isHidden = false
+    }
 }
-//
+
 //    func showDetail(at indexPath: IndexPath, animated: Bool) {
 //        let controller = BrowseDetailViewController()
 //        

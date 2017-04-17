@@ -8,500 +8,588 @@
 
 import UIKit
 
-internal enum TransitioningOperation: Int {
-    case pop
-    case push
-    case present
-    case dismiss
+internal protocol TransitioningView: class {
+    
+    var ub_frame: CGRect { get }
+    var ub_bounds: CGRect { get }
+    var ub_transform: CGAffineTransform { get }
+    
+    func ub_snapshotView(afterScreenUpdates: Bool) -> UIView?
 }
-
-internal enum TransitioningContextKey: Int {
-    case from
-    case to
-    case source
-    case destination
-}
-
-internal class Animator: NSObject {
-    
-    internal init(destination: AnimatableTransitioningDelegate, source: AnimatableTransitioningDelegate, at indexPath: IndexPath) {
-        self.indexPath = indexPath
-        super.init()
-        self.source = source
-        self.destination = destination
-    }
-    
-    internal var duration: TimeInterval = 0.35
-    internal var indexPath: IndexPath
-    
-    internal weak var source: AnimatableTransitioningDelegate?
-    internal weak var destination: AnimatableTransitioningDelegate?
-}
-
-internal class TransitioningScene: NSObject {
-    
-    internal var view: UIView?
-    
-    internal var frame: CGRect = .zero
-    internal var transform: CGAffineTransform = .identity
-    
-    internal var bounds: CGRect = .zero
-    internal var center: CGPoint = .zero
-    
-    internal var orientation: UIImageOrientation = .up
-    
-    internal var contentSize: CGSize = .zero
-    internal var contentMode: UIViewContentMode = .scaleAspectFill
-    
-    internal func align(rect: CGRect) -> CGRect {
-        var size = contentSize
-        if isLandscape {
-            swap(&size.width, &size.height)
-        }
-        // if contentMode is scale is used in all rect
-        if contentMode == .scaleToFill {
-            return rect
-        }
-        var x = rect.minX
-        var y = rect.minY
-        var width = size.width
-        var height = size.height
-        // if contentMode is aspect scale to fit, calculate the zoom ratio
-        if contentMode == .scaleAspectFit {
-            let scale = min(rect.width / max(size.width, 1), rect.height / max(size.height, 1))
-            
-            width = size.width * scale
-            height = size.height * scale
-        }
-        // if contentMode is aspect scale to fill, calculate the zoom ratio
-        if contentMode == .scaleAspectFill {
-            let scale = max(rect.width / max(size.width, 1), rect.height / max(size.height, 1))
-            
-            width = size.width * scale
-            height = size.height * scale
-        }
-        // horizontal alignment
-        if [.left, .topLeft, .bottomLeft].contains(contentMode) {
-            // align left
-            x += (0)
-            
-        } else if [.right, .topRight, .bottomRight].contains(contentMode) {
-            // align right
-            x += (rect.width - width)
-            
-        } else {
-            // algin center
-            x += (rect.width - width) / 2
-        }
-        // vertical alignment
-        if [.top, .topLeft, .topRight].contains(contentMode) {
-            // align top
-            y += (0)
-            
-        } else if [.bottom, .bottomLeft, .bottomRight].contains(contentMode) {
-            // align bottom
-            y += (rect.height - width)
-            
-        } else {
-            // algin center
-            y += (rect.height - height) / 2
-        }
-        return CGRect(x: x, y: y, width: width, height: height)
-    }
-    var angle: CGFloat {
-        switch orientation {
-        case .up, .upMirrored:  return 0 * CGFloat(M_PI_2)
-        case .right, .rightMirrored: return 1 * CGFloat(M_PI_2)
-        case .down, .downMirrored: return 2 * CGFloat(M_PI_2)
-        case .left, .leftMirrored: return 3 * CGFloat(M_PI_2)
-        }
-    }
-    var isLandscape: Bool {
-        switch orientation {
-        case .left, .leftMirrored: return true
-        case .right, .rightMirrored: return true
-        case .up, .upMirrored: return false
-        case .down, .downMirrored: return false
-        }
-    }
-}
-
 internal protocol TransitioningContext: class {
     
-    var operation: TransitioningOperation { get }
+    var ub_isAnimated: Bool { get }
+    // This indicates whether the transition is currently interactive.
+    var ub_isInteractive: Bool { get }
     
-    var indexPath: IndexPath { get }
-    var containerView: UIView { get }
+    var ub_operation: Animator.Operation { get }
     
-    // This indicates whether the transition is animatable
-    var isAnimated: Bool { get }
-    /// This indicates whether the transition is currently interactive.
-    var isInteractive: Bool { get }
+    var ub_containerView: UIView { get }
+    var ub_snapshotView: UIView? { get }
     
-    var transitionWasCancelled: Bool { get }
+    func ub_view(for key: Animator.Content) -> UIView?
+    func ub_viewController(for key: Animator.Content) -> UIViewController?
     
-    func scene(for key: TransitioningContextKey) -> TransitioningScene
-    func delegate(for key: TransitioningContextKey) -> AnimatableTransitioningDelegate?
+    func ub_transitioningView(for key: Animator.Content) -> TransitioningView?
     
-    func view(for key: TransitioningContextKey) -> UIView?
-    func viewController(for key: TransitioningContextKey) -> UIViewController?
+    func ub_update(percent: CGFloat, at offset: CGPoint)
+    func ub_complete(_ didComplete: Bool)
     
-    func completeTransition(_ didComplete: Bool)
+}
+internal protocol TransitioningDataSource: class {
+    
+    func ub_transitionView(using animator: Animator, for operation: Animator.Operation) -> TransitioningView?
+    
+    func ub_transitionShouldStart(using animator: Animator, for operation: Animator.Operation) -> Bool
+    func ub_transitionShouldStartInteractive(using animator: Animator, for operation: Animator.Operation) -> Bool
+    
+    func ub_transitionDidPrepare(using animator: Animator, context: TransitioningContext)
+    func ub_transitionDidStart(using animator: Animator, context: TransitioningContext)
+    
+    func ub_transitionDidEnd(using animator: Animator, transitionCompleted: Bool)
+}
+internal extension TransitioningDataSource {
+    
+    func ub_transitionShouldStartInteractive(using animator: Animator, for key: Animator.Operation) -> Bool {
+        return false
+    }
+    
+    func ub_transitionDidPrepare(using animator: Animator, context: TransitioningContext) {
+        // the default implementation is empty
+    }
+    func ub_transitionDidStart(using animator: Animator, context: TransitioningContext) {
+        // the default implementation is empty
+    }
+    func ub_transitionDidEnd(using animator: Animator, transitionCompleted: Bool) {
+        // the default implementation is empty
+    }
 }
 
-internal protocol AnimatableTransitioningDelegate: class {
-    // generate transition object for key and index path
-    func transitioningScene(using animator: Animator, operation: TransitioningOperation, at indexPath: IndexPath) -> TransitioningScene?
-    
-    // prepare transition animation
-    func animationPreparing(using animator: Animator, context: TransitioningContext)
-    // generate transitioning animation
-    func animateTransition(using animator: Animator, context: TransitioningContext)
-    // transitioning animation end
-    func animationEnded(using animator: Animator, transitionCompleted: Bool)
-}
-internal extension AnimatableTransitioningDelegate {
-    // prepare transition animation
-    internal func animationPreparing(using animator: Animator, context: TransitioningContext) {
-    }
-    // generate transitioning animation
-    internal func animateTransition(using animator: Animator, context: TransitioningContext) {
-        context.completeTransition(true)
-    }
-    // transitioning animation end
-    internal func animationEnded(using animator: Animator, transitionCompleted: Bool) {
-        // nothing
-    }
-}
 
-internal protocol InteractivableTransitioningDelegate: class {
-    // the gesture recognizer responsible for top or dismiss view controller.
-    var interactiveDismissGestureRecognizer: UIPanGestureRecognizer { get }
-}
-
-///
-///  Provide transition animation perform
-///
-internal extension Animator {
-    
-    internal func animate(for context: TransitioningContext, options: UIViewAnimationOptions, animations: @escaping () -> Void, completion: ((Bool) -> Void)?) {
+internal class Animator: NSObject {
+    enum Content: Int {
+        case from
+        case to
+        case source
+        case destination
+    }
+    enum Operation: Int {
+        case pop
+        case push
+        case present
+        case dismiss
         
-        var state = true
-        var group = DispatchGroup()
-        
-        let to = context.delegate(for: .to)
-        let from = context.delegate(for: .from)
-        
-        // prepare transition animation
-        from?.animationPreparing(using: self, context: context)
-        to?.animationPreparing(using: self, context: context)
-        // set transition animation complete callback
-        (context as? AnimatorTransitioningContext)?.setCompleteHandler { finished in
-            // :)
-            state = finished && state
-            group.leave()
+        var appear: Bool {
+            return self == .push
+                || self == .present
         }
-        // perfrom transition animation for source
-        if let delegate = from {
-            group.enter()
-            delegate.animateTransition(using: self, context: context)
-        }
-        // perform transition animation for destination
-        if let delegate = to {
-            group.enter()
-            delegate.animateTransition(using: self, context: context)
-        }
-        // perfrom transition animation for default
-        group.enter()
-        UIView.animate(withDuration: duration, delay: 0, options: options, animations: animations) { finished in
-            // :)
-            state = finished && state
-            group.leave()
-        }
-        // wait all animation finish
-        group.notify(queue: .main) {
-            completion?(state)
+        var disappear: Bool {
+            return self == .pop
+                || self == .dismiss
         }
     }
+
+    init(source: TransitioningDataSource, destination: TransitioningDataSource) {
+        self.source = source
+        self.destination = destination
+        super.init()
+    }
     
-    internal func animationEnded(for context: TransitioningContext, transitionCompleted: Bool) {
-        if let delegate = context.delegate(for: .from) {
-            delegate.animationEnded(using: self, transitionCompleted: transitionCompleted)
-        }
-        if let delegate = context.delegate(for: .to) {
-            delegate.animationEnded(using: self, transitionCompleted: transitionCompleted)
-        }
+    weak var source: TransitioningDataSource?
+    weak var destination: TransitioningDataSource?
+    
+    var duration: TimeInterval = 0.35
+    var indexPath: IndexPath?
+    
+    func ub_animate(with options: UIViewAnimationOptions, animations: @escaping () -> Swift.Void, completion: ((Bool) -> Void)? = nil) {
+        //UIView.animate(withDuration: duration * 5, delay: 0, options: options, animations: animations, completion: completion)
+        UIView.animate(withDuration: duration, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 10, options: options, animations: animations, completion: completion)
     }
 }
 
-///
-/// Provide custom transition delegate forward support
-///
 extension Animator: UINavigationControllerTransitioningDelegate {
     
-    open func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-        logger.debug()
+    internal func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        logger.info?.write()
         return nil
     }
-    open func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-        logger.debug()
+    internal func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        logger.info?.write()
         return nil
     }
     
-    open func animationController(forPush pushed: UIViewController, from: UIViewController, source: UINavigationController) -> UIViewControllerAnimatedTransitioning? {
-        // fetch from transitioning context, if nil ignore the event
-        guard let fromScene = self.source?.transitioningScene(using: self, operation: .push, at: indexPath) else {
+    internal func animationController(forPush pushed: UIViewController, from: UIViewController, source: UINavigationController) -> UIViewControllerAnimatedTransitioning? {
+        logger.trace?.write()
+        
+        guard self.source?.ub_transitionShouldStart(using: self, for: .push) ?? false else {
             return nil
         }
-        // fetch to transitioning context, if nil ignore the event
-        guard let toScene = self.destination?.transitioningScene(using: self, operation: .push, at: indexPath) else {
+        guard self.destination?.ub_transitionShouldStart(using: self, for: .push) ?? false else {
             return nil
         }
-        // generation of transitioning animator
-        return AnimatorShowTransition(animator: self, from: fromScene, to: toScene, operation: .push)
+        return Animator.AnimatedTransitioning(animator: self, operation: .push)
+    }
+    internal func animationController(forPop poped: UIViewController, from: UIViewController, source: UINavigationController) -> UIViewControllerAnimatedTransitioning? {
+        logger.trace?.write()
+        
+        guard self.source?.ub_transitionShouldStart(using: self, for: .pop) ?? false else {
+            return nil
+        }
+        guard self.destination?.ub_transitionShouldStart(using: self, for: .pop) ?? false else {
+            return nil
+        }
+        return Animator.AnimatedTransitioning(animator: self, operation: .pop)
     }
     
-    open func animationController(forPop poped: UIViewController, from: UIViewController, source: UINavigationController) -> UIViewControllerAnimatedTransitioning? {
-        // fetch from transitioning context, if nil ignore the event
-        guard let fromScene = self.destination?.transitioningScene(using: self, operation: .pop, at: indexPath) else {
-            return nil
-        }
-        // fetch to transitioning context, if nil ignore the event
-        guard let toScene = self.source?.transitioningScene(using: self, operation: .pop, at: indexPath) else {
-            return nil
-        }
-        // generation of transitioning animator
-        return AnimatorDismissTransition(animator: self, from: fromScene, to: toScene, operation: .pop)
-    }
-    
-    open func interactionControllerForPresentation(using animator: UIViewControllerAnimatedTransitioning) -> UIViewControllerInteractiveTransitioning? {
-        logger.debug()
+    internal func interactionControllerForPresentation(using animator: UIViewControllerAnimatedTransitioning) -> UIViewControllerInteractiveTransitioning? {
+        logger.info?.write()
         return nil
     }
 
-    open func interactionControllerForDismissal(using animator: UIViewControllerAnimatedTransitioning) -> UIViewControllerInteractiveTransitioning? {
-        logger.debug()
+    internal func interactionControllerForDismissal(using animator: UIViewControllerAnimatedTransitioning) -> UIViewControllerInteractiveTransitioning? {
+        logger.trace?.write()
+        
+//        guard self.source.ub_transitionShouldStartInteractive(using: self, for: .pop) else {
+//            return nil
+//        }
+//        return Animator.InteractivedTransitioning(animator: self, transitioning: animator, operation: .push)
         return nil
     }
     
     open func interactionControllerForPop(using animator: UIViewControllerAnimatedTransitioning) -> UIViewControllerInteractiveTransitioning? {
-        logger.debug()
+        logger.trace?.write()
+        
+        guard self.destination?.ub_transitionShouldStartInteractive(using: self, for: .pop) ?? false else {
+            return nil
+        }
+        return Animator.InteractivedTransitioning(animator: self, transitioning: animator, operation: .pop)
+    }
+    internal func interactionControllerForPush(using animator: UIViewControllerAnimatedTransitioning) -> UIViewControllerInteractiveTransitioning? {
+        logger.info?.write()
         return nil
     }
-    open func interactionControllerForPush(using animator: UIViewControllerAnimatedTransitioning) -> UIViewControllerInteractiveTransitioning? {
-        logger.debug()
-        return nil
+}
+extension Animator {
+    /// 快照
+    internal class SnapshotView: UIView {
+        
+        init(animator: Animator) {
+            self.animator = animator
+            self.containerView = UIView()
+            //self.destination = destination
+            super.init(frame: .zero)
+            self.setup()
+        }
+        required init?(coder aDecoder: NSCoder) {
+            fatalError("init(coder:) has not been implemented")
+        }
+        override class var layerClass: AnyClass {
+            return SnapshotLayer.self
+        }
+        
+        func setup() {
+            // config
+            containerView.clipsToBounds = true
+            //containerView.backgroundColor = .clear
+            containerView.backgroundColor = .random
+            // add to view
+            addSubview(containerView)
+        }
+        
+        func prepare(with view: TransitioningView?) {
+            // 生成快照
+            guard let snapshotView = view?.ub_snapshotView(afterScreenUpdates: true) else {
+                return
+            }
+            contentView = snapshotView
+            containerView.addSubview(snapshotView)
+        }
+        
+        func apply(with view: TransitioningView?) {
+            guard let view = view else {
+                return
+            }
+            // setup transitioning
+            transitioningView = view
+            // setup transitioning view
+            let frame = convert(view.ub_frame, from: superview)
+            containerView.transform = view.ub_transform
+            containerView.bounds = .init(origin: .zero, size: frame.size)
+            containerView.center = .init(x: frame.midX, y: frame.midY)
+            // setup transitioning content view
+            contentView?.frame = view.ub_bounds
+        }
+        func apply(with view: TransitioningView?, percent: CGFloat, at offset: CGPoint) {
+            guard let view = transitioningView else {
+                return
+            }
+            let transform = view.ub_transform
+            let frame = convert(view.ub_frame, from: superview)
+            // setup transitioning view
+            containerView.transform = transform.concatenating(.init(scaleX: 1 - damping(percent), y: 1 - damping(percent)))
+            containerView.center = .init(x: frame.midX + offset.x, y: frame.midY + offset.y)
+        }
+        
+        func link(_ closer: @escaping (CGFloat) -> Void) {
+            guard let layer = (layer as? SnapshotLayer) else {
+                return
+            }
+            handler = closer
+            CATransaction.setDisableActions(true)
+            layer.percent = 0
+            CATransaction.setDisableActions(false)
+            layer.percent = 1
+        }
+        func damping(_ v1: CGFloat) -> CGFloat {
+            return v1 * 0.5
+        }
+        
+        override func display(_ layer: CALayer) {
+            guard let layer = (layer.presentation() as? SnapshotLayer) else {
+                return
+            }
+            handler?(layer.percent)
+        }
+        
+        var handler: ((CGFloat) -> Void)?
+        var transitioningView: TransitioningView?
+        
+        var contentView: UIView?
+        var containerView: UIView
+        
+        var animator: Animator
+    }
+    internal class SnapshotLayer: CALayer {
+        
+        internal override init() {
+            super.init()
+        }
+        internal override init(layer: Any) {
+            super.init(layer: layer)
+            if let layer = layer as? SnapshotLayer {
+                percent = layer.percent
+            }
+        }
+        internal required init?(coder aDecoder: NSCoder) {
+            super.init(coder: aDecoder)
+        }
+        
+        internal override class func needsDisplay(forKey key: String) -> Bool {
+            switch key {
+            case #keyPath(percent):
+                return true
+                
+            default:
+                return super.needsDisplay(forKey: key)
+            }
+        }
+        internal override func action(forKey event: String) -> CAAction? {
+            switch event {
+            case #keyPath(percent):
+                guard let animation = super.action(forKey: #keyPath(backgroundColor)) as? CABasicAnimation else {
+                    return nil
+                }
+                animation.keyPath = event
+                animation.fromValue = presentation()?.percent
+                animation.toValue = nil
+                return animation
+                
+            default:
+                return super.action(forKey: event)
+            }
+        }
+        
+        @NSManaged var percent: CGFloat
     }
 }
 
-///
-/// implementation show transition animation
-///
-internal class AnimatorTransition: NSObject, UIViewControllerAnimatedTransitioning {
-    
-    internal init(animator: Animator, from: TransitioningScene, to: TransitioningScene, operation: TransitioningOperation) {
-        self.operation = operation
-        self.animator = animator
-        self.from = from
-        self.to = to
-        super.init()
+extension Animator {
+    /// 动画转场
+    internal class AnimatedTransitioning: NSObject, UIViewControllerAnimatedTransitioning {
+        init(animator: Animator, operation: Animator.Operation) {
+            self.animator = animator
+            self.operation = operation
+            super.init()
+        }
+        
+        func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
+            return animator.duration
+        }
+        
+        func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
+            // create transition context
+            let context = AnimatedTransitioningContext(animator: animator, context: transitionContext, operation: operation)
+            let application = UIApplication.shared
+            // apply transition context for from
+            context.prepare(for: .from)
+            application.beginIgnoringInteractionEvents()
+            // preform animation
+            animator.ub_animate(with: .curveEaseInOut, animations: {
+                // apply transition context for to
+                context.apply(for: .to)
+                
+            }, completion: { finished in
+                // complate transition, clear context
+                context.complete(!transitionContext.transitionWasCancelled)
+                application.endIgnoringInteractionEvents()
+            })
+        }
+        
+        // This is a convenience and if implemented will be invoked by the system when the transition context's completeTransition: method is invoked.
+        func animationEnded(_ transitionCompleted: Bool) {
+        }
+        
+        var animator: Animator
+        var operation: Animator.Operation
     }
-    
-    internal func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
-        return animator.duration
+    internal class AnimatedTransitioningContext: NSObject, TransitioningContext {
+        init(animator: Animator, context: UIViewControllerContextTransitioning, operation: Animator.Operation) {
+            self.context = context
+            self.animator = animator
+            self.operation = operation
+            self.snapshotView = SnapshotView(animator: animator)
+            super.init()
+        }
+        
+        
+        var ub_isAnimated: Bool {
+            return context.isAnimated
+        }
+        var ub_isInteractive: Bool {
+            return context.isInteractive
+        }
+        
+        var ub_operation: Animator.Operation {
+            return operation
+        }
+        
+        var ub_containerView: UIView {
+            return context.containerView
+        }
+        var ub_snapshotView: UIView? {
+            return nil
+        }
+        
+        func ub_view(for key: Animator.Content) -> UIView? {
+            switch (ub_operation, key) {
+            case (.push, .source), (.present, .source): return context.view(forKey: .from)
+            case (.push, .destination), (.present, .destination): return context.view(forKey: .to)
+                
+            case (.pop, .source), (.dismiss, .source): return context.view(forKey: .to)
+            case (.pop, .destination), (.dismiss, .destination): return context.view(forKey: .from)
+                
+            case (_, .from): return context.view(forKey: .from)
+            case (_, .to): return context.view(forKey: .to)
+            }
+        }
+        func ub_viewController(for key: Animator.Content) -> UIViewController? {
+            switch (ub_operation, key) {
+            case (.push, .source), (.present, .source): return context.viewController(forKey: .from)
+            case (.push, .destination), (.present, .destination): return context.viewController(forKey: .to)
+                
+            case (.pop, .source), (.dismiss, .source): return context.viewController(forKey: .to)
+            case (.pop, .destination), (.dismiss, .destination): return context.viewController(forKey: .from)
+                
+            case (_, .from): return context.viewController(forKey: .from)
+            case (_, .to): return context.viewController(forKey: .to)
+            }
+        }
+        
+        func ub_transitioningView(for key: Animator.Content) -> TransitioningView? {
+            switch (operation, key) {
+            case (.push, .from), (.present, .from): return sourceView
+            case (.push, .to), (.present, .to): return destinationView
+                
+            case (.pop, .from), (.dismiss, .from): return destinationView
+            case (.pop, .to), (.dismiss, .to): return sourceView
+                
+            case (_, .source): return sourceView
+            case (_, .destination): return destinationView
+            }
+        }
+        
+        func ub_backgroundColor(for key: Animator.Content) -> UIColor? {
+            switch (key, operation.appear) {
+            case (.destination, true), (.to, true):
+                return ub_view(for: key)?.backgroundColor
+                
+            case (.source, false), (.from, false):
+                return ub_view(for: key)?.backgroundColor
+                
+            default:
+                return .clear
+            }
+        }
+        
+        func ub_update(percent: CGFloat, at offset: CGPoint) {
+        }
+        func ub_complete(_ didComplete: Bool) {
+        }
+        
+        func prepare(for key: Animator.Content) {
+            logger.trace?.write()
+        
+            // fetch from view & to view, if is empty, is an unknow error
+            guard let fromView = context.view(forKey: .from), let toView = context.view(forKey: .to) else {
+                logger.error?.write("'from view' or 'to view' no found!")
+                return
+            }
+            // same time display fromView and toView
+            context.containerView.insertSubview(toView, aboveSubview: fromView)
+            // refresh layout, fix layout of the screen after the rotation error issue
+            if toView.frame != context.containerView.bounds {
+                toView.frame = context.containerView.bounds
+                toView.layoutIfNeeded()
+            }
+            // notice delegate prepare
+            animator.source?.ub_transitionDidPrepare(using: animator, context: self)
+            animator.destination?.ub_transitionDidPrepare(using: animator, context: self)
+            // setup transition context for snapshot view
+            snapshotView.frame = context.containerView.bounds
+            snapshotView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+            context.containerView.addSubview(snapshotView)
+            // setup transition context for init
+            snapshotView.prepare(with: ub_transitioningView(for: .destination))
+            apply(for: key)
+            // setup transition context for other
+            ub_view(for: .destination)?.isHidden = true
+            // notice delegate start
+            animator.source?.ub_transitionDidStart(using: animator, context: self)
+            animator.destination?.ub_transitionDidStart(using: animator, context: self)
+        }
+        func complete(_ completed: Bool) {
+            logger.trace?.write(completed)
+            
+            // setup transition context for other
+            ub_view(for: .destination)?.isHidden = false
+            // clear context
+            snapshotView.removeFromSuperview()
+            // notice delegate
+            animator.source?.ub_transitionDidEnd(using: animator, transitionCompleted: completed)
+            animator.destination?.ub_transitionDidEnd(using: animator, transitionCompleted: completed)
+            // commit
+            context.completeTransition(completed)
+        }
+        
+        func apply(for key: Animator.Content) {
+            logger.trace?.write(key)
+        
+            snapshotView.apply(with: ub_transitioningView(for: key))
+            snapshotView.backgroundColor = ub_backgroundColor(for: key)
+        }
+        
+        let context: UIViewControllerContextTransitioning
+        let animator: Animator
+        let operation: Animator.Operation
+        let snapshotView: SnapshotView
+        
+        var sourceView: TransitioningView? {
+            if let view = _sourceView {
+                return view
+            }
+            let view = animator.source?.ub_transitionView(using: animator, for: operation)
+            _sourceView = view
+            return view
+        }
+        var destinationView: TransitioningView? {
+            if let view = _destinationView {
+                return view
+            }
+            let view = animator.destination?.ub_transitionView(using: animator, for: operation)
+            _destinationView = view
+            return view
+        }
+        
+        private var _sourceView: TransitioningView??
+        private var _destinationView: TransitioningView??
     }
-    internal func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
-        transitionContext.completeTransition(transitionContext.transitionWasCancelled)
-    }
-    
-    internal let to: TransitioningScene
-    internal let from: TransitioningScene
-    internal let animator: Animator
-    internal let operation: TransitioningOperation
 }
-
-///
-/// implementation show transition animation
-///
-internal class AnimatorShowTransition: AnimatorTransition {
-    
-    internal override func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
-        // get from view & to view , if is empty, is an unknow error
-        guard let fromView = transitionContext.view(forKey: .from), let toView = transitionContext.view(forKey: .to) else {
-            return
-        }
-        let containerView = UIView()
-        let animator = self.animator
-        let context = AnimatorTransitioningContext(self, contentView: containerView, transition: transitionContext)
-        
-        // refresh layout, fix layout of the screen after the rotation error issue
-        if toView.frame != transitionContext.containerView.bounds {
-            toView.frame = transitionContext.containerView.bounds
-            toView.layoutIfNeeded()
+extension Animator {
+    /// 交互转场
+    internal class InteractivedTransitioning: NSObject, UIViewControllerInteractiveTransitioning {
+        init(animator: Animator, transitioning: UIViewControllerAnimatedTransitioning, operation: Animator.Operation) {
+            self.animator = animator
+            self.operation = operation
+            self.transitioning = transitioning
+            super.init()
         }
         
-        // setup container view
-        containerView.frame = transitionContext.containerView.convert(toView.bounds, from: toView)
-        containerView.backgroundColor = .clear
+        var completionSpeed: CGFloat {
+            return 1
+        }
+        var completionCurve: UIViewAnimationCurve {
+            return .easeInOut
+        }
         
-        // add to transitioning context
-        transitionContext.containerView.insertSubview(toView, aboveSubview: containerView)
-        transitionContext.containerView.insertSubview(containerView, belowSubview: toView)
+        func startInteractiveTransition(_ transitionContext: UIViewControllerContextTransitioning) {
+            // create transition context
+            context = InteractivedTransitioningContext(animator: animator, context: transitionContext, operation: operation)
+            // apply transition context for from
+            context?.prepare(for: .from)
+        }
         
-        // perform with animate
-        animator.animate(for: context, options: .curveEaseIn, animations: {
+        var context: InteractivedTransitioningContext?
+        var animator: Animator
+        var operation: Animator.Operation
+        var transitioning: UIViewControllerAnimatedTransitioning
+    }
+    internal class InteractivedTransitioningContext: AnimatedTransitioningContext {
+        
+        override func ub_update(percent: CGFloat, at offset: CGPoint) {
+            logger.trace?.write(offset, percent)
             
-            containerView.backgroundColor = toView.backgroundColor
+            context.updateInteractiveTransition(percent)
             
-        }, completion: { finished in
+            snapshotView.apply(with: ub_transitioningView(for: .to), percent: percent, at: offset)
+            snapshotView.backgroundColor = ub_backgroundColor(for: .from)?.withAlphaComponent(1 - min(percent * 1.2, 1))
             
-            containerView.removeFromSuperview()
+            _percentComplete = percent
+        }
+        override func ub_complete(_ didComplete: Bool) {
+            logger.trace?.write(didComplete)
             
-            transitionContext.completeTransition(!context.transitionWasCancelled)
-            animator.animationEnded(for: context, transitionCompleted: !transitionContext.transitionWasCancelled)
-        })
+            if didComplete {
+                finish()
+            } else {
+                cancel()
+            }
+        }
+        
+        func cancel() {
+            logger.trace?.write()
+            
+            UIView.animate(withDuration: 0.2) {
+                let percent = self._percentComplete
+                // link to the core animation context
+                self.snapshotView.link { p in
+                    self.context.updateInteractiveTransition(percent * (1 - p))
+                }
+            }
+            
+            animator.ub_animate(with: .curveEaseInOut, animations: {
+                self.apply(for: .from)
+                self.snapshotView.backgroundColor = self.ub_backgroundColor(for: .from)
+            }, completion: { _ in
+                self.snapshotView.handler = nil // must clear
+                self.context.cancelInteractiveTransition()
+                self.complete(false)
+            })
+        }
+        func finish() {
+            logger.trace?.write()
+            
+            UIView.animate(withDuration: 0.2) {
+                self.context.finishInteractiveTransition()
+            }
+            
+            animator.ub_animate(with: .curveEaseInOut, animations: {
+                self.apply(for: .to)
+                self.snapshotView.backgroundColor = self.ub_backgroundColor(for: .to)
+            }, completion: { _ in
+                self.complete(true)
+            })
+        }
+        
+        private var _percentComplete: CGFloat = 0
     }
 }
-
-///
-/// implementation dismiss transition animation
-///
-internal class AnimatorDismissTransition: AnimatorTransition {
-    
-    internal override func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
-        // get from view & to view , if is empty, is an unknow error
-        guard let fromView = transitionContext.view(forKey: .from), let toView = transitionContext.view(forKey: .to) else {
-            return
-        }
-        let containerView = UIView()
-        let animator = self.animator
-        let context = AnimatorTransitioningContext(self, contentView: containerView, transition: transitionContext)
-        
-        // refresh layout, fix layout of the screen after the rotation error issue
-        if toView.frame != transitionContext.containerView.bounds {
-            toView.frame = transitionContext.containerView.bounds
-            toView.layoutIfNeeded()
-        }
-        
-        // setup container view
-        containerView.frame = transitionContext.containerView.convert(toView.bounds, from: toView)
-        containerView.backgroundColor = fromView.backgroundColor
-        
-        // add to transitioning context
-        transitionContext.containerView.insertSubview(toView, aboveSubview: fromView)
-        transitionContext.containerView.addSubview(containerView)
-        
-        // perform with animate
-        animator.animate(for: context, options: .curveEaseIn, animations: {
-            
-            containerView.backgroundColor = .clear
-            
-        }, completion: { finished in
-            
-            containerView.removeFromSuperview()
-            
-            transitionContext.completeTransition(!transitionContext.transitionWasCancelled)
-            animator.animationEnded(for: context, transitionCompleted: !transitionContext.transitionWasCancelled)
-        })
-    }
-}
-
-fileprivate class AnimatorTransitioningContext: NSObject, TransitioningContext {
-    
-    init(_ animationController: AnimatorTransition, contentView: UIView, transition: UIViewControllerContextTransitioning) {
-        _controller = animationController
-        _contentView = contentView
-        _transitionContext = transition
-        super.init()
-    }
-    
-    var operation: TransitioningOperation {
-        return _controller.operation
-    }
-    
-    var indexPath: IndexPath {
-        return _controller.animator.indexPath
-    }
-    
-    var containerView: UIView {
-        return _contentView
-    }
-    
-    // This indicates whether the transition is animatable
-    var isAnimated: Bool {
-        return _transitionContext.isAnimated
-    }
-    /// This indicates whether the transition is currently interactive.
-    var isInteractive: Bool {
-        return _transitionContext.isInteractive
-    }
-    
-    var transitionWasCancelled: Bool {
-        return _transitionContext.transitionWasCancelled
-    }
-    
-    func scene(for key: TransitioningContextKey) -> TransitioningScene {
-        switch (operation, key) {
-        case (.push, .source), (.present, .source): return _controller.from
-        case (.push, .destination), (.present, .destination): return _controller.to
-            
-        case (.pop, .source), (.dismiss, .source): return _controller.to
-        case (.pop, .destination), (.dismiss, .destination): return _controller.from
-            
-        case (_, .from): return _controller.from
-        case (_, .to): return _controller.to
-        }
-    }
-    func delegate(for key: TransitioningContextKey) -> AnimatableTransitioningDelegate? {
-        switch (operation, key) {
-        case (.push, .from), (.present, .from): return _controller.animator.source
-        case (.push, .to), (.present, .to): return _controller.animator.destination
-            
-        case (.pop, .from), (.dismiss, .from): return _controller.animator.destination
-        case (.pop, .to), (.dismiss, .to): return _controller.animator.source
-            
-        case (_, .source): return _controller.animator.source
-        case (_, .destination): return _controller.animator.destination
-        }
-    }
-    
-    func view(for key: TransitioningContextKey) -> UIView? {
-        switch (operation, key) {
-        case (.push, .source), (.present, .source): return _transitionContext.view(forKey: .from)
-        case (.push, .destination), (.present, .destination): return _transitionContext.view(forKey: .to)
-            
-        case (.pop, .source), (.dismiss, .source): return _transitionContext.view(forKey: .to)
-        case (.pop, .destination), (.dismiss, .destination): return _transitionContext.view(forKey: .from)
-            
-        case (_, .from): return _transitionContext.view(forKey: .from)
-        case (_, .to): return _transitionContext.view(forKey: .to)
-        }
-    }
-    func viewController(for key: TransitioningContextKey) -> UIViewController? {
-        switch (operation, key) {
-        case (.push, .source), (.present, .source): return _transitionContext.viewController(forKey: .from)
-        case (.push, .destination), (.present, .destination): return _transitionContext.viewController(forKey: .to)
-            
-        case (.pop, .source), (.dismiss, .source): return _transitionContext.viewController(forKey: .to)
-        case (.pop, .destination), (.dismiss, .destination): return _transitionContext.viewController(forKey: .from)
-            
-        case (_, .from): return _transitionContext.viewController(forKey: .from)
-        case (_, .to): return _transitionContext.viewController(forKey: .to)
-        }
-    }
-    
-    func completeTransition(_ didComplete: Bool) {
-        _completeHandler?(didComplete)
-    }
-    
-    func setCompleteHandler(_ handler: @escaping ((Bool) -> Void)) {
-        _completeHandler = handler
-    }
-    
-    private var _controller: AnimatorTransition
-    private var _contentView: UIView
-    private var _transitionContext: UIViewControllerContextTransitioning
-    
-    private var _completeHandler: ((Bool) -> Void)?
-}
-

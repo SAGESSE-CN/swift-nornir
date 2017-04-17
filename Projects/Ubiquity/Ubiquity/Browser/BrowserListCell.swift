@@ -20,6 +20,9 @@ internal class BrowserListCell: UICollectionViewCell {
 //    }
     
     internal var orientation: UIImageOrientation = .up
+//    internal var orientation: UIImageOrientation = .left
+//    internal var orientation: UIImageOrientation = .down
+//    internal var orientation: UIImageOrientation = .right
     
 //    
 //    var asset: Browseable? {
@@ -69,6 +72,28 @@ internal class BrowserListCell: UICollectionViewCell {
             imageView.contentMode = .scaleAspectFill
             imageView.image = item.image?.withOrientation(orientation)
         }
+        
+        _contentSize = item.size
+    }
+    
+    fileprivate var _contentSize: CGSize = .zero
+}
+
+/// custom transition support
+extension BrowserListCell: TransitioningView {
+    
+    internal var ub_frame: CGRect {
+        return convert(bounds, to: window)
+    }
+    internal var ub_bounds: CGRect {
+        return contentView.bounds.ub_aligned(with: _contentSize)
+    }
+    internal var ub_transform: CGAffineTransform {
+        return contentView.transform.rotated(by: orientation.ub_angle)
+    }
+    
+    internal func ub_snapshotView(afterScreenUpdates: Bool) -> UIView? {
+        return contentView.snapshotView(afterScreenUpdates: afterScreenUpdates)
     }
 }
 

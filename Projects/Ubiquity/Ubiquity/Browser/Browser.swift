@@ -36,7 +36,7 @@ internal class BrowserItem: Item {
         
 //        if (index == -1) {
             size = .init(width: 1600, height: 1200)
-            image = UIImage(named: "t1")
+            image = __image
 //        } else {
 //            size = .init(width: 640, height: 1136)
 //            image = UIImage(named: "cl_\((index % 12) + 1)")
@@ -87,6 +87,7 @@ public extension Browser {
         get { return nil }
     }
 }
+
 
 
 //public class Ubiquity: BrowseDataSource, BrowseDelegate {

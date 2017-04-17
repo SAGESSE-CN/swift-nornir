@@ -47,115 +47,57 @@ import UIKit
     public weak var delegate: CanvasViewDelegate?
     
     /// default CGPointZero
-    public var contentOffset: CGPoint {
-        set { return _containerView.contentOffset = newValue }
-        get { return _containerView.contentOffset }
-    }
-    /// default CGSizeZero
-    public var contentSize: CGSize = .zero
+    @NSManaged public var contentOffset: CGPoint
     /// default UIEdgeInsetsZero. add additional scroll area around content
-    public var contentInset: UIEdgeInsets {
-        set { return _containerView.contentInset = newValue }
-        get { return _containerView.contentInset }
-    }
+    @NSManaged public var contentInset: UIEdgeInsets
     
     /// default YES. if YES, bounces past edge of content and back again
-    public var bounces: Bool {
-        set { return _containerView.bounces = newValue }
-        get { return _containerView.bounces }
-    }
+    @NSManaged public var bounces: Bool
     /// default NO. if YES and bounces is YES, even if content is smaller than bounds, allow drag vertically
-    public var alwaysBounceVertical: Bool {
-        set { return _containerView.alwaysBounceVertical = newValue }
-        get { return _containerView.alwaysBounceVertical }
-    }
+    @NSManaged public var alwaysBounceVertical: Bool
     /// default NO. if YES and bounces is YES, even if content is smaller than bounds, allow drag horizontally
-    public var alwaysBounceHorizontal: Bool {
-        set { return _containerView.alwaysBounceHorizontal = newValue }
-        get { return _containerView.alwaysBounceHorizontal }
-    }
+    @NSManaged public var alwaysBounceHorizontal: Bool
     
     /// default YES. turn off any dragging temporarily
-    public var isScrollEnabled: Bool {
-        set { return _containerView.isScrollEnabled = newValue }
-        get { return _containerView.isScrollEnabled }
-    }
+    @NSManaged public var isScrollEnabled: Bool
     
     /// default YES. show indicator while we are tracking. fades out after tracking
-    public var showsHorizontalScrollIndicator: Bool {
-        set { return _containerView.showsHorizontalScrollIndicator = newValue }
-        get { return _containerView.showsHorizontalScrollIndicator }
-    }
+    @NSManaged public var showsHorizontalScrollIndicator: Bool
     /// default YES. show indicator while we are tracking. fades out after tracking
-    public  var showsVerticalScrollIndicator: Bool {
-        set { return _containerView.showsVerticalScrollIndicator = newValue }
-        get { return _containerView.showsVerticalScrollIndicator }
-    }
+    @NSManaged public var showsVerticalScrollIndicator: Bool
     /// default is UIEdgeInsetsZero. adjust indicators inside of insets
-    public var scrollIndicatorInsets: UIEdgeInsets {
-        set { return _containerView.scrollIndicatorInsets = newValue }
-        get { return _containerView.scrollIndicatorInsets }
-    }
+    @NSManaged public var scrollIndicatorInsets: UIEdgeInsets
     /// default is UIScrollViewIndicatorStyleDefault
-    public var indicatorStyle: UIScrollViewIndicatorStyle {
-        set { return _containerView.indicatorStyle = newValue }
-        get { return _containerView.indicatorStyle }
-    }
+    @NSManaged public var indicatorStyle: UIScrollViewIndicatorStyle
     
-    public var decelerationRate: CGFloat {
-        set { return _containerView.decelerationRate = newValue }
-        get { return _containerView.decelerationRate }
-    }
+    @NSManaged public var decelerationRate: CGFloat
     
     /// default is YES. if NO, we immediately call -touchesShouldBegin:withEvent:inContentView:. this has no effect on presses
-    public var delaysContentTouches: Bool {
-        set { return _containerView.delaysContentTouches = newValue }
-        get { return _containerView.delaysContentTouches }
-    }
+    @NSManaged public var delaysContentTouches: Bool
     /// default is YES. if NO, then once we start tracking, we don't try to drag if the touch moves. this has no effect on presses
-    public var canCancelContentTouches: Bool {
-        set { return _containerView.canCancelContentTouches = newValue }
-        get { return _containerView.canCancelContentTouches }
-    }
+    @NSManaged public var canCancelContentTouches: Bool
     
     /// default is 1.0
-    public var minimumZoomScale: CGFloat {
-        return _containerView.minimumZoomScale
-    }
-    /// default is 1.0. must be > minimum zoom scale to enable zooming
-    public var maximumZoomScale: CGFloat {
-        return _containerView.maximumZoomScale
-    }
-    
+    @NSManaged public var minimumZoomScale: CGFloat
+    @NSManaged public var maximumZoomScale: CGFloat
     /// default is 1.0
-    public var zoomScale: CGFloat  {
-        set { return _containerView.zoomScale = newValue }
-        get { return _containerView.zoomScale }
-    }
+    @NSManaged public var zoomScale: CGFloat
     /// default is YES. if set, user can go past min/max zoom while gesturing and the zoom will animate to the min/max value at gesture end
-    public var bouncesZoom: Bool {
-        set { return _containerView.bouncesZoom = newValue }
-        get { return _containerView.bouncesZoom }
-    }
+    @NSManaged public var bouncesZoom: Bool
     /// default is YES.
-    public var scrollsToTop: Bool {
-        set { return _containerView.scrollsToTop = newValue }
-        get { return _containerView.scrollsToTop }
-    }
+    @NSManaged public var scrollsToTop: Bool
     
+    /// animate at constant velocity to new offset
+    @NSManaged public func setContentOffset(_ contentOffset: CGPoint, animated: Bool)
+    /// scroll so rect is just visible (nearest edges). nothing if rect completely visible
+    @NSManaged public func scrollRectToVisible(_ rect: CGRect, animated: Bool)
+    
+    /// default CGSizeZero
+    public var contentSize: CGSize = .zero
     /// default is UIImageOrientationUp
     public var orientation: UIImageOrientation {
         set { return _updateOrientation(with: _angle(for: orientation), animated: false) }
         get { return _orientation }
-    }
-    
-    /// animate at constant velocity to new offset
-    public func setContentOffset(_ contentOffset: CGPoint, animated: Bool) {
-        _containerView.setContentOffset(contentOffset, animated: animated)
-    }
-    /// scroll so rect is just visible (nearest edges). nothing if rect completely visible
-    public func scrollRectToVisible(_ rect: CGRect, animated: Bool) {
-        _containerView.scrollRectToVisible(rect, animated: animated)
     }
     
     public func setZoomScale(_ scale: CGFloat, animated: Bool) {
@@ -224,37 +166,22 @@ import UIKit
         _updateOrientation(with: _angle(for: orientation), animated: animated)
     }
     
-    public var isLockContentOffset: Bool {
-        set { return _containerView.isLockContentOffset = newValue }
-        get { return _containerView.isLockContentOffset }
-    }
+    @NSManaged public var isLockContentOffset: Bool
     
     /// displays the scroll indicators for a short time. This should be done whenever you bring the scroll view to front.
-    public func flashScrollIndicators() {
-        _containerView.flashScrollIndicators()
-    }
+    @NSManaged public func flashScrollIndicators()
     
     /// returns YES if user has touched. may not yet have started dragging
-    public var isTracking: Bool {
-        return _containerView.isTracking
-    }
+    @NSManaged public var isTracking: Bool
     /// returns YES if user has started scrolling. this may require some time and or distance to move to initiate dragging
-    public var isDragging: Bool {
-        return _containerView.isDragging
-    }
+    @NSManaged public var isDragging: Bool 
     /// returns YES if user isn't dragging (touch up) but scroll view is still moving
-    public var isDecelerating: Bool {
-        return _containerView.isDecelerating
-    }
+    @NSManaged public var isDecelerating: Bool
     
     /// returns YES if user in zoom gesture
-    public var isZooming: Bool {
-        return _containerView.isZooming
-    }
+    @NSManaged public var isZooming: Bool 
     /// returns YES if we are in the middle of zooming back to the min/max value
-    public var isZoomBouncing: Bool {
-        return _containerView.isZoomBouncing
-    }
+    @NSManaged public var isZoomBouncing: Bool 
     
     /// returns YES if user in rotation gesture
     public var isRotationing: Bool {
@@ -265,13 +192,10 @@ import UIKit
     /// Do not change the gestures' delegates or override the getters for these properties.
     
     /// Change `panGestureRecognizer.allowedTouchTypes` to limit scrolling to a particular set of touch types.
-    public var panGestureRecognizer: UIPanGestureRecognizer {
-        return _containerView.panGestureRecognizer
-    }
+    @NSManaged public var panGestureRecognizer: UIPanGestureRecognizer 
     /// `pinchGestureRecognizer` will return nil when zooming is disabled.
-    public var pinchGestureRecognizer: UIPinchGestureRecognizer? {
-        return _containerView.pinchGestureRecognizer
-    }
+    @NSManaged public var pinchGestureRecognizer: UIPinchGestureRecognizer?
+    
     /// `pinchGestureRecognizer` will return nil when zooming is disabled.
     public var rotationGestureRecognizer: UIRotationGestureRecognizer? {
         // if there is no `zoomingView` there is no rotation gesture
@@ -285,7 +209,17 @@ import UIKit
         return _containerView.transform
     }
     
+//    public override func setNeedsLayout() {
+//        super.setNeedsLayout()
+//        _containerView.setNeedsLayout()
+//    }
+//    public override func layoutIfNeeded() {
+//        super.layoutIfNeeded()
+//        _containerView.layoutIfNeeded()
+//    }
+    
     fileprivate var _bounds: CGRect?
+    fileprivate var _targetOffset: CGPoint?
     fileprivate var _isRotationing: Bool = false
     
     fileprivate var _orientation: UIImageOrientation = .up {
@@ -312,7 +246,7 @@ import UIKit
     }
 }
 
-fileprivate extension CanvasView {
+extension CanvasView {
     
     fileprivate func _commonInit() {
         
@@ -349,24 +283,23 @@ fileprivate extension CanvasView {
     /// convert orientation to angle
     fileprivate func _angle(for orientation: UIImageOrientation) -> CGFloat {
         switch orientation {
-        case .up,
-             .upMirrored:
-            return 0 * CGFloat(M_PI_2)
-        case .right,
-             .rightMirrored:
-            return 1 * CGFloat(M_PI_2)
-        case .down,
-             .downMirrored:
-            return 2 * CGFloat(M_PI_2)
-        case .left,
-             .leftMirrored:
-            return 3 * CGFloat(M_PI_2)
+        case .up, .upMirrored:
+            return 0 * CGFloat.pi / 2
+            
+        case .right, .rightMirrored:
+            return 1 * CGFloat.pi / 2
+            
+        case .down, .downMirrored:
+            return 2 * CGFloat.pi / 2
+            
+        case .left, .leftMirrored:
+            return 3 * CGFloat.pi / 2
         }
     }
     
     /// convert angle to orientation
     fileprivate func _orientation(for angle: CGFloat) -> UIImageOrientation {
-        switch Int(angle / CGFloat(M_PI_2)) % 4 {
+        switch Int(angle / (.pi / 2)) % 4 {
         case 0:     return .up
         case 1, -3: return .right
         case 2, -2: return .down
@@ -447,7 +380,7 @@ fileprivate extension CanvasView {
     }
     
     /// rotation handler
-    internal dynamic func rotationHandler(_ sender: UIRotationGestureRecognizer) {
+    fileprivate dynamic func rotationHandler(_ sender: UIRotationGestureRecognizer) {
         // is opened rotation?
         guard _isRotationing else {
             return
@@ -460,7 +393,7 @@ fileprivate extension CanvasView {
         }
         // call update orientation
         _isRotationing = false
-        _updateOrientation(with: round(sender.rotation / CGFloat(M_PI_2)) * CGFloat(M_PI_2), animated: true) { f in
+        _updateOrientation(with: round(sender.rotation / (.pi / 2)) * (.pi / 2), animated: true) { f in
             // callback notifi user
             self.delegate?.canvasViewDidEndRotationing?(self, with: self._contentView, atOrientation: self._orientation)
         }
@@ -522,6 +455,9 @@ fileprivate extension CanvasView {
         
         // cache
         _bounds = bounds
+    }
+    public override func forwardingTarget(for aSelector: Selector!) -> Any? {
+        return _containerView
     }
 }
 

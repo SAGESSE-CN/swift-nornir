@@ -15,5 +15,3 @@ FOUNDATION_EXPORT double UbiquityVersionNumber;
 FOUNDATION_EXPORT const unsigned char UbiquityVersionString[];
 
 // In this header, you should import all the public headers of your framework using statements like #import <Ubiquity/PublicHeader.h>
-
-

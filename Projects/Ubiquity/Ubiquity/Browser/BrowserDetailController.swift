@@ -47,6 +47,7 @@ internal class BrowserDetailController: UICollectionViewController {
         // setup gesture recognizer
         interactiveDismissGestureRecognizer.delegate = self
         interactiveDismissGestureRecognizer.maximumNumberOfTouches = 1
+        interactiveDismissGestureRecognizer.delaysTouchesEnded = true
         interactiveDismissGestureRecognizer.addTarget(self, action: #selector(dismiss(_:)))
         view.addGestureRecognizer(interactiveDismissGestureRecognizer)
         
@@ -105,15 +106,18 @@ internal class BrowserDetailController: UICollectionViewController {
     
     // MARK: internal var
     
-    internal var animator: Animator?
     internal var container: Container
+    internal var animator: Animator? {
+        willSet {
+            ub_transitioningDelegate = newValue
+        }
+    }
     
     internal let indicatorItem = IndicatorItem()
     internal let interactiveDismissGestureRecognizer = UIPanGestureRecognizer()
     
     internal let extraContentInset = UIEdgeInsetsMake(0, -20, 0, -20)
     
-    internal var isInteractiving = false
     internal var vaildContentOffset = CGPoint.zero
     
     internal var ignoreContentOffsetChange: Bool {
@@ -123,7 +127,16 @@ internal class BrowserDetailController: UICollectionViewController {
         return result
     }
     
+    internal var currentIndexPath: IndexPath? {
+        return _currentIndexPath
+    }
+    
     // MARK: private ivar
+    
+    // 转场
+    fileprivate var _transitionIsInteractiving: Bool = false
+    fileprivate var _transitionAtLocation: CGPoint = .zero
+    fileprivate var _transitionContext: TransitioningContext?
     
     // 插入删除的时候必须清除
     fileprivate var _interactivingFromIndex: Int?
@@ -134,10 +147,10 @@ internal class BrowserDetailController: UICollectionViewController {
     fileprivate var _currentItem: UICollectionViewLayoutAttributes?
     fileprivate var _currentIndexPath: IndexPath? {
         willSet {
-            guard let newValue = newValue else {
-                return 
-            }
-            animator?.indexPath = newValue
+//            guard let newValue = newValue else {
+//                return 
+//            }
+//            animator?.indexPath = newValue
         }
     }
     
@@ -228,7 +241,7 @@ extension BrowserDetailController: UICollectionViewDelegateFlowLayout {
         guard let indexPath = collectionView.indexPathForItem(at: CGPoint(x: x, y: 0)) else {
             return // not found, use old
         }
-        logger.debug("\(x) => \(indexPath)")
+        logger.debug?.write("\(x) => \(indexPath)")
         
         let newValue = collectionView.layoutAttributesForItem(at: indexPath)
         // update to current context
@@ -376,7 +389,7 @@ extension BrowserDetailController: UIGestureRecognizerDelegate {
         // only process dismiss gesture recognizer
         if interactiveDismissGestureRecognizer == gestureRecognizer  {
             // if it has started to interact, it is the exclusive mode
-            guard !isInteractiving else {
+            guard !_transitionIsInteractiving else {
                 return false
             }
             guard let panGestureRecognizer = otherGestureRecognizer as? UIPanGestureRecognizer else {
@@ -392,270 +405,161 @@ extension BrowserDetailController: UIGestureRecognizerDelegate {
     }
     
     fileprivate dynamic func dismiss(_ sender: UIPanGestureRecognizer) {
-        // interactiving is turned on?
-        guard !isInteractiving else {
-            // ignore changed events
-            guard sender.state != .changed else {
+       
+        if !_transitionIsInteractiving { // start
+            // check the direction of gestures => vertical & up
+            let velocity = sender.velocity(in: view)
+            guard velocity.y > 0 && fabs(velocity.x / velocity.y) < 1.5 else {
                 return
             }
-            // disable interactiving
-            isInteractiving = false
-            // restore canvas view context
-            if let canvasView = (collectionView?.visibleCells.last as? BrowserDetailCell)?.contentView as? CanvasView {
-                DispatchQueue.main.async {
-                    canvasView.setContentOffset(self.vaildContentOffset, animated: false)
+            // get cell & detail view & container view
+            guard let cell = collectionView?.visibleCells.last as? BrowserDetailCell, let detailView = cell.detailView else {
+                return
+            }
+            // check whether this has triggered bounces
+            let mh = sender.location(in: view).y
+            let point = sender.location(in: cell.detailView?.superview)
+            guard point.y - mh < 0 || detailView.frame.height <= view.frame.height else {
+                return
+            }
+            // enable interactiving
+            _transitionAtLocation = sender.location(in: nil)
+            _transitionIsInteractiving = true
+            
+//            // save canvas view context
+//            let frame = detailView.frame
+//            let size = containerView.frame.size
+//            vaildContentOffset.x = min(max(offset.x, frame.minX), max(frame.width, size.width) - size.width)
+//            vaildContentOffset.y = min(max(offset.y, frame.minY), max(frame.height, size.height) - size.height)
+            // dismiss
+            DispatchQueue.main.async {
+                // setup vaild content offset
+//                if let containerView = cell.containerView {
+//                    containerView.layoutIfNeeded()
+//                    - (void)(id)arg1;
+//                    - (void)handlePinch:(id)arg1;
+                    //var offset = containerVie.contentOffset
+                    //containerView.contentOffset
+                //containerView.setContentOffset(self.vaildContentOffset, animated: false)
+//                }
+                // if is navigation controller poped
+                if let navigationController = self.navigationController {
+                    navigationController.popViewController(animated: true)
+                    return
                 }
+                // if is presented
+                self.dismiss(animated: true, completion: nil)
             }
-            return
-        }
-        // check the direction of gestures => vertical & up
-        let velocity = sender.velocity(in: view)
-        guard velocity.y > 0 && fabs(velocity.x / velocity.y) < 1.5 else {
-            return
-        }
-        // get cell & detail view & container view
-        guard let cell = collectionView?.visibleCells.last as? BrowserDetailCell, let detailView = cell.detailView, let containerView = cell.containerView else {
-            return
-        }
-        // check whether this has triggered bounces
-        let mh = interactiveDismissGestureRecognizer.location(in: view).y
-        let point = interactiveDismissGestureRecognizer.location(in: cell.detailView?.superview)
-        guard point.y - mh < 0 || detailView.frame.height <= view.frame.height else {
-            return
-        }
-        // save canvas view context
-        let offset = containerView.contentOffset
-        let frame = detailView.frame
-        let size = containerView.frame.size
-        vaildContentOffset.x = min(max(offset.x, frame.minX), max(frame.width, size.width) - size.width)
-        vaildContentOffset.y = min(max(offset.y, frame.minY), max(frame.height, size.height) - size.height)
-        // enable interactiving
-        isInteractiving = true
-        // dismiss
-        DispatchQueue.main.async {
-            // setup vaild content offset
-            containerView.setContentOffset(self.vaildContentOffset, animated: false)
-            // if is navigation controller poped
-            if let navigationController = self.navigationController {
-                navigationController.popViewController(animated: true)
-                return
+            logger.debug?.write("start")
+            
+        } else if sender.state == .changed {
+            // update
+            let origin = _transitionAtLocation
+            let current = sender.location(in: nil)
+            
+            let offset = CGPoint(x: current.x - origin.x, y: current.y - origin.y)
+            let percent = offset.y / (UIScreen.main.bounds.height * 3 / 5)
+            
+            _transitionContext?.ub_update(percent: min(max(percent, 0), 1), at: offset)
+            
+        } else {
+            // complate or cancel
+            logger.debug?.write("stop")
+            // forced to reset the content of offset
+            // prevent jitter caused by the rolling animation
+            collectionView?.visibleCells.forEach {
+                guard let cell = ($0 as? BrowserDetailCell) else {
+                    return
+                }
+                guard let offset = cell.draggingContentOffset, cell.containerView?.isDecelerating ?? false else {
+                    return
+                }
+              //  cell.logger.debug?.write(offset)
+                cell.containerView?.setContentOffset(offset, animated: false)
             }
-            // if is presented
-            self.dismiss(animated: true, completion: nil)
+            // commit animation
+            let complete = sender.state == .ended && sender.velocity(in: nil).y >= 0
+            _transitionContext?.ub_complete(complete)
+            // disable interactiving
+            _transitionContext = nil
+            _transitionIsInteractiving = false
         }
+        
+        
+//        // if state is change, update
+//        guard sender.state != .changed else {
+//            return
+//        }
+        
+//        // interactiving is turned on?
+//        guard !isInteractiving else {
+//            // ignore changed events
+//            guard sender.state != .changed else {
+//                return
+//            }
+//            return
+//        }
     }
 }
+
 
 ///
 /// Provide interactivable transitioning support
 ///
-extension BrowserDetailController: AnimatableTransitioningDelegate, InteractivableTransitioningDelegate {
+extension BrowserDetailController: TransitioningDataSource {
     
-    // generate transition object for key and index path
-    internal func transitioningScene(using animator: Animator, operation: TransitioningOperation, at indexPath: IndexPath) -> TransitioningScene? {
-        let scene = TransitioningScene()
-        scene.contentMode = .scaleAspectFill
-        scene.orientation = .up
-        return scene
+    internal func ub_transitionView(using animator: Animator, for operation: Animator.Operation) -> TransitioningView? {
+        logger.trace?.write()
+        
+        guard let indexPath = animator.indexPath else {
+            return nil
+        }
+        // get at current index path the cell
+        return collectionView?.cellForItem(at: indexPath) as? BrowserDetailCell
     }
-    // prepare transition animation
-    internal func animationPreparing(using animator: Animator, context: TransitioningContext) {
+    
+    internal func ub_transitionShouldStart(using animator: Animator, for operation: Animator.Operation) -> Bool {
+        logger.trace?.write()
+        
+        animator.indexPath = currentIndexPath
+        return true
+    }
+    internal func ub_transitionShouldStartInteractive(using animator: Animator, for operation: Animator.Operation) -> Bool {
+        logger.trace?.write()
+        
+        let state = interactiveDismissGestureRecognizer.state
+        guard state == .changed || state == .began else {
+            return false
+        }
+        return true
+    }
+    
+    internal func ub_transitionDidPrepare(using animator: Animator, context: TransitioningContext) {
+        logger.trace?.write()
+        
         // must be attached to the collection view
-        guard let collectionView = collectionView else {
+        guard let collectionView = collectionView, let indexPath = animator.indexPath else {
             return
         }
         // check the index path is displaying
-        if !collectionView.indexPathsForVisibleItems.contains(context.indexPath) {
+        if !collectionView.indexPathsForVisibleItems.contains(indexPath) {
+            // no, scroll to the cell at index path
+            collectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: false)
             // must call the layoutIfNeeded method, otherwise cell may not create
             UIView.performWithoutAnimation {
                 indicatorItem.layoutIfNeeded()
+                collectionView.setNeedsLayout()
                 collectionView.layoutIfNeeded()
             }
         }
-        // fetch cell at index path, if is displayed
-        guard let cell = collectionView.cellForItem(at: context.indexPath) as? BrowserDetailCell, let detailView = cell.detailView else {
-            return
-        }
-        let destination = context.scene(for: .destination)
-        destination.view = detailView
-        destination.frame = cell.convert(cell.bounds, to: view)
-        destination.contentSize = container.item(at: context.indexPath).size
-        destination.bounds = detailView.superview?.bounds ?? .zero
-        destination.center = detailView.superview?.center ?? .zero
-        destination.transform = detailView.superview?.transform ?? .identity
-        destination.orientation = cell.orientation
-    }
-    // generate transitioning animation
-    internal func animateTransition(using animator: Animator, context: TransitioningContext) {
-        logger.debug()
-        
-        let to = context.scene(for: .to)
-        let from = context.scene(for: .from)
-        let containerView = context.containerView
-        
-//        guard let cell = dest.view as? BrowserDetailCell, let detailView = cell.detailView else {
-//            context.completeTransition(true)
-//            return
-//        }
-//        logger.debug("\(cell) => \(detailView)")
-        
-//        context.completeTransition(true)
-//
-//        let superview = fromContext.view.superview
-//        let transitionView = fromContext.view
-//        let transitionSuperview = UIView()
-//        let backgroundView = UIView()
-//        
-//        // add context view
-//        containerView.addSubview(transitionSuperview)
-//
-//        // refresh layout
-//        toView.frame = containerView.bounds
-//        toView.layoutIfNeeded()
-//        
-//        let toColor = UIColor.clear
-//        let fromColor = fromView.backgroundColor
-        
-//        guard let fromView = from.view as? UICollectionViewCell, let toView = to.view as? UICollectionViewCell else {
-//            context.completeTransition(true)
-//            return 
-//        }
-        
-        let contentView = UIView()
-        let canvasView = UIView()
-        let zoomView = context.scene(for: .destination).view
-        
-        // save zoom view context
-        let originSuprview = zoomView?.superview
-        let originFrame = zoomView?.frame
-        let toFrame = to.view?.frame
-
-        // setup begin context
-        contentView.frame = containerView.convert(from.frame, from: context.view(for: .from))
-        contentView.addSubview(canvasView)
-        contentView.clipsToBounds = true
-        
-        let o = context.scene(for: .destination).angle
-        
-        canvasView.bounds = from.bounds
-        canvasView.center = from.center
-        canvasView.transform = from.transform.rotated(by: from.angle - o)
-        
-            let dest = context.scene(for: .destination)
-        
-        if let zoomView = zoomView {
-            canvasView.addSubview(zoomView)
-            zoomView.frame = dest.align(rect: from.view?.frame ?? .zero)
-        }
-        
-        // setup container
-        containerView.addSubview(contentView)
-        
-        // setup context
-        context.scene(for: .source).view?.isHidden = true
-        context.view(for: .destination)?.isHidden = true
-        
-        // perform
-        UIView.animate(withDuration: animator.duration, animations: {
-            
-            contentView.frame = containerView.convert(to.frame, from: context.view(for: .to))
-            
-            canvasView.bounds = to.bounds
-            canvasView.center = to.center
-            canvasView.transform = to.transform.rotated(by: to.angle - o)
-            
-            zoomView?.frame = dest.align(rect: toFrame ?? .zero)
-            
-        }, completion: { finished in
-            
-            // restore zoom view context
-            if let zoomView = zoomView {
-                zoomView.frame = originFrame ?? .zero
-                zoomView.removeFromSuperview()
-                originSuprview?.addSubview(zoomView)
-            }
-            
-            // restore source context
-            context.scene(for: .source).view?.isHidden = false
-            context.view(for: .destination)?.isHidden = false
-            
-            contentView.removeFromSuperview()
-            context.completeTransition(true)
-        })
-        
-//        let toSuperviewFrame = containerView.convert(toContext.view.superview?.bounds ?? .zero, from: toContext.view.superview)
-//        let fromSuperviewFrame = containerView.convert(fromContext.view.bounds, from: fromContext.view)
-//        
-//        let toViewFrame = containerView.convert(toContext.align(rect: toContext.view.bounds), from: toContext.view)
-//        let fromViewFrame = containerView.convert(fromContext.view.bounds, from: fromContext.view)
-//        
-//        let toAngle = toContext.angle()
-//        let fromAngle = fromContext.angle()
-//        
-//        backgroundView.frame = fromView.frame
-//        backgroundView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-//        
-//        transitionSuperview.frame = fromSuperviewFrame
-//        transitionSuperview.clipsToBounds = true
-//        transitionSuperview.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-//        transitionSuperview.addSubview(transitionView)
-//        transitionView.frame = containerView.convert(fromViewFrame, to: transitionSuperview)
-//        
-//        fromView.isHidden = true
-//        toContext.view.isHidden = true
-//        backgroundView.backgroundColor = fromColor
-//        
-//        //UIView.animate(withDuration: transitionDuration(using: transitionContext), animations: { 
-//        UIView.animate(withDuration: transitionDuration(using: transitionContext), delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 10, options: .curveEaseIn, animations: { 
-//            
-//            backgroundView.backgroundColor = toColor
-//            
-//            transitionSuperview.frame = toSuperviewFrame
-//            transitionView.transform = transitionView.transform.rotated(by: (toAngle - fromAngle))
-//            transitionView.frame = containerView.convert(toViewFrame, to: transitionSuperview) 
-//            
-//        }, completion: { _ in
-//            
-//            // restore context
-//            fromView.isHidden = false
-//            
-//            superview?.addSubview(transitionView)
-//            
-//            toContext.view.isHidden = false
-//            
-//            transitionView.transform = transitionView.transform.rotated(by: -(toAngle - fromAngle))
-//            transitionView.frame = containerView.convert(fromViewFrame, to: superview) 
-//            transitionContext.completeTransition(!transitionContext.transitionWasCancelled)
-//            
-//            backgroundView.removeFromSuperview()
-//            transitionSuperview.removeFromSuperview()
-//        })
-        
-    }
-    // transitioning animation end
-    internal func animationEnded(using animator: Animator, transitionCompleted: Bool) {
-        logger.debug()
     }
     
-//    var browseIndexPath: IndexPath? {
-//        return collectionView.indexPathsForVisibleItems.last
-//    }
-//    var browseInteractiveDismissGestureRecognizer: UIGestureRecognizer? {
-//        return interactiveDismissGestureRecognizer
-//    }
-//    
-//    func browseContentSize(at indexPath: IndexPath) -> CGSize {
-//        return dataSource?.browser(self, assetForItemAt: indexPath).browseContentSize ?? .zero
-//    }
-//    func browseContentMode(at indexPath: IndexPath) -> UIViewContentMode {
-//        return .scaleAspectFill
-//    }
-//    func browseContentOrientation(at indexPath: IndexPath) -> UIImageOrientation {
-//        guard let cell = collectionView.cellForItem(at: indexPath) as? BrowseDetailViewCell else {
-//            return .up
-//        }
-//        return cell.orientation
-//    }
+    internal func ub_transitionDidStart(using animator: Animator, context: TransitioningContext) {
+        _transitionContext = context
+    }
+    internal func ub_transitionDidEnd(using animator: Animator, transitionCompleted: Bool) {
+        _transitionContext = nil
+    }
 }
 
 ///
@@ -689,20 +593,20 @@ extension BrowserDetailController: IndicatorViewDataSource, IndicatorViewDelegat
     }
     
     internal func indicatorWillBeginDragging(_ indicator: IndicatorView) {
-        logger.trace()
+        logger.trace?.write()
         
         collectionView?.isScrollEnabled = false
         interactiveDismissGestureRecognizer.isEnabled = false
     }
     internal func indicatorDidEndDragging(_ indicator: IndicatorView) {
-        logger.trace()
+        logger.trace?.write()
         
         collectionView?.isScrollEnabled = true
         interactiveDismissGestureRecognizer.isEnabled = true
     }
 
     internal func indicator(_ indicator: IndicatorView, didSelectItemAt indexPath: IndexPath) {
-        logger.trace(indexPath)
+        logger.debug?.write(indexPath)
         
 //        guard !isInteractiving else {
 //            return // 正在交互

@@ -11,7 +11,8 @@ import UIKit
 ///
 /// navigation controller transitioning delegate
 ///
-@objc public protocol  UINavigationControllerTransitioningDelegate: UIViewControllerTransitioningDelegate {
+@objc
+public protocol  UINavigationControllerTransitioningDelegate: UIViewControllerTransitioningDelegate {
     
     @objc optional func animationController(forPush pushed: UIViewController, from: UIViewController, source: UINavigationController) -> UIViewControllerAnimatedTransitioning?
 
@@ -25,28 +26,23 @@ import UIKit
 }
 
 ///
+/// view controller custom transitioning support
+///
+public extension UIViewController {
+    public weak var ub_transitioningDelegate: UINavigationControllerTransitioningDelegate? {
+        set { return transitioningDelegate = __ub_file_init(newValue) }
+        get { return transitioningDelegate as? UINavigationControllerTransitioningDelegate }
+    }
+}
+
+///
 /// navigation controller custom transitioning support
 ///
 fileprivate extension UINavigationController {
     
-    open override class func initialize() {
-        
-        guard self == UINavigationController.self else {
-            return
-        }
-        let m11 = class_getInstanceMethod(self, Selector(String("pushViewController:animated:")))
-        let m21 = class_getInstanceMethod(self, Selector(String("popViewControllerAnimated:")))
-        
-        let m12 = class_getInstanceMethod(self, #selector(__ub_pushViewController(_:animated:)))
-        let m22 = class_getInstanceMethod(self, #selector(__ub_popViewController(animated:)))
-        
-        method_exchangeImplementations(m11, m12)
-        method_exchangeImplementations(m21, m22)
-    }
-    
     fileprivate dynamic func __ub_pushViewController(_ viewController: UIViewController, animated: Bool) {
         // if view controller need custom transitioning animation
-        guard let transitioningDelegate = viewController.transitioningDelegate as? UINavigationControllerTransitioningDelegate, animated else {
+        guard let transitioningDelegate = viewController.ub_transitioningDelegate, animated else {
             // no need, ignore
             return __ub_pushViewController(viewController, animated: animated)
         }
@@ -57,7 +53,7 @@ fileprivate extension UINavigationController {
     }
     fileprivate dynamic func __ub_popViewController(animated: Bool) -> UIViewController? {
         // if view controller need custom transitioning animation
-        guard let transitioningDelegate = topViewController?.transitioningDelegate as? UINavigationControllerTransitioningDelegate else {
+        guard let transitioningDelegate = topViewController?.ub_transitioningDelegate else {
             // no need, ignore
             return __ub_popViewController(animated: animated)
         }
@@ -128,3 +124,19 @@ fileprivate class UINavigationControllerTransitioningHelper: NSObject, UINavigat
     unowned var transitioning: UINavigationControllerTransitioningDelegate
 }
 
+
+private var __ub_file_init: (UIViewControllerTransitioningDelegate?) -> UIViewControllerTransitioningDelegate? = {
+    
+    let cls = UINavigationController.self
+    
+    let m11 = class_getInstanceMethod(cls, Selector(String("pushViewController:animated:")))
+    let m21 = class_getInstanceMethod(cls, Selector(String("popViewControllerAnimated:")))
+    
+    let m12 = class_getInstanceMethod(cls, #selector(cls.__ub_pushViewController(_:animated:)))
+    let m22 = class_getInstanceMethod(cls, #selector(cls.__ub_popViewController(animated:)))
+    
+    method_exchangeImplementations(m11, m12)
+    method_exchangeImplementations(m21, m22)
+    
+    return { $0 }
+}()

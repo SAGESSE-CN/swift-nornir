@@ -9,6 +9,49 @@
 import UIKit
 import AVFoundation
 
+//+ (UIFont *)fontWithDescriptor:(UIFontDescriptor *)descriptor size:(CGFloat)pointSize NS_AVAILABLE_IOS(7_0);
+
+//:size:
+
+//extension UIFont {
+//    
+//    static func st() {
+//        let m1 = class_getClassMethod(self, Selector(String("fontWithDescriptor:size:")))
+//        let m2 = class_getClassMethod(self, Selector(String("my_fontWithDescriptor:size:")))
+//        method_exchangeImplementations(m1, m2);
+//    }
+//    
+//    class func my_fontWithDescriptor(_ descriptor: UIFontDescriptor, size: CGFloat) -> UIFont {
+//        if descriptor.postscriptName == "AutoFontI375" {
+//            return my_fontWithDescriptor(descriptor, size: size * 2)
+//        }
+//        return my_fontWithDescriptor(descriptor, size: size)
+//    }
+//}
+
+//extension UIFont {
+//    
+//    static func st() {
+//        let m1 = class_getInstanceMethod(self, Selector(String("initWithCoder:")))
+//        let m2 = class_getInstanceMethod(self, #selector(my_init(coder:)))
+//        method_exchangeImplementations(m1, m2)
+//    }
+//    
+//    dynamic func my_init(coder: NSCoder) -> UIFont {
+//        if (coder.decodeObject(forKey: "UIFontName") as? String) == "AutoI375" {
+//            let m = class_getInstanceMethod(AIFont.self, #selector(getter: pointSize))
+//            let imp = method_getImplementation(m)
+//            class_addMethod(type(of: self), #selector(getter: pointSize), imp, method_getTypeEncoding(m))
+//        }
+//        let font = my_init(coder: coder)
+//        return font
+//    }
+//}
+//class AIFont: UIFont {
+//    open override var pointSize: CGFloat {
+//        return 32
+//    }
+//}
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -18,6 +61,28 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
+        
+//class A: NSObject {
+//    func xa () {
+//    }
+//}
+//
+//let a = A()
+//a.xa()
+//logger.error?.print("---")
+
+//ProcessInfo().processName
+//ProcessInfo().processIdentifier
+//ProcessInfo().systemUptime
+//print(info.system_time, info.user_time)
+
+
+//task_t port = mach_thread_self();\
+//struct task_thread_times_info startTime[TASK_INFO_MAX];\
+//mach_msg_type_number_t count = TASK_INFO_MAX;\
+//thread_info(port, TASK_THREAD_TIMES_INFO, (task_info_t)&startTime, &count);\
+//time = ((double)(startTime->system_time.seconds+startTime->system_time.microseconds+startTime->user_time.seconds+startTime->user_time.microseconds))/MSEC_PER_SEC;\
+        
         
 //        UIView.self.perform(Selector(String("_enableToolsDebugColorViewBounds:")), with: true)
         

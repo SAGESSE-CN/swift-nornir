@@ -32,6 +32,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		0C6B90161E899A24008138A6 /* AutoFontI375.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = AutoFontI375.ttf; path = ../../../../../../Documents/AutoFontI375.ttf; sourceTree = "<group>"; };
 		0CE49E1E1E7A3F690058F5F8 /* Ubiquity-Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Ubiquity-Example.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		0CE49E211E7A3F690058F5F8 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		0CE49E261E7A3F690058F5F8 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -75,6 +76,7 @@
 		0CE49E201E7A3F690058F5F8 /* Example */ = {
 			isa = PBXGroup;
 			children = (
+				0C6B90161E899A24008138A6 /* AutoFontI375.ttf */,
 				0CE49EA81E7B97CE0058F5F8 /* TestCanvasViewController.swift */,
 				0CE49E211E7A3F690058F5F8 /* AppDelegate.swift */,
 				0CE49E251E7A3F690058F5F8 /* Main.storyboard */,

@@ -211,7 +211,7 @@ internal class TilingViewLayout: NSObject {
                 break // 己经超出的话忽略(性能优化)
             }
         }
-        logger.debug("\(rect) => \(begin) ..< \(end)")
+        logger.debug?.write("\(rect) => \(begin) ..< \(end)")
         guard begin < end else {
             return nil
         }

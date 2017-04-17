@@ -27,6 +27,7 @@ internal class BrowserDetailCell: UICollectionViewCell {
     }
     
     internal var orientation: UIImageOrientation = .up
+//    internal var orientation: UIImageOrientation = .left
     
 //    var asset: Browseable?
 //    
@@ -62,11 +63,14 @@ internal class BrowserDetailCell: UICollectionViewCell {
         
         containerView?.contentSize = item.size
         containerView?.zoom(to: bounds , with: orientation, animated: false)
+        
         detailView?.backgroundColor = item.backgroundColor
         
         if let imageView = detailView as? UIImageView {
             imageView.image = item.image?.withOrientation(orientation)
         }
+        
+        _contentSize = item.size
     }
     
 //    internal override func apply(_ layoutAttributes: UICollectionViewLayoutAttributes) {
@@ -423,9 +427,57 @@ internal class BrowserDetailCell: UICollectionViewCell {
 //    fileprivate lazy var _consoleView = IBVideoConsoleView(frame: CGRect(x: 0, y: 0, width: 70, height: 70))
 //    fileprivate lazy var _progressView = IBOverlayProgressView(frame: CGRect(x: 0, y: 0, width: 22, height: 22))
     
+    public var draggingContentOffset: CGPoint?
+    
+    fileprivate var _contentSize: CGSize = .zero
+    
     private var _detailView: UIView?
     private var _containerView: CanvasView?
     
+}
+
+/// custom transition support
+extension BrowserDetailCell: TransitioningView {
+    
+    internal var ub_frame: CGRect {
+        guard let containerView = containerView, let detailView = detailView else {
+            return .zero
+        }
+        let center = containerView.convert(detailView.center, from: detailView.superview)
+        let bounds = detailView.frame.applying(.init(rotationAngle: orientation.ub_angle))
+        
+        let c1 = containerView.convert(center, to: window)
+        let b1 = containerView.convert(bounds, to: window)
+        
+        return .init(x: c1.x - b1.width / 2, y: c1.y - b1.height / 2, width: b1.width, height: b1.height)
+    }
+    internal var ub_bounds: CGRect {
+        guard let detailView = detailView else {
+            return .zero
+        }
+        let bounds = detailView.frame.applying(.init(rotationAngle: orientation.ub_angle))
+        return .init(origin: .zero, size: bounds.size)
+    }
+    internal var ub_transform: CGAffineTransform {
+        guard let containerView = containerView else {
+            return .identity
+        }
+        return containerView.contentTransform.rotated(by: orientation.ub_angle)
+    }
+    internal func ub_snapshotView(afterScreenUpdates: Bool) -> UIView? {
+//        let view = detailView?.snapshotView(afterScreenUpdates: afterScreenUpdates)
+//        view?.transform = .init(rotationAngle: -orientation.ub_angle)
+//        return view
+        guard let detailView = detailView else {
+            return nil
+        }
+        let imageView = UIImageView(frame: detailView.frame)
+        if let x = detailView as? UIImageView {
+            imageView.image = x.image
+        }
+        imageView.transform = .init(rotationAngle: -orientation.ub_angle)
+        return imageView
+    }
 }
 
 /// dynamic class support
@@ -474,13 +526,22 @@ extension BrowserDetailCell: CanvasViewDelegate {
     }
     
     func canvasViewDidScroll(_ canvasView: CanvasView) {
+        logger.trace?.write(canvasView.contentOffset, canvasView.isDecelerating, canvasView.isDragging, canvasView.isTracking)
+        
 //        _updateProgressLayoutIfNeeded()
     }
     func canvasViewDidZoom(_ canvasView: CanvasView) {
 //        _updateProgressLayoutIfNeeded()
     }
     
+    func canvasViewWillEndDragging(_ canvasView: CanvasView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
+        logger.trace?.write(targetContentOffset.move())
+        draggingContentOffset = targetContentOffset.move()
+    }
+    
     func canvasViewWillBeginDragging(_ canvasView: CanvasView) {
+        // at the start of the clear, prevent invalid content offset
+        draggingContentOffset = nil
 //        _updateConsoleLock(true, animated: true)
     }
     func canvasViewWillBeginZooming(_ canvasView: CanvasView, with view: UIView?) {
@@ -498,12 +559,16 @@ extension BrowserDetailCell: CanvasViewDelegate {
     }
     
     func canvasViewDidEndDecelerating(_ canvasView: CanvasView) {
+        // clear, is end decelerate
+        draggingContentOffset = nil
 //        _updateConsoleLock(false, animated: true)
     }
     func canvasViewDidEndDragging(_ canvasView: CanvasView, willDecelerate decelerate: Bool) {
-//        guard !decelerate else {
-//            return
-//        }
+        guard !decelerate else {
+            return
+        }
+        // clear, is end dragg but no decelerat
+        draggingContentOffset = nil
 //        _updateConsoleLock(false, animated: true)
     }
     func canvasViewDidEndZooming(_ canvasView: CanvasView, with view: UIView?, atScale scale: CGFloat) {

@@ -78,7 +78,7 @@ import UIKit
     }
     
     internal func updateIndexPath(_ indexPath: IndexPath?, animated: Bool) {
-        logger.trace("\(indexPath)")
+        logger.trace?.write(indexPath ?? "")
         
         let oldValue = _currentIndexPath 
         let newValue = indexPath
@@ -399,7 +399,8 @@ extension IndicatorView: UIScrollViewDelegate, TilingViewDataSource, TilingViewD
     }
     
     internal func tilingView(_ tilingView: TilingView, didSelectItemAt indexPath: IndexPath) {
-        logger.debug(indexPath)
+        logger.trace?.write(indexPath)
+        
         updateIndexPath(indexPath, animated: true)
     }
 }
