@@ -148,7 +148,6 @@ extension Animator: UINavigationControllerTransitioningDelegate {
 
     internal func interactionControllerForDismissal(using animator: UIViewControllerAnimatedTransitioning) -> UIViewControllerInteractiveTransitioning? {
         logger.trace?.write()
-        
 //        guard self.source.ub_transitionShouldStartInteractive(using: self, for: .pop) else {
 //            return nil
 //        }

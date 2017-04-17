@@ -47,8 +47,7 @@ internal class BrowserDetailController: UICollectionViewController {
         // setup gesture recognizer
         interactiveDismissGestureRecognizer.delegate = self
         interactiveDismissGestureRecognizer.maximumNumberOfTouches = 1
-        interactiveDismissGestureRecognizer.delaysTouchesEnded = true
-        interactiveDismissGestureRecognizer.addTarget(self, action: #selector(dismiss(_:)))
+        interactiveDismissGestureRecognizer.addTarget(self, action: #selector(handleDismiss(_:)))
         view.addGestureRecognizer(interactiveDismissGestureRecognizer)
         
         // setup colleciton view
@@ -404,7 +403,7 @@ extension BrowserDetailController: UIGestureRecognizerDelegate {
         return false
     }
     
-    fileprivate dynamic func dismiss(_ sender: UIPanGestureRecognizer) {
+    fileprivate dynamic func handleDismiss(_ sender: UIPanGestureRecognizer) {
        
         if !_transitionIsInteractiving { // start
             // check the direction of gestures => vertical & up
@@ -425,23 +424,8 @@ extension BrowserDetailController: UIGestureRecognizerDelegate {
             // enable interactiving
             _transitionAtLocation = sender.location(in: nil)
             _transitionIsInteractiving = true
-            
-//            // save canvas view context
-//            let frame = detailView.frame
-//            let size = containerView.frame.size
-//            vaildContentOffset.x = min(max(offset.x, frame.minX), max(frame.width, size.width) - size.width)
-//            vaildContentOffset.y = min(max(offset.y, frame.minY), max(frame.height, size.height) - size.height)
             // dismiss
             DispatchQueue.main.async {
-                // setup vaild content offset
-//                if let containerView = cell.containerView {
-//                    containerView.layoutIfNeeded()
-//                    - (void)(id)arg1;
-//                    - (void)handlePinch:(id)arg1;
-                    //var offset = containerVie.contentOffset
-                    //containerView.contentOffset
-                //containerView.setContentOffset(self.vaildContentOffset, animated: false)
-//                }
                 // if is navigation controller poped
                 if let navigationController = self.navigationController {
                     navigationController.popViewController(animated: true)
@@ -452,8 +436,8 @@ extension BrowserDetailController: UIGestureRecognizerDelegate {
             }
             logger.debug?.write("start")
             
-        } else if sender.state == .changed {
-            // update
+        } else if sender.state == .changed { // update
+            
             let origin = _transitionAtLocation
             let current = sender.location(in: nil)
             
@@ -462,43 +446,33 @@ extension BrowserDetailController: UIGestureRecognizerDelegate {
             
             _transitionContext?.ub_update(percent: min(max(percent, 0), 1), at: offset)
             
-        } else {
-            // complate or cancel
+        } else { // stop
+            
             logger.debug?.write("stop")
-            // forced to reset the content of offset
-            // prevent jitter caused by the rolling animation
-            collectionView?.visibleCells.forEach {
-                guard let cell = ($0 as? BrowserDetailCell) else {
-                    return
-                }
-                guard let offset = cell.draggingContentOffset, cell.containerView?.isDecelerating ?? false else {
-                    return
-                }
-              //  cell.logger.debug?.write(offset)
-                cell.containerView?.setContentOffset(offset, animated: false)
-            }
-            // commit animation
+            // read of state
+            let context = _transitionContext
             let complete = sender.state == .ended && sender.velocity(in: nil).y >= 0
-            _transitionContext?.ub_complete(complete)
+            // have to delay treatment, otherwise will not found draggingContentOffset
+            DispatchQueue.main.async {
+                // forced to reset the content of offset
+                // prevent jitter caused by the rolling animation
+                self.collectionView?.visibleCells.forEach {
+                    guard let cell = ($0 as? BrowserDetailCell) else {
+                        return
+                    }
+                    guard let offset = cell.draggingContentOffset, cell.containerView?.isDecelerating ?? false else {
+                        return
+                    }
+                    // stop all scroll animation
+                    cell.containerView?.setContentOffset(offset, animated: false)
+                }
+                // commit animation
+                context?.ub_complete(complete)
+            }
             // disable interactiving
             _transitionContext = nil
             _transitionIsInteractiving = false
         }
-        
-        
-//        // if state is change, update
-//        guard sender.state != .changed else {
-//            return
-//        }
-        
-//        // interactiving is turned on?
-//        guard !isInteractiving else {
-//            // ignore changed events
-//            guard sender.state != .changed else {
-//                return
-//            }
-//            return
-//        }
     }
 }
 

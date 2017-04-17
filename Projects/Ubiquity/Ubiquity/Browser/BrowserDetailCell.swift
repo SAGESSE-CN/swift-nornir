@@ -526,7 +526,7 @@ extension BrowserDetailCell: CanvasViewDelegate {
     }
     
     func canvasViewDidScroll(_ canvasView: CanvasView) {
-        logger.trace?.write(canvasView.contentOffset, canvasView.isDecelerating, canvasView.isDragging, canvasView.isTracking)
+        //logger.trace?.write(canvasView.contentOffset, canvasView.isDecelerating, canvasView.isDragging, canvasView.isTracking)
         
 //        _updateProgressLayoutIfNeeded()
     }
@@ -535,19 +535,24 @@ extension BrowserDetailCell: CanvasViewDelegate {
     }
     
     func canvasViewWillEndDragging(_ canvasView: CanvasView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
-        logger.trace?.write(targetContentOffset.move())
+        logger.trace?.write()
+        // record the content offset of the end
         draggingContentOffset = targetContentOffset.move()
     }
     
     func canvasViewWillBeginDragging(_ canvasView: CanvasView) {
+        logger.trace?.write()
         // at the start of the clear, prevent invalid content offset
         draggingContentOffset = nil
 //        _updateConsoleLock(true, animated: true)
     }
     func canvasViewWillBeginZooming(_ canvasView: CanvasView, with view: UIView?) {
+        logger.trace?.write()
 //        _updateConsoleLock(true, animated: true)
     }
     func canvasViewShouldBeginRotationing(_ canvasView: CanvasView, with view: UIView?) -> Bool {
+        logger.trace?.write()
+        
 //        guard delegate?.browseDetailView?(self, canvasView, shouldBeginRotationing: view) ?? true else {
 //            return false
 //        }
@@ -559,11 +564,13 @@ extension BrowserDetailCell: CanvasViewDelegate {
     }
     
     func canvasViewDidEndDecelerating(_ canvasView: CanvasView) {
+        logger.trace?.write()
         // clear, is end decelerate
         draggingContentOffset = nil
 //        _updateConsoleLock(false, animated: true)
     }
     func canvasViewDidEndDragging(_ canvasView: CanvasView, willDecelerate decelerate: Bool) {
+        logger.trace?.write()
         guard !decelerate else {
             return
         }
@@ -572,9 +579,11 @@ extension BrowserDetailCell: CanvasViewDelegate {
 //        _updateConsoleLock(false, animated: true)
     }
     func canvasViewDidEndZooming(_ canvasView: CanvasView, with view: UIView?, atScale scale: CGFloat) {
+        logger.trace?.write()
 //        _updateConsoleLock(false, animated: true)
     }
     func canvasViewDidEndRotationing(_ canvasView: CanvasView, with view: UIView?, atOrientation orientation: UIImageOrientation) {
+        logger.trace?.write()
         // update content orientation
         self.orientation = orientation
         if let imageView = detailView as? UIImageView {
