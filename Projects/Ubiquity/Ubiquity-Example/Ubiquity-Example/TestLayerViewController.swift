@@ -7,11 +7,12 @@
 //
 
 import UIKit
+@testable import Ubiquity
 
 class TestLayerViewController: UIViewController {
     
-    let mpv = IBOverlayProgressView()
-    let mpv2 = IBOverlayProgressView()
+    let mpv = Ubiquity.ProgressView()
+    let mpv2 = Ubiquity.ProgressView()
 
     override func viewDidLoad() {
         super.viewDidLoad()

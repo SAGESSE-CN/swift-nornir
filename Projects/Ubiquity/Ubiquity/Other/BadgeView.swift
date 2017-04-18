@@ -1,87 +1,84 @@
 //
-//  IBBadgeBar.swift
+//  BadgeView.swift
 //  Ubiquity
 //
-//  Created by sagesse on 20/12/2016.
-//  Copyright © 2016 sagesse. All rights reserved.
+//  Created by SAGESSE on 4/18/17.
+//  Copyright © 2017 SAGESSE. All rights reserved.
 //
 
 import UIKit
 
-enum IBBadgeBarItemStyle {
+internal class BadgeView: UIView {
+    /// displayable item
+    internal class Item: NSObject {
+        
+        static var downloading  = Item(named: "ubiquity_badge_downloading", render: .alwaysOriginal)
+        
+        static var burst        = Item(named: "ubiquity_badge_burst")
+        static var favorites    = Item(named: "ubiquity_badge_favorites")
+        static var panorama     = Item(named: "ubiquity_badge_panorama")
+        static var screenshots  = Item(named: "ubiquity_badge_screenshots")
+        static var selfies      = Item(named: "ubiquity_badge_selfies")
+        static var slomo        = Item(named: "ubiquity_badge_slomo")
+        static var timelapse    = Item(named: "ubiquity_badge_timelapse")
+        static var video        = Item(named: "ubiquity_badge_video")
+        
+        static var recentlyDeleted  = Item(named: "ubiquity_badge_recentlyDeleted")
+        static var lastImport       = Item(named: "ubiquity_badge_lastImport")
+        
+        static func text(_ value: String) -> Item {
+            return Item(text: value)
+        }
+        static func image(_ value: UIImage?) -> Item {
+            return Item(image: value)
+        }
+        
+        private init(text: String) {
+            self.text = text
+            super.init()
+        }
+        private init(image: UIImage?) {
+            self.image = image
+            super.init()
+        }
+        private convenience init(named: String, render: UIImageRenderingMode = .alwaysTemplate) {
+            let icon = UIImage.ub_init(named: named)?.withRenderingMode(render)
+            self.init(image: icon)
+        }
+        
+        var text: String?
+        var image: UIImage?
+    }
     
-    case burst
-    case favorites
-    case panorama
-    case screenshots
-    case selfies
-    case slomo
-    case timelapse
-    case video
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        self.setup()
+    }
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+        self.setup()
+    }
     
-    case recentlyDeleted
-    case lastImport
+    func setup() {
+        //_updateBackgroundImage()
+        _needUpdateVisableViews = true
+    }
     
-    case loading
-    
-    fileprivate var imageName: String {
-        switch self {
-        case .burst:            return "browse_badge_burst"
-        case .favorites:        return "browse_badge_favorites"
-        case .panorama:         return "browse_badge_panorama"
-        case .screenshots:      return "browse_badge_screenshots"
-        case .selfies:          return "browse_badge_selfies"
-        case .slomo:            return "browse_badge_slomo"
-        case .timelapse:        return "browse_badge_timelapse"
-        case .video:            return "browse_badge_video"
-            
-        case .recentlyDeleted:  return "browse_badge_recentlyDeleted"
-        case .lastImport:       return "browse_badge_lastImport"
-            
-        case .loading:          return "browse_badge_loading"
+    var leftItems: Array<Item>? {
+        didSet {
+            _needUpdateVisableViews = true
+            setNeedsLayout()
         }
     }
-}
-
-class IBBadgeBarItem {
-    
-    init(title: String) {
-        self.title = title
-    }
-    init(image: UIImage?) {
-        self.image = image
-    }
-    convenience init(style: IBBadgeBarItemStyle) {
-        // 缓存
-        var icon = UIImage(named: style.imageName)
-        if style != .loading {
-            icon = icon?.withRenderingMode(.alwaysTemplate)
+    var rightItems: Array<Item>? {
+        didSet {
+            _needUpdateVisableViews = true
+            setNeedsLayout()
         }
-        self.init(image: icon)
     }
-    
-    var title: String?
-    var image: UIImage?
-}
-
-class IBBadgeBar: UIView {
-    
     var backgroundImage: UIImage? {
-        willSet {
-            layer.contents = newValue?.cgImage
-        }
-    }
-    
-    var leftBarItems: [IBBadgeBarItem]? {
         didSet {
-            _needUpdateVisableViews = true
-            setNeedsLayout()
-        }
-    }
-    var rightBarItems: [IBBadgeBarItem]? {
-        didSet {
-            _needUpdateVisableViews = true
-            setNeedsLayout()
+            _updateBackgroundImage()
         }
     }
     
@@ -94,6 +91,7 @@ class IBBadgeBar: UIView {
     
     override func tintColorDidChange() {
         super.tintColorDidChange()
+        
         _leftViews.forEach { 
             guard let label = $0 as? UILabel else {
                 return
@@ -108,6 +106,18 @@ class IBBadgeBar: UIView {
         }
     }
     
+    private func _updateBackgroundImage() {
+        guard let newValue = backgroundImage else {
+            let image: UIImage? = _backgroundImage ?? {
+                let image = UIImage.ub_init(named: "ubiquity_background_gradient")
+                _backgroundImage = image
+                return image
+            }()
+            layer.contents = image?.cgImage
+            return
+        }
+        layer.contents = newValue.cgImage
+    }
     private func _updateVisableViewsIfNeeded() {
         guard _needUpdateVisableViews else {
             return
@@ -121,12 +131,12 @@ class IBBadgeBar: UIView {
             $0.removeFromSuperview()
         }
         
-        _leftViews = leftBarItems?.map { item -> UIView in
+        _leftViews = leftItems?.map { item -> UIView in
             let view = _createView(with: item)
             addSubview(view)
             return view
         } ?? []
-        _rightViews = rightBarItems?.map { item -> UIView in
+        _rightViews = rightItems?.map { item -> UIView in
             let view = _createView(with: item)
             addSubview(view)
             return view
@@ -171,13 +181,13 @@ class IBBadgeBar: UIView {
         }
     }
     
-    private func _createView(with item: IBBadgeBarItem) -> UIView {
+    private func _createView(with item: Item) -> UIView {
         if let image = item.image {
             let view = UIImageView(image: image)
             view.contentMode = .center
             return view
         }
-        if let title = item.title {
+        if let title = item.text {
             let label = UILabel()
             
             label.text = title
@@ -196,4 +206,6 @@ class IBBadgeBar: UIView {
     private lazy var _leftViews: [UIView] = []
     private lazy var _rightViews: [UIView] = []
 }
+
+private weak var _backgroundImage: UIImage?
 

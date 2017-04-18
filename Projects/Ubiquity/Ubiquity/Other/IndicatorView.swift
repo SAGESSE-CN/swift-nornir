@@ -30,19 +30,19 @@ import UIKit
 
 @objc internal class IndicatorView: UIView {
     
-    internal override init(frame: CGRect) {
+    override init(frame: CGRect) {
         super.init(frame: frame)
         _commonInit()
     }
-    internal required init?(coder aDecoder: NSCoder) {
+    required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         _commonInit()
     }
     
-    internal weak var delegate: IndicatorViewDelegate?
-    internal weak var dataSource: IndicatorViewDataSource?
+    weak var delegate: IndicatorViewDelegate?
+    weak var dataSource: IndicatorViewDataSource?
     
-    internal var indexPath: IndexPath? {
+    var indexPath: IndexPath? {
 //        set { 
 //            // 设置为选中状态
 //            _currentIndexPath = newValue 
@@ -58,26 +58,26 @@ import UIKit
 //        }
     }
     
-    internal var estimatedItemSize: CGSize = CGSize(width: 19, height: 38)
+    var estimatedItemSize: CGSize = CGSize(width: 19, height: 38)
     
-    internal func beginInteractiveMovement() {
+    func beginInteractiveMovement() {
         guard !_tilingView.isDragging else {
             return
         }
         _isInteractiving = true
     }
-    internal func endInteractiveMovement() {
+    func endInteractiveMovement() {
         guard _isInteractiving else {
             return
         }
         _isInteractiving = false
     }
     
-    internal func scrollToItem(at indexPath: IndexPath, animated: Bool) {
+    func scrollToItem(at indexPath: IndexPath, animated: Bool) {
         updateIndexPath(indexPath, animated: animated)
     }
     
-    internal func updateIndexPath(_ indexPath: IndexPath?, animated: Bool) {
+    func updateIndexPath(_ indexPath: IndexPath?, animated: Bool) {
         logger.trace?.write(indexPath ?? "")
         
         let oldValue = _currentIndexPath 
@@ -212,7 +212,7 @@ import UIKit
         }
     }
     
-    internal override func layoutSubviews() {
+    override func layoutSubviews() {
         super.layoutSubviews()
         
         guard _cacheBounds != bounds else {
@@ -337,14 +337,14 @@ extension IndicatorView: UIScrollViewDelegate, TilingViewDataSource, TilingViewD
         }
     }
     
-    internal func scrollViewDidScroll(_ scrollView: UIScrollView) {
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
         guard !_ignoreContentOffsetChange else {
             return
         }
         _updateCurrentItem(scrollView.contentOffset)
     }
     
-    internal func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
         // 拖动的时候清除当前激活的焦点
         if indexPath != nil {
             updateIndexPath(nil, animated: true) 
@@ -352,7 +352,7 @@ extension IndicatorView: UIScrollViewDelegate, TilingViewDataSource, TilingViewD
         _isInteractiving = false
         delegate?.indicatorWillBeginDragging?(self)
     }
-    internal func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
         guard !decelerate else {
             return
         }
@@ -360,22 +360,22 @@ extension IndicatorView: UIScrollViewDelegate, TilingViewDataSource, TilingViewD
         // ..
         delegate?.indicatorDidEndDragging?(self)
     }
-    internal func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
         self.scrollViewDidEndDragging(scrollView, willDecelerate: false)
     }
     
-    internal func numberOfSections(in tilingView: TilingView) -> Int {
+    func numberOfSections(in tilingView: TilingView) -> Int {
         return dataSource?.numberOfSections?(in: self) ?? 1
     }
     
-    internal func tilingView(_ tilingView: TilingView, numberOfItemsInSection section: Int) -> Int {
+    func tilingView(_ tilingView: TilingView, numberOfItemsInSection section: Int) -> Int {
         return dataSource?.indicator(self, numberOfItemsInSection: section) ?? 0
     }
-    internal func tilingView(_ tilingView: TilingView, cellForItemAt indexPath: IndexPath) -> TilingViewCell {
+    func tilingView(_ tilingView: TilingView, cellForItemAt indexPath: IndexPath) -> TilingViewCell {
         return tilingView.dequeueReusableCell(withReuseIdentifier: "ASSET-IMAGE", for: indexPath)
     }
     
-    internal func tilingView(_ tilingView: TilingView, willDisplay cell: TilingViewCell, forItemAt indexPath: IndexPath) {
+    func tilingView(_ tilingView: TilingView, willDisplay cell: TilingViewCell, forItemAt indexPath: IndexPath) {
         guard let cell = cell as? IndicatorViewCell else {
             return
         }
@@ -391,14 +391,14 @@ extension IndicatorView: UIScrollViewDelegate, TilingViewDataSource, TilingViewD
         delegate?.indicator?(self, didEndDisplaying: cell, forItemAt: indexPath)
     }
     
-    internal func tilingView(_ tilingView: TilingView, layout: TilingViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+    func tilingView(_ tilingView: TilingView, layout: TilingViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         guard _currentIndexPath == indexPath else {
             return estimatedItemSize
         }
         return _sizeForItem(indexPath)
     }
     
-    internal func tilingView(_ tilingView: TilingView, didSelectItemAt indexPath: IndexPath) {
+    func tilingView(_ tilingView: TilingView, didSelectItemAt indexPath: IndexPath) {
         logger.trace?.write(indexPath)
         
         updateIndexPath(indexPath, animated: true)

@@ -28,6 +28,7 @@ public class Browser: NSObject, Container {
     }
     
     public var items: Array<Item> =  (0 ..< 120).map { BrowserItem($0) }
+    
 }
 
 internal class BrowserItem: Item {
@@ -36,16 +37,15 @@ internal class BrowserItem: Item {
         
 //        if (index == -1) {
             size = .init(width: 1600, height: 1200)
-            image = __image
+            //size = .init(width: 5600, height: 1800)//28:9
+            //image = __image
 //        } else {
 //            size = .init(width: 640, height: 1136)
 //            image = UIImage(named: "cl_\((index % 12) + 1)")
 //        }
-        backgroundColor = .random
     }
     
     var size: CGSize
-    var backgroundColor: UIColor? 
     
     var image: UIImage?
 }
@@ -136,3 +136,11 @@ public extension Browser {
 //
 //browser.transitioningDelegate = nil
 //UIViewController().show(browser, sender: indexPath)
+
+// some default configure
+internal extension Browser {
+    
+    static var ub_backgroundColor: UIColor? {
+        return UIColor(white: 0.94, alpha: 1)
+    }
+}

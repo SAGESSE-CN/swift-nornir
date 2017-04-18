@@ -25,7 +25,7 @@ internal protocol TransitioningContext: class {
     var ub_operation: Animator.Operation { get }
     
     var ub_containerView: UIView { get }
-    var ub_snapshotView: UIView? { get }
+    var ub_transitioningView: UIView? { get }
     
     func ub_view(for key: Animator.Content) -> UIView?
     func ub_viewController(for key: Animator.Content) -> UIViewController?
@@ -46,6 +46,7 @@ internal protocol TransitioningDataSource: class {
     func ub_transitionDidPrepare(using animator: Animator, context: TransitioningContext)
     func ub_transitionDidStart(using animator: Animator, context: TransitioningContext)
     
+    func ub_transitionWillEnd(using animator: Animator, context: TransitioningContext, transitionCompleted: Bool)
     func ub_transitionDidEnd(using animator: Animator, transitionCompleted: Bool)
 }
 internal extension TransitioningDataSource {
@@ -58,6 +59,9 @@ internal extension TransitioningDataSource {
         // the default implementation is empty
     }
     func ub_transitionDidStart(using animator: Animator, context: TransitioningContext) {
+        // the default implementation is empty
+    }
+    func ub_transitionWillEnd(using animator: Animator, context: TransitioningContext, transitionCompleted: Bool) {
         // the default implementation is empty
     }
     func ub_transitionDidEnd(using animator: Animator, transitionCompleted: Bool) {
@@ -109,16 +113,16 @@ internal class Animator: NSObject {
 
 extension Animator: UINavigationControllerTransitioningDelegate {
     
-    internal func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+    func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
         logger.info?.write()
         return nil
     }
-    internal func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+    func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
         logger.info?.write()
         return nil
     }
     
-    internal func animationController(forPush pushed: UIViewController, from: UIViewController, source: UINavigationController) -> UIViewControllerAnimatedTransitioning? {
+    func animationController(forPush pushed: UIViewController, from: UIViewController, source: UINavigationController) -> UIViewControllerAnimatedTransitioning? {
         logger.trace?.write()
         
         guard self.source?.ub_transitionShouldStart(using: self, for: .push) ?? false else {
@@ -129,7 +133,7 @@ extension Animator: UINavigationControllerTransitioningDelegate {
         }
         return Animator.AnimatedTransitioning(animator: self, operation: .push)
     }
-    internal func animationController(forPop poped: UIViewController, from: UIViewController, source: UINavigationController) -> UIViewControllerAnimatedTransitioning? {
+    func animationController(forPop poped: UIViewController, from: UIViewController, source: UINavigationController) -> UIViewControllerAnimatedTransitioning? {
         logger.trace?.write()
         
         guard self.source?.ub_transitionShouldStart(using: self, for: .pop) ?? false else {
@@ -141,12 +145,12 @@ extension Animator: UINavigationControllerTransitioningDelegate {
         return Animator.AnimatedTransitioning(animator: self, operation: .pop)
     }
     
-    internal func interactionControllerForPresentation(using animator: UIViewControllerAnimatedTransitioning) -> UIViewControllerInteractiveTransitioning? {
+    func interactionControllerForPresentation(using animator: UIViewControllerAnimatedTransitioning) -> UIViewControllerInteractiveTransitioning? {
         logger.info?.write()
         return nil
     }
 
-    internal func interactionControllerForDismissal(using animator: UIViewControllerAnimatedTransitioning) -> UIViewControllerInteractiveTransitioning? {
+    func interactionControllerForDismissal(using animator: UIViewControllerAnimatedTransitioning) -> UIViewControllerInteractiveTransitioning? {
         logger.trace?.write()
 //        guard self.source.ub_transitionShouldStartInteractive(using: self, for: .pop) else {
 //            return nil
@@ -155,7 +159,7 @@ extension Animator: UINavigationControllerTransitioningDelegate {
         return nil
     }
     
-    open func interactionControllerForPop(using animator: UIViewControllerAnimatedTransitioning) -> UIViewControllerInteractiveTransitioning? {
+    func interactionControllerForPop(using animator: UIViewControllerAnimatedTransitioning) -> UIViewControllerInteractiveTransitioning? {
         logger.trace?.write()
         
         guard self.destination?.ub_transitionShouldStartInteractive(using: self, for: .pop) ?? false else {
@@ -163,7 +167,7 @@ extension Animator: UINavigationControllerTransitioningDelegate {
         }
         return Animator.InteractivedTransitioning(animator: self, transitioning: animator, operation: .pop)
     }
-    internal func interactionControllerForPush(using animator: UIViewControllerAnimatedTransitioning) -> UIViewControllerInteractiveTransitioning? {
+    func interactionControllerForPush(using animator: UIViewControllerAnimatedTransitioning) -> UIViewControllerInteractiveTransitioning? {
         logger.info?.write()
         return nil
     }
@@ -189,8 +193,7 @@ extension Animator {
         func setup() {
             // config
             containerView.clipsToBounds = true
-            //containerView.backgroundColor = .clear
-            containerView.backgroundColor = .random
+            containerView.backgroundColor = .clear
             // add to view
             addSubview(containerView)
         }
@@ -260,20 +263,20 @@ extension Animator {
     }
     internal class SnapshotLayer: CALayer {
         
-        internal override init() {
+        override init() {
             super.init()
         }
-        internal override init(layer: Any) {
+        override init(layer: Any) {
             super.init(layer: layer)
             if let layer = layer as? SnapshotLayer {
                 percent = layer.percent
             }
         }
-        internal required init?(coder aDecoder: NSCoder) {
+        required init?(coder aDecoder: NSCoder) {
             super.init(coder: aDecoder)
         }
         
-        internal override class func needsDisplay(forKey key: String) -> Bool {
+        override class func needsDisplay(forKey key: String) -> Bool {
             switch key {
             case #keyPath(percent):
                 return true
@@ -282,7 +285,7 @@ extension Animator {
                 return super.needsDisplay(forKey: key)
             }
         }
-        internal override func action(forKey event: String) -> CAAction? {
+        override func action(forKey event: String) -> CAAction? {
             switch event {
             case #keyPath(percent):
                 guard let animation = super.action(forKey: #keyPath(backgroundColor)) as? CABasicAnimation else {
@@ -365,8 +368,8 @@ extension Animator {
         var ub_containerView: UIView {
             return context.containerView
         }
-        var ub_snapshotView: UIView? {
-            return nil
+        var ub_transitioningView: UIView? {
+            return snapshotView.containerView
         }
         
         func ub_view(for key: Animator.Content) -> UIView? {
@@ -459,6 +462,9 @@ extension Animator {
         func complete(_ completed: Bool) {
             logger.trace?.write(completed)
             
+            // notice delegate
+            animator.source?.ub_transitionWillEnd(using: animator, context: self, transitionCompleted: completed)
+            animator.destination?.ub_transitionWillEnd(using: animator, context: self, transitionCompleted: completed)
             // setup transition context for other
             ub_view(for: .destination)?.isHidden = false
             // clear context

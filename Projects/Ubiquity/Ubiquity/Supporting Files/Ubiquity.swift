@@ -13,7 +13,6 @@ import UIKit
 ///
 public protocol Item {
     var size: CGSize { get }
-    var backgroundColor: UIColor? { get }
     var image: UIImage? { get }
 }
 

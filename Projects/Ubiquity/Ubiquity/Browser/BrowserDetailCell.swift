@@ -10,24 +10,26 @@ import UIKit
 
 internal class BrowserDetailCell: UICollectionViewCell {
     
-    internal override init(frame: CGRect) {
+    override init(frame: CGRect) {
         super.init(frame: frame)
         self.setup()
     }
-    internal required init?(coder aDecoder: NSCoder) {
+    required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         self.setup()
     }
     
-    internal var detailView: UIView? {
+    var detailView: UIView? {
         return _detailView
     }
-    internal var containerView: CanvasView? {
+    var containerView: CanvasView? {
         return _containerView
     }
     
-    internal var orientation: UIImageOrientation = .up
-//    internal var orientation: UIImageOrientation = .left
+    var orientation: UIImageOrientation = .up
+    //var orientation: UIImageOrientation = .left
+    //var orientation: UIImageOrientation = .right
+    //var orientation: UIImageOrientation = .down
     
 //    var asset: Browseable?
 //    
@@ -46,7 +48,7 @@ internal class BrowserDetailCell: UICollectionViewCell {
 //        }
 //    }
     
-    internal override func prepareForReuse() {
+    override func prepareForReuse() {
         super.prepareForReuse()
         
 //        // 重置
@@ -59,12 +61,11 @@ internal class BrowserDetailCell: UICollectionViewCell {
         
     }
     
-    internal func apply(for item: Item) {
+    func apply(for item: Item) {
+        logger.trace?.write(item.size)
         
         containerView?.contentSize = item.size
         containerView?.zoom(to: bounds , with: orientation, animated: false)
-        
-        detailView?.backgroundColor = item.backgroundColor
         
         if let imageView = detailView as? UIImageView {
             imageView.image = item.image?.withOrientation(orientation)
@@ -72,8 +73,13 @@ internal class BrowserDetailCell: UICollectionViewCell {
         
         _contentSize = item.size
     }
+    func apply(for contentInset: UIEdgeInsets) {
+        logger.trace?.write(contentInset)
+        
+        _contentInset = contentInset
+    }
     
-//    internal override func apply(_ layoutAttributes: UICollectionViewLayoutAttributes) {
+//    override func apply(_ layoutAttributes: UICollectionViewLayoutAttributes) {
 //        super.apply(layoutAttributes)
 //
 //        detailView.backgroundColor = newValue.backgroundColor
@@ -89,7 +95,7 @@ internal class BrowserDetailCell: UICollectionViewCell {
 //        //containerView.setZoomScale(containerView.maximumZoomScale, animated: false)
 //    }
     
-    internal override func layoutSubviews() {
+    override func layoutSubviews() {
         super.layoutSubviews()
 //        guard _cachedBounds != bounds else {
 //            return
@@ -100,7 +106,7 @@ internal class BrowserDetailCell: UICollectionViewCell {
         //_updateProgressLayoutIfNeeded()
     }
     
-    internal func setup() {
+    func setup() {
         
         // make detail & container view
         _detailView = (type(of: self).detailViewClass as? UIView.Type)?.init()
@@ -117,8 +123,9 @@ internal class BrowserDetailCell: UICollectionViewCell {
         // setup detail view if needed
         if let detailView = _detailView {
             _detailView = detailView
-            _detailView?.backgroundColor = UIColor(white: 0.94, alpha: 1)
             _containerView?.addSubview(detailView)
+            // set default background color
+            _detailView?.backgroundColor = Browser.ub_backgroundColor
         }
         
 //        _typeView.frame = CGRect(x: 0, y: 0, width: 60, height: 26)
@@ -141,7 +148,7 @@ internal class BrowserDetailCell: UICollectionViewCell {
 //        _progressView.addTarget(self, action: #selector(progressView(willRetry: )), for: .touchUpInside)
     }
     
-    internal dynamic func doubleTapHandler(_ sender: UITapGestureRecognizer) {
+    dynamic func doubleTapHandler(_ sender: UITapGestureRecognizer) {
         guard let containerView = containerView else {
             return
         }
@@ -427,19 +434,49 @@ internal class BrowserDetailCell: UICollectionViewCell {
 //    fileprivate lazy var _consoleView = IBVideoConsoleView(frame: CGRect(x: 0, y: 0, width: 70, height: 70))
 //    fileprivate lazy var _progressView = IBOverlayProgressView(frame: CGRect(x: 0, y: 0, width: 22, height: 22))
     
-    public var draggingContentOffset: CGPoint?
+    internal var draggingContentOffset: CGPoint?
     
     fileprivate var _contentSize: CGSize = .zero
+    fileprivate var _contentInset: UIEdgeInsets = .zero
     
-    private var _detailView: UIView?
-    private var _containerView: CanvasView?
+    fileprivate var _detailView: UIView?
+    fileprivate var _progressView: ProgressView?
+    fileprivate var _containerView: CanvasView?
+}
+
+
+/// layout support
+extension BrowserDetailCell {
+    
+    func updateProgress(_ progress: Double) {
+        logger.trace?.write(progress)
+        
+        updateProgressView()
+        updateProgressViewLayout()
+    }
+    func updateProgressView() {
+    }
+    func updateProgressViewLayout() {
+    }
+    
+//        if lock {
+//            // 锁定
+//            let progress = _progress
+//            _updateProgress(progress, force: true, animated: animated)
+//            _progressOfLock = progress
+//        } else {
+//            // 解锁, 并尝试恢复
+//            let progress = _progressOfLock ?? _progress
+//            _progressOfLock = nil
+//            _updateProgress(progress, force: false, animated: animated)
+//        }
     
 }
 
 /// custom transition support
 extension BrowserDetailCell: TransitioningView {
     
-    internal var ub_frame: CGRect {
+    var ub_frame: CGRect {
         guard let containerView = containerView, let detailView = detailView else {
             return .zero
         }
@@ -451,20 +488,20 @@ extension BrowserDetailCell: TransitioningView {
         
         return .init(x: c1.x - b1.width / 2, y: c1.y - b1.height / 2, width: b1.width, height: b1.height)
     }
-    internal var ub_bounds: CGRect {
+    var ub_bounds: CGRect {
         guard let detailView = detailView else {
             return .zero
         }
         let bounds = detailView.frame.applying(.init(rotationAngle: orientation.ub_angle))
         return .init(origin: .zero, size: bounds.size)
     }
-    internal var ub_transform: CGAffineTransform {
+    var ub_transform: CGAffineTransform {
         guard let containerView = containerView else {
             return .identity
         }
         return containerView.contentTransform.rotated(by: orientation.ub_angle)
     }
-    internal func ub_snapshotView(afterScreenUpdates: Bool) -> UIView? {
+    func ub_snapshotView(afterScreenUpdates: Bool) -> UIView? {
 //        let view = detailView?.snapshotView(afterScreenUpdates: afterScreenUpdates)
 //        view?.transform = .init(rotationAngle: -orientation.ub_angle)
 //        return view
@@ -475,15 +512,16 @@ extension BrowserDetailCell: TransitioningView {
         if let x = detailView as? UIImageView {
             imageView.image = x.image
         }
+        imageView.backgroundColor = detailView.backgroundColor
         imageView.transform = .init(rotationAngle: -orientation.ub_angle)
         return imageView
     }
 }
 
 /// dynamic class support
-internal extension BrowserDetailCell {
+extension BrowserDetailCell {
     // dynamically generated class
-    internal dynamic class func `dynamic`(with viewClass: AnyClass) -> AnyClass {
+    dynamic class func `dynamic`(with viewClass: AnyClass) -> AnyClass {
         let name = "\(NSStringFromClass(self))<\(NSStringFromClass(viewClass))>"
         // if the class has been registered, ignore
         if let newClass = objc_getClass(name) as? AnyClass {
@@ -505,11 +543,11 @@ internal extension BrowserDetailCell {
         return newClass
     }
     // provide content view of class
-    internal dynamic class var contentViewClass: AnyClass {
+    dynamic class var contentViewClass: AnyClass {
         return CanvasView.self
     }
     // provide detail view of class
-    internal dynamic class var detailViewClass: AnyClass {
+    dynamic class var detailViewClass: AnyClass {
         return UIView.self
     }
     // provide content view of class, iOS 8+
@@ -597,8 +635,9 @@ extension BrowserDetailCell: CanvasViewDelegate {
     }
 }
 
+
 //extension BrowserDetailCell: IBVideoConsoleViewDelegate {
-//    
+//
 //    func progressView(willRetry sender: Any) {
 //        _logger.debug()
 //        

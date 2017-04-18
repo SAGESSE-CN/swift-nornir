@@ -10,26 +10,27 @@ import UIKit
 
 internal class BrowserListController: UICollectionViewController {
     
-    internal init(container: Container) {
+    init(container: Container) {
         self.container = container
         super.init(collectionViewLayout: BrowserListLayout())
     }
-    internal required init?(coder aDecoder: NSCoder) {
+    required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    internal override func loadView() {
+    override func loadView() {
         super.loadView()
         // setup controller
         title = "Collection"
         
         // setup colleciton view
         collectionView?.register(BrowserListCell.dynamic(with: UIImageView.self), forCellWithReuseIdentifier: "ASSET-IMAGE")
+        collectionView?.register(BrowserListCell.dynamic(with: UIImageView.self), forCellWithReuseIdentifier: "ASSET-IMAGE-BADGE")
         collectionView?.backgroundColor = .white
         collectionView?.alwaysBounceVertical = true
     }
     
-    internal let container: Container
+    let container: Container
 }
 
 ///
@@ -37,31 +38,31 @@ internal class BrowserListController: UICollectionViewController {
 ///
 extension BrowserListController: UICollectionViewDelegateFlowLayout {
     
-    internal override func numberOfSections(in collectionView: UICollectionView) -> Int {
+    override func numberOfSections(in collectionView: UICollectionView) -> Int {
         return container.numberOfSections
     }
-    internal override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+    override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return container.numberOfItems(inSection: section)
     }
     
-    internal override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+    override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         return collectionView.dequeueReusableCell(withReuseIdentifier: "ASSET-IMAGE", for: indexPath)
     }
-    internal override func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+    override func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         guard let cell =  cell as? BrowserListCell else {
             return
         }
         return cell.apply(for: container.item(at: indexPath))
     }
     
-    internal func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         guard let layout = collectionViewLayout as? UICollectionViewFlowLayout else {
             return .zero
         }
         return layout.itemSize
     }
     
-    internal override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+    override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         logger.trace?.write(indexPath)
         
         let controller = BrowserDetailController(container: container, at: indexPath)
@@ -79,7 +80,7 @@ extension BrowserListController: UICollectionViewDelegateFlowLayout {
 ///
 extension BrowserListController: TransitioningDataSource {
     
-    internal func ub_transitionView(using animator: Animator, for operation: Animator.Operation) -> TransitioningView? {
+    func ub_transitionView(using animator: Animator, for operation: Animator.Operation) -> TransitioningView? {
         logger.trace?.write()
         
         guard let indexPath = animator.indexPath else {
@@ -89,16 +90,16 @@ extension BrowserListController: TransitioningDataSource {
         return collectionView?.cellForItem(at: indexPath) as? BrowserListCell
     }
     
-    internal func ub_transitionShouldStart(using animator: Animator, for operation: Animator.Operation) -> Bool {
+    func ub_transitionShouldStart(using animator: Animator, for operation: Animator.Operation) -> Bool {
         logger.trace?.write()
         return true
     }
-    internal func ub_transitionShouldStartInteractive(using animator: Animator, for operation: Animator.Operation) -> Bool {
+    func ub_transitionShouldStartInteractive(using animator: Animator, for operation: Animator.Operation) -> Bool {
         logger.trace?.write()
         return false
     }
     
-    internal func ub_transitionDidPrepare(using animator: Animator, context: TransitioningContext) {
+    func ub_transitionDidPrepare(using animator: Animator, context: TransitioningContext) {
         logger.trace?.write()
         
         // must be attached to the collection view
@@ -136,11 +137,34 @@ extension BrowserListController: TransitioningDataSource {
         }
         cell.isHidden = true
     }
-    internal func ub_transitionDidEnd(using animator: Animator, transitionCompleted: Bool) {
-        guard let indexPath = animator.indexPath else {
+    func ub_transitionWillEnd(using animator: Animator, context: TransitioningContext, transitionCompleted: Bool) {
+        logger.trace?.write(transitionCompleted)
+        // if the disappear operation and indexPath is exists
+        guard let indexPath = animator.indexPath, context.ub_operation.disappear else {
             return
         }
+        // fetch cell at index path, if is displayed
         guard let cell = collectionView?.cellForItem(at: indexPath) as? BrowserListCell else {
+            return
+        }
+        guard let transitioningView = context.ub_transitioningView, let snapshotView = transitioningView.snapshotView(afterScreenUpdates: false) else {
+            return
+        }
+        snapshotView.transform = transitioningView.transform
+        snapshotView.bounds = .init(origin: .zero, size: transitioningView.bounds.size)
+        snapshotView.center = .init(x: transitioningView.bounds.midX, y: transitioningView.bounds.midY)
+        cell.addSubview(snapshotView)
+        
+        UIView.animate(withDuration: 0.2, animations: {
+            snapshotView.alpha = 0
+        }, completion: { finished in
+            snapshotView.removeFromSuperview()
+        })
+    }
+    func ub_transitionDidEnd(using animator: Animator, transitionCompleted: Bool) {
+        logger.trace?.write(transitionCompleted)
+        // fetch cell at index path, if index path is nil ignore
+        guard let indexPath = animator.indexPath, let cell = collectionView?.cellForItem(at: indexPath) as? BrowserListCell else {
             return
         }
         cell.isHidden = false

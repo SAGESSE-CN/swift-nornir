@@ -10,15 +10,16 @@ import UIKit
 
 internal class ExtendedItem: UIBarButtonItem {
     
-    internal init(customView: UIView) {
+    init(customView: UIView) {
         self.height = customView.frame.size.height
         super.init()
         self.customView = customView
     }
-    internal required init?(coder aDecoder: NSCoder) {
+    required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
     /// 保留高度
-    internal let height: CGFloat
+    let height: CGFloat
 }
+

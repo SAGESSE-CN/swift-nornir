@@ -10,7 +10,7 @@ import UIKit
 
 internal class BrowserListLayout: UICollectionViewFlowLayout {
     
-    internal override func prepare() {
+    override func prepare() {
         super.prepare()
         // must be attached to the collection view
         guard let collectionView = collectionView else {
@@ -32,7 +32,7 @@ internal class BrowserListLayout: UICollectionViewFlowLayout {
         minimumInteritemSpacing = spacing
     }
     
-    internal override func shouldInvalidateLayout(forBoundsChange newBounds: CGRect) -> Bool {
+    override func shouldInvalidateLayout(forBoundsChange newBounds: CGRect) -> Bool {
         guard super.shouldInvalidateLayout(forBoundsChange: newBounds) else {
             return false
         }
@@ -60,7 +60,7 @@ internal class BrowserListLayout: UICollectionViewFlowLayout {
         return true
     }
     
-    internal override func targetContentOffset(forProposedContentOffset proposedContentOffset: CGPoint) -> CGPoint {
+    override func targetContentOffset(forProposedContentOffset proposedContentOffset: CGPoint) -> CGPoint {
         let offset = super.targetContentOffset(forProposedContentOffset: proposedContentOffset)
         // only the process screen rotation
         guard let indexPath = invaildCenterIndexPath else {
@@ -78,10 +78,10 @@ internal class BrowserListLayout: UICollectionViewFlowLayout {
         return .init(x: offset.x, y: min(max(location.y - frame.midY, -edg.top),  size.height - frame.maxY + edg.bottom))
     }
     
-    internal override func initialLayoutAttributesForAppearingItem(at itemIndexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
+    override func initialLayoutAttributesForAppearingItem(at itemIndexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
         return super.initialLayoutAttributesForAppearingItem(at: itemIndexPath)
     }
-    internal override func finalLayoutAttributesForDisappearingItem(at itemIndexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
+    override func finalLayoutAttributesForDisappearingItem(at itemIndexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
         return super.finalLayoutAttributesForDisappearingItem(at: itemIndexPath)
     }
     

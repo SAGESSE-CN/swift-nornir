@@ -10,7 +10,7 @@ import UIKit
 
 internal class BrowserDetailLayout: UICollectionViewFlowLayout {
     
-    internal override func shouldInvalidateLayout(forBoundsChange newBounds: CGRect) -> Bool {
+    override func shouldInvalidateLayout(forBoundsChange newBounds: CGRect) -> Bool {
         guard super.shouldInvalidateLayout(forBoundsChange: newBounds) else {
             return false
         }
@@ -19,7 +19,7 @@ internal class BrowserDetailLayout: UICollectionViewFlowLayout {
         return true
     }
     
-    internal override func targetContentOffset(forProposedContentOffset proposedContentOffset: CGPoint) -> CGPoint {
+    override func targetContentOffset(forProposedContentOffset proposedContentOffset: CGPoint) -> CGPoint {
         let offset = super.targetContentOffset(forProposedContentOffset: proposedContentOffset)
         // if cell is currently being displayed
         guard let collectionView = collectionView, let indexPath = invaildIndexPath else {
@@ -38,13 +38,13 @@ internal class BrowserDetailLayout: UICollectionViewFlowLayout {
         return .init(x: count * collectionView.frame.width, y: offset.y)
     }
     
-    internal override func prepare(forCollectionViewUpdates updateItems: [UICollectionViewUpdateItem]) {
+    override func prepare(forCollectionViewUpdates updateItems: [UICollectionViewUpdateItem]) {
         // clear invaild index path on collection view update animation
         invaildIndexPath = nil
         super.prepare(forCollectionViewUpdates: updateItems)
     }
 
-    internal override func initialLayoutAttributesForAppearingItem(at itemIndexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
+    override func initialLayoutAttributesForAppearingItem(at itemIndexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
         // special handling of update operations
         guard invaildIndexPath == itemIndexPath else {
             // use the original method
@@ -53,7 +53,7 @@ internal class BrowserDetailLayout: UICollectionViewFlowLayout {
         // ignore any animation
         return layoutAttributesForItem(at: itemIndexPath)
     }
-    internal override func finalLayoutAttributesForDisappearingItem(at itemIndexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
+    override func finalLayoutAttributesForDisappearingItem(at itemIndexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
         // special handling of update operations
         guard invaildIndexPath == itemIndexPath else {
             // use the original method

@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="11762" systemVersion="16D32" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="Ghq-4e-xjI">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="12118" systemVersion="16D32" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="Ghq-4e-xjI">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11757"/>
-        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12086"/>
         <capability name="Constraints with non-1.0 multipliers" minToolsVersion="5.1"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -140,10 +139,10 @@
             </objects>
             <point key="canvasLocation" x="972" y="1380"/>
         </scene>
-        <!--Test Badge View Controller-->
+        <!--View Controller-->
         <scene sceneID="nd9-fs-0d9">
             <objects>
-                <viewController storyboardIdentifier="cb44444" useStoryboardIdentifierAsRestorationIdentifier="YES" id="2TO-kW-hP1" customClass="TestBadgeViewController" customModule="Ubiquity_Example" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="cb44444" useStoryboardIdentifierAsRestorationIdentifier="YES" id="2TO-kW-hP1" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="gS1-Nb-Sgn"/>
                         <viewControllerLayoutGuide type="bottom" id="bAk-9d-3to"/>
@@ -152,24 +151,14 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="er0-ZT-fCT" customClass="IBBadgeBar" customModule="Ubiquity_Example" customModuleProvider="target">
-                                <rect key="frame" x="16" y="40" width="343" height="20"/>
-                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="20" id="d90-iE-dWM"/>
-                                </constraints>
+                            <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="x7k-tn-0bq" customClass="BadgeView" customModule="Ubiquity">
+                                <rect key="frame" x="76" y="78" width="240" height="128"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                             </view>
                         </subviews>
                         <color key="backgroundColor" red="0.89413207769393921" green="0.89413201808929443" blue="0.89413201808929443" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
-                        <constraints>
-                            <constraint firstItem="er0-ZT-fCT" firstAttribute="top" secondItem="gS1-Nb-Sgn" secondAttribute="bottom" constant="20" id="Kho-ON-twY"/>
-                            <constraint firstAttribute="trailingMargin" secondItem="er0-ZT-fCT" secondAttribute="trailing" id="juM-qC-KgL"/>
-                            <constraint firstItem="er0-ZT-fCT" firstAttribute="leading" secondItem="Rtp-zB-m5S" secondAttribute="leadingMargin" id="kYd-1F-Itp"/>
-                        </constraints>
                     </view>
-                    <connections>
-                        <outlet property="bar" destination="er0-ZT-fCT" id="F0L-UP-1dU"/>
-                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="EIj-hm-EZR" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
@@ -199,7 +188,7 @@
                 <navigationController storyboardIdentifier="X1" automaticallyAdjustsScrollViewInsets="NO" useStoryboardIdentifierAsRestorationIdentifier="YES" toolbarHidden="NO" id="Ghq-4e-xjI" sceneMemberID="viewController">
                     <tabBarItem key="tabBarItem" title="Item" id="RyF-E1-Hla"/>
                     <toolbarItems/>
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="Whb-RP-aWQ">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" misplaced="YES" id="Whb-RP-aWQ">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>

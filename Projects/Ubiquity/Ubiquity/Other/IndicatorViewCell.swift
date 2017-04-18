@@ -10,13 +10,13 @@ import UIKit
 
 internal class IndicatorViewCell: TilingViewCell {
     
-    internal override init(frame: CGRect) {
+    override init(frame: CGRect) {
         let viewClass = ((type(of: self).contentViewClass as? UIView.Type) ?? UIView.self)
         _contentView = viewClass.init()
         super.init(frame: frame)
         self.setup()
     }
-    internal required init?(coder aDecoder: NSCoder) {
+    required init?(coder aDecoder: NSCoder) {
         let viewClass = ((type(of: self).contentViewClass as? UIView.Type) ?? UIView.self)
         _contentView = viewClass.init()
         super.init(coder: aDecoder)
@@ -24,17 +24,17 @@ internal class IndicatorViewCell: TilingViewCell {
     }
     
     
-    internal var contentView: UIView {
+    var contentView: UIView {
         return _contentView
     }
     
-    internal var contentSize: CGSize? {
+    var contentSize: CGSize? {
         willSet {
             setNeedsLayout()
         }
     }
     
-    internal func setup() {
+    func setup() {
         
         _contentView.frame = bounds
         _contentView.clipsToBounds = true
@@ -55,7 +55,7 @@ internal class IndicatorViewCell: TilingViewCell {
 //    }
 //    
     
-    internal override func layoutSubviews() {
+    override func layoutSubviews() {
         super.layoutSubviews()
         
         guard let contentSize = contentSize else {
@@ -101,7 +101,7 @@ internal class IndicatorViewCell: TilingViewCell {
 /// dynamic class support
 internal extension IndicatorViewCell {
     // dynamically generated class
-    internal dynamic class func `dynamic`(with viewClass: AnyClass) -> AnyClass {
+    dynamic class func `dynamic`(with viewClass: AnyClass) -> AnyClass {
         let name = "\(NSStringFromClass(self))<\(NSStringFromClass(viewClass))>"
         // if the class has been registered, ignore
         if let newClass = objc_getClass(name) as? AnyClass {
@@ -123,7 +123,7 @@ internal extension IndicatorViewCell {
         return newClass
     }
     // provide content view of class
-    internal dynamic class var contentViewClass: AnyClass {
+    dynamic class var contentViewClass: AnyClass {
         return UIView.self
     }
 }

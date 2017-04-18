@@ -485,17 +485,17 @@ fileprivate class TilingViewReusableDequeue: NSObject {
 
 internal extension CGRect {
     
-    internal func tiling_contains(_ point: CGPoint) -> Bool {
+    func tiling_contains(_ point: CGPoint) -> Bool {
         return (minX <= point.x && point.x <= maxX) 
             && (minY <= point.y && point.y <= maxY)
     }
-    internal func tiling_contains(_ rect2: CGRect) -> Bool {
+    func tiling_contains(_ rect2: CGRect) -> Bool {
         return ((minX <= rect2.minX && rect2.minX <= maxX) || (minX <= rect2.maxX && rect2.maxX <= maxX))
             && ((minY <= rect2.minY && rect2.minY <= maxY) || (minY <= rect2.maxY && rect2.maxY <= maxY))
     }
     
     // 避免误差
-    internal func tiling_equal(_ rect: CGRect) -> Bool {
+    func tiling_equal(_ rect: CGRect) -> Bool {
         return (fabs(minX - rect.minX) < 0.000001)
             && (fabs(minY - rect.minY) < 0.000001)
             && (fabs(width - rect.width) < 0.000001)

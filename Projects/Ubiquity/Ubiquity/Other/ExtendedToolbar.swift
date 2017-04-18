@@ -10,12 +10,12 @@ import UIKit
 
 internal class ExtendedToolbar: UIToolbar {
     
-    internal override var items: [UIBarButtonItem]? {
+    override var items: [UIBarButtonItem]? {
         set { return setItems(newValue, animated: false) }
         get { return _items }
     }
     
-    internal override func setItems(_ items: [UIBarButtonItem]?, animated: Bool) {
+    override func setItems(_ items: [UIBarButtonItem]?, animated: Bool) {
         _items = items
         let lines = items?.reduce([], { result, item -> [[UIBarButtonItem]] in
             if item is ExtendedItem {

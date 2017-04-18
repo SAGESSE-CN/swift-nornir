@@ -7,7 +7,7 @@
 //
 
 import UIKit
-import Ubiquity
+@testable import Ubiquity
 
 class TestCanvasViewController: UIViewController, Ubiquity.CanvasViewDelegate {
     

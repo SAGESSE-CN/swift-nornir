@@ -10,21 +10,30 @@ import UIKit
 
 internal class BrowserListCell: UICollectionViewCell {
 //    
-//    override init(frame: CGRect) {
-//        super.init(frame: frame)
-//        _commonInit()
-//    }
-//    required init?(coder aDecoder: NSCoder) {
-//        super.init(coder: aDecoder)
-//        _commonInit()
-//    }
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        self.setup()
+    }
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+        self.setup()
+    }
     
-    internal var orientation: UIImageOrientation = .up
-//    internal var orientation: UIImageOrientation = .left
-//    internal var orientation: UIImageOrientation = .down
-//    internal var orientation: UIImageOrientation = .right
+    func setup() {
+        // set default background color
+        contentView.backgroundColor = Browser.ub_backgroundColor
+        
+        _createBadgeView()
+    }
     
-//    
+    var orientation: UIImageOrientation = .up
+//    var orientation: UIImageOrientation = .left
+//    var orientation: UIImageOrientation = .down
+//    var orientation: UIImageOrientation = .right
+    
+    
+    var badgeView: BadgeView?
+//
 //    var asset: Browseable? {
 //        willSet {
 //            guard asset !== newValue else {
@@ -63,7 +72,7 @@ internal class BrowserListCell: UICollectionViewCell {
 //    private lazy var _previewView = UIImageView(frame: .zero)
 //    private lazy var _badgeBar = IBBadgeBar(frame: .zero)
     
-    internal func apply(for item: Item) {
+    func apply(for item: Item) {
         
         //backgroundColor = item.backgroundColor
         
@@ -76,23 +85,44 @@ internal class BrowserListCell: UICollectionViewCell {
         _contentSize = item.size
     }
     
+    func _createBadgeView() {
+        
+        let view = BadgeView()
+        
+        view.frame = CGRect(x: 0, y: contentView.bounds.height - 20, width: contentView.bounds.width, height: 20)
+        view.tintColor = .white
+        view.autoresizingMask = [.flexibleWidth, .flexibleTopMargin]
+        view.isUserInteractionEnabled = false
+        
+        view.leftItems = [
+            //.video
+        ]
+        view.rightItems = [
+            .downloading
+            //.text("99:99")
+        ]
+        
+        addSubview(view)
+        badgeView = view
+    }
+    
     fileprivate var _contentSize: CGSize = .zero
 }
 
 /// custom transition support
 extension BrowserListCell: TransitioningView {
     
-    internal var ub_frame: CGRect {
+    var ub_frame: CGRect {
         return convert(bounds, to: window)
     }
-    internal var ub_bounds: CGRect {
+    var ub_bounds: CGRect {
         return contentView.bounds.ub_aligned(with: _contentSize)
     }
-    internal var ub_transform: CGAffineTransform {
+    var ub_transform: CGAffineTransform {
         return contentView.transform.rotated(by: orientation.ub_angle)
     }
     
-    internal func ub_snapshotView(afterScreenUpdates: Bool) -> UIView? {
+    func ub_snapshotView(afterScreenUpdates: Bool) -> UIView? {
         return contentView.snapshotView(afterScreenUpdates: afterScreenUpdates)
     }
 }
@@ -100,7 +130,7 @@ extension BrowserListCell: TransitioningView {
 /// dynamic class support
 internal extension BrowserListCell {
     // dynamically generated class
-    internal dynamic class func `dynamic`(with viewClass: AnyClass) -> AnyClass {
+    dynamic class func `dynamic`(with viewClass: AnyClass) -> AnyClass {
         let name = "\(NSStringFromClass(self))<\(NSStringFromClass(viewClass))>"
         // if the class has been registered, ignore
         if let newClass = objc_getClass(name) as? AnyClass {
@@ -122,7 +152,7 @@ internal extension BrowserListCell {
         return newClass
     }
     // provide content view of class
-    internal dynamic class var contentViewClass: AnyClass {
+    dynamic class var contentViewClass: AnyClass {
         return CanvasView.self
     }
     // provide content view of class, iOS 8+
