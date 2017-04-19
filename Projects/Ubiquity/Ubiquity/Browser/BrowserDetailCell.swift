@@ -50,15 +50,6 @@ internal class BrowserDetailCell: UICollectionViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        
-//        // 重置
-//        _progressOfHidden = true
-//        _progressOfLock = nil
-//        _progressView.progress = 0
-//        _progressView.removeFromSuperview()
-//        _progressView.alpha = 0
-//        _progress = 0
-        
     }
     
     func apply(for item: Item) {
@@ -70,13 +61,16 @@ internal class BrowserDetailCell: UICollectionViewCell {
         if let imageView = detailView as? UIImageView {
             imageView.image = item.image?.withOrientation(orientation)
         }
-        
         _contentSize = item.size
+        
+        _progress?.setValue(-1, animated: false)
     }
     func apply(for contentInset: UIEdgeInsets) {
         logger.trace?.write(contentInset)
         
         _contentInset = contentInset
+        
+        setNeedsLayout()
     }
     
 //    override func apply(_ layoutAttributes: UICollectionViewLayoutAttributes) {
@@ -97,13 +91,17 @@ internal class BrowserDetailCell: UICollectionViewCell {
     
     override func layoutSubviews() {
         super.layoutSubviews()
-//        guard _cachedBounds != bounds else {
-//            return
+        
+//        if _cachedBounds != bounds {
+//            _cachedBounds = bounds
+//            // update the utility view layout
+//            updateConsoleViewLayout()
+//            //_updateIconLayoutIfNeeded()
+//            //_updateConsoleLayoutIfNeeded()
 //        }
-//        _cachedBounds = bounds
-        //_updateIconLayoutIfNeeded()
-        //_updateConsoleLayoutIfNeeded()
-        //_updateProgressLayoutIfNeeded()
+        
+        // update progress layout
+        _progress?.center = _progressCenter
     }
     
     func setup() {
@@ -116,7 +114,7 @@ internal class BrowserDetailCell: UICollectionViewCell {
         if let containerView = _containerView {
             containerView.delegate = self
             // add double tap recognizer
-            let doubleTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(doubleTapHandler(_:)))
+            let doubleTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(handleDoubleTap(_:)))
             doubleTapRecognizer.numberOfTapsRequired = 2
             containerView.addGestureRecognizer(doubleTapRecognizer)
         }
@@ -127,6 +125,9 @@ internal class BrowserDetailCell: UICollectionViewCell {
             // set default background color
             _detailView?.backgroundColor = Browser.ub_backgroundColor
         }
+        // setup progress view 
+        _progress = Progress(frame: .init(x: 0, y: 0, width: 24, height: 24), owner: self)
+        _progress?.addTarget(self, action: #selector(handleRetry(_:)))
         
 //        _typeView.frame = CGRect(x: 0, y: 0, width: 60, height: 26)
 //        _typeView.titleLabel?.font = UIFont.systemFont(ofSize: 14)
@@ -141,14 +142,21 @@ internal class BrowserDetailCell: UICollectionViewCell {
 //        _typeView.setImage(UIImage(named: "browse_badge_hdr"), for: .normal)
 //
 //        _consoleView.delegate = self
-//        
-//        _progressView.radius = (_progressView.bounds.width / 2) - 3
-//        _progressView.fillColor = UIColor.white
-//        _progressView.strokeColor = UIColor.lightGray
-//        _progressView.addTarget(self, action: #selector(progressView(willRetry: )), for: .touchUpInside)
     }
     
-    dynamic func doubleTapHandler(_ sender: UITapGestureRecognizer) {
+    dynamic func handleRetry(_ sender: Any) {
+        self._progress?.setValue(0, animated: false)
+        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(1), execute: {
+            self._progress?.setValue(0.35, animated: true)
+            DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2), execute: {
+                self._progress?.setValue(0.65, animated: true)
+                DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(3), execute: {
+                    self._progress?.setValue(1.00, animated: true)
+                })
+            })
+        })
+    }
+    dynamic func handleDoubleTap(_ sender: UITapGestureRecognizer) {
         guard let containerView = containerView else {
             return
         }
@@ -197,7 +205,7 @@ internal class BrowserDetailCell: UICollectionViewCell {
 //        // }];
 //        
 //        //AVAsynchronousKeyValueLoading
-//        
+//
 //        detailView.backgroundColor = newValue.backgroundColor
 //        detailView.image = newValue.browseImage?.withOrientation(orientation)
 //        containerView.contentSize = newValue.browseContentSize
@@ -207,17 +215,6 @@ internal class BrowserDetailCell: UICollectionViewCell {
 //        _updateType(newValue.browseType, animated: false)
 //        _updateSubtype(newValue.browseSubtype, animated: false)
 //        
-//        //_updateProgress(0.25, force: false, animated: false)
-//        _updateProgress(-1, force: false, animated: false)
-//        //DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(1), execute: {
-//        //    self._updateProgress(0.35, animated: true)
-//        //    DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2), execute: {
-//        //        self._updateProgress(0.65, animated: true)
-//        //        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(3), execute: {
-//        //            self._updateProgress(1.00, animated: true)
-//        //        })
-//        //    })
-//        //})
 //    }
 //    
 //    
@@ -283,73 +280,7 @@ internal class BrowserDetailCell: UICollectionViewCell {
 //            })
 //        }
 //    }
-//    fileprivate func _updateProgress(_ progress: Double, force: Bool? = nil, animated: Bool) {
-//        guard _progressOfLock == nil else {
-//            // is lock
-//            _progressOfLock = progress
-//            return
-//        }
-//        let full = progress > 0.999999 // progress >= 1.0(±0.000001)
-//        let view = _progressView
-//        
-//        let oldProgress = _progress
-//        let oldHidden = _progressOfHidden
-//        let newProgress = progress
-//        let newHidden = (force ?? full) || full
-//        
-//        guard newProgress != oldProgress || newHidden != oldHidden else {
-//            return // no change
-//        }
-//        _progress = newProgress
-//        _progressOfHidden = newHidden
-//        
-//        if (newProgress != view.progress || !newHidden) && view.superview == nil {
-//            addSubview(view)
-//        }
-//        _updateProgressLayoutIfNeeded()
-//        
-//        guard animated else {
-//            view.setProgress(newProgress, animated: false)
-//            if newHidden {
-//                view.alpha = 0
-//                view.removeFromSuperview()
-//            } else {
-//                view.alpha = 1
-//            }
-//            return
-//        }
-//        
-//        // show if need
-//        UIView.animate(withDuration: 0.25, delay: 0, options: .curveLinear, animations: {
-//            guard newProgress != oldProgress || !newHidden else {
-//                return
-//            }
-//            view.alpha = 1
-//        }, completion: { isFinish in
-//            var delay: TimeInterval = 0.35
-//            // set if need
-//            if newProgress == oldProgress {
-//                delay = 0
-//            }
-//            view.setProgress(newProgress, animated: true)
-//            // hidden if need
-//            UIView.animate(withDuration: 0.25, delay: delay, options: .curveLinear, animations: {
-//                guard view.progress > 0.999999 || newHidden else {
-//                    return
-//                }
-//                view.alpha = 0
-//            }, completion: { isFinish in
-//                guard isFinish else {
-//                    return
-//                }
-//                guard view.progress > 0.999999 || self._progressOfHidden else {
-//                    return
-//                }
-//                view.removeFromSuperview()
-//            })
-//        })
-//    }
-//    
+//
 //    // MARK: Layout & Auto Lock
 //    
 //    fileprivate func _updateConsoleLock(_ lock: Bool, animated: Bool) {
@@ -359,20 +290,7 @@ internal class BrowserDetailCell: UICollectionViewCell {
 //        _consoleOfLock = lock
 //        _consoleView.updateFocus(!lock, animated: animated)
 //    }
-//    fileprivate func _updateProgressLock(_ lock: Bool, animated: Bool) {
-//        if lock {
-//            // 锁定
-//            let progress = _progress
-//            _updateProgress(progress, force: true, animated: animated)
-//            _progressOfLock = progress
-//        } else {
-//            // 解锁, 并尝试恢复
-//            let progress = _progressOfLock ?? _progress
-//            _progressOfLock = nil
-//            _updateProgress(progress, force: false, animated: animated)
-//        }
-//    }
-//    
+//
 //    fileprivate func _updateIconLayoutIfNeeded() {
 //        guard _typeView.superview != nil else {
 //            return
@@ -392,85 +310,58 @@ internal class BrowserDetailCell: UICollectionViewCell {
 //        }
 //        _consoleView.center = CGPoint(x: bounds.width / 2, y: bounds.height / 2)
 //    }
-//    fileprivate func _updateProgressLayoutIfNeeded() {
-//        guard !_progressOfHidden else {
-//            return
-//        }
-//        //logger.debug(containerView.contentSize)
-//        
-//        let edg = _containerInset
-//        let size = _progressView.frame.size
-//        let frame = convert(detailView.frame, from: detailView.superview)
-//        let bounds = UIEdgeInsetsInsetRect(self.bounds, contentInset)
-//        
-//        let y2 = min(frame.maxY, bounds.maxY)
-//        let x2 = min(max(frame.maxX, min(max(frame.minX, bounds.minX) + frame.width, bounds.maxX)), bounds.maxX)
-//        
-//        _progressView.center = CGPoint(x: x2 - size.width / 2 - edg.right, y: y2 - size.height / 2 - edg.bottom)
-//    }
-//    
-//    // MARK: Init
-//    
-//    private func _commonInit() {
-//        
-//    }
-//    
+//
 //    // MARK: Ivar
-//    
+//
 //    private var _cachedBounds: CGRect?
-//    
-//    private var _containerInset: UIEdgeInsets = UIEdgeInsetsMake(8, 8, 8, 8)
-//    
+//
 //    private var _type: IBAssetType = .unknow
 //    private var _subtype: IBAssetSubtype = .unknow
 //    
 //    private var _consoleOfLock: Bool = false
-//    
-//    private var _progress: Double = 0
-//    private var _progressOfLock: Double?
-//    private var _progressOfHidden: Bool = true
-//    
+//
 //    fileprivate lazy var _typeView = UIButton(type: .system)
 //    fileprivate lazy var _consoleView = IBVideoConsoleView(frame: CGRect(x: 0, y: 0, width: 70, height: 70))
-//    fileprivate lazy var _progressView = IBOverlayProgressView(frame: CGRect(x: 0, y: 0, width: 22, height: 22))
     
     internal var draggingContentOffset: CGPoint?
     
+    // content
     fileprivate var _contentSize: CGSize = .zero
     fileprivate var _contentInset: UIEdgeInsets = .zero
-    
-    fileprivate var _detailView: UIView?
-    fileprivate var _progressView: ProgressView?
+    fileprivate var _indicatorInset: UIEdgeInsets = .init(top: 8, left: 8, bottom: 8, right: 8)
     fileprivate var _containerView: CanvasView?
+    fileprivate var _detailView: UIView?
+    
+    // progress
+    fileprivate var _progress: Progress?
+    fileprivate var _progressCenter: CGPoint {
+        // If no progress or detailview center is zero
+        guard let detailView = detailView, let progress = _progress else {
+            return .zero
+        }
+        let rect1 = convert(detailView.bounds, from: detailView)
+        let rect2 = UIEdgeInsetsInsetRect(bounds, _contentInset)
+        
+        let x = min(max(rect1.maxX, min(max(rect1.minX, rect2.minX) + rect1.width, rect2.maxX)), rect2.maxX)
+        let y = min(rect1.maxY, rect2.maxY)
+        
+        return .init(x: x - _indicatorInset.right - progress.bounds.midX,
+                     y: y - _indicatorInset.bottom - progress.bounds.midY)
+    }
 }
 
 
 /// layout support
 extension BrowserDetailCell {
     
-    func updateProgress(_ progress: Double) {
-        logger.trace?.write(progress)
-        
-        updateProgressView()
-        updateProgressViewLayout()
+    func updateConsole() {
     }
-    func updateProgressView() {
+    func updateConsoleView(_ isLock: Bool, animated: Bool) {
+//        logger.trace?.write(isLock, animated)
     }
-    func updateProgressViewLayout() {
+    func updateConsoleViewLayout() {
+//        logger.trace?.write()
     }
-    
-//        if lock {
-//            // 锁定
-//            let progress = _progress
-//            _updateProgress(progress, force: true, animated: animated)
-//            _progressOfLock = progress
-//        } else {
-//            // 解锁, 并尝试恢复
-//            let progress = _progressOfLock ?? _progress
-//            _progressOfLock = nil
-//            _updateProgress(progress, force: false, animated: animated)
-//        }
-    
 }
 
 /// custom transition support
@@ -566,10 +457,13 @@ extension BrowserDetailCell: CanvasViewDelegate {
     func canvasViewDidScroll(_ canvasView: CanvasView) {
         //logger.trace?.write(canvasView.contentOffset, canvasView.isDecelerating, canvasView.isDragging, canvasView.isTracking)
         
-//        _updateProgressLayoutIfNeeded()
+        // update progress
+        _progress?.center = _progressCenter
     }
     func canvasViewDidZoom(_ canvasView: CanvasView) {
-//        _updateProgressLayoutIfNeeded()
+        
+        // update progress
+        _progress?.center = _progressCenter
     }
     
     func canvasViewWillEndDragging(_ canvasView: CanvasView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
@@ -582,11 +476,15 @@ extension BrowserDetailCell: CanvasViewDelegate {
         logger.trace?.write()
         // at the start of the clear, prevent invalid content offset
         draggingContentOffset = nil
-//        _updateConsoleLock(true, animated: true)
+        
+//        // update the utility view status
+//        updateConsoleView(true, animated: true)
     }
     func canvasViewWillBeginZooming(_ canvasView: CanvasView, with view: UIView?) {
         logger.trace?.write()
-//        _updateConsoleLock(true, animated: true)
+        
+//        // update the utility view status
+//        updateConsoleView(true, animated: true)
     }
     func canvasViewShouldBeginRotationing(_ canvasView: CanvasView, with view: UIView?) -> Bool {
         logger.trace?.write()
@@ -594,10 +492,11 @@ extension BrowserDetailCell: CanvasViewDelegate {
 //        guard delegate?.browseDetailView?(self, canvasView, shouldBeginRotationing: view) ?? true else {
 //            return false
 //        }
-//        
-//        _updateConsoleLock(true, animated: true)
-//        _updateProgressLock(true, animated: false)
-//        
+        
+        // update progress
+        _progress?.center = _progressCenter
+        _progress?.setIsHidden(true, animated: false)
+        
         return true
     }
     
@@ -605,7 +504,9 @@ extension BrowserDetailCell: CanvasViewDelegate {
         logger.trace?.write()
         // clear, is end decelerate
         draggingContentOffset = nil
-//        _updateConsoleLock(false, animated: true)
+        
+//        // update the utility view status
+//        updateConsoleView(false, animated: true)
     }
     func canvasViewDidEndDragging(_ canvasView: CanvasView, willDecelerate decelerate: Bool) {
         logger.trace?.write()
@@ -614,11 +515,13 @@ extension BrowserDetailCell: CanvasViewDelegate {
         }
         // clear, is end dragg but no decelerat
         draggingContentOffset = nil
-//        _updateConsoleLock(false, animated: true)
+        // update the utility view status
+        updateConsoleView(false, animated: true)
     }
     func canvasViewDidEndZooming(_ canvasView: CanvasView, with view: UIView?, atScale scale: CGFloat) {
         logger.trace?.write()
-//        _updateConsoleLock(false, animated: true)
+        // update the utility view status
+        updateConsoleView(false, animated: true)
     }
     func canvasViewDidEndRotationing(_ canvasView: CanvasView, with view: UIView?, atOrientation orientation: UIImageOrientation) {
         logger.trace?.write()
@@ -627,11 +530,12 @@ extension BrowserDetailCell: CanvasViewDelegate {
         if let imageView = detailView as? UIImageView {
             imageView.image = imageView.image?.withOrientation(orientation)
         }
-//
+        // update progress
+        _progress?.center = _progressCenter
+        _progress?.setIsHidden(false, animated: true)
+        
+//        updateConsoleView(false, animated: true)
 //        delegate?.browseDetailView?(self, canvasView, didEndRotationing: view, atOrientation: orientation)
-//        
-//        _updateProgressLock(false, animated: true)
-//        _updateConsoleLock(false, animated: true)
     }
 }
 

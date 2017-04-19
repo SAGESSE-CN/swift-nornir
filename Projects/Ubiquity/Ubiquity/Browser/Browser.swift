@@ -36,11 +36,12 @@ internal class BrowserItem: Item {
     init(_ index: Int) {
         
 //        if (index == -1) {
-            size = .init(width: 1600, height: 1200)
-            //size = .init(width: 5600, height: 1800)//28:9
-            //image = __image
+//            size = .init(width: 1600, height: 1200)
+//            image = __image1
+//            size = .init(width: 3200, height: 1200)//8:3
+//            image = __image12
 //        } else {
-//            size = .init(width: 640, height: 1136)
+            size = .init(width: 640, height: 1136)
 //            image = UIImage(named: "cl_\((index % 12) + 1)")
 //        }
     }
@@ -49,7 +50,8 @@ internal class BrowserItem: Item {
     
     var image: UIImage?
 }
-fileprivate var __image = UIImage(named: "t1")
+fileprivate var __image1 = UIImage(named: "t1")
+fileprivate var __image2 = UIImage(named: "t2")
 
 ///
 /// data fetch & update
@@ -143,4 +145,6 @@ internal extension Browser {
     static var ub_backgroundColor: UIColor? {
         return UIColor(white: 0.94, alpha: 1)
     }
+    
 }
+

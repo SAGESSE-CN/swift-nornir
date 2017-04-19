@@ -107,16 +107,7 @@ internal class BadgeView: UIView {
     }
     
     private func _updateBackgroundImage() {
-        guard let newValue = backgroundImage else {
-            let image: UIImage? = _backgroundImage ?? {
-                let image = UIImage.ub_init(named: "ubiquity_background_gradient")
-                _backgroundImage = image
-                return image
-            }()
-            layer.contents = image?.cgImage
-            return
-        }
-        layer.contents = newValue.cgImage
+        layer.contents = backgroundImage?.cgImage
     }
     private func _updateVisableViewsIfNeeded() {
         guard _needUpdateVisableViews else {
@@ -207,5 +198,17 @@ internal class BadgeView: UIView {
     private lazy var _rightViews: [UIView] = []
 }
 
-private weak var _backgroundImage: UIImage?
+
+extension BadgeView {
+    static var ub_backgroundImage: UIImage? {
+        if let image = __backgroundImage {
+            return image
+        }
+        let image = UIImage.ub_init(named: "ubiquity_background_gradient")
+        __backgroundImage = image
+        return image
+    }
+}
+
+private weak var __backgroundImage: UIImage?
 

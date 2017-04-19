@@ -1,5 +1,5 @@
 //
-//  ProgressView.swift
+//  Progress.swift
 //  Ubiquity
 //
 //  Created by SAGESSE on 4/18/17.
@@ -8,7 +8,163 @@
 
 import UIKit
 
-internal class ProgressView: UIView {
+
+internal class Progress: NSObject {
+    
+    init(frame: CGRect, owner: UIView) {
+        center = .init(x: frame.midX, y: frame.midY)
+        bounds = .init(origin: .zero, size: frame.size)
+        _owner = owner
+        _forwarder = UIControl()
+        super.init()
+    }
+    
+    var value: Double {
+        return _value
+    }
+    
+    var bounds: CGRect {
+        willSet {
+            _progressView?.bounds = newValue
+            _progressView?.radius = (bounds.width / 2) - 3
+        }
+    }
+    var center: CGPoint {
+        willSet {
+            _progressView?.center = newValue
+        }
+    }
+    
+    var isHidden: Bool {
+        return _isForceHidden
+    }
+    
+    func setValue(_ value: Double, animated: Bool) {
+        logger.trace?.write(value, animated)
+        
+        // update value
+        _value = value
+        // check whether progressView has been hidden?
+        guard !_isForceHidden else {
+            // if you need animation, delayed update
+            guard !animated else {
+                return
+            }
+            // if you don't need animation, enforce the update
+            _progressView?.setProgress(value, animated: false)
+            return
+        }
+        // update ui
+        _updateProgress(value, animated: animated)
+    }
+    
+    func setIsHidden(_ isHidden: Bool, animated: Bool) {
+        logger.trace?.write(isHidden, animated)
+        
+        // set force hidden flag
+        _isForceHidden = isHidden
+        _updateProgress(_value, animated: animated, isForceHidden: isHidden)
+    }
+    
+    func addTarget(_ target: Any?, action: Selector) {
+        _forwarder.addTarget(target, action: action, for: .touchUpInside)
+    }
+    func removeTarget(_ target: Any?, action: Selector?) {
+        _forwarder.removeTarget(target, action: action, for: .touchUpInside)
+    }
+    
+    private func _updateProgress(_ progress: Double, animated: Bool, isForceHidden: Bool? = nil) {
+        
+        // if progress greater than or equal to 1.0(±0.000001), status is full
+        let isFull = progress > 0.999999
+        // if not specified, the automatic calculation is hidden
+        let isHidden = (isForceHidden ?? isFull) || isFull
+        
+        // if progressView not found, automatically create
+        let progressView = _progressView ?? {
+            let progressView = ProgressView(frame: .zero)
+            
+            progressView.bounds = bounds
+            progressView.center = center
+            progressView.strokeColor = UIColor.lightGray
+            progressView.fillColor = UIColor.white
+            progressView.progress = progress
+            progressView.radius = (bounds.width / 2) - 3
+            progressView.alpha = isHidden ? 0 : 1
+            progressView.addTarget(self, action: #selector(_handleRetry(_:)), for: .touchUpInside)
+            
+            _owner.addSubview(progressView)
+            _progressView = progressView
+            
+            return progressView
+        }()
+        // need update animate?
+        guard animated else {
+            // if don't need animation
+            _progressView?.alpha = isHidden ? 0 : 1
+            _progressView?.setProgress(progress, animated: false)
+            // if it is full, clear the progressView
+            guard isFull else {
+                return
+            }
+            _progressView?.removeFromSuperview()
+            _progressView = nil
+            return
+        }
+        // commit animation
+        UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseIn, animations: {
+            // if hidden is false, nedd show animation
+            // if progress is change, need show animation
+            guard progressView.progress != progress || !isHidden else {
+                return
+            }
+            // update status for show
+            progressView.alpha = 1
+            
+        }, completion: { finished in
+            // if this failure, that have a new alpha
+            guard finished else {
+                return
+            }
+            // progress is must be update
+            UIView.animate(withDuration: 0.35, delay: 0, options: .curveLinear, animations: {
+                // update progress
+                progressView.progress = progress
+                
+            }, completion: { finished in
+                // if this failure, that have a new progress
+                guard finished, isHidden else {
+                    return
+                }
+                UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseOut, animations: {
+                    // update status for hide
+                    progressView.alpha = 0
+                    
+                }, completion: { finished in
+                    // if this failure, that have a new alpha
+                    guard finished else {
+                        return
+                    }
+                    // clear if need
+                    self._progressView?.removeFromSuperview()
+                    self._progressView = nil
+                })
+            })
+        })
+    }
+    private dynamic func _handleRetry(_ o: Any) {
+        _forwarder.sendActions(for: .touchUpInside)
+    }
+    
+    private var _value: Double = 1.0
+    private var _isForceHidden: Bool = false
+    
+    private var _owner: UIView
+    private var _forwarder: UIControl
+    private var _progressView: ProgressView?
+}
+
+internal class ProgressView: UIControl {
    
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -43,20 +199,12 @@ internal class ProgressView: UIView {
     }
     
     var radius: CGFloat {
-        set {
-            setRaidus(newValue, animated: false)
-        }
-        get {
-            return _layer.radius
-        }
+        set { return _layer.radius = newValue }
+        get { return _layer.radius }
     }
     var progress: Double {
-        set {
-            setProgress(newValue, animated: false)
-        }
-        get {
-            return _layer.progress
-        }
+        set { return _layer.progress = newValue }
+        get { return _layer.progress }
     }
     
     func setRaidus(_ radius: CGFloat, animated: Bool) {
@@ -82,7 +230,7 @@ internal class ProgressView: UIView {
         guard progress < -0.000001 else {
             return false
         }
-        return super.point(inside: point, with: event)
+        return UIEdgeInsetsInsetRect(bounds, UIEdgeInsetsMake(-8, -8, -8, -8)).contains(point)
     }
     
     override class var layerClass: AnyClass {
@@ -135,14 +283,18 @@ internal class ProgressLayer: CAShapeLayer {
     override func action(forKey key: String) -> CAAction? {
         switch key {
         case #keyPath(radius):
-            let ani = CABasicAnimation(keyPath: key)
+            guard let ani = super.action(forKey: #keyPath(backgroundColor)) as? CABasicAnimation else {
+                return nil
+            }
             ani.keyPath = key
             ani.fromValue = _currentRadius
             ani.toValue = nil
             return ani
             
         case #keyPath(progress):
-            let ani = CABasicAnimation(keyPath: key)
+            guard let ani = super.action(forKey: #keyPath(backgroundColor)) as? CABasicAnimation else {
+                return nil
+            }
             ani.keyPath = key
             ani.fromValue = _currentProgress
             ani.toValue = nil

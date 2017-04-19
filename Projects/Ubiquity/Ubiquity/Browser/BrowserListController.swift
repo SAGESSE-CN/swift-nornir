@@ -68,10 +68,6 @@ extension BrowserListController: UICollectionViewDelegateFlowLayout {
         let controller = BrowserDetailController(container: container, at: indexPath)
         controller.animator = Animator(source: self, destination: controller)
         show(controller, sender: indexPath)
-       
-//        let animator = Animator(destination: controller, source: self, at: indexPath)
-            //BrowserAnimator(destination: controller, source: self, at: indexPath)
-//        controller.animator = animator
     }
 }
 
@@ -155,7 +151,7 @@ extension BrowserListController: TransitioningDataSource {
         snapshotView.center = .init(x: transitioningView.bounds.midX, y: transitioningView.bounds.midY)
         cell.addSubview(snapshotView)
         
-        UIView.animate(withDuration: 0.2, animations: {
+        UIView.animate(withDuration: 0.15, delay: 0, options: .curveEaseIn, animations: {
             snapshotView.alpha = 0
         }, completion: { finished in
             snapshotView.removeFromSuperview()
@@ -170,33 +166,3 @@ extension BrowserListController: TransitioningDataSource {
         cell.isHidden = false
     }
 }
-
-//    func showDetail(at indexPath: IndexPath, animated: Bool) {
-//        let controller = BrowseDetailViewController()
-//        
-//        controller.delegate = delegate
-//        controller.dataSource = dataSource
-//        
-//        _browseAnimator = IBControllerAnimator(from: self, to: controller)
-//        _browseIndexPath = indexPath
-//        
-//        // self => controller
-//        
-//        let root = view.window?.rootViewController
-//        
-//        if let nav = root as? UINavigationController {
-//            nav.delegate = _browseAnimator
-//            nav.pushViewController(controller, animated: true)
-//        } else {
-//            controller.transitioningDelegate = _browseAnimator
-//            root?.present(controller, animated: true, completion: nil)
-//        }
-//    }
-//    
-//    func showDetail(_ asset: Browseable, animated: Bool) {
-//        let controller = BrowseDetailViewController()
-//        
-//        controller.view.backgroundColor = asset.backgroundColor
-//        
-//        show(controller, sender: self)
-//    }

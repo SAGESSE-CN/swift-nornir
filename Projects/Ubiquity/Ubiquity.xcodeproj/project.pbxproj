@@ -9,7 +9,7 @@
 /* Begin PBXBuildFile section */
 		0C16F8751EA6026500C788C5 /* BadgeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C16F8741EA6026500C788C5 /* BadgeView.swift */; };
 		0C16F8771EA61D2500C788C5 /* UIImage+Module.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C16F8761EA61D2500C788C5 /* UIImage+Module.swift */; };
-		0C16F8791EA660F000C788C5 /* ProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C16F8781EA660F000C788C5 /* ProgressView.swift */; };
+		0C16F8791EA660F000C788C5 /* Progress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C16F8781EA660F000C788C5 /* Progress.swift */; };
 		0C72B7631E7C372B00877797 /* IndicatorItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C72B7621E7C372B00877797 /* IndicatorItem.swift */; };
 		0C879F291E7EB63F00E55741 /* UINavigationController+Transitioning.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C879F281E7EB63F00E55741 /* UINavigationController+Transitioning.swift */; };
 		0C8FEE5C1E8BBD710096EC4C /* UIImageOrientation+Angle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C8FEE5B1E8BBD710096EC4C /* UIImageOrientation+Angle.swift */; };
@@ -72,7 +72,7 @@
 /* Begin PBXFileReference section */
 		0C16F8741EA6026500C788C5 /* BadgeView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BadgeView.swift; sourceTree = "<group>"; };
 		0C16F8761EA61D2500C788C5 /* UIImage+Module.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIImage+Module.swift"; sourceTree = "<group>"; };
-		0C16F8781EA660F000C788C5 /* ProgressView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProgressView.swift; sourceTree = "<group>"; };
+		0C16F8781EA660F000C788C5 /* Progress.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Progress.swift; sourceTree = "<group>"; };
 		0C72B7621E7C372B00877797 /* IndicatorItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IndicatorItem.swift; sourceTree = "<group>"; };
 		0C879F281E7EB63F00E55741 /* UINavigationController+Transitioning.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UINavigationController+Transitioning.swift"; sourceTree = "<group>"; };
 		0C8FEE5B1E8BBD710096EC4C /* UIImageOrientation+Angle.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIImageOrientation+Angle.swift"; sourceTree = "<group>"; };
@@ -245,6 +245,7 @@
 			children = (
 				0CE49E9A1E7AB1130058F5F8 /* Extension */,
 				0CE0DAB61E8121F400A0E8CC /* Animator.swift */,
+				0C16F8781EA660F000C788C5 /* Progress.swift */,
 				0C16F8741EA6026500C788C5 /* BadgeView.swift */,
 				0CE49E811E7AAF760058F5F8 /* CanvasView.swift */,
 				0CE49E821E7AAF760058F5F8 /* ExtendedItem.swift */,
@@ -252,7 +253,6 @@
 				0C72B7621E7C372B00877797 /* IndicatorItem.swift */,
 				0CE49E841E7AAF760058F5F8 /* IndicatorView.swift */,
 				0CE49E851E7AAF760058F5F8 /* IndicatorViewCell.swift */,
-				0C16F8781EA660F000C788C5 /* ProgressView.swift */,
 				0CE49E861E7AAF760058F5F8 /* TilingView.swift */,
 				0CE49E871E7AAF760058F5F8 /* TilingViewCell.swift */,
 				0CE49E881E7AAF760058F5F8 /* TilingViewLayout.swift */,
@@ -430,7 +430,7 @@
 				0C8FEE5C1E8BBD710096EC4C /* UIImageOrientation+Angle.swift in Sources */,
 				0CE49EA31E7AB11D0058F5F8 /* Debugger.swift in Sources */,
 				0CE49E8A1E7AAF760058F5F8 /* CanvasView.swift in Sources */,
-				0C16F8791EA660F000C788C5 /* ProgressView.swift in Sources */,
+				0C16F8791EA660F000C788C5 /* Progress.swift in Sources */,
 				0CE49E8C1E7AAF760058F5F8 /* ExtendedToolbar.swift in Sources */,
 				0CE49E611E7A7D900058F5F8 /* BrowserController.swift in Sources */,
 				0C8FEE5E1E8BBF540096EC4C /* CGRect+Align.swift in Sources */,

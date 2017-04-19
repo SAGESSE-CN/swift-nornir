@@ -93,9 +93,10 @@ internal class BrowserListCell: UICollectionViewCell {
         view.tintColor = .white
         view.autoresizingMask = [.flexibleWidth, .flexibleTopMargin]
         view.isUserInteractionEnabled = false
+//        view.backgroundImage = BadgeView.ub_backgroundImage
         
         view.leftItems = [
-            //.video
+//            .video
         ]
         view.rightItems = [
             .downloading

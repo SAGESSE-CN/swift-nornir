@@ -299,8 +299,8 @@ internal class Logger {
         // stream write to console
         internal class Console: Appender {
             // init
-            internal init() {
-                super.init(name: "stdout", pattern: "[%-5p] %C.%M: %m%n", threshold: .all)
+            internal init(threshold: Priority = .all) {
+                super.init(name: "stdout", pattern: "[%-5p] %C.%M: %m%n", threshold: threshold)
             }
             // write a log
             internal override func write(_ log: Logger.Log) {
@@ -400,7 +400,7 @@ internal class Logger {
     }
     internal static var appender: Array<Appender> = [
         Appender.File(),
-        Appender.Console(),
+        Appender.Console(threshold: .debug),
     ]
 }
 

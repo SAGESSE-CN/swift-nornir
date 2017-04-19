@@ -61,34 +61,63 @@ class TestLayerViewController: UIViewController {
         
         let target = false
         
-        // show if need
-        UIView.animate(withDuration: 0.25, delay: 0, options: .curveLinear, animations: {
-            guard newValue != oldValue || !target else {
-                return
-            }
-            self.mpv.alpha = 1
-        }, completion: { isFinish in
-            var delay: TimeInterval = 0.3
-            // set if need
-            if newValue == oldValue {
-                delay = 0
-            }
-            self.mpv.setProgress(newValue, animated: true)
-            self.mpv2.setProgress(newValue, animated: true)
-            // hidden if need
-            UIView.animate(withDuration: 0.25, delay: delay, options: .curveLinear, animations: {
-                guard self.mpv.progress > 0.999999 || target else {
+        let progressView = self.mpv
+        let progressView2 = self.mpv2
+        
+        let du: TimeInterval = 0.25
+        
+        
+        UIView.animate(withDuration: du, animations: {
+            progressView.alpha = 1
+        }, completion: { finished in
+            UIView.animate(withDuration: du, animations: {
+                progressView.progress = progress
+                progressView2.progress = progress
+            }, completion: { finished in
+                guard progressView.progress > 0.999999 else {
                     return
                 }
-                self.mpv.alpha = 0
-            }, completion: { isFinish in
-                guard isFinish, self.mpv.progress > 0.999999 || target else {
-                    return
-                }
-                self.mpv.setProgress(0, animated: false)
-                self.mpv2.setProgress(0, animated: false)
+                UIView.animate(withDuration: du, animations: {
+                    progressView.alpha = 0
+                }, completion: { finished in
+                    guard progressView.progress > 0.999999 else {
+                        return
+                    }
+                    progressView.setProgress(0, animated: false)
+                    progressView2.setProgress(0, animated: false)
+                    //progressView.removeFromSuperview()
+                })
             })
         })
+        
+//        // show if need
+//        UIView.animate(withDuration: 0.25, delay: 0, options: .curveLinear, animations: {
+//            guard newValue != oldValue || !target else {
+//                return
+//            }
+//            self.mpv.alpha = 1
+//        }, completion: { isFinish in
+//            var delay: TimeInterval = 0.3
+//            // set if need
+//            if newValue == oldValue {
+//                delay = 0
+//            }
+//            self.mpv.setProgress(newValue, animated: true)
+//            self.mpv2.setProgress(newValue, animated: true)
+//            // hidden if need
+//            UIView.animate(withDuration: 0.25, delay: delay, options: .curveLinear, animations: {
+//                guard self.mpv.progress > 0.999999 || target else {
+//                    return
+//                }
+//                self.mpv.alpha = 0
+//            }, completion: { isFinish in
+//                guard isFinish, self.mpv.progress > 0.999999 || target else {
+//                    return
+//                }
+//                self.mpv.setProgress(0, animated: false)
+//                self.mpv2.setProgress(0, animated: false)
+//            })
+//        })
         
     }
 }
