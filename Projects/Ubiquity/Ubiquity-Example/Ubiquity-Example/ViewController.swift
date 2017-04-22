@@ -36,7 +36,7 @@ class ViewController: UIViewController, UIActionSheetDelegate {
         switch buttonIndex {
         case 1:
             let browser = Ubiquity.Browser()
-            present(browser, animated: true, completion: nil)
+            ub_present(browser, animated: true, completion: nil)
             
 //        case 2:
 //            let browser = Ubiquity.Picker()

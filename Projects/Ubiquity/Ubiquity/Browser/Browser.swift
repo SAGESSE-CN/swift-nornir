@@ -8,11 +8,12 @@
 
 import UIKit
 
-///
 /// a media browser
-///
 public class Browser: NSObject, Container {
     
+    public var view: UIView {
+        fatalError("no imp")
+    }
     public var viewController: UIViewController {
         return BrowserListController(container: self)
     }
@@ -36,12 +37,12 @@ internal class BrowserItem: Item {
     init(_ index: Int) {
         
 //        if (index == -1) {
-//            size = .init(width: 1600, height: 1200)
+            size = .init(width: 1600, height: 1200)
 //            image = __image1
 //            size = .init(width: 3200, height: 1200)//8:3
-//            image = __image12
+//            image = __image2
 //        } else {
-            size = .init(width: 640, height: 1136)
+//            size = .init(width: 640, height: 1136)
 //            image = UIImage(named: "cl_\((index % 12) + 1)")
 //        }
     }
@@ -79,18 +80,6 @@ public extension Browser {
     public func deleteItems(at indexPaths: Array<IndexPath>) {
     }
 }
-
-///
-/// transition display support
-///
-public extension Browser {
-    weak var transitioningDelegate: AnyObject? {
-        set { return }
-        get { return nil }
-    }
-}
-
-
 
 //public class Ubiquity: BrowseDataSource, BrowseDelegate {
 //    

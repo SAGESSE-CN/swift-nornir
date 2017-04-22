@@ -12,14 +12,14 @@ internal class BrowserListCell: UICollectionViewCell {
 //    
     override init(frame: CGRect) {
         super.init(frame: frame)
-        self.setup()
+        _setup()
     }
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
-        self.setup()
+        _setup()
     }
     
-    func setup() {
+    private func _setup() {
         // set default background color
         contentView.backgroundColor = Browser.ub_backgroundColor
         
@@ -79,7 +79,7 @@ internal class BrowserListCell: UICollectionViewCell {
         if let imageView = contentView as? UIImageView {
             imageView.clipsToBounds = true
             imageView.contentMode = .scaleAspectFill
-            imageView.image = item.image?.withOrientation(orientation)
+            imageView.image = item.image?.ub_withOrientation(orientation)
         }
         
         _contentSize = item.size
@@ -97,6 +97,7 @@ internal class BrowserListCell: UICollectionViewCell {
         
         view.leftItems = [
 //            .video
+//            .panorama
         ]
         view.rightItems = [
             .downloading

@@ -8,11 +8,8 @@
 
 import UIKit
 
-///
 /// navigation controller transitioning delegate
-///
-@objc
-public protocol  UINavigationControllerTransitioningDelegate: UIViewControllerTransitioningDelegate {
+@objc internal protocol  UINavigationControllerTransitioningDelegate: UIViewControllerTransitioningDelegate {
     
     @objc optional func animationController(forPush pushed: UIViewController, from: UIViewController, source: UINavigationController) -> UIViewControllerAnimatedTransitioning?
 
@@ -25,19 +22,16 @@ public protocol  UINavigationControllerTransitioningDelegate: UIViewControllerTr
     
 }
 
-///
 /// view controller custom transitioning support
-///
-public extension UIViewController {
-    public weak var ub_transitioningDelegate: UINavigationControllerTransitioningDelegate? {
+internal extension UIViewController {
+    // contains the navigation controller transitioning animation
+    weak var ub_transitioningDelegate: UINavigationControllerTransitioningDelegate? {
         set { return transitioningDelegate = __ub_file_init(newValue) }
         get { return transitioningDelegate as? UINavigationControllerTransitioningDelegate }
     }
 }
 
-///
 /// navigation controller custom transitioning support
-///
 fileprivate extension UINavigationController {
     
     fileprivate dynamic func __ub_pushViewController(_ viewController: UIViewController, animated: Bool) {
@@ -129,8 +123,8 @@ private var __ub_file_init: (UIViewControllerTransitioningDelegate?) -> UIViewCo
     
     let cls = UINavigationController.self
     
-    let m11 = class_getInstanceMethod(cls, Selector(String("pushViewController:animated:")))
-    let m21 = class_getInstanceMethod(cls, Selector(String("popViewControllerAnimated:")))
+    let m11 = class_getInstanceMethod(cls, #selector(cls.pushViewController(_:animated:)))
+    let m21 = class_getInstanceMethod(cls, #selector(cls.popViewController(animated:)))
     
     let m12 = class_getInstanceMethod(cls, #selector(cls.__ub_pushViewController(_:animated:)))
     let m22 = class_getInstanceMethod(cls, #selector(cls.__ub_popViewController(animated:)))

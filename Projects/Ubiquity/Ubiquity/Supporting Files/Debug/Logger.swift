@@ -400,7 +400,7 @@ internal class Logger {
     }
     internal static var appender: Array<Appender> = [
         Appender.File(),
-        Appender.Console(threshold: .debug),
+        Appender.Console(threshold: .all),
     ]
 }
 

@@ -8,33 +8,34 @@
 
 import UIKit
 
-
-internal class Progress: NSObject {
-    
+internal class ProgressProxy: NSObject {
     init(frame: CGRect, owner: UIView) {
-        center = .init(x: frame.midX, y: frame.midY)
-        bounds = .init(origin: .zero, size: frame.size)
         _owner = owner
-        _forwarder = UIControl()
+        _center = .init(x: frame.midX, y: frame.midY)
+        _bounds = .init(origin: .zero, size: frame.size)
+        _forwarder = EventCenter()
         super.init()
+    }
+    
+    var bounds: CGRect {
+        set {
+            _bounds = newValue
+            _progressView?.bounds = newValue
+            _progressView?.radius = (bounds.width / 2) - 3
+        }
+        get { return _bounds }
+    }
+    var center: CGPoint {
+        set {
+            _center = newValue
+            _progressView?.center = newValue
+        }
+        get { return _center }
     }
     
     var value: Double {
         return _value
     }
-    
-    var bounds: CGRect {
-        willSet {
-            _progressView?.bounds = newValue
-            _progressView?.radius = (bounds.width / 2) - 3
-        }
-    }
-    var center: CGPoint {
-        willSet {
-            _progressView?.center = newValue
-        }
-    }
-    
     var isHidden: Bool {
         return _isForceHidden
     }
@@ -57,7 +58,6 @@ internal class Progress: NSObject {
         // update ui
         _updateProgress(value, animated: animated)
     }
-    
     func setIsHidden(_ isHidden: Bool, animated: Bool) {
         logger.trace?.write(isHidden, animated)
         
@@ -66,11 +66,15 @@ internal class Progress: NSObject {
         _updateProgress(_value, animated: animated, isForceHidden: isHidden)
     }
     
-    func addTarget(_ target: Any?, action: Selector) {
-        _forwarder.addTarget(target, action: action, for: .touchUpInside)
+    func addTarget(_ target: AnyObject, action: Selector, for controlEvents: UIControlEvents) {
+        logger.trace?.write()
+        
+        _forwarder.addTarget(target, action: action, for: controlEvents)
     }
-    func removeTarget(_ target: Any?, action: Selector?) {
-        _forwarder.removeTarget(target, action: action, for: .touchUpInside)
+    func removeTarget(_ target: AnyObject?, action: Selector?, for controlEvents: UIControlEvents) {
+        logger.trace?.write()
+        
+        _forwarder.removeTarget(target, action: action, for: controlEvents)
     }
     
     private func _updateProgress(_ progress: Double, animated: Bool, isForceHidden: Bool? = nil) {
@@ -91,9 +95,9 @@ internal class Progress: NSObject {
             progressView.progress = progress
             progressView.radius = (bounds.width / 2) - 3
             progressView.alpha = isHidden ? 0 : 1
-            progressView.addTarget(self, action: #selector(_handleRetry(_:)), for: .touchUpInside)
             
             _owner.addSubview(progressView)
+            _forwarder.apply(progressView)
             _progressView = progressView
             
             return progressView
@@ -152,27 +156,28 @@ internal class Progress: NSObject {
             })
         })
     }
-    private dynamic func _handleRetry(_ o: Any) {
-        _forwarder.sendActions(for: .touchUpInside)
-    }
+    
+    private var _bounds: CGRect
+    private var _center: CGPoint
     
     private var _value: Double = 1.0
     private var _isForceHidden: Bool = false
     
     private var _owner: UIView
-    private var _forwarder: UIControl
+    private var _forwarder: EventCenter
     private var _progressView: ProgressView?
 }
+
 
 internal class ProgressView: UIControl {
    
     override init(frame: CGRect) {
         super.init(frame: frame)
-        self.setup()
+        _setup()
     }
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
-        self.setup()
+        _setup()
     }
     
     var fillColor: UIColor? {
@@ -237,7 +242,7 @@ internal class ProgressView: UIControl {
         return ProgressLayer.self
     }
     
-    private func setup() {
+    private func _setup() {
         
         backgroundColor = .clear
         
@@ -257,15 +262,15 @@ internal class ProgressLayer: CAShapeLayer {
     
     override init() {
         super.init()
-        setup()
+        _setup()
     }
     override init(layer: Any) {
         super.init(layer: layer)
-        setup()
+        _setup()
     }
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
-        setup()
+        _setup()
     }
     
     @NSManaged var radius: CGFloat
@@ -388,7 +393,7 @@ internal class ProgressLayer: CAShapeLayer {
         return _cacheIconPath!
     }
     
-    private func setup() {
+    private func _setup() {
         
         lineCap = kCALineCapRound
         lineJoin = kCALineJoinRound
@@ -416,3 +421,4 @@ internal class ProgressLayer: CAShapeLayer {
         return presentation()?.progress ?? progress
     }
 }
+

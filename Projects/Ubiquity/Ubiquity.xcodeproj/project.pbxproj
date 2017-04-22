@@ -9,7 +9,7 @@
 /* Begin PBXBuildFile section */
 		0C16F8751EA6026500C788C5 /* BadgeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C16F8741EA6026500C788C5 /* BadgeView.swift */; };
 		0C16F8771EA61D2500C788C5 /* UIImage+Module.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C16F8761EA61D2500C788C5 /* UIImage+Module.swift */; };
-		0C16F8791EA660F000C788C5 /* Progress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C16F8781EA660F000C788C5 /* Progress.swift */; };
+		0C16F8791EA660F000C788C5 /* ProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C16F8781EA660F000C788C5 /* ProgressView.swift */; };
 		0C72B7631E7C372B00877797 /* IndicatorItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C72B7621E7C372B00877797 /* IndicatorItem.swift */; };
 		0C879F291E7EB63F00E55741 /* UINavigationController+Transitioning.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C879F281E7EB63F00E55741 /* UINavigationController+Transitioning.swift */; };
 		0C8FEE5C1E8BBD710096EC4C /* UIImageOrientation+Angle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C8FEE5B1E8BBD710096EC4C /* UIImageOrientation+Angle.swift */; };
@@ -57,6 +57,8 @@
 		0CE49EA31E7AB11D0058F5F8 /* Debugger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE49EA01E7AB11D0058F5F8 /* Debugger.swift */; };
 		0CE49EA41E7AB11D0058F5F8 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE49EA11E7AB11D0058F5F8 /* Logger.swift */; };
 		0CE49EA51E7AB11D0058F5F8 /* UIColor+Random.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE49EA21E7AB11D0058F5F8 /* UIColor+Random.swift */; };
+		0CF3A3A31EA7AC5D00810A39 /* ConsoleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF3A3A21EA7AC5D00810A39 /* ConsoleView.swift */; };
+		0CF972EC1EA90A8C0019CFB9 /* EventCenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF972EB1EA90A8C0019CFB9 /* EventCenter.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -72,7 +74,7 @@
 /* Begin PBXFileReference section */
 		0C16F8741EA6026500C788C5 /* BadgeView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BadgeView.swift; sourceTree = "<group>"; };
 		0C16F8761EA61D2500C788C5 /* UIImage+Module.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIImage+Module.swift"; sourceTree = "<group>"; };
-		0C16F8781EA660F000C788C5 /* Progress.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Progress.swift; sourceTree = "<group>"; };
+		0C16F8781EA660F000C788C5 /* ProgressView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProgressView.swift; sourceTree = "<group>"; };
 		0C72B7621E7C372B00877797 /* IndicatorItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IndicatorItem.swift; sourceTree = "<group>"; };
 		0C879F281E7EB63F00E55741 /* UINavigationController+Transitioning.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UINavigationController+Transitioning.swift"; sourceTree = "<group>"; };
 		0C8FEE5B1E8BBD710096EC4C /* UIImageOrientation+Angle.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIImageOrientation+Angle.swift"; sourceTree = "<group>"; };
@@ -124,6 +126,8 @@
 		0CE49EA01E7AB11D0058F5F8 /* Debugger.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Debugger.swift; sourceTree = "<group>"; };
 		0CE49EA11E7AB11D0058F5F8 /* Logger.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
 		0CE49EA21E7AB11D0058F5F8 /* UIColor+Random.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIColor+Random.swift"; sourceTree = "<group>"; };
+		0CF3A3A21EA7AC5D00810A39 /* ConsoleView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleView.swift; sourceTree = "<group>"; };
+		0CF972EB1EA90A8C0019CFB9 /* EventCenter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EventCenter.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -245,9 +249,11 @@
 			children = (
 				0CE49E9A1E7AB1130058F5F8 /* Extension */,
 				0CE0DAB61E8121F400A0E8CC /* Animator.swift */,
-				0C16F8781EA660F000C788C5 /* Progress.swift */,
 				0C16F8741EA6026500C788C5 /* BadgeView.swift */,
 				0CE49E811E7AAF760058F5F8 /* CanvasView.swift */,
+				0CF3A3A21EA7AC5D00810A39 /* ConsoleView.swift */,
+				0C16F8781EA660F000C788C5 /* ProgressView.swift */,
+				0CF972EB1EA90A8C0019CFB9 /* EventCenter.swift */,
 				0CE49E821E7AAF760058F5F8 /* ExtendedItem.swift */,
 				0CE49E831E7AAF760058F5F8 /* ExtendedToolbar.swift */,
 				0C72B7621E7C372B00877797 /* IndicatorItem.swift */,
@@ -430,7 +436,7 @@
 				0C8FEE5C1E8BBD710096EC4C /* UIImageOrientation+Angle.swift in Sources */,
 				0CE49EA31E7AB11D0058F5F8 /* Debugger.swift in Sources */,
 				0CE49E8A1E7AAF760058F5F8 /* CanvasView.swift in Sources */,
-				0C16F8791EA660F000C788C5 /* Progress.swift in Sources */,
+				0C16F8791EA660F000C788C5 /* ProgressView.swift in Sources */,
 				0CE49E8C1E7AAF760058F5F8 /* ExtendedToolbar.swift in Sources */,
 				0CE49E611E7A7D900058F5F8 /* BrowserController.swift in Sources */,
 				0C8FEE5E1E8BBF540096EC4C /* CGRect+Align.swift in Sources */,
@@ -449,6 +455,8 @@
 				0CE49E8E1E7AAF760058F5F8 /* IndicatorViewCell.swift in Sources */,
 				0CE49E691E7A9CE50058F5F8 /* BrowserListCell.swift in Sources */,
 				0CE49E991E7AB0200058F5F8 /* Ubiquity.swift in Sources */,
+				0CF3A3A31EA7AC5D00810A39 /* ConsoleView.swift in Sources */,
+				0CF972EC1EA90A8C0019CFB9 /* EventCenter.swift in Sources */,
 				0C879F291E7EB63F00E55741 /* UINavigationController+Transitioning.swift in Sources */,
 				0CE49E8B1E7AAF760058F5F8 /* ExtendedItem.swift in Sources */,
 				0C16F8771EA61D2500C788C5 /* UIImage+Module.swift in Sources */,

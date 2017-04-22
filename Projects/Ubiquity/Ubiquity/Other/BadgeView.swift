@@ -52,14 +52,14 @@ internal class BadgeView: UIView {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        self.setup()
+        _setup()
     }
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
-        self.setup()
+        _setup()
     }
     
-    func setup() {
+    private func _setup() {
         //_updateBackgroundImage()
         _needUpdateVisableViews = true
     }

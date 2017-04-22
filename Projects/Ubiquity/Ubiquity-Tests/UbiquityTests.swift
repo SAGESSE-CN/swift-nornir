@@ -10,8 +10,8 @@ import XCTest
 
 class UbiquityTests: XCTestCase {
     
-    override func setUp() {
-        super.setUp()
+    override private func _setup() {
+        super._setup()
         // Put setup code here. This method is called before the invocation of each test method in the class.
     }
     

@@ -10,6 +10,20 @@ import UIKit
 
 
 internal extension UIImage {
+    
+    func ub_withOrientation(_ orientation: UIImageOrientation) -> UIImage? {
+        guard imageOrientation != orientation else {
+            return self
+        }
+        if let image = cgImage {
+            return UIImage(cgImage: image, scale: scale, orientation: orientation)
+        }
+        if let image = ciImage {
+            return UIImage(ciImage: image, scale: scale, orientation: orientation)
+        }
+        return nil
+    }
+    
     static func ub_init(named: String) -> UIImage? {
         return UIImage(named: named, in: _bundle, compatibleWith: nil)
     }

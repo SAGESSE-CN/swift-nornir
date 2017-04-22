@@ -8,6 +8,10 @@
 
 import UIKit
 
+//extension UIToolbar{
+//    @NSManaged func defaultSizeForOrientation(_ or: UIInterfaceOrientation) -> CGSize
+//}
+
 internal class ExtendedToolbar: UIToolbar {
     
     override var items: [UIBarButtonItem]? {
@@ -30,6 +34,8 @@ internal class ExtendedToolbar: UIToolbar {
         })
         _setLines(lines, animated: animated)
     }
+//    override func setItems(_ items: [UIBarButtonItem]?, animated: Bool) {
+//    }
     
     private func _setLines(_ lines: [[UIBarButtonItem]]?, animated: Bool) {
         

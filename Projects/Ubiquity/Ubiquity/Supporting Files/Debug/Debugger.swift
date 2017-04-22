@@ -67,18 +67,12 @@ internal class Debugger: UIView {
         rects.forEach {
             context?.setStrokeColor(color(with: $0).cgColor)
             context?.beginPath()
-            // x1
-            context?.move(to: CGPoint(x: bounds.minX, y: $1.minY))
-            context?.addLine(to: CGPoint(x: bounds.maxX, y: $1.minY))
-            // x2
-            context?.move(to: CGPoint(x: bounds.minX, y: $1.maxY))
-            context?.addLine(to: CGPoint(x: bounds.maxX, y: $1.maxY))
-            // y1
-            context?.move(to: CGPoint(x: $1.minX, y: bounds.minY))
-            context?.addLine(to: CGPoint(x: $1.minX, y: bounds.maxY))
-            // y2
-            context?.move(to: CGPoint(x: $1.maxX, y: bounds.minY))
-            context?.addLine(to: CGPoint(x: $1.maxX, y: bounds.maxY))
+            
+            context?.move(to: .init(x: $1.minX, y: $1.minY))
+            context?.addLine(to: .init(x: $1.maxX, y: $1.minY))
+            context?.addLine(to: .init(x: $1.maxX, y: $1.maxY))
+            context?.addLine(to: .init(x: $1.minX, y: $1.maxY))
+            context?.addLine(to: .init(x: $1.minX, y: $1.minY))
             
             context?.strokePath()
         }

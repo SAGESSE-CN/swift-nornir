@@ -61,7 +61,7 @@ class TestCanvasViewController: UIViewController, Ubiquity.CanvasViewDelegate {
         return true
     }
     func canvasViewDidEndRotationing(_ canvasView: CanvasView, with view: UIView?, atOrientation orientation: UIImageOrientation) {
-        imageView.image = imageView.image?.withOrientation(orientation)
+        imageView.image = imageView.image?.ub_withOrientation(orientation)
         
     }
     
