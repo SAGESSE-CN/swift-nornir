@@ -52,7 +52,7 @@ extension BrowserListController: UICollectionViewDelegateFlowLayout {
         guard let cell =  cell as? BrowserListCell else {
             return
         }
-        return cell.apply(with: container.item(at: indexPath))
+        return cell.apply(with: container.item(at: indexPath), orientation: .up)
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {

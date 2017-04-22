@@ -15,6 +15,9 @@ internal protocol TransitioningView: class {
     var ub_transform: CGAffineTransform { get }
     
     func ub_snapshotView(with context: TransitioningContext) -> UIView?
+    
+    func ub_transitionDidStart(_ context: TransitioningContext)
+    func ub_transitionDidEnd(_ didComplete: Bool)
 }
 internal protocol TransitioningContext: class {
     
@@ -49,26 +52,6 @@ internal protocol TransitioningDataSource: class {
     func ub_transitionWillEnd(using animator: Animator, context: TransitioningContext, transitionCompleted: Bool)
     func ub_transitionDidEnd(using animator: Animator, transitionCompleted: Bool)
 }
-internal extension TransitioningDataSource {
-    
-    func ub_transitionShouldStartInteractive(using animator: Animator, for key: Animator.Operation) -> Bool {
-        return false
-    }
-    
-    func ub_transitionDidPrepare(using animator: Animator, context: TransitioningContext) {
-        // the default implementation is empty
-    }
-    func ub_transitionDidStart(using animator: Animator, context: TransitioningContext) {
-        // the default implementation is empty
-    }
-    func ub_transitionWillEnd(using animator: Animator, context: TransitioningContext, transitionCompleted: Bool) {
-        // the default implementation is empty
-    }
-    func ub_transitionDidEnd(using animator: Animator, transitionCompleted: Bool) {
-        // the default implementation is empty
-    }
-}
-
 
 internal class Animator: NSObject {
     enum Content: Int {
@@ -457,6 +440,9 @@ extension Animator {
             // notice delegate start
             animator.source?.ub_transitionDidStart(using: animator, context: self)
             animator.destination?.ub_transitionDidStart(using: animator, context: self)
+            // notice transitioning view
+            ub_transitioningView(for: .source)?.ub_transitionDidStart(self)
+            ub_transitioningView(for: .destination)?.ub_transitionDidStart(self)
         }
         func complete(_ completed: Bool) {
             logger.trace?.write(completed)
@@ -471,6 +457,9 @@ extension Animator {
             // notice delegate
             animator.source?.ub_transitionDidEnd(using: animator, transitionCompleted: completed)
             animator.destination?.ub_transitionDidEnd(using: animator, transitionCompleted: completed)
+            // notice transitioning view
+            ub_transitioningView(for: .source)?.ub_transitionDidEnd(completed)
+            ub_transitioningView(for: .destination)?.ub_transitionDidEnd(completed)
             // commit
             context.completeTransition(completed)
         }
@@ -597,3 +586,33 @@ extension Animator {
         private var _percentComplete: CGFloat = 0
     }
 }
+
+internal extension TransitioningView {
+    
+    func ub_transitionDidStart(_ context: TransitioningContext) {
+        // the default implementation is empty
+    }
+    func ub_transitionDidEnd(_ didComplete: Bool) {
+        // the default implementation is empty
+    }
+}
+internal extension TransitioningDataSource {
+    
+    func ub_transitionShouldStartInteractive(using animator: Animator, for key: Animator.Operation) -> Bool {
+        return false
+    }
+    
+    func ub_transitionDidPrepare(using animator: Animator, context: TransitioningContext) {
+        // the default implementation is empty
+    }
+    func ub_transitionDidStart(using animator: Animator, context: TransitioningContext) {
+        // the default implementation is empty
+    }
+    func ub_transitionWillEnd(using animator: Animator, context: TransitioningContext, transitionCompleted: Bool) {
+        // the default implementation is empty
+    }
+    func ub_transitionDidEnd(using animator: Animator, transitionCompleted: Bool) {
+        // the default implementation is empty
+    }
+}
+

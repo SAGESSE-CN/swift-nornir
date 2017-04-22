@@ -13,7 +13,8 @@ internal class VideoView: UIView, ItemContainer {
     /// update container content with item
     ///
     /// - parameter item: resource abstract of item
+    /// - parameter orientation: item display orientation
     ///
-    func apply(with item: Item) {
+    func apply(with item: Item, orientation: UIImageOrientation) {
     }
 }

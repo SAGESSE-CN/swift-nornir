@@ -8,7 +8,7 @@
 
 import UIKit
 
-internal class ConsoleProxy: NSObject, CAAnimationDelegate {
+internal class ConsoleProxy: NSObject {
     
     init(frame: CGRect, owner: UIView) {
         _owner = owner
@@ -34,15 +34,21 @@ internal class ConsoleProxy: NSObject, CAAnimationDelegate {
     }
     
     func setState(_ state: ConsoleView.State, animated: Bool) {
+        // state hav any change?
+        guard _state != state else {
+            return // no change
+        }
         logger.trace?.write(state, animated)
-        
         _updateState(state, animated: animated)
         _state = state
     }
     
     func setIsHidden(_ isHidden: Bool, animated: Bool) {
+        // if state is none, ignore hidden event
+        guard _state != .none else {
+            return
+        }
         logger.trace?.write(isHidden, animated)
-        
         _updateState(_state, animated: animated, isForceHidden: isHidden)
     }
     
@@ -70,7 +76,7 @@ internal class ConsoleProxy: NSObject, CAAnimationDelegate {
             consoleView.center = center
             consoleView.alpha = 0
             
-            _owner.addSubview(consoleView)
+            _owner?.addSubview(consoleView)
             _forwarder.apply(consoleView)
             _consoleView = consoleView
             
@@ -80,11 +86,10 @@ internal class ConsoleProxy: NSObject, CAAnimationDelegate {
         // need animation?
         guard animated else {
             // no
-            consoleView.alpha = 1
-            consoleView.isHidden = isHidden
+            consoleView.alpha = isHidden ? 0 : 1
             consoleView.setState(state, animated: animated)
             // if it is none, remove consoleview
-            guard isNone else {
+            guard _state == .none else {
                 return
             }
             _consoleView?.removeFromSuperview()
@@ -92,30 +97,24 @@ internal class ConsoleProxy: NSObject, CAAnimationDelegate {
             return
         }
         
-        let from: Float = consoleView.layer.presentation()?.opacity ?? consoleView.layer.opacity
-        let to: Float = isHidden ? 0 : 1
-        // don't use block the animation because
-        // he could not continue to animation from the previous value画
-        let ani = CABasicAnimation(keyPath: "opacity")
-        ani.fromValue = from
-        ani.toValue = to
-        ani.duration = TimeInterval(fabs(from - to)) * 0.25
-        ani.delegate = self
-        consoleView.layer.opacity = to
-        consoleView.layer.add(ani, forKey: "opacity")
-        // upload state
-        UIView.animate(withDuration: 0.25, animations: {
-            consoleView.setState(state, animated: animated)
+        let from = CGFloat(consoleView.layer.presentation()?.opacity ?? consoleView.layer.opacity)
+        let to = CGFloat(isHidden ? 0 : 1)
+        
+        consoleView.alpha = from
+        consoleView.setState(state, animated: animated)
+        
+        UIView.animate(withDuration: 0.25 * TimeInterval(fabs(from - to)), animations: {
+            
+            consoleView.alpha = to
+            
+        }, completion: { finished in
+            guard finished, isNone else {
+                return
+            }
+            // state is none, remove
+            self._consoleView?.removeFromSuperview()
+            self._consoleView = nil
         })
-    }
-    
-    func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
-        guard _state == .none, flag else {
-            return
-        }
-        // state is none, remove
-        _consoleView?.removeFromSuperview()
-        _consoleView = nil
     }
     
     private var _bounds: CGRect
@@ -124,9 +123,10 @@ internal class ConsoleProxy: NSObject, CAAnimationDelegate {
     private var _state: ConsoleView.State = .none
     private var _isHidden: Bool = true
     
-    private var _owner: UIView
     private var _forwarder: EventCenter
     private var _consoleView: ConsoleView?
+    
+    private weak var _owner: UIView?
 }
 
 internal class ConsoleView: UIControl {
@@ -159,7 +159,15 @@ internal class ConsoleView: UIControl {
     }
     
     func setState(_ state: State, animated: Bool) {
+        guard _state != state else {
+            return // no change
+        }
         _state = state
+        
+        if animated {
+            UIView.beginAnimations(nil, context: nil)
+            UIView.setAnimationDuration(0.25)
+        }
         
         switch state {
         case .none:
@@ -183,6 +191,9 @@ internal class ConsoleView: UIControl {
             _indicatorView.startAnimating()
         }
         
+        if animated {
+            UIView.commitAnimations()
+        }
     }
     
     override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {

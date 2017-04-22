@@ -13,9 +13,10 @@ internal class ImageView: UIImageView, ItemContainer {
     /// update container content with item
     ///
     /// - parameter item: resource abstract of item
+    /// - parameter orientation: item display orientation
     ///
-    func apply(with item: Item) {
-        image = item.image
+    func apply(with item: Item, orientation: UIImageOrientation) {
+        image = item.image?.ub_withOrientation(orientation)
     }
     
     override func snapshotView(afterScreenUpdates afterUpdates: Bool) -> UIView? {

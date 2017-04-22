@@ -41,6 +41,10 @@ internal class ProgressProxy: NSObject {
     }
     
     func setValue(_ value: Double, animated: Bool) {
+        // value have any change?
+        guard _value != value else {
+            return // no change
+        }
         logger.trace?.write(value, animated)
         
         // update value
@@ -59,8 +63,11 @@ internal class ProgressProxy: NSObject {
         _updateProgress(value, animated: animated)
     }
     func setIsHidden(_ isHidden: Bool, animated: Bool) {
+        // progress is full
+        guard _valueOfPresentation <= 0.999999 else {
+            return
+        }
         logger.trace?.write(isHidden, animated)
-        
         // set force hidden flag
         _isForceHidden = isHidden
         _updateProgress(_value, animated: animated, isForceHidden: isHidden)
@@ -96,12 +103,14 @@ internal class ProgressProxy: NSObject {
             progressView.radius = (bounds.width / 2) - 3
             progressView.alpha = isHidden ? 0 : 1
             
-            _owner.addSubview(progressView)
+            _owner?.addSubview(progressView)
             _forwarder.apply(progressView)
             _progressView = progressView
             
             return progressView
         }()
+        // update to presentation value
+        _valueOfPresentation = progress
         // need update animate?
         guard animated else {
             // if don't need animation
@@ -146,7 +155,7 @@ internal class ProgressProxy: NSObject {
                     
                 }, completion: { finished in
                     // if this failure, that have a new alpha
-                    guard finished else {
+                    guard finished, isFull else {
                         return
                     }
                     // clear if need
@@ -161,11 +170,13 @@ internal class ProgressProxy: NSObject {
     private var _center: CGPoint
     
     private var _value: Double = 1.0
+    private var _valueOfPresentation: Double = 1.0
     private var _isForceHidden: Bool = false
     
-    private var _owner: UIView
     private var _forwarder: EventCenter
     private var _progressView: ProgressView?
+    
+    private weak var _owner: UIView?
 }
 
 
