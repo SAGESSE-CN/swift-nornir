@@ -8,8 +8,8 @@
 
 import UIKit
 
-internal class BrowserListCell: UICollectionViewCell {
-//    
+internal class BrowserListCell: UICollectionViewCell, ItemContainer {
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         _setup()
@@ -72,7 +72,12 @@ internal class BrowserListCell: UICollectionViewCell {
 //    private lazy var _previewView = UIImageView(frame: .zero)
 //    private lazy var _badgeBar = IBBadgeBar(frame: .zero)
     
-    func apply(for item: Item) {
+    ///
+    /// update container content with item
+    ///
+    /// - parameter item: resource abstract of item
+    ///
+    func apply(with item: Item) {
         
         //backgroundColor = item.backgroundColor
         
@@ -124,8 +129,8 @@ extension BrowserListCell: TransitioningView {
         return contentView.transform.rotated(by: orientation.ub_angle)
     }
     
-    func ub_snapshotView(afterScreenUpdates: Bool) -> UIView? {
-        return contentView.snapshotView(afterScreenUpdates: afterScreenUpdates)
+    func ub_snapshotView(with context: TransitioningContext) -> UIView? {
+        return contentView.snapshotView(afterScreenUpdates: context.ub_operation.appear)
     }
 }
 

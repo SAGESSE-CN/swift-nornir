@@ -48,6 +48,7 @@ internal class BrowserDetailController: UICollectionViewController {
         interactiveDismissGestureRecognizer.delegate = self
         interactiveDismissGestureRecognizer.maximumNumberOfTouches = 1
         interactiveDismissGestureRecognizer.addTarget(self, action: #selector(handleDismiss(_:)))
+        
         view.addGestureRecognizer(interactiveDismissGestureRecognizer)
         
         // setup colleciton view
@@ -61,7 +62,8 @@ internal class BrowserDetailController: UICollectionViewController {
         collectionView?.allowsMultipleSelection = false
         collectionView?.allowsSelection = false
         collectionView?.backgroundColor = .white
-        collectionView?.register(BrowserDetailCell.dynamic(with: UIImageView.self), forCellWithReuseIdentifier: "ASSET-DETAIL-IMAGE")
+        collectionView?.register(BrowserDetailCell.dynamic(with: ImageView.self), forCellWithReuseIdentifier: "ASSET-DETAIL-IMAGE")
+        collectionView?.register(BrowserDetailCell.dynamic(with: VideoView.self), forCellWithReuseIdentifier: "ASSET-DETAIL-VIDEO")
         
         // setup indicator 
         indicatorItem.delegate = self
@@ -115,6 +117,7 @@ internal class BrowserDetailController: UICollectionViewController {
     
     let indicatorItem = IndicatorItem()
     let interactiveDismissGestureRecognizer = UIPanGestureRecognizer()
+    let tapGestureRecognizer = UITapGestureRecognizer()
     
     let extraContentInset = UIEdgeInsetsMake(0, -20, 0, -20)
     
@@ -145,22 +148,13 @@ internal class BrowserDetailController: UICollectionViewController {
     fileprivate var _interactivingToIndexPath: IndexPath?
     
     fileprivate var _currentItem: UICollectionViewLayoutAttributes?
-    fileprivate var _currentIndexPath: IndexPath? {
-        willSet {
-//            guard let newValue = newValue else {
-//                return 
-//            }
-//            animator?.indexPath = newValue
-        }
-    }
+    fileprivate var _currentIndexPath: IndexPath?
     
     fileprivate var _ignoreContentOffsetChange = false
     fileprivate var _systemContentInset: UIEdgeInsets = .zero
 }
 
-///
 /// Provide collection view display support
-///
 extension BrowserDetailController: UICollectionViewDelegateFlowLayout {
     
     override func numberOfSections(in collectionView: UICollectionView) -> Int {
@@ -177,8 +171,8 @@ extension BrowserDetailController: UICollectionViewDelegateFlowLayout {
         guard let cell =  cell as? BrowserDetailCell else {
             return
         }
-        cell.apply(for: _systemContentInset)
-        cell.apply(for: container.item(at: indexPath))
+        cell.apply(with: _systemContentInset)
+        cell.apply(with: container.item(at: indexPath))
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
@@ -293,7 +287,7 @@ extension BrowserDetailController: UICollectionViewDelegateFlowLayout {
         logger.trace?.write(contentInset)
         // notice all displayed cell
         collectionView?.visibleCells.forEach {
-            ($0 as? BrowserDetailCell)?.apply(for: contentInset)
+            ($0 as? BrowserDetailCell)?.apply(with: contentInset)
         }
         // update cache
         _systemContentInset = contentInset
@@ -308,72 +302,13 @@ extension BrowserDetailController: UICollectionViewDelegateFlowLayout {
         return result
     }
     
-    
-//    func numberOfSections(in collectionView: UICollectionView) -> Int {
-//        return dataSource?.numberOfSections(in: self) ?? 0
-//    }
-//    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-//        return dataSource?.browser(self, numberOfItemsInSection: section) ?? 0
-//    }
-//    
-//    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-//        return collectionView.dequeueReusableCell(withReuseIdentifier: "Asset", for: indexPath)
-//    }
-//    func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-//        guard let cell = cell as? BrowseDetailViewCell else {
-//            return
-//        }
-//        // 更新属性
-//        cell.apply(dataSource?.browser(self, assetForItemAt: indexPath))
-//        
-//        cell.delegate = self
-//        cell.contentInset = _currentContentInset
-//    }
-//    func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-//        guard let cell = cell as? BrowseDetailViewCell else {
-//            return
-//        }
-//        // 清除属性
-//        cell.apply(nil)
-//    }
-//    
-//
-//    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-//        //dismissHandler(indexPath)
-//    }
-    
-//
-//    
-//
-//}
-//
-//extension BrowseDetailViewController: BrowseDetailViewDelegate, UINavigationBarDelegate {
-//    
-//    func navigationBar(_ navigationBar: UINavigationBar, shouldPop item: UINavigationItem) -> Bool {
-//        // 正在旋转的时候不允许返回
-//        guard collectionView.isScrollEnabled else {
-//            return false
-//        }
-//        
-//        return true
-//    }
-//    
-//    func browseDetailView(_ browseDetailView: Any, _ containerView: IBScrollView, shouldBeginRotationing view: UIView?) -> Bool {
-//        collectionView.isScrollEnabled = false
-//        return true
-//    }
-//    func browseDetailView(_ browseDetailView: Any, _ containerView: IBScrollView, didEndRotationing view: UIView?, atOrientation orientation: UIImageOrientation) {
-//        collectionView.isScrollEnabled = true
-//    }
 }
 
-///
 /// Provide dismiss gesture recognizer support
-///
 extension BrowserDetailController: UIGestureRecognizerDelegate {
     
     func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
-        if  interactiveDismissGestureRecognizer == gestureRecognizer  {
+        if interactiveDismissGestureRecognizer == gestureRecognizer {
             let velocity = interactiveDismissGestureRecognizer.velocity(in: collectionView)
             // detect the direction of gestures => up or down
             guard fabs(velocity.x / velocity.y) < 1.5 else {
@@ -394,7 +329,7 @@ extension BrowserDetailController: UIGestureRecognizerDelegate {
     
     func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
         // only process dismiss gesture recognizer
-        if interactiveDismissGestureRecognizer == gestureRecognizer  {
+        if interactiveDismissGestureRecognizer == gestureRecognizer {
             // if it has started to interact, it is the exclusive mode
             guard !_transitionIsInteractiving else {
                 return false

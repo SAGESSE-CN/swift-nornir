@@ -38,7 +38,7 @@ internal class BrowserItem: Item {
         
 //        if (index == -1) {
             size = .init(width: 1600, height: 1200)
-//            image = __image1
+            image = __image1
 //            size = .init(width: 3200, height: 1200)//8:3
 //            image = __image2
 //        } else {
@@ -54,9 +54,7 @@ internal class BrowserItem: Item {
 fileprivate var __image1 = UIImage(named: "t1")
 fileprivate var __image2 = UIImage(named: "t2")
 
-///
 /// data fetch & update
-///
 public extension Browser {
     
     public weak var dataSource: AnyObject? {

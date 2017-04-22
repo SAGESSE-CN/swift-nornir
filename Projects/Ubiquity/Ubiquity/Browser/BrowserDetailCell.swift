@@ -8,7 +8,7 @@
 
 import UIKit
 
-internal class BrowserDetailCell: UICollectionViewCell {
+internal class BrowserDetailCell: UICollectionViewCell, ItemContainer {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -31,48 +31,36 @@ internal class BrowserDetailCell: UICollectionViewCell {
     //var orientation: UIImageOrientation = .right
     //var orientation: UIImageOrientation = .down
     
-//    var asset: Browseable?
-//    
-//    var orientation: UIImageOrientation = .up
-//    
-//    weak var delegate: BrowseDetailViewDelegate?
-//
-    
-//    var contentInset: UIEdgeInsets = .zero {
-//        didSet {
-//            guard contentInset != oldValue else {
-//                return
-//            }
-//            _updateIconLayoutIfNeeded()
-//            _updateProgressLayoutIfNeeded()
-//        }
-//    }
-    
-    override func prepareForReuse() {
-        super.prepareForReuse()
-    }
-    
-    func apply(for item: Item) {
+    ///
+    /// update container content with item
+    ///
+    /// - parameter item: resource abstract of item
+    ///
+    func apply(with item: Item) {
         logger.trace?.write(item.size)
         
+        // update canvas
         containerView?.contentSize = item.size
         containerView?.zoom(to: bounds , with: orientation, animated: false)
         
-        if let imageView = detailView as? UIImageView {
-            imageView.image = item.image?.ub_withOrientation(orientation)
-        }
-        _contentSize = item.size
-        
-        // 初始化状态
-        //_console?.setState(.waiting, animated: false)
-        _console?.setState(.stop, animated: false)
+        // update init state
         _progress?.setValue(-1, animated: false)
+        _console?.setState(.stop, animated: false)
+        
+        // update content
+        (detailView as? ItemContainer)?.apply(with: item)
     }
-    func apply(for contentInset: UIEdgeInsets) {
+    ///
+    /// update container content inset
+    ///
+    /// - parameter contentInset: new content inset
+    ///
+    func apply(with contentInset: UIEdgeInsets) {
         logger.trace?.write(contentInset)
         
         _contentInset = contentInset
         
+        // need update layout
         setNeedsLayout()
     }
     
@@ -95,14 +83,6 @@ internal class BrowserDetailCell: UICollectionViewCell {
     override func layoutSubviews() {
         super.layoutSubviews()
         
-//        if _cachedBounds != bounds {
-//            _cachedBounds = bounds
-//            // update the utility view layout
-//            updateConsoleViewLayout()
-//            //_updateIconLayoutIfNeeded()
-//            //_updateConsoleLayoutIfNeeded()
-//        }
-        
         // update utility view
         _progress?.center = _progressCenter
         _console?.center = _consoleCenter
@@ -117,10 +97,16 @@ internal class BrowserDetailCell: UICollectionViewCell {
         // setup container view if needed
         if let containerView = _containerView {
             containerView.delegate = self
-            // add double tap recognizer
+            // add tap recognizer
+            let tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(handleTap(_:)))
             let doubleTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(handleDoubleTap(_:)))
+            
             doubleTapRecognizer.numberOfTapsRequired = 2
+            tapRecognizer.numberOfTapsRequired = 1
+            tapRecognizer.require(toFail: doubleTapRecognizer)
+            
             containerView.addGestureRecognizer(doubleTapRecognizer)
+            containerView.addGestureRecognizer(tapRecognizer)
         }
         // setup detail view if needed
         if let detailView = _detailView {
@@ -135,22 +121,6 @@ internal class BrowserDetailCell: UICollectionViewCell {
         // setup progress
         _progress = ProgressProxy(frame: .init(x: 0, y: 0, width: 24, height: 24), owner: self)
         _progress?.addTarget(self, action: #selector(handleRetry(_:)), for: .touchUpInside)
-        
-//    fileprivate lazy var _consoleView = IBVideoConsoleView(frame: CGRect(x: 0, y: 0, width: 70, height: 70))
-        
-//        _typeView.frame = CGRect(x: 0, y: 0, width: 60, height: 26)
-//        _typeView.titleLabel?.font = UIFont.systemFont(ofSize: 14)
-//        _typeView.titleEdgeInsets = UIEdgeInsetsMake(0, 4, 0, -4)
-//        _typeView.isUserInteractionEnabled = false
-//        _typeView.backgroundColor = UIColor.white.withAlphaComponent(0.25)
-//        _typeView.tintColor = UIColor.black.withAlphaComponent(0.6)
-//        _typeView.layer.cornerRadius = 3
-//        _typeView.layer.masksToBounds = true
-//        
-//        _typeView.setTitle("HDR", for: .normal)
-//        _typeView.setImage(UIImage(named: "browse_badge_hdr"), for: .normal)
-//
-//        _consoleView.delegate = self
     }
     
     dynamic func handleRetry(_ sender: Any) {
@@ -172,10 +142,13 @@ internal class BrowserDetailCell: UICollectionViewCell {
         self._console?.setState(.waiting, animated: true)
         DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(3), execute: {
             self._console?.setState(.playing, animated: true)
-            DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(5), execute: {
-                self._console?.setState(.none, animated: true)
+            DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(10), execute: {
+                self._console?.setState(.stop, animated: true)
             })
         })
+    }
+    dynamic func handleTap(_ sender: UITapGestureRecognizer) {
+        logger.trace?.write()
     }
     dynamic func handleDoubleTap(_ sender: UITapGestureRecognizer) {
         logger.trace?.write()
@@ -239,9 +212,6 @@ internal class BrowserDetailCell: UICollectionViewCell {
 //        
 //    }
 //    
-//    
-//    fileprivate var _asset: Browseable?
-//    
 //    // MARK: Value
 //    
 //    fileprivate func _updateType(_ type: IBAssetType, animated: Bool) {
@@ -303,56 +273,16 @@ internal class BrowserDetailCell: UICollectionViewCell {
 //        }
 //    }
 //
-//    // MARK: Layout & Auto Lock
-//    
-//    fileprivate func _updateConsoleLock(_ lock: Bool, animated: Bool) {
-//        guard _consoleOfLock != lock && !_progressOfHidden else {
-//            return
-//        }
-//        _consoleOfLock = lock
-//        _consoleView.updateFocus(!lock, animated: animated)
-//    }
-//
-//    fileprivate func _updateIconLayoutIfNeeded() {
-//        guard _typeView.superview != nil else {
-//            return
-//        }
-//        let edg = _containerInset
-//        let bounds = UIEdgeInsetsInsetRect(self.bounds, contentInset)
-//       
-//        var nframe = _typeView.frame
-//        nframe.origin.x = bounds.minX + edg.left
-//        nframe.origin.y = bounds.minY + edg.top
-//        nframe.size.height = 27
-//        _typeView.frame = nframe
-//    }
-//    fileprivate func _updateConsoleLayoutIfNeeded() {
-//        guard _consoleView.superview != nil else {
-//            return
-//        }
-//        _consoleView.center = CGPoint(x: bounds.width / 2, y: bounds.height / 2)
-//    }
-//
-//    // MARK: Ivar
-//
-//    private var _cachedBounds: CGRect?
-//
-//    private var _type: IBAssetType = .unknow
-//    private var _subtype: IBAssetSubtype = .unknow
-//    
-//    private var _consoleOfLock: Bool = false
-//
-//    fileprivate lazy var _typeView = UIButton(type: .system)
-//    fileprivate lazy var _consoleView = IBVideoConsoleView(frame: CGRect(x: 0, y: 0, width: 70, height: 70))
     
-    internal var draggingContentOffset: CGPoint?
+    var draggingContentOffset: CGPoint?
     
-    // content
-    fileprivate var _contentSize: CGSize = .zero
+    // config
     fileprivate var _contentInset: UIEdgeInsets = .zero
     fileprivate var _indicatorInset: UIEdgeInsets = .init(top: 8, left: 8, bottom: 8, right: 8)
-    fileprivate var _containerView: CanvasView?
+    
+    // content
     fileprivate var _detailView: UIView?
+    fileprivate var _containerView: CanvasView?
     
     // progress
     fileprivate var _progress: ProgressProxy?
@@ -376,20 +306,6 @@ internal class BrowserDetailCell: UICollectionViewCell {
     fileprivate var _consoleCenter: CGPoint {
         return .init(x: bounds.midX,
                      y: bounds.midY)
-    }
-}
-
-
-/// layout support
-extension BrowserDetailCell {
-    
-    func updateConsole() {
-    }
-    func updateConsoleView(_ isLock: Bool, animated: Bool) {
-//        logger.trace?.write(isLock, animated)
-    }
-    func updateConsoleViewLayout() {
-//        logger.trace?.write()
     }
 }
 
@@ -421,20 +337,10 @@ extension BrowserDetailCell: TransitioningView {
         }
         return containerView.contentTransform.rotated(by: orientation.ub_angle)
     }
-    func ub_snapshotView(afterScreenUpdates: Bool) -> UIView? {
-//        let view = detailView?.snapshotView(afterScreenUpdates: afterScreenUpdates)
-//        view?.transform = .init(rotationAngle: -orientation.ub_angle)
-//        return view
-        guard let detailView = detailView else {
-            return nil
-        }
-        let imageView = UIImageView(frame: detailView.frame)
-        if let x = detailView as? UIImageView {
-            imageView.image = x.image
-        }
-        imageView.backgroundColor = detailView.backgroundColor
-        imageView.transform = .init(rotationAngle: -orientation.ub_angle)
-        return imageView
+    func ub_snapshotView(with context: TransitioningContext) -> UIView? {
+        let view = detailView?.snapshotView(afterScreenUpdates: context.ub_operation.appear)
+        view?.transform = .init(rotationAngle: -orientation.ub_angle)
+        return view
     }
 }
 

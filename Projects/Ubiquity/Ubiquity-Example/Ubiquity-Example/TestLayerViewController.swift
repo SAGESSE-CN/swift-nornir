@@ -56,10 +56,10 @@ class TestLayerViewController: UIViewController {
 
     func updateProgress(_ progress: Double) {
         
-        let oldValue = self.mpv.progress
-        let newValue = progress
-        
-        let target = false
+//        let oldValue = self.mpv.progress
+//        let newValue = progress
+//        
+//        let target = false
         
         let progressView = self.mpv
         let progressView2 = self.mpv2

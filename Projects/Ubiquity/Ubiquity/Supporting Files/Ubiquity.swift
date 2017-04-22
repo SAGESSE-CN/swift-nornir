@@ -8,10 +8,20 @@
 
 import UIKit
 
-/// displayable the item abstract class
+/// resource abstract of item
 public protocol Item: class {
     var size: CGSize { get }
     var image: UIImage? { get }
+}
+
+/// resource display abstract container
+internal protocol ItemContainer {
+    ///
+    /// update container content with item
+    ///
+    /// - parameter item: resource abstract of item
+    ///
+    func apply(with item: Item)
 }
 
 /// displayable the container abstract class
