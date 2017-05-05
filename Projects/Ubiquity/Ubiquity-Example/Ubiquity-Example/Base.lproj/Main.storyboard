@@ -139,30 +139,37 @@
             </objects>
             <point key="canvasLocation" x="972" y="1380"/>
         </scene>
-        <!--View Controller-->
+        <!--Test Indicator View Controller-->
         <scene sceneID="nd9-fs-0d9">
             <objects>
-                <viewController storyboardIdentifier="cb44444" useStoryboardIdentifierAsRestorationIdentifier="YES" id="2TO-kW-hP1" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="a2s2" useStoryboardIdentifierAsRestorationIdentifier="YES" id="2TO-kW-hP1" customClass="TestIndicatorViewController" customModule="Ubiquity_Example" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="gS1-Nb-Sgn"/>
                         <viewControllerLayoutGuide type="bottom" id="bAk-9d-3to"/>
                     </layoutGuides>
-                    <view key="view" contentMode="scaleToFill" id="Rtp-zB-m5S">
+                    <view key="view" contentMode="scaleToFill" id="Rtp-zB-m5S" customClass="XA" customModule="Ubiquity_Example" customModuleProvider="target">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="x7k-tn-0bq" customClass="BadgeView" customModule="Ubiquity">
-                                <rect key="frame" x="76" y="78" width="240" height="128"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="TeF-sr-GqE" customClass="IndicatorView" customModule="Ubiquity_Example" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="623" width="375" height="44"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="44" id="8R2-tC-dxk"/>
+                                </constraints>
                             </view>
                         </subviews>
                         <color key="backgroundColor" red="0.89413207769393921" green="0.89413201808929443" blue="0.89413201808929443" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+                        <constraints>
+                            <constraint firstItem="TeF-sr-GqE" firstAttribute="leading" secondItem="Rtp-zB-m5S" secondAttribute="leading" id="FDy-hl-wp6"/>
+                            <constraint firstItem="bAk-9d-3to" firstAttribute="top" secondItem="TeF-sr-GqE" secondAttribute="bottom" id="McP-pB-4Gf"/>
+                            <constraint firstAttribute="trailing" secondItem="TeF-sr-GqE" secondAttribute="trailing" id="Yut-ab-R4k"/>
+                        </constraints>
                     </view>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="EIj-hm-EZR" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1721" y="1379"/>
+            <point key="canvasLocation" x="1720.8" y="1378.56071964018"/>
         </scene>
         <!--Test Loader View Controller-->
         <scene sceneID="FTi-TW-nk0">
@@ -188,7 +195,7 @@
                 <navigationController storyboardIdentifier="X1" automaticallyAdjustsScrollViewInsets="NO" useStoryboardIdentifierAsRestorationIdentifier="YES" toolbarHidden="NO" id="Ghq-4e-xjI" sceneMemberID="viewController">
                     <tabBarItem key="tabBarItem" title="Item" id="RyF-E1-Hla"/>
                     <toolbarItems/>
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" misplaced="YES" id="Whb-RP-aWQ">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="Whb-RP-aWQ">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>

@@ -78,6 +78,25 @@ internal class Debugger: UIView {
         }
     }
     
+    static var toolsDebugColorViewBounds: Bool {
+        set {
+            UIView.self.perform(Selector(String("_enableToolsDebugColorViewBounds:")), with: newValue)
+        }
+        get {
+            let ob = (UIView.self as Any) as AnyObject
+            return ob.value(forKey: "_toolsDebugColorViewBounds") as? Bool ?? false
+        }
+    }
+    static var toolsDebugAlignmentRects: Bool {
+        set {
+            UIView.self.perform(Selector(String("_enableToolsDebugAlignmentRects:")), with: newValue)
+        }
+        get {
+            let ob = (UIView.self as Any) as AnyObject
+            return ob.value(forKey: "_toolsDebugAlignmentRects") as? Bool ?? false
+        }
+    }
+    
     lazy var texts: [String: String] = [:]
     
     lazy var rects: [String: CGRect] = [:]

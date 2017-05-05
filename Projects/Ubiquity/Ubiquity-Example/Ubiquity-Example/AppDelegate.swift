@@ -83,9 +83,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 //thread_info(port, TASK_THREAD_TIMES_INFO, (task_info_t)&startTime, &count);\
 //time = ((double)(startTime->system_time.seconds+startTime->system_time.microseconds+startTime->user_time.seconds+startTime->user_time.microseconds))/MSEC_PER_SEC;\
         
-        
-//        UIView.self.perform(Selector(String("_enableToolsDebugColorViewBounds:")), with: true)
-        
 //        DispatchQueue.main.async {
 //            guard let window = self.window else {
 //                return

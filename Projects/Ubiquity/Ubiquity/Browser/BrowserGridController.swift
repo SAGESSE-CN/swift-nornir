@@ -8,11 +8,11 @@
 
 import UIKit
 
-internal class BrowserListController: UICollectionViewController {
+internal class BrowserGridController: UICollectionViewController {
     
     init(container: Container) {
         self.container = container
-        super.init(collectionViewLayout: BrowserListLayout())
+        super.init(collectionViewLayout: BrowserGridLayout())
     }
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -24,8 +24,8 @@ internal class BrowserListController: UICollectionViewController {
         title = "Collection"
         
         // setup colleciton view
-        collectionView?.register(BrowserListCell.dynamic(with: UIImageView.self), forCellWithReuseIdentifier: "ASSET-IMAGE")
-        collectionView?.register(BrowserListCell.dynamic(with: UIImageView.self), forCellWithReuseIdentifier: "ASSET-IMAGE-BADGE")
+        collectionView?.register(BrowserGridCell.dynamic(with: UIImageView.self), forCellWithReuseIdentifier: "ASSET-IMAGE")
+        collectionView?.register(BrowserGridCell.dynamic(with: UIImageView.self), forCellWithReuseIdentifier: "ASSET-IMAGE-BADGE")
         collectionView?.backgroundColor = .white
         collectionView?.alwaysBounceVertical = true
     }
@@ -36,7 +36,7 @@ internal class BrowserListController: UICollectionViewController {
 ///
 /// Provide collection view display support
 ///
-extension BrowserListController: UICollectionViewDelegateFlowLayout {
+extension BrowserGridController: UICollectionViewDelegateFlowLayout {
     
     override func numberOfSections(in collectionView: UICollectionView) -> Int {
         return container.numberOfSections
@@ -49,7 +49,7 @@ extension BrowserListController: UICollectionViewDelegateFlowLayout {
         return collectionView.dequeueReusableCell(withReuseIdentifier: "ASSET-IMAGE", for: indexPath)
     }
     override func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        guard let cell =  cell as? BrowserListCell else {
+        guard let cell =  cell as? BrowserGridCell else {
             return
         }
         return cell.apply(with: container.item(at: indexPath), orientation: .up)
@@ -74,7 +74,7 @@ extension BrowserListController: UICollectionViewDelegateFlowLayout {
 ///
 /// Provide animatable transitioning support
 ///
-extension BrowserListController: TransitioningDataSource {
+extension BrowserGridController: TransitioningDataSource {
     
     func ub_transitionView(using animator: Animator, for operation: Animator.Operation) -> TransitioningView? {
         logger.trace?.write()
@@ -83,7 +83,7 @@ extension BrowserListController: TransitioningDataSource {
             return nil
         }
         // get at current index path the cell
-        return collectionView?.cellForItem(at: indexPath) as? BrowserListCell
+        return collectionView?.cellForItem(at: indexPath) as? BrowserGridCell
     }
     
     func ub_transitionShouldStart(using animator: Animator, for operation: Animator.Operation) -> Bool {
@@ -110,7 +110,7 @@ extension BrowserListController: TransitioningDataSource {
             collectionView.layoutIfNeeded()
         }
         // fetch cell at index path, if is displayed
-        guard let cell = collectionView.cellForItem(at: indexPath) as? BrowserListCell else {
+        guard let cell = collectionView.cellForItem(at: indexPath) as? BrowserGridCell else {
             return
         }
         // if it is to, reset cell boundary
@@ -140,7 +140,7 @@ extension BrowserListController: TransitioningDataSource {
             return
         }
         // fetch cell at index path, if is displayed
-        guard let cell = collectionView?.cellForItem(at: indexPath) as? BrowserListCell else {
+        guard let cell = collectionView?.cellForItem(at: indexPath) as? BrowserGridCell else {
             return
         }
         guard let transitioningView = context.ub_transitioningView, let snapshotView = transitioningView.snapshotView(afterScreenUpdates: false) else {
@@ -160,7 +160,7 @@ extension BrowserListController: TransitioningDataSource {
     func ub_transitionDidEnd(using animator: Animator, transitionCompleted: Bool) {
         logger.trace?.write(transitionCompleted)
         // fetch cell at index path, if index path is nil ignore
-        guard let indexPath = animator.indexPath, let cell = collectionView?.cellForItem(at: indexPath) as? BrowserListCell else {
+        guard let indexPath = animator.indexPath, let cell = collectionView?.cellForItem(at: indexPath) as? BrowserGridCell else {
             return
         }
         cell.isHidden = false

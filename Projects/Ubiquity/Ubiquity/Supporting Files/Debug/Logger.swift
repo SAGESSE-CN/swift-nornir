@@ -146,12 +146,12 @@ internal class Logger {
                 format.replaceCharacters(in: $0.range, with: "%\(substr(format, with: $0.rangeAt(1)) ?? "")S")
                 
                 return node
-                }.reversed()
+            }.reversed()
         }
         // use the log format string
         internal func format(with log: Log) -> String {
             // the format string, note: that you should hold the array to use pointer
-            let parameters = _nodes.map({ $0.format(with: log) })
+            let parameters = _nodes.map({ $0.format(with: log) + "\0\0" })
             // convert a string to CVarArg
             return .init(format: (_format as String), arguments: parameters.map {
                 return ($0 as NSString).cString(using: String.Encoding.utf16.rawValue)!

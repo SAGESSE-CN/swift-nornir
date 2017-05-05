@@ -1,5 +1,5 @@
 //
-//  BrowserListLayout.swift
+//  BrowserGridLayout.swift
 //  Ubiquity
 //
 //  Created by sagesse on 16/03/2017.
@@ -8,7 +8,7 @@
 
 import UIKit
 
-internal class BrowserListLayout: UICollectionViewFlowLayout {
+internal class BrowserGridLayout: UICollectionViewFlowLayout {
     
     override func prepare() {
         super.prepare()

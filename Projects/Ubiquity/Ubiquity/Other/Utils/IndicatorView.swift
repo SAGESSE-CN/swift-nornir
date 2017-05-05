@@ -26,17 +26,19 @@ import UIKit
     
     func indicator(_ indicator: IndicatorView, numberOfItemsInSection section: Int) -> Int
     func indicator(_ indicator: IndicatorView, sizeForItemAt indexPath: IndexPath) -> CGSize
+    
+    func indicator(_ indicator: IndicatorView, cellForItemAt indexPath: IndexPath) -> IndicatorViewCell
 }
 
 @objc internal class IndicatorView: UIView {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        _commonInit()
+        _setup()
     }
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
-        _commonInit()
+        _setup()
     }
     
     weak var delegate: IndicatorViewDelegate?
@@ -244,6 +246,32 @@ import UIKit
         _updateCurrentItem(_tilingView.contentOffset)
     }
     
+    func register(_ cellClass: AnyClass?, forCellWithReuseIdentifier identifier: String) {
+        return _tilingView.register(cellClass, forCellWithReuseIdentifier: identifier)
+    }
+    func dequeueReusableCell(withReuseIdentifier identifier: String, for indexPath: IndexPath) -> IndicatorViewCell {
+        // 检查类型
+        guard let cell = _tilingView.dequeueReusableCell(withReuseIdentifier: identifier, for: indexPath) as? IndicatorViewCell else {
+            logger.fatal?.write("you must use the IndicatorViewCell")
+            fatalError()
+        }
+        return cell
+    }
+    
+    func performBatchUpdates(_ updates: (() -> Swift.Void)?, completion: ((Bool) -> Swift.Void)? = nil) {
+        return _tilingView.performBatchUpdates(updates, completion: completion)
+    }
+    
+    func insertItems(at indexPaths: [IndexPath]) {
+        return _tilingView.insertItems(at: indexPaths)
+    }
+    func reloadItems(at indexPaths: [IndexPath]) {
+        return _tilingView.reloadItems(at: indexPaths)
+    }
+    func deleteItems(at indexPaths: [IndexPath]) {
+        return _tilingView.deleteItems(at: indexPaths)
+    }
+    
     fileprivate func _performWithoutContentOffsetChange(_ actionsWithoutAnimation: () -> Void) {
         _ignoreContentOffsetChange = true
         actionsWithoutAnimation()
@@ -274,7 +302,7 @@ import UIKit
         return size
     }
     
-    fileprivate func _commonInit() {
+    fileprivate func _setup() {
         //backgroundColor = .random
         
         _tilingView.delegate = self
@@ -285,8 +313,6 @@ import UIKit
         _tilingView.alwaysBounceHorizontal = true
         _tilingView.showsVerticalScrollIndicator = false
         _tilingView.showsHorizontalScrollIndicator = false
-        
-        _tilingView.register(IndicatorViewCell.dynamic(with: UIImageView.self), forCellWithReuseIdentifier: "ASSET-IMAGE")
         
         addSubview(_tilingView)
         clipsToBounds = true
@@ -372,7 +398,11 @@ extension IndicatorView: UIScrollViewDelegate, TilingViewDataSource, TilingViewD
         return dataSource?.indicator(self, numberOfItemsInSection: section) ?? 0
     }
     func tilingView(_ tilingView: TilingView, cellForItemAt indexPath: IndexPath) -> TilingViewCell {
-        return tilingView.dequeueReusableCell(withReuseIdentifier: "ASSET-IMAGE", for: indexPath)
+        guard let cell = dataSource?.indicator(self, cellForItemAt: indexPath) else {
+            logger.fatal?.write("failed to provide the cell data problem")
+            fatalError()
+        }
+        return cell
     }
     
     func tilingView(_ tilingView: TilingView, willDisplay cell: TilingViewCell, forItemAt indexPath: IndexPath) {

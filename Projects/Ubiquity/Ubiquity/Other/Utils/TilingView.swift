@@ -69,10 +69,15 @@ import UIKit
         return cell
     }
     
-    // TODO: 插入和删除
+    func performBatchUpdates(_ updates: (() -> Swift.Void)?, completion: ((Bool) -> Swift.Void)? = nil) {
+    }
     
+    func insertItems(at indexPaths: [IndexPath]) {
+        logger.trace?.write(indexPaths)
+        
+    }
     func reloadItems(at indexPaths: [IndexPath]) {
-        //_logger.trace(indexPaths)
+        logger.trace?.write(indexPaths)
         
         _needsUpdateLayout = true // 重新更新
         _needsUpdateLayoutVisibleRect = true // 重新计算
@@ -105,6 +110,7 @@ import UIKit
         }
     }
     func reloadItems(at indexPaths: [IndexPath], _ sizeForItemWithHandler: (TilingViewLayoutAttributes) -> CGSize) {
+        logger.trace?.write(indexPaths)
         
         _needsUpdateLayout = true // 重新更新
         _needsUpdateLayoutVisibleRect = true // 重新计算
@@ -118,6 +124,9 @@ import UIKit
         contentSize = _layout.tilingViewContentSize
             
         _updateLayout()
+    }
+    func deleteItems(at indexPaths: [IndexPath]) {
+        logger.trace?.write(indexPaths)
     }
     
     var indexPathsForVisibleItems: [IndexPath] { 

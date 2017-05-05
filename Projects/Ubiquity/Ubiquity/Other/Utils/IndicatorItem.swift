@@ -17,36 +17,9 @@ internal class IndicatorItem: ExtendedItem {
         fatalError("init(coder:) has not been implemented")
     }
     
-    internal weak var dataSource: IndicatorViewDataSource? {
-        set { return _indicatorView.dataSource = newValue }
-        get { return _indicatorView.dataSource }
+    internal var indicatorView: IndicatorView {
+        return _indicatorView
     }
-    internal weak var delegate: IndicatorViewDelegate? {
-        set { return _indicatorView.delegate = newValue }
-        get { return _indicatorView.delegate }
-    }
-    
-    internal func beginInteractiveMovement() {
-        _indicatorView.beginInteractiveMovement()
-    }
-    internal func updateIndexPath(from indexPath1: IndexPath?, to indexPath2: IndexPath?, percent: CGFloat) {
-        _indicatorView.updateIndexPath(from: indexPath1, to: indexPath2, percent: percent)
-    }
-    internal func endInteractiveMovement() {
-        _indicatorView.endInteractiveMovement()
-    }
-    
-    internal func setNeedsLayout() {
-        _indicatorView.setNeedsLayout()
-    }
-    internal func layoutIfNeeded() {
-        _indicatorView.layoutIfNeeded()
-    }
-    
-    internal func scrollToItem(at indexPath: IndexPath, animated: Bool) {
-        _indicatorView.scrollToItem(at: indexPath, animated: animated)
-    }
-    
     
     private var _indicatorView: IndicatorView
 }

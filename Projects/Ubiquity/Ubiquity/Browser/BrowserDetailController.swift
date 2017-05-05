@@ -66,13 +66,15 @@ internal class BrowserDetailController: UICollectionViewController {
         collectionView?.register(BrowserDetailCell.dynamic(with: VideoView.self), forCellWithReuseIdentifier: "ASSET-DETAIL-VIDEO")
         
         // setup indicator 
-        indicatorItem.delegate = self
-        indicatorItem.dataSource = self
+        indicatorItem.indicatorView.delegate = self
+        indicatorItem.indicatorView.dataSource = self
+        indicatorItem.indicatorView.register(IndicatorViewCell.dynamic(with: UIImageView.self), forCellWithReuseIdentifier: "ASSET-IMAGE")
+        //indicatorItem.indicatorView.register(IndicatorViewCell.dynamic(with: UIScrollView.self), forCellWithReuseIdentifier: "ASSET-IMAGE")
         
         // setup toolbar items
         let toolbarItems = [
             indicatorItem,
-            UIBarButtonItem(barButtonSystemItem: .action, target: nil, action: nil),
+            UIBarButtonItem(barButtonSystemItem: .action, target: self, action: nil),
             UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil),
             UIBarButtonItem(barButtonSystemItem: .trash, target: nil, action: nil)
         ]
@@ -86,8 +88,8 @@ internal class BrowserDetailController: UICollectionViewController {
             return
         }
         UIView.performWithoutAnimation {
-            indicatorItem.scrollToItem(at: indexPath, animated: false)
             collectionView?.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: false)
+            indicatorItem.indicatorView.scrollToItem(at: indexPath, animated: false)
         }
     }
     
@@ -165,7 +167,7 @@ extension BrowserDetailController: UICollectionViewDelegateFlowLayout {
     }
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        return collectionView.dequeueReusableCell(withReuseIdentifier: "ASSET-DETAIL-IMAGE", for: indexPath)
+        return collectionView.dequeueReusableCell(withReuseIdentifier: "ASSET-DETAIL-VIDEO", for: indexPath)
     }
     override func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         guard let cell =  cell as? BrowserDetailCell else {
@@ -200,7 +202,7 @@ extension BrowserDetailController: UICollectionViewDelegateFlowLayout {
             return
         }
         // notify indicator interactive start
-        indicatorItem.beginInteractiveMovement()
+        indicatorItem.indicatorView.beginInteractiveMovement()
     }
     override  func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
         // only process in collection view
@@ -211,7 +213,7 @@ extension BrowserDetailController: UICollectionViewDelegateFlowLayout {
         guard !decelerate else {
             return
         }
-        indicatorItem.endInteractiveMovement()
+        indicatorItem.indicatorView.endInteractiveMovement()
     }
     override func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
         // only process in collection view
@@ -219,7 +221,7 @@ extension BrowserDetailController: UICollectionViewDelegateFlowLayout {
             return
         }
         // notify indicator interactive finish
-        indicatorItem.endInteractiveMovement()
+        indicatorItem.indicatorView.endInteractiveMovement()
     }
     
     // MARK: private method
@@ -270,7 +272,7 @@ extension BrowserDetailController: UICollectionViewDelegateFlowLayout {
             _interactivingToIndexPath = indexPath
         }
         // use percentage update index
-        indicatorItem.updateIndexPath(from: _interactivingFromIndexPath, to: _interactivingToIndexPath, percent: percent)
+        indicatorItem.indicatorView.updateIndexPath(from: _interactivingFromIndexPath, to: _interactivingToIndexPath, percent: percent)
     }
     fileprivate func _updateSystemContentInsetIfNeeded() {
         
@@ -464,9 +466,10 @@ extension BrowserDetailController: TransitioningDataSource {
             collectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: false)
             // must call the layoutIfNeeded method, otherwise cell may not create
             UIView.performWithoutAnimation {
-                indicatorItem.layoutIfNeeded()
                 collectionView.setNeedsLayout()
                 collectionView.layoutIfNeeded()
+                indicatorItem.indicatorView.setNeedsLayout()
+                indicatorItem.indicatorView.layoutIfNeeded()
             }
         }
     }
@@ -497,9 +500,15 @@ extension BrowserDetailController: IndicatorViewDataSource, IndicatorViewDelegat
         return container.item(at: indexPath).size
     }
     
+    func indicator(_ indicator: IndicatorView, cellForItemAt indexPath: IndexPath) -> IndicatorViewCell {
+        logger.trace?.write(indexPath)
+        return indicator.dequeueReusableCell(withReuseIdentifier: "ASSET-IMAGE", for: indexPath)
+    }
+    
     // MARK: IndicatorViewDelegate
     
     func indicator(_ indicator: IndicatorView, willDisplay cell: IndicatorViewCell, forItemAt indexPath: IndexPath) {
+        logger.trace?.write(indexPath)
         
         if let imageView = cell.contentView as? UIImageView {
             imageView.contentMode = .scaleAspectFill
@@ -524,7 +533,7 @@ extension BrowserDetailController: IndicatorViewDataSource, IndicatorViewDelegat
     }
 
     func indicator(_ indicator: IndicatorView, didSelectItemAt indexPath: IndexPath) {
-        logger.debug?.write(indexPath)
+        logger.trace?.write(indexPath)
         
 //        guard !isInteractiving else {
 //            return // 正在交互

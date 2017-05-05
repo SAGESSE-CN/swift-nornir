@@ -9,6 +9,11 @@
 import UIKit
 
 /// resource abstract of item
+public protocol Group: class {
+    var title: String? { get }
+}
+
+/// resource abstract of item
 public protocol Item: class {
     var size: CGSize { get }
     var image: UIImage? { get }

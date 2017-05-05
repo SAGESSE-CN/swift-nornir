@@ -29,6 +29,14 @@ internal class BrowserDetailCell: UICollectionViewCell, ItemContainer {
         return _draggingContentOffset
     }
     
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        
+        // update utility view
+        _progress?.center = _progressCenter
+        _console?.center = _consoleCenter
+    }
+    
     ///
     /// update container content with item
     ///
@@ -47,7 +55,7 @@ internal class BrowserDetailCell: UICollectionViewCell, ItemContainer {
         _containerView?.zoom(to: bounds , with: orientation, animated: false)
         
         // update util view
-        _progress?.setValue(-1, animated: false)
+        _progress?.setValue(0, animated: false)
         _console?.setState(.stop, animated: false)
         
         // update content
@@ -65,14 +73,6 @@ internal class BrowserDetailCell: UICollectionViewCell, ItemContainer {
         
         // need update layout
         setNeedsLayout()
-    }
-    
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        
-        // update utility view
-        _progress?.center = _progressCenter
-        _console?.center = _consoleCenter
     }
     
     private func _setup() {

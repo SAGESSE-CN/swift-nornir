@@ -15,11 +15,12 @@ public class Browser: NSObject, Container {
         fatalError("no imp")
     }
     public var viewController: UIViewController {
-        return BrowserListController(container: self)
+        return BrowserAlbumController(container: self)
+        //return BrowserGridController(container: self)
     }
     
     public var numberOfSections: Int {
-        return 2
+        return 1
     }
     public func numberOfItems(inSection section: Int) -> Int {
         return items.count
@@ -41,7 +42,7 @@ internal class BrowserItem: Item {
             image = __image1
 //            size = .init(width: 3200, height: 1200)//8:3
 //            image = __image2
-//        } else {
+//        } else {j
 //            size = .init(width: 640, height: 1136)
 //            image = UIImage(named: "cl_\((index % 12) + 1)")
 //        }

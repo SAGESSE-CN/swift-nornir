@@ -1,5 +1,5 @@
 //
-//  BrowserListCell.swift
+//  BrowserGridCell.swift
 //  Ubiquity
 //
 //  Created by sagesse on 16/03/2017.
@@ -8,7 +8,7 @@
 
 import UIKit
 
-internal class BrowserListCell: UICollectionViewCell, ItemContainer {
+internal class BrowserGridCell: UICollectionViewCell, ItemContainer {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -118,7 +118,7 @@ internal class BrowserListCell: UICollectionViewCell, ItemContainer {
 }
 
 /// custom transition support
-extension BrowserListCell: TransitioningView {
+extension BrowserGridCell: TransitioningView {
     
     var ub_frame: CGRect {
         return convert(bounds, to: window)
@@ -136,7 +136,7 @@ extension BrowserListCell: TransitioningView {
 }
 
 /// dynamic class support
-internal extension BrowserListCell {
+internal extension BrowserGridCell {
     // dynamically generated class
     dynamic class func `dynamic`(with viewClass: AnyClass) -> AnyClass {
         let name = "\(NSStringFromClass(self))<\(NSStringFromClass(viewClass))>"
