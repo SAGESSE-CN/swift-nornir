@@ -73,11 +73,11 @@ import UIKit
     }
     
     func insertItems(at indexPaths: [IndexPath]) {
-        logger.trace?.write(indexPaths)
+        //logger.trace?.write(indexPaths)
         
     }
     func reloadItems(at indexPaths: [IndexPath]) {
-        logger.trace?.write(indexPaths)
+        //logger.trace?.write(indexPaths)
         
         _needsUpdateLayout = true // 重新更新
         _needsUpdateLayoutVisibleRect = true // 重新计算
@@ -110,7 +110,7 @@ import UIKit
         }
     }
     func reloadItems(at indexPaths: [IndexPath], _ sizeForItemWithHandler: (TilingViewLayoutAttributes) -> CGSize) {
-        logger.trace?.write(indexPaths)
+        //logger.trace?.write(indexPaths)
         
         _needsUpdateLayout = true // 重新更新
         _needsUpdateLayoutVisibleRect = true // 重新计算

@@ -11,14 +11,14 @@ import UIKit
 ///
 /// display images resources
 ///
-internal class ImageView: UIImageView, ItemContainer {
+internal class ImageView: UIImageView, Displayable {
     ///
-    /// update container content with item
+    /// display container content with item
     ///
-    /// - parameter item: resource abstract of item
-    /// - parameter orientation: item display orientation
+    /// - parameter item: need display the item
+    /// - parameter orientation: need display the orientation
     ///
-    func apply(with item: Item, orientation: UIImageOrientation) {
+    func display(with item: Item, orientation: UIImageOrientation) {
         logger.trace?.write()
         
         // update image

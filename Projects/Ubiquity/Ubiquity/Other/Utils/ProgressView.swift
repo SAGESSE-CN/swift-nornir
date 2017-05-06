@@ -179,7 +179,6 @@ internal class ProgressProxy: NSObject {
     private weak var _owner: UIView?
 }
 
-
 internal class ProgressView: UIControl {
    
     override init(frame: CGRect) {

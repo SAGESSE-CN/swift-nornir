@@ -8,7 +8,7 @@
 
 import UIKit
 
-internal class BrowserDetailCell: UICollectionViewCell, ItemContainer {
+internal class BrowserDetailCell: UICollectionViewCell, Displayable {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -38,12 +38,12 @@ internal class BrowserDetailCell: UICollectionViewCell, ItemContainer {
     }
     
     ///
-    /// update container content with item
+    /// display container content with item
     ///
-    /// - parameter item: resource abstract of item
-    /// - parameter orientation: item display orientation
+    /// - parameter item: need display the item
+    /// - parameter orientation: need display the orientation
     ///
-    func apply(with item: Item, orientation: UIImageOrientation) {
+    func display(with item: Item, orientation: UIImageOrientation) {
         logger.trace?.write(item.size)
         
         // update ata
@@ -55,12 +55,13 @@ internal class BrowserDetailCell: UICollectionViewCell, ItemContainer {
         _containerView?.zoom(to: bounds , with: orientation, animated: false)
         
         // update util view
-        _progress?.setValue(0, animated: false)
+        _progress?.setValue(1.000, animated: false)
         _console?.setState(.stop, animated: false)
         
         // update content
-        (_detailView as? ItemContainer)?.apply(with: item, orientation: orientation)
+        (_detailView as? Displayable)?.display(with: item, orientation: orientation)
     }
+    
     ///
     /// update container content inset
     ///
@@ -101,6 +102,9 @@ internal class BrowserDetailCell: UICollectionViewCell, ItemContainer {
             _containerView?.addSubview(detailView)
             // set default background color
             _detailView?.backgroundColor = Browser.ub_backgroundColor
+            
+            // If the detail to support the operation, set the operation delegate
+            (_detailView as? Operable)?.delegate = self
         }
         // setup console
         _console = ConsoleProxy(frame: .init(x: 0, y: 0, width: 70, height: 70), owner: self)
@@ -211,13 +215,17 @@ extension BrowserDetailCell {
     fileprivate dynamic func handleCommand(_ sender: Any) {
         logger.trace?.write()
         
-        self._console?.setState(.waiting, animated: true)
-        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(3), execute: {
-            self._console?.setState(.playing, animated: true)
-            DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(10), execute: {
-                self._console?.setState(.stop, animated: true)
-            })
-        })
+        // if is stopped, click goto prepare
+        if _console?.state == .stop {
+            // check the data
+            guard let item = _item else {
+                return
+            }
+            // update the status for waiting
+            _console?.setState(.waiting, animated: true)
+            // prepare player
+            (_detailView as? Operable)?.prepare(with: item)
+        }
     }
     
     fileprivate dynamic func handleTap(_ sender: UITapGestureRecognizer) {
@@ -344,7 +352,7 @@ extension BrowserDetailCell: CanvasViewDelegate {
         _isRotationing = false
         // update content orientation
         _orientation = orientation
-        (_detailView as? ItemContainer)?.apply(with: item, orientation: orientation)
+        (_detailView as? Displayable)?.display(with: item, orientation: orientation)
         // update progress
         _progress?.center = _progressCenter
         _progress?.setIsHidden(false, animated: true)
@@ -403,5 +411,41 @@ extension BrowserDetailCell: TransitioningView {
         // restore util view status
         _console?.setIsHidden(false, animated: true)
         _progress?.setIsHidden(false, animated: true)
+    }
+}
+
+/// operation support
+extension BrowserDetailCell: OperableDelegate {
+    
+    func operable(didPrepare operable: Operable, item: Item) {
+        logger.trace?.write()
+        
+        operable.play()
+    }
+    func operable(didStartPlay operable: Operable, item: Item) {
+        logger.trace?.write()
+        
+        _console?.setState(.playing, animated: true)
+    }
+    func operable(didStop operable: Operable, item: Item) {
+        logger.trace?.write()
+        
+        _console?.setState(.stop, animated: true)
+    }
+    
+    func operable(didSuspend operable: Operable, item: Item) {
+    }
+    func operable(didResume operable: Operable, item: Item) {
+    }
+    
+    func operable(didFinish operable: Operable, item: Item) {
+        logger.trace?.write()
+        
+        _console?.setState(.stop, animated: true)
+    }
+    func operable(didOccur operable: Operable, item: Item, error: Error?) {
+        logger.trace?.write()
+        
+        _console?.setState(.stop, animated: true)
     }
 }

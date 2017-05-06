@@ -161,7 +161,7 @@ extension Animator {
         
         init(animator: Animator) {
             self.animator = animator
-            self.containerView = UIView()
+            self.containerView = SnapshotContainerView()
             super.init(frame: .zero)
             _setup()
         }
@@ -239,7 +239,7 @@ extension Animator {
         var transitioningView: TransitioningView?
         
         var contentView: UIView?
-        var containerView: UIView
+        var containerView: SnapshotContainerView
         
         var animator: Animator
     }
@@ -284,6 +284,9 @@ extension Animator {
         }
         
         @NSManaged var percent: CGFloat
+    }
+    internal class SnapshotContainerView: UIView {
+        // is empty
     }
 }
 

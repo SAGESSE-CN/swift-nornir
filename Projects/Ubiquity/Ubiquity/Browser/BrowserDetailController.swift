@@ -174,7 +174,7 @@ extension BrowserDetailController: UICollectionViewDelegateFlowLayout {
             return
         }
         cell.apply(with: _systemContentInset)
-        cell.apply(with: container.item(at: indexPath), orientation: .up)
+        cell.display(with: container.item(at: indexPath), orientation: .up)
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {

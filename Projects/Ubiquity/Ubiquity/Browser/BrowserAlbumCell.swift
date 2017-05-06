@@ -74,7 +74,7 @@ internal class BrowserAlbumCell: UITableViewCell {
 //        _badgeView.leftItems = [
 //            .favorites
 //        ]
-        _thumbView.images = nil
+        _thumbView.images = [nil, nil, nil]
     }
     
     private lazy var _titleLabel: UILabel = .init()

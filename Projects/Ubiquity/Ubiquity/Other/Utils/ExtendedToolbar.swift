@@ -77,6 +77,7 @@ internal class ExtendedToolbar: UIToolbar {
         
         // 更新
         _lines = newLines
+        _token = Int(CACurrentMediaTime())
         // 添加视图&更新
         newLines?.forEach { 
             guard let view = $0.view else {
@@ -95,12 +96,14 @@ internal class ExtendedToolbar: UIToolbar {
             }
             toolbar.setItems(nil, animated: animated)
         }
+        
         // 更新布局
         self.setNeedsLayout()
         self.layoutIfNeeded()
         self._layoutSubviewsWithLines(oldLines, in: self.frame.height)
         self._layoutSubviewsWithLines(newLines, in: max(self.frame.height, minimuxHeight))
         
+        let token = _token
         let block: () -> Void = {
             // 更新frame
             var nframe = self.frame
@@ -119,7 +122,7 @@ internal class ExtendedToolbar: UIToolbar {
         }
         let completion: (Bool) -> Void = { successed in
             // 动画是成功的?
-            guard successed else {
+            guard successed, self._token == token else {
                 return
             }
             // 清除无效subviews
@@ -177,6 +180,8 @@ internal class ExtendedToolbar: UIToolbar {
     
     private var _items: [UIBarButtonItem]?
     private var _lines: [ExtendedLineContext]?
+    
+    private var _token: Int = 0
     
     private lazy var _toolbars: [UIToolbar] = []
 }

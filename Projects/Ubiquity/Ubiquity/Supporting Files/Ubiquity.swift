@@ -19,17 +19,6 @@ public protocol Item: class {
     var image: UIImage? { get }
 }
 
-/// resource display abstract container
-internal protocol ItemContainer {
-    ///
-    /// update container content with item
-    ///
-    /// - parameter item: resource abstract of item
-    /// - parameter orientation: item display orientation
-    ///
-    func apply(with item: Item, orientation: UIImageOrientation)
-}
-
 /// displayable the container abstract class
 public protocol Container: class {
     
@@ -41,6 +30,46 @@ public protocol Container: class {
     var view: UIView { get }
     var viewController: UIViewController { get }
 }
+
+/// can operate abstract protocol
+internal protocol Operable: class {
+    
+    /// operate event callback delegate
+    weak var delegate: OperableDelegate? { set get }
+    
+    func play()
+    func stop()
+    
+    func suspend()
+    func resume()
+    
+    func prepare(with item: Item)
+}
+/// can operate abstract delegate
+internal protocol OperableDelegate: class {
+    
+    func operable(didPrepare operable: Operable, item: Item)
+    func operable(didStartPlay operable: Operable, item: Item)
+    func operable(didStop operable: Operable, item: Item)
+    
+    func operable(didSuspend operable: Operable, item: Item)
+    func operable(didResume operable: Operable, item: Item)
+    
+    func operable(didFinish operable: Operable, item: Item)
+    func operable(didOccur operable: Operable, item: Item, error: Error?)
+}
+
+/// can display abstract protocol
+internal protocol Displayable {
+    ///
+    /// display content with item
+    ///
+    /// - parameter item: need display the item
+    /// - parameter orientation: need display the orientation
+    ///
+    func display(with item: Item, orientation: UIImageOrientation)
+}
+
 
 /// Provide the container display support
 //public extension UIView {
@@ -73,4 +102,5 @@ public extension UINavigationController {
         pushViewController(container.viewController, animated: animated)
     }
 }
+
 

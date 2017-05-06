@@ -8,7 +8,7 @@
 
 import UIKit
 
-internal class BrowserGridCell: UICollectionViewCell, ItemContainer {
+internal class BrowserGridCell: UICollectionViewCell, Displayable {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -73,12 +73,12 @@ internal class BrowserGridCell: UICollectionViewCell, ItemContainer {
 //    private lazy var _badgeBar = IBBadgeBar(frame: .zero)
     
     ///
-    /// update container content with item
+    /// display container content with item
     ///
-    /// - parameter item: resource abstract of item
-    /// - parameter orientation: item display orientation
+    /// - parameter item: need display the item
+    /// - parameter orientation: need display the orientation
     ///
-    func apply(with item: Item, orientation: UIImageOrientation) {
+    func display(with item: Item, orientation: UIImageOrientation) {
         
         //backgroundColor = item.backgroundColor
         

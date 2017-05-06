@@ -33,6 +33,10 @@ internal class ConsoleProxy: NSObject {
         get { return _center }
     }
     
+    var state: ConsoleView.State {
+        return _state
+    }
+    
     func setState(_ state: ConsoleView.State, animated: Bool) {
         // state hav any change?
         guard _state != state else {
@@ -89,7 +93,7 @@ internal class ConsoleProxy: NSObject {
             consoleView.alpha = isHidden ? 0 : 1
             consoleView.setState(state, animated: animated)
             // if it is none, remove consoleview
-            guard _state == .none else {
+            guard state == .none else {
                 return
             }
             _consoleView?.removeFromSuperview()
