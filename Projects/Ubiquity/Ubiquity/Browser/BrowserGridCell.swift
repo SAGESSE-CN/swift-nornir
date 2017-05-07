@@ -99,15 +99,16 @@ internal class BrowserGridCell: UICollectionViewCell, Displayable {
         view.tintColor = .white
         view.autoresizingMask = [.flexibleWidth, .flexibleTopMargin]
         view.isUserInteractionEnabled = false
-//        view.backgroundImage = BadgeView.ub_backgroundImage
         
+        view.backgroundImage = BadgeView.ub_backgroundImage
         view.leftItems = [
-//            .video
+            .video
 //            .panorama
         ]
         view.rightItems = [
-            .downloading
+            //.downloading
             //.text("99:99")
+            .text("04:21")
         ]
         
         addSubview(view)

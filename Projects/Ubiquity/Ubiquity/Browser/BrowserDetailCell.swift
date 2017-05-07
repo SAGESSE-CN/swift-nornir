@@ -433,9 +433,19 @@ extension BrowserDetailCell: OperableDelegate {
         _console?.setState(.stop, animated: true)
     }
     
+    func operable(didStalled operable: Operable, item: Item) {
+        logger.trace?.write()
+        
+        _console?.setState(.waiting, animated: true)
+    }
     func operable(didSuspend operable: Operable, item: Item) {
+        logger.trace?.write()
+        // nothing
     }
     func operable(didResume operable: Operable, item: Item) {
+        logger.trace?.write()
+        
+        _console?.setState(.playing, animated: true)
     }
     
     func operable(didFinish operable: Operable, item: Item) {

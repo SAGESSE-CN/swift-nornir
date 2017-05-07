@@ -41,11 +41,11 @@ internal class BrowserItem: Item {
 //            size = .init(width: 1600, height: 1200)
 //            image = __image1
         
-//            size = .init(width: 1920, height: 1080)
+            size = .init(width: 1920, height: 1080)
 //            image = __image2
         
-            size = .init(width: 600, height: 338)
-            image = __image3
+//            size = .init(width: 600, height: 338)
+//            image = __image3
         
 //        } else {
 //            size = .init(width: 640, height: 1136)

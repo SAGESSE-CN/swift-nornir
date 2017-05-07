@@ -151,7 +151,7 @@ extension BrowserGridController: TransitioningDataSource {
         snapshotView.center = .init(x: transitioningView.bounds.midX, y: transitioningView.bounds.midY)
         cell.addSubview(snapshotView)
         
-        UIView.animate(withDuration: 0.15, delay: 0, options: .curveEaseIn, animations: {
+        UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseInOut, animations: {
             snapshotView.alpha = 0
         }, completion: { finished in
             snapshotView.removeFromSuperview()

@@ -45,11 +45,10 @@ internal class BrowserAlbumCell: UITableViewCell {
         _subtitleLabel.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(_subtitleLabel)
         
-        
         // setup constraints
         contentView.addConstraints([
             
-            .make(_thumbView, .leading, .equal, contentView, .leadingMargin),
+            .make(_thumbView, .leading, .equal, contentView, .leading, 16),
             .make(_thumbView, .centerY, .equal, contentView, .centerY),
             
             .make(_thumbView, .width, .equal, nil, .notAnAttribute, 70),
@@ -57,11 +56,11 @@ internal class BrowserAlbumCell: UITableViewCell {
             
             .make(_titleLabel, .bottom, .equal, contentView, .centerY, -2),
             .make(_titleLabel, .leading, .equal, _thumbView, .trailing, 8),
-            .make(_titleLabel, .trailing, .equal, contentView, .trailingMargin),
+            .make(_titleLabel, .trailing, .equal, contentView, .trailing),
             
             .make(_subtitleLabel, .top, .equal, contentView, .centerY, 2),
             .make(_subtitleLabel, .leading, .equal, _thumbView, .trailing, 8),
-            .make(_subtitleLabel, .trailing, .equal, contentView, .trailingMargin),
+            .make(_subtitleLabel, .trailing, .equal, contentView, .trailing),
         ])
         
 //        _thumbView.images = [
