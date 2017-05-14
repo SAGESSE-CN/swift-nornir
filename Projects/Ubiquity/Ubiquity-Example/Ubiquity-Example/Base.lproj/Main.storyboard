@@ -10,79 +10,122 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--View Controller-->
-        <scene sceneID="tne-QT-ifu">
+        <!--Ubiquity-->
+        <scene sceneID="87b-Yu-8Sf">
             <objects>
-                <viewController id="BYZ-38-t0r" customClass="ViewController" customModule="Ubiquity_Example" customModuleProvider="target" sceneMemberID="viewController">
-                    <layoutGuides>
-                        <viewControllerLayoutGuide type="top" id="y3c-jy-aDJ"/>
-                        <viewControllerLayoutGuide type="bottom" id="wfy-db-euE"/>
-                    </layoutGuides>
-                    <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
+                <tableViewController hidesBottomBarWhenPushed="YES" id="BIC-XQ-RJL" customClass="ViewController" customModule="Ubiquity_Example" customModuleProvider="target" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="static" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" id="hVB-Ko-pd1">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                    </view>
-                    <toolbarItems>
-                        <barButtonItem systemItem="action" id="cPQ-4N-UCb">
-                            <connections>
-                                <segue destination="bCH-wR-wLF" kind="show" id="KQq-lF-dfr"/>
-                            </connections>
-                        </barButtonItem>
-                    </toolbarItems>
-                    <navigationItem key="navigationItem" id="XLf-HT-uE4">
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <sections>
+                            <tableViewSection headerTitle="" id="3Wf-Bw-frG">
+                                <cells>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" textLabel="vdn-30-Kng" style="IBUITableViewCellStyleDefault" id="hpL-8b-CJp">
+                                        <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="hpL-8b-CJp" id="JRW-Z7-3E3">
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Canvas View" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="vdn-30-Kng">
+                                                    <rect key="frame" x="15" y="0.0" width="345" height="43.5"/>
+                                                    <autoresizingMask key="autoresizingMask"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                        </tableViewCellContentView>
+                                        <connections>
+                                            <segue destination="bCH-wR-wLF" kind="show" id="F1w-YM-Pba"/>
+                                        </connections>
+                                    </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" textLabel="tkl-zB-sTR" style="IBUITableViewCellStyleDefault" id="UjW-xf-lGw">
+                                        <rect key="frame" x="0.0" y="44" width="375" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="UjW-xf-lGw" id="Bcc-H5-m2S">
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Progresss View" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="tkl-zB-sTR">
+                                                    <rect key="frame" x="15" y="0.0" width="345" height="43.5"/>
+                                                    <autoresizingMask key="autoresizingMask"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                        </tableViewCellContentView>
+                                        <connections>
+                                            <segue destination="2sn-UF-eS6" kind="show" id="f3r-Ea-J8A"/>
+                                        </connections>
+                                    </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" textLabel="fgc-YY-Feb" style="IBUITableViewCellStyleDefault" id="pZ0-8E-UUj">
+                                        <rect key="frame" x="0.0" y="88" width="375" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="pZ0-8E-UUj" id="4DS-Dy-drl">
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Filmstrip View" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="fgc-YY-Feb">
+                                                    <rect key="frame" x="15" y="0.0" width="345" height="43.5"/>
+                                                    <autoresizingMask key="autoresizingMask"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                        </tableViewCellContentView>
+                                        <connections>
+                                            <segue destination="3DQ-VI-cWG" kind="show" id="Jng-c9-JM4"/>
+                                        </connections>
+                                    </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" textLabel="pzI-bx-end" style="IBUITableViewCellStyleDefault" id="Enr-GT-UAN">
+                                        <rect key="frame" x="0.0" y="132" width="375" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="Enr-GT-UAN" id="RSd-Md-cgq">
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Indicator View" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="pzI-bx-end">
+                                                    <rect key="frame" x="15" y="0.0" width="345" height="43.5"/>
+                                                    <autoresizingMask key="autoresizingMask"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                        </tableViewCellContentView>
+                                        <connections>
+                                            <segue destination="2TO-kW-hP1" kind="show" id="HE8-we-uds"/>
+                                        </connections>
+                                    </tableViewCell>
+                                </cells>
+                            </tableViewSection>
+                        </sections>
+                        <connections>
+                            <outlet property="dataSource" destination="BIC-XQ-RJL" id="Gdu-0h-kyx"/>
+                            <outlet property="delegate" destination="BIC-XQ-RJL" id="ojQ-5A-pz9"/>
+                        </connections>
+                    </tableView>
+                    <toolbarItems/>
+                    <navigationItem key="navigationItem" title="Ubiquity" id="6SP-Lh-OdR">
                         <barButtonItem key="rightBarButtonItem" title="Show" id="HhU-Tf-gGK">
                             <connections>
-                                <action selector="show:" destination="BYZ-38-t0r" id="24X-Y3-dwM"/>
+                                <action selector="show:" destination="BIC-XQ-RJL" id="ZEg-nL-D4S"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="K5S-pk-RHR" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1911.2" y="38.23088455772114"/>
-        </scene>
-        <!--Item-->
-        <scene sceneID="8Gy-61-9f9">
-            <objects>
-                <viewController storyboardIdentifier="X2" useStoryboardIdentifierAsRestorationIdentifier="YES" id="k0D-XX-Dpp" customClass="TestLayoutViewController" sceneMemberID="viewController">
-                    <layoutGuides>
-                        <viewControllerLayoutGuide type="top" id="LYm-jo-ueB"/>
-                        <viewControllerLayoutGuide type="bottom" id="BcD-Nc-MTW"/>
-                    </layoutGuides>
-                    <view key="view" contentMode="scaleToFill" id="UZN-Bi-HHB">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <subviews>
-                            <slider opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="1" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="2tC-OD-LJY">
-                                <rect key="frame" x="54" y="34" width="266" height="31"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <connections>
-                                    <action selector="x2:" destination="k0D-XX-Dpp" eventType="valueChanged" id="C5c-iS-FPq"/>
-                                </connections>
-                            </slider>
-                            <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3Yd-f1-oEz" customClass="BrowseView" customModule="Ubiquity_Example" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="146" width="375" height="375"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
-                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                            </view>
-                        </subviews>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                    </view>
-                    <tabBarItem key="tabBarItem" title="Item" id="rEX-x6-5Jx"/>
-                    <connections>
-                        <outlet property="x1" destination="3Yd-f1-oEz" id="Wny-gL-gLc"/>
-                        <outlet property="x3" destination="2tC-OD-LJY" id="DSJ-Gq-4Iq"/>
-                    </connections>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="ma0-pG-RzW" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="972" y="724.58770614692662"/>
+            <point key="canvasLocation" x="1911" y="38"/>
         </scene>
         <!--Test Layer View Controller-->
         <scene sceneID="Cz2-5S-HLc">
             <objects>
-                <viewController storyboardIdentifier="X3" useStoryboardIdentifierAsRestorationIdentifier="YES" id="2sn-UF-eS6" customClass="TestLayerViewController" customModule="Ubiquity_Example" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="X3" automaticallyAdjustsScrollViewInsets="NO" useStoryboardIdentifierAsRestorationIdentifier="YES" id="2sn-UF-eS6" customClass="TestLayerViewController" customModule="Ubiquity_Example" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="dOH-Z4-xPZ"/>
                         <viewControllerLayoutGuide type="bottom" id="rEC-FJ-rSv"/>
@@ -134,15 +177,16 @@
                             <constraint firstItem="ZZy-fx-Uve" firstAttribute="leading" secondItem="aHh-tv-fpZ" secondAttribute="leading" constant="20" id="vOJ-pM-j2I"/>
                         </constraints>
                     </view>
+                    <nil key="simulatedBottomBarMetrics"/>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="y3T-w1-y0Y" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="972" y="1380"/>
+            <point key="canvasLocation" x="2513" y="797"/>
         </scene>
         <!--Test Indicator View Controller-->
         <scene sceneID="nd9-fs-0d9">
             <objects>
-                <viewController storyboardIdentifier="a2s2" useStoryboardIdentifierAsRestorationIdentifier="YES" id="2TO-kW-hP1" customClass="TestIndicatorViewController" customModule="Ubiquity_Example" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="a2s2" automaticallyAdjustsScrollViewInsets="NO" useStoryboardIdentifierAsRestorationIdentifier="YES" id="2TO-kW-hP1" customClass="TestIndicatorViewController" customModule="Ubiquity_Example" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="gS1-Nb-Sgn"/>
                         <viewControllerLayoutGuide type="bottom" id="bAk-9d-3to"/>
@@ -166,28 +210,46 @@
                             <constraint firstAttribute="trailing" secondItem="TeF-sr-GqE" secondAttribute="trailing" id="Yut-ab-R4k"/>
                         </constraints>
                     </view>
+                    <nil key="simulatedBottomBarMetrics"/>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="EIj-hm-EZR" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1720.8" y="1378.56071964018"/>
+            <point key="canvasLocation" x="2903" y="31"/>
         </scene>
-        <!--Test Loader View Controller-->
-        <scene sceneID="FTi-TW-nk0">
+        <!--Test Video Filmstrip View Controller-->
+        <scene sceneID="zUz-Yr-iJN">
             <objects>
-                <viewController storyboardIdentifier="ZCX" useStoryboardIdentifierAsRestorationIdentifier="YES" id="a66-8D-IVP" customClass="TestLoaderViewController" customModule="Ubiquity_Example" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="TestVideoFilmstripViewController" automaticallyAdjustsScrollViewInsets="NO" useStoryboardIdentifierAsRestorationIdentifier="YES" id="3DQ-VI-cWG" customClass="TestVideoFilmstripViewController" customModule="Ubiquity_Example" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
-                        <viewControllerLayoutGuide type="top" id="q8k-f2-rfc"/>
-                        <viewControllerLayoutGuide type="bottom" id="YVf-BI-2BS"/>
+                        <viewControllerLayoutGuide type="top" id="qiR-z0-iKH"/>
+                        <viewControllerLayoutGuide type="bottom" id="e3r-UZ-2VM"/>
                     </layoutGuides>
-                    <view key="view" contentMode="scaleToFill" id="t09-Qq-RwB">
+                    <view key="view" contentMode="scaleToFill" id="t3p-zx-Sf3">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" red="0.89413207769393921" green="0.89413201808929443" blue="0.89413201808929443" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+                        <subviews>
+                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="lbf-VY-H4O">
+                                <rect key="frame" x="0.0" y="629" width="375" height="38"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="38" id="1B5-aS-5x6"/>
+                                </constraints>
+                            </scrollView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstAttribute="trailing" secondItem="lbf-VY-H4O" secondAttribute="trailing" id="SUq-zp-idb"/>
+                            <constraint firstItem="e3r-UZ-2VM" firstAttribute="top" secondItem="lbf-VY-H4O" secondAttribute="bottom" id="pSL-yG-zYQ"/>
+                            <constraint firstItem="lbf-VY-H4O" firstAttribute="leading" secondItem="t3p-zx-Sf3" secondAttribute="leading" id="tT4-NB-pkz"/>
+                        </constraints>
                     </view>
+                    <nil key="simulatedBottomBarMetrics"/>
+                    <connections>
+                        <outlet property="scrollView" destination="lbf-VY-H4O" id="Dc6-l0-aak"/>
+                    </connections>
                 </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="rF0-vu-C6z" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="xK8-n1-B8J" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2468" y="1379"/>
+            <point key="canvasLocation" x="1305" y="797"/>
         </scene>
         <!--Item-->
         <scene sceneID="s9a-KE-DGc">
@@ -205,7 +267,7 @@
                         <autoresizingMask key="autoresizingMask"/>
                     </toolbar>
                     <connections>
-                        <segue destination="BYZ-38-t0r" kind="relationship" relationship="rootViewController" id="Uic-c8-fB8"/>
+                        <segue destination="BIC-XQ-RJL" kind="relationship" relationship="rootViewController" id="Egt-Hg-rGc"/>
                     </connections>
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="8Nk-Ke-QMM" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -215,7 +277,7 @@
         <!--CanvasView-->
         <scene sceneID="u1y-ED-pFi">
             <objects>
-                <viewController hidesBottomBarWhenPushed="YES" id="bCH-wR-wLF" customClass="TestCanvasViewController" customModule="Ubiquity_Example" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController automaticallyAdjustsScrollViewInsets="NO" hidesBottomBarWhenPushed="YES" id="bCH-wR-wLF" customClass="TestCanvasViewController" customModule="Ubiquity_Example" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="og9-Jn-iul"/>
                         <viewControllerLayoutGuide type="bottom" id="Pk2-Wl-0Uq"/>
@@ -257,13 +319,14 @@
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" title="CanvasView" id="h40-hZ-Dbt"/>
+                    <nil key="simulatedBottomBarMetrics"/>
                     <connections>
-                        <outlet property="containterView" destination="TSZ-6D-3DX" id="FJy-Q0-mvK"/>
+                        <outlet property="containerView" destination="TSZ-6D-3DX" id="c1b-ug-pqe"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="aOL-8L-679" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2719" y="38"/>
+            <point key="canvasLocation" x="1910" y="797"/>
         </scene>
     </scenes>
 </document>

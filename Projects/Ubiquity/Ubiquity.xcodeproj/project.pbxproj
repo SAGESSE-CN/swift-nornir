@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		0C16F8771EA61D2500C788C5 /* UIImage+Module.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C16F8761EA61D2500C788C5 /* UIImage+Module.swift */; };
+		0C5DCB7E1EC5C680009FA343 /* UIResponder+Fullscreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C5DCB7D1EC5C680009FA343 /* UIResponder+Fullscreen.swift */; };
 		0C7D45151EAB7AE800D56AB5 /* Animator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C7D45061EAB7AE800D56AB5 /* Animator.swift */; };
 		0C7D45161EAB7AE800D56AB5 /* BadgeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C7D45071EAB7AE800D56AB5 /* BadgeView.swift */; };
 		0C7D45171EAB7AE800D56AB5 /* CanvasView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C7D45081EAB7AE800D56AB5 /* CanvasView.swift */; };
@@ -82,6 +83,7 @@
 
 /* Begin PBXFileReference section */
 		0C16F8761EA61D2500C788C5 /* UIImage+Module.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIImage+Module.swift"; sourceTree = "<group>"; };
+		0C5DCB7D1EC5C680009FA343 /* UIResponder+Fullscreen.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIResponder+Fullscreen.swift"; sourceTree = "<group>"; };
 		0C7D45061EAB7AE800D56AB5 /* Animator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Animator.swift; sourceTree = "<group>"; };
 		0C7D45071EAB7AE800D56AB5 /* BadgeView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BadgeView.swift; sourceTree = "<group>"; };
 		0C7D45081EAB7AE800D56AB5 /* CanvasView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CanvasView.swift; sourceTree = "<group>"; };
@@ -134,7 +136,7 @@
 		0CE49E391E7A3FE50058F5F8 /* UbiquityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UbiquityTests.swift; sourceTree = "<group>"; };
 		0CE49E3B1E7A3FE50058F5F8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		0CE49E601E7A7D900058F5F8 /* BrowserAlbumController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BrowserAlbumController.swift; sourceTree = "<group>"; };
-		0CE49E621E7A983A0058F5F8 /* BrowserDetailController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BrowserDetailController.swift; sourceTree = "<group>"; };
+		0CE49E621E7A983A0058F5F8 /* BrowserDetailController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BrowserDetailController.swift; sourceTree = "<group>"; wrapsLines = 0; };
 		0CE49E641E7A99180058F5F8 /* BrowserGridController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BrowserGridController.swift; sourceTree = "<group>"; wrapsLines = 0; };
 		0CE49E661E7A9BA80058F5F8 /* BrowserGridLayout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BrowserGridLayout.swift; sourceTree = "<group>"; };
 		0CE49E681E7A9CE50058F5F8 /* BrowserGridCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BrowserGridCell.swift; sourceTree = "<group>"; };
@@ -326,6 +328,7 @@
 			children = (
 				0C8FEE5D1E8BBF540096EC4C /* CGRect+Align.swift */,
 				0C16F8761EA61D2500C788C5 /* UIImage+Module.swift */,
+				0C5DCB7D1EC5C680009FA343 /* UIResponder+Fullscreen.swift */,
 				0C8FEE5B1E8BBD710096EC4C /* UIImageOrientation+Angle.swift */,
 				0C879F281E7EB63F00E55741 /* UINavigationController+Transitioning.swift */,
 				0CD030301EBB84590098638E /* NSLayoutConstraint+Make.swift */,
@@ -491,6 +494,7 @@
 				0C8FEE5E1E8BBF540096EC4C /* CGRect+Align.swift in Sources */,
 				0CE49EA41E7AB11D0058F5F8 /* Logger.swift in Sources */,
 				0C7D45201EAB7AE800D56AB5 /* TilingView.swift in Sources */,
+				0C5DCB7E1EC5C680009FA343 /* UIResponder+Fullscreen.swift in Sources */,
 				0C7D45181EAB7AE800D56AB5 /* ConsoleView.swift in Sources */,
 				0CE49E121E7A3F010058F5F8 /* Editor.swift in Sources */,
 				0CE49E7F1E7AAEB70058F5F8 /* BrowserDetailCell.swift in Sources */,

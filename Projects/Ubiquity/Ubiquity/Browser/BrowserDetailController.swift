@@ -8,12 +8,6 @@
 
 import UIKit
 
-//@objc protocol BrowseDetailViewDelegate {
-//    
-//    @objc optional func browseDetailView(_ browseDetailView: Any, _ containerView: IBScrollView, shouldBeginRotationing view: UIView?) -> Bool
-//    @objc optional func browseDetailView(_ browseDetailView: Any, _ containerView: IBScrollView, didEndRotationing view: UIView?, atOrientation orientation: UIImageOrientation) // scale between minimum and maximum. called after any 'bounce' animations
-//}
-
 internal class BrowserDetailController: UICollectionViewController {
     
     init(container: Container, at indexPath: IndexPath) {
@@ -142,6 +136,9 @@ internal class BrowserDetailController: UICollectionViewController {
     fileprivate var _transitionIsInteractiving: Bool = false
     fileprivate var _transitionAtLocation: CGPoint = .zero
     fileprivate var _transitionContext: TransitioningContext?
+    
+    // 全屏模式
+    fileprivate var _isFullscreen: Bool = false
     
     // 插入删除的时候必须清除
     fileprivate var _interactivingFromIndex: Int?
@@ -376,6 +373,7 @@ extension BrowserDetailController: UIGestureRecognizerDelegate {
                     navigationController.popViewController(animated: true)
                     return
                 }
+                
                 // if is presented
                 self.dismiss(animated: true, completion: nil)
             }
@@ -421,6 +419,92 @@ extension BrowserDetailController: UIGestureRecognizerDelegate {
     }
 }
 
+/// Provide full-screen display support
+extension BrowserDetailController {
+    
+    override var prefersStatusBarHidden: Bool {
+        return _isFullscreen || super.prefersStatusBarHidden
+    }
+    override var preferredStatusBarUpdateAnimation: UIStatusBarAnimation {
+        return .none
+    }
+    
+    override var ub_isFullscreen: Bool {
+        return _isFullscreen
+    }
+    
+    @discardableResult
+    override func ub_enterFullscreen(animated: Bool) -> Bool {
+        logger.trace?.write(animated)
+        
+        _isFullscreen = true
+        _animate(with: 0.25, options: .curveEaseInOut, animations: {
+            // need to add animation?
+            guard animated else {
+                return
+            }
+            
+            self.view.backgroundColor = .black
+            self.collectionView?.backgroundColor = .black
+            
+            self.navigationController?.toolbar?.alpha = 0
+            self.navigationController?.navigationBar.alpha = 0
+            
+        }, completion: { finished in
+            
+            self.view.backgroundColor = .black
+            self.collectionView?.backgroundColor = .black
+            
+            self.setNeedsStatusBarAppearanceUpdate()
+            self.navigationController?.toolbar?.alpha = 1
+            self.navigationController?.toolbar.isHidden =  true
+            self.navigationController?.navigationBar.alpha = 1
+            self.navigationController?.navigationBar.isHidden =  true
+        })
+        
+        return true
+    }
+    
+    @discardableResult
+    override func ub_exitFullscreen(animated: Bool) -> Bool {
+        logger.trace?.write(animated)
+        
+        _isFullscreen = false
+        
+        _animate(with: 0.25, options: .curveEaseInOut, animations: {
+            // need to add animation?
+            guard animated else {
+                return
+            }
+            UIView.performWithoutAnimation {
+                
+                self.setNeedsStatusBarAppearanceUpdate()
+                self.navigationController?.toolbar?.alpha = 0
+                self.navigationController?.toolbar.isHidden = false
+                self.navigationController?.navigationBar.alpha = 0
+                self.navigationController?.navigationBar.isHidden = false
+            }
+            
+            self.view.backgroundColor = .white
+            self.collectionView?.backgroundColor = .white
+            
+            self.navigationController?.toolbar?.alpha = 1
+            self.navigationController?.navigationBar.alpha = 1
+            
+        }, completion: { finished in
+            
+            self.view.backgroundColor = .white
+            self.collectionView?.backgroundColor = .white
+        })
+        
+        return true
+    }
+    
+    fileprivate func _animate(with duration: TimeInterval, options: UIViewAnimationOptions, animations: @escaping () -> Swift.Void, completion: ((Bool) -> Void)? = nil) {
+        //UIView.animate(withDuration: duration * 5, delay: 0, options: options, animations: animations, completion: completion)
+        UIView.animate(withDuration: duration, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 10, options: options, animations: animations, completion: completion)
+    }
+}
 
 ///
 /// Provide interactivable transitioning support
@@ -439,7 +523,6 @@ extension BrowserDetailController: TransitioningDataSource {
     
     func ub_transitionShouldStart(using animator: Animator, for operation: Animator.Operation) -> Bool {
         logger.trace?.write()
-        
         animator.indexPath = currentIndexPath
         return true
     }
@@ -449,6 +532,21 @@ extension BrowserDetailController: TransitioningDataSource {
         let state = interactiveDismissGestureRecognizer.state
         guard state == .changed || state == .began else {
             return false
+        }
+        // transitions in full-screen mode, require additional add exit full-screen of the animation
+        guard ub_isFullscreen else {
+            return true
+        }
+        UIView.performWithoutAnimation {
+            self.setNeedsStatusBarAppearanceUpdate()
+            self.navigationController?.toolbar?.alpha = 0
+            self.navigationController?.toolbar?.isHidden = false
+            self.navigationController?.navigationBar.alpha = 0
+            self.navigationController?.navigationBar.isHidden = false
+        }
+        UIView.animate(withDuration: 0.25) {
+            self.navigationController?.toolbar?.alpha = 1
+            self.navigationController?.navigationBar.alpha = 1
         }
         return true
     }
@@ -479,6 +577,18 @@ extension BrowserDetailController: TransitioningDataSource {
     }
     func ub_transitionDidEnd(using animator: Animator, transitionCompleted: Bool) {
         _transitionContext = nil
+        
+        // transitions in failure, if needed restore full-screen mode
+        guard !transitionCompleted && ub_isFullscreen else {
+            return
+        }
+        UIView.performWithoutAnimation {
+            self.setNeedsStatusBarAppearanceUpdate()
+            self.navigationController?.toolbar?.alpha = 1
+            self.navigationController?.toolbar?.isHidden = true
+            self.navigationController?.navigationBar.alpha = 1
+            self.navigationController?.navigationBar.isHidden = true
+        }
     }
 }
 

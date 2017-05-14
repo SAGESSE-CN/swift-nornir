@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		0C16F87B1EA663E700C788C5 /* TestLayerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C16F87A1EA663E700C788C5 /* TestLayerViewController.swift */; };
 		0C224C421EAC55F7001ABB47 /* TestIndicatorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C224C411EAC55F7001ABB47 /* TestIndicatorViewController.swift */; };
+		0C5DCB7C1EC0C45F009FA343 /* TestVideoFilmstripViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C5DCB7B1EC0C45F009FA343 /* TestVideoFilmstripViewController.swift */; };
 		0CE49E221E7A3F690058F5F8 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE49E211E7A3F690058F5F8 /* AppDelegate.swift */; };
 		0CE49E271E7A3F690058F5F8 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0CE49E251E7A3F690058F5F8 /* Main.storyboard */; };
 		0CE49E291E7A3F690058F5F8 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0CE49E281E7A3F690058F5F8 /* Assets.xcassets */; };
@@ -36,6 +37,7 @@
 /* Begin PBXFileReference section */
 		0C16F87A1EA663E700C788C5 /* TestLayerViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestLayerViewController.swift; sourceTree = "<group>"; };
 		0C224C411EAC55F7001ABB47 /* TestIndicatorViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestIndicatorViewController.swift; sourceTree = "<group>"; };
+		0C5DCB7B1EC0C45F009FA343 /* TestVideoFilmstripViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestVideoFilmstripViewController.swift; sourceTree = "<group>"; };
 		0CE49E1E1E7A3F690058F5F8 /* Ubiquity-Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Ubiquity-Example.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		0CE49E211E7A3F690058F5F8 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		0CE49E261E7A3F690058F5F8 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -88,6 +90,7 @@
 				0CE49E2A1E7A3F690058F5F8 /* LaunchScreen.storyboard */,
 				0CE49E2D1E7A3F690058F5F8 /* Info.plist */,
 				0CE49EA61E7B978E0058F5F8 /* ViewController.swift */,
+				0C5DCB7B1EC0C45F009FA343 /* TestVideoFilmstripViewController.swift */,
 			);
 			name = Example;
 			path = "Ubiquity-Example";
@@ -176,6 +179,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				0C16F87B1EA663E700C788C5 /* TestLayerViewController.swift in Sources */,
+				0C5DCB7C1EC0C45F009FA343 /* TestVideoFilmstripViewController.swift in Sources */,
 				0CE49EA71E7B978E0058F5F8 /* ViewController.swift in Sources */,
 				0C224C421EAC55F7001ABB47 /* TestIndicatorViewController.swift in Sources */,
 				0CE49EA91E7B97CE0058F5F8 /* TestCanvasViewController.swift in Sources */,

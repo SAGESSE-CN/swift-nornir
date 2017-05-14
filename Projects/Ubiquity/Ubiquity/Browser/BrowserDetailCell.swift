@@ -86,8 +86,8 @@ internal class BrowserDetailCell: UICollectionViewCell, Displayable {
         if let containerView = _containerView {
             containerView.delegate = self
             // add tap recognizer
-            let tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(handleTap(_:)))
-            let doubleTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(handleDoubleTap(_:)))
+            let tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(_handleTap(_:)))
+            let doubleTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(_handleDoubleTap(_:)))
             
             doubleTapRecognizer.numberOfTapsRequired = 2
             tapRecognizer.numberOfTapsRequired = 1
@@ -108,10 +108,10 @@ internal class BrowserDetailCell: UICollectionViewCell, Displayable {
         }
         // setup console
         _console = ConsoleProxy(frame: .init(x: 0, y: 0, width: 70, height: 70), owner: self)
-        _console?.addTarget(self, action: #selector(handleCommand(_:)), for: .touchUpInside)
+        _console?.addTarget(self, action: #selector(_handleCommand(_:)), for: .touchUpInside)
         // setup progress
         _progress = ProgressProxy(frame: .init(x: 0, y: 0, width: 24, height: 24), owner: self)
-        _progress?.addTarget(self, action: #selector(handleRetry(_:)), for: .touchUpInside)
+        _progress?.addTarget(self, action: #selector(_handleRetry(_:)), for: .touchUpInside)
     }
     
     // data
@@ -199,7 +199,7 @@ extension BrowserDetailCell {
 /// event support
 extension BrowserDetailCell {
     
-    fileprivate dynamic func handleRetry(_ sender: Any) {
+    fileprivate dynamic func _handleRetry(_ sender: Any) {
         logger.trace?.write()
         self._progress?.setValue(0, animated: false)
         DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(1), execute: {
@@ -212,7 +212,7 @@ extension BrowserDetailCell {
             })
         })
     }
-    fileprivate dynamic func handleCommand(_ sender: Any) {
+    fileprivate dynamic func _handleCommand(_ sender: Any) {
         logger.trace?.write()
         
         // if is stopped, click goto prepare
@@ -225,13 +225,24 @@ extension BrowserDetailCell {
             _console?.setState(.waiting, animated: true)
             // prepare player
             (_detailView as? Operable)?.prepare(with: item)
+            
+            // start playing enter fullscreen mode
+            if !ub_isFullscreen {
+                ub_enterFullscreen(animated: true)
+            }
         }
     }
     
-    fileprivate dynamic func handleTap(_ sender: UITapGestureRecognizer) {
+    fileprivate dynamic func _handleTap(_ sender: UITapGestureRecognizer) {
         logger.trace?.write()
+        
+        if !ub_isFullscreen {
+            ub_enterFullscreen(animated: true)
+        } else {
+            ub_exitFullscreen(animated: true)
+        }
     }
-    fileprivate dynamic func handleDoubleTap(_ sender: UITapGestureRecognizer) {
+    fileprivate dynamic func _handleDoubleTap(_ sender: UITapGestureRecognizer) {
         logger.trace?.write()
         guard let containerView = containerView else {
             return

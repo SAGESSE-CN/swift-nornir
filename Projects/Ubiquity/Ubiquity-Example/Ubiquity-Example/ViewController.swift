@@ -9,7 +9,7 @@
 import UIKit
 import Ubiquity
 
-class ViewController: UIViewController, UIActionSheetDelegate {
+class ViewController: UITableViewController, UIActionSheetDelegate {
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()

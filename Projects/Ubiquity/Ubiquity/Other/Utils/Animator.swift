@@ -324,6 +324,7 @@ extension Animator {
         
         // This is a convenience and if implemented will be invoked by the system when the transition context's completeTransition: method is invoked.
         func animationEnded(_ transitionCompleted: Bool) {
+            logger.trace?.write(transitionCompleted)
         }
         
         var animator: Animator
@@ -457,14 +458,14 @@ extension Animator {
             ub_view(for: .destination)?.isHidden = false
             // clear context
             snapshotView.removeFromSuperview()
-            // notice delegate
-            animator.source?.ub_transitionDidEnd(using: animator, transitionCompleted: completed)
-            animator.destination?.ub_transitionDidEnd(using: animator, transitionCompleted: completed)
+            // commit
+            context.completeTransition(completed)
             // notice transitioning view
             ub_transitioningView(for: .source)?.ub_transitionDidEnd(completed)
             ub_transitioningView(for: .destination)?.ub_transitionDidEnd(completed)
-            // commit
-            context.completeTransition(completed)
+            // notice delegate
+            animator.source?.ub_transitionDidEnd(using: animator, transitionCompleted: completed)
+            animator.destination?.ub_transitionDidEnd(using: animator, transitionCompleted: completed)
         }
         
         func apply(for key: Animator.Content) {
@@ -549,6 +550,15 @@ extension Animator {
             } else {
                 cancel()
             }
+        }
+        
+        override func prepare(for key: Animator.Content) {
+            logger.trace?.write(context.containerView.layer.speed)
+            super.prepare(for: key)
+        }
+        override func complete(_ completed: Bool) {
+            super.complete(completed)
+            logger.trace?.write(context.containerView.layer.speed)
         }
         
         func cancel() {
