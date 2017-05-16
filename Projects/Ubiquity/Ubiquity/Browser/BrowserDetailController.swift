@@ -56,8 +56,8 @@ internal class BrowserDetailController: UICollectionViewController {
         collectionView?.allowsMultipleSelection = false
         collectionView?.allowsSelection = false
         collectionView?.backgroundColor = .white
-        collectionView?.register(BrowserDetailCell.dynamic(with: ImageView.self), forCellWithReuseIdentifier: "ASSET-DETAIL-IMAGE")
-        collectionView?.register(BrowserDetailCell.dynamic(with: VideoView.self), forCellWithReuseIdentifier: "ASSET-DETAIL-VIDEO")
+        collectionView?.register(BrowserDetailCell.dynamic(with: ImageView.self), forCellWithReuseIdentifier: _identifier(with: .image))
+        collectionView?.register(BrowserDetailCell.dynamic(with: VideoView.self), forCellWithReuseIdentifier: _identifier(with: .video))
         
         // setup indicator 
         indicatorItem.indicatorView.delegate = self
@@ -164,14 +164,21 @@ extension BrowserDetailController: UICollectionViewDelegateFlowLayout {
     }
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        return collectionView.dequeueReusableCell(withReuseIdentifier: "ASSET-DETAIL-VIDEO", for: indexPath)
+        let identifier = _identifier(with: container.item(at: indexPath).type)
+        return collectionView.dequeueReusableCell(withReuseIdentifier: identifier, for: indexPath)
     }
     override func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         guard let cell =  cell as? BrowserDetailCell else {
             return
         }
         cell.apply(with: _systemContentInset)
-        cell.display(with: container.item(at: indexPath), orientation: .up)
+        cell.willDisplay(with: container.item(at: indexPath), orientation: .up)
+    }
+    override func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+        guard let cell =  cell as? BrowserDetailCell else {
+            return
+        }
+        cell.endDisplay(with: container.item(at: indexPath))
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
@@ -222,6 +229,13 @@ extension BrowserDetailController: UICollectionViewDelegateFlowLayout {
     }
     
     // MARK: private method
+    
+    fileprivate func _identifier(with type: ItemType) -> String {
+        switch type {
+        case .image: return "ASSET-DETAIL-IMAGE"
+        case .video: return "ASSET-DETAIL-VIDEO"
+        }
+    }
     
     fileprivate func _updateCurrentItem(_ offset: CGPoint) {
         // must has a collection view
@@ -422,12 +436,12 @@ extension BrowserDetailController: UIGestureRecognizerDelegate {
 /// Provide full-screen display support
 extension BrowserDetailController {
     
-    override var prefersStatusBarHidden: Bool {
-        return _isFullscreen || super.prefersStatusBarHidden
-    }
-    override var preferredStatusBarUpdateAnimation: UIStatusBarAnimation {
-        return .none
-    }
+//    override var prefersStatusBarHidden: Bool {
+//        return _isFullscreen || super.prefersStatusBarHidden
+//    }
+//    override var preferredStatusBarUpdateAnimation: UIStatusBarAnimation {
+//        return .none
+//    }
     
     override var ub_isFullscreen: Bool {
         return _isFullscreen
@@ -455,7 +469,7 @@ extension BrowserDetailController {
             self.view.backgroundColor = .black
             self.collectionView?.backgroundColor = .black
             
-            self.setNeedsStatusBarAppearanceUpdate()
+//            self.setNeedsStatusBarAppearanceUpdate()
             self.navigationController?.toolbar?.alpha = 1
             self.navigationController?.toolbar.isHidden =  true
             self.navigationController?.navigationBar.alpha = 1
@@ -478,7 +492,7 @@ extension BrowserDetailController {
             }
             UIView.performWithoutAnimation {
                 
-                self.setNeedsStatusBarAppearanceUpdate()
+//                self.setNeedsStatusBarAppearanceUpdate()
                 self.navigationController?.toolbar?.alpha = 0
                 self.navigationController?.toolbar.isHidden = false
                 self.navigationController?.navigationBar.alpha = 0
@@ -583,7 +597,7 @@ extension BrowserDetailController: TransitioningDataSource {
             return
         }
         UIView.performWithoutAnimation {
-            self.setNeedsStatusBarAppearanceUpdate()
+//            self.setNeedsStatusBarAppearanceUpdate()
             self.navigationController?.toolbar?.alpha = 1
             self.navigationController?.toolbar?.isHidden = true
             self.navigationController?.navigationBar.alpha = 1

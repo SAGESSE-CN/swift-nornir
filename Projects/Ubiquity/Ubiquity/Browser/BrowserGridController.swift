@@ -25,7 +25,6 @@ internal class BrowserGridController: UICollectionViewController {
         
         // setup colleciton view
         collectionView?.register(BrowserGridCell.dynamic(with: UIImageView.self), forCellWithReuseIdentifier: "ASSET-IMAGE")
-        collectionView?.register(BrowserGridCell.dynamic(with: UIImageView.self), forCellWithReuseIdentifier: "ASSET-IMAGE-BADGE")
         collectionView?.backgroundColor = .white
         collectionView?.alwaysBounceVertical = true
     }
@@ -48,18 +47,25 @@ extension BrowserGridController: UICollectionViewDelegateFlowLayout {
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         return collectionView.dequeueReusableCell(withReuseIdentifier: "ASSET-IMAGE", for: indexPath)
     }
-    override func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        guard let cell =  cell as? BrowserGridCell else {
-            return
-        }
-        return cell.display(with: container.item(at: indexPath), orientation: .up)
-    }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         guard let layout = collectionViewLayout as? UICollectionViewFlowLayout else {
             return .zero
         }
         return layout.itemSize
+    }
+    
+    override func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+        guard let cell =  cell as? BrowserGridCell else {
+            return
+        }
+        cell.willDisplay(with: container.item(at: indexPath), orientation: .up)
+    }
+    override func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+        guard let cell =  cell as? BrowserGridCell else {
+            return
+        }
+        cell.endDisplay(with: container.item(at: indexPath))
     }
     
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {

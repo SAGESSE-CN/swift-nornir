@@ -78,7 +78,7 @@ internal class BrowserGridCell: UICollectionViewCell, Displayable {
     /// - parameter item: need display the item
     /// - parameter orientation: need display the orientation
     ///
-    func display(with item: Item, orientation: UIImageOrientation) {
+    func willDisplay(with item: Item, orientation: UIImageOrientation) {
         
         //backgroundColor = item.backgroundColor
         
@@ -88,7 +88,30 @@ internal class BrowserGridCell: UICollectionViewCell, Displayable {
             imageView.image = item.image?.ub_withOrientation(orientation)
         }
         
+        switch item.type {
+        case .image:
+            badgeView?.backgroundImage = nil
+            badgeView?.leftItems = nil
+            badgeView?.rightItems = nil
+            
+        case .video:
+            badgeView?.backgroundImage = BadgeView.ub_backgroundImage
+            badgeView?.leftItems = [
+                .video
+            ]
+            badgeView?.rightItems = [
+                .text("04:21")
+            ]
+        }
+        
         _contentSize = item.size
+    }
+    ///
+    /// end display content with item
+    ///
+    /// - parameter item: need display the item
+    ///
+    func endDisplay(with item: Item) {
     }
     
     func _createBadgeView() {
@@ -100,16 +123,6 @@ internal class BrowserGridCell: UICollectionViewCell, Displayable {
         view.autoresizingMask = [.flexibleWidth, .flexibleTopMargin]
         view.isUserInteractionEnabled = false
         
-        view.backgroundImage = BadgeView.ub_backgroundImage
-        view.leftItems = [
-            .video
-//            .panorama
-        ]
-        view.rightItems = [
-            //.downloading
-            //.text("99:99")
-            .text("04:21")
-        ]
         
         addSubview(view)
         badgeView = view

@@ -8,6 +8,11 @@
 
 import UIKit
 
+public enum ItemType: Int {
+    case image
+    case video
+}
+
 /// resource abstract of item
 public protocol Group: class {
     var title: String? { get }
@@ -17,6 +22,8 @@ public protocol Group: class {
 public protocol Item: class {
     var size: CGSize { get }
     var image: UIImage? { get }
+    
+    var type: ItemType { get }
 }
 
 /// displayable the container abstract class
@@ -83,7 +90,13 @@ internal protocol Displayable {
     /// - parameter item: need display the item
     /// - parameter orientation: need display the orientation
     ///
-    func display(with item: Item, orientation: UIImageOrientation)
+    func willDisplay(with item: Item, orientation: UIImageOrientation)
+    ///
+    /// end display content with item
+    ///
+    /// - parameter item: need display the item
+    ///
+    func endDisplay(with item: Item)
 }
 
 

@@ -11,27 +11,29 @@ import UIKit
 ///
 /// display images resources
 ///
-internal class ImageView: UIImageView, Displayable {
+internal class ImageView: AnimatedImageView, Displayable {
     ///
     /// display container content with item
     ///
     /// - parameter item: need display the item
     /// - parameter orientation: need display the orientation
     ///
-    func display(with item: Item, orientation: UIImageOrientation) {
+    func willDisplay(with item: Item, orientation: UIImageOrientation) {
         logger.trace?.write()
         
         // update image
-        image = item.image?.ub_withOrientation(orientation)
+        image = item.image //?.ub_withOrientation(orientation)
     }
-    
     ///
-    /// generate quick snapshot, if there is time synchronous display
+    /// end display content with item
     ///
-    override func snapshotView(afterScreenUpdates afterUpdates: Bool) -> UIView? {
-        let imageView = UIImageView(frame: frame)
-        imageView.image = image
-        imageView.backgroundColor = backgroundColor
-        return imageView
+    /// - parameter item: need display the item
+    ///
+    func endDisplay(with item: Item) {
+        logger.trace?.write()
+        
+        // stop animation if needed
+        stopAnimating()
     }
 }
+

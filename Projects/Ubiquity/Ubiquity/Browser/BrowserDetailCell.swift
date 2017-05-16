@@ -43,7 +43,7 @@ internal class BrowserDetailCell: UICollectionViewCell, Displayable {
     /// - parameter item: need display the item
     /// - parameter orientation: need display the orientation
     ///
-    func display(with item: Item, orientation: UIImageOrientation) {
+    func willDisplay(with item: Item, orientation: UIImageOrientation) {
         logger.trace?.write(item.size)
         
         // update ata
@@ -54,12 +54,30 @@ internal class BrowserDetailCell: UICollectionViewCell, Displayable {
         _containerView?.contentSize = item.size
         _containerView?.zoom(to: bounds , with: orientation, animated: false)
         
+        // if it is a video view show control button
+        if _detailView is VideoView {
+            // defaults is stop
+            _console?.setState(.stop, animated: false)
+        }
+        
         // update util view
         _progress?.setValue(1.000, animated: false)
-        _console?.setState(.stop, animated: false)
         
         // update content
-        (_detailView as? Displayable)?.display(with: item, orientation: orientation)
+        (_contentView as? Displayable)?.willDisplay(with: item, orientation: orientation)
+        (_detailView as? Displayable)?.willDisplay(with: item, orientation: orientation)
+    }
+    ///
+    /// end display content with item
+    ///
+    /// - parameter item: need display the item
+    ///
+    func endDisplay(with item: Item) {
+        logger.trace?.write()
+        
+        // update content
+        (_contentView as? Displayable)?.endDisplay(with: item)
+        (_detailView as? Displayable)?.endDisplay(with: item)
     }
     
     ///
@@ -98,10 +116,14 @@ internal class BrowserDetailCell: UICollectionViewCell, Displayable {
         }
         // setup detail view if needed
         if let detailView = _detailView {
-            _detailView = detailView
-            _containerView?.addSubview(detailView)
+            let contentView = DisplayView(frame: detailView.bounds)
+            _contentView = contentView
+            _detailView?.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+            // setup superview
+            _containerView?.addSubview(contentView)
+            _contentView?.addSubview(detailView)
             // set default background color
-            _detailView?.backgroundColor = Browser.ub_backgroundColor
+            _contentView?.backgroundColor = Browser.ub_backgroundColor
             
             // If the detail to support the operation, set the operation delegate
             (_detailView as? Operable)?.delegate = self
@@ -130,16 +152,17 @@ internal class BrowserDetailCell: UICollectionViewCell, Displayable {
     
     // content
     fileprivate var _detailView: UIView?
+    fileprivate var _contentView: UIView?
     fileprivate var _containerView: CanvasView?
     
     // progress
     fileprivate var _progress: ProgressProxy?
     fileprivate var _progressCenter: CGPoint {
         // If no progress or detailview center is zero
-        guard let detailView = detailView, let progress = _progress else {
+        guard let contentView = _contentView, let progress = _progress else {
             return .zero
         }
-        let rect1 = convert(detailView.bounds, from: detailView)
+        let rect1 = convert(contentView.bounds, from: contentView)
         let rect2 = UIEdgeInsetsInsetRect(bounds, _contentInset)
         
         let x = min(max(rect1.maxX, min(max(rect1.minX, rect2.minX) + rect1.width, rect2.maxX)), rect2.maxX)
@@ -214,23 +237,7 @@ extension BrowserDetailCell {
     }
     fileprivate dynamic func _handleCommand(_ sender: Any) {
         logger.trace?.write()
-        
-        // if is stopped, click goto prepare
-        if _console?.state == .stop {
-            // check the data
-            guard let item = _item else {
-                return
-            }
-            // update the status for waiting
-            _console?.setState(.waiting, animated: true)
-            // prepare player
-            (_detailView as? Operable)?.prepare(with: item)
-            
-            // start playing enter fullscreen mode
-            if !ub_isFullscreen {
-                ub_enterFullscreen(animated: true)
-            }
-        }
+        play()
     }
     
     fileprivate dynamic func _handleTap(_ sender: UITapGestureRecognizer) {
@@ -263,7 +270,7 @@ extension BrowserDetailCell {
 extension BrowserDetailCell: CanvasViewDelegate {
     
     func viewForZooming(in canvasView: CanvasView) -> UIView? {
-        return detailView
+        return _contentView
     }
     
     func canvasViewDidScroll(_ canvasView: CanvasView) {
@@ -363,7 +370,9 @@ extension BrowserDetailCell: CanvasViewDelegate {
         _isRotationing = false
         // update content orientation
         _orientation = orientation
-        (_detailView as? Displayable)?.display(with: item, orientation: orientation)
+        // update display
+        (_contentView as? Displayable)?.willDisplay(with: item, orientation: orientation)
+        (_detailView as? Displayable)?.willDisplay(with: item, orientation: orientation)
         // update progress
         _progress?.center = _progressCenter
         _progress?.setIsHidden(false, animated: true)
@@ -379,11 +388,11 @@ extension BrowserDetailCell: CanvasViewDelegate {
 extension BrowserDetailCell: TransitioningView {
     
     var ub_frame: CGRect {
-        guard let containerView = _containerView, let detailView = _detailView else {
+        guard let containerView = _containerView, let contentView = _contentView else {
             return .zero
         }
-        let center = containerView.convert(detailView.center, from: detailView.superview)
-        let bounds = detailView.frame.applying(.init(rotationAngle: _orientation.ub_angle))
+        let center = containerView.convert(contentView.center, from: contentView.superview)
+        let bounds = contentView.frame.applying(.init(rotationAngle: _orientation.ub_angle))
         
         let c1 = containerView.convert(center, to: window)
         let b1 = containerView.convert(bounds, to: window)
@@ -391,10 +400,10 @@ extension BrowserDetailCell: TransitioningView {
         return .init(x: c1.x - b1.width / 2, y: c1.y - b1.height / 2, width: b1.width, height: b1.height)
     }
     var ub_bounds: CGRect {
-        guard let detailView = detailView else {
+        guard let contentView = _contentView else {
             return .zero
         }
-        let bounds = detailView.frame.applying(.init(rotationAngle: _orientation.ub_angle))
+        let bounds = contentView.frame.applying(.init(rotationAngle: _orientation.ub_angle))
         return .init(origin: .zero, size: bounds.size)
     }
     var ub_transform: CGAffineTransform {
@@ -404,7 +413,7 @@ extension BrowserDetailCell: TransitioningView {
         return containerView.contentTransform.rotated(by: _orientation.ub_angle)
     }
     func ub_snapshotView(with context: TransitioningContext) -> UIView? {
-        let view = _detailView?.snapshotView(afterScreenUpdates: context.ub_operation.appear)
+        let view = _contentView?.snapshotView(afterScreenUpdates: context.ub_operation.appear)
         view?.transform = .init(rotationAngle: -_orientation.ub_angle)
         return view
     }
@@ -427,6 +436,44 @@ extension BrowserDetailCell: TransitioningView {
 
 /// operation support
 extension BrowserDetailCell: OperableDelegate {
+    
+    func play() {
+        // must provide the context
+        guard let console = _console, let detailView = _detailView as? Operable, let item = _item else {
+            return
+        }
+        // if is stopped, click goto prepare
+        guard console.state == .stop else {
+            return
+        }
+        logger.trace?.write()
+        // update the status for waiting
+        console.setState(.waiting, animated: true)
+        // start playing enter fullscreen mode
+        if !ub_isFullscreen {
+            ub_enterFullscreen(animated: true)
+        }
+        
+        // prepare player
+        DispatchQueue.main.async {
+            detailView.prepare(with: item)
+        }
+    }
+    func stop() {
+        // must provide the context
+        guard let console = _console, let detailView = _detailView as? Operable else {
+            return
+        }
+        // if is playing or waiting, click goto stop
+        guard console.state != .none && console.state != .stop else {
+            return
+        }
+        logger.trace?.write()
+        // update the status for stop
+        console.setState(.stop, animated: true)
+        // stop player
+        detailView.stop()
+    }
     
     func operable(didPrepare operable: Operable, item: Item) {
         logger.trace?.write()
