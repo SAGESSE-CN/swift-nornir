@@ -29,14 +29,6 @@ internal class BrowserDetailCell: UICollectionViewCell, Displayable {
         return _draggingContentOffset
     }
     
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        
-        // update utility view
-        _progress?.center = _progressCenter
-        _console?.center = _consoleCenter
-    }
-    
     ///
     /// display container content with item
     ///
@@ -61,7 +53,7 @@ internal class BrowserDetailCell: UICollectionViewCell, Displayable {
         }
         
         // update util view
-        _progress?.setValue(1.000, animated: false)
+        _progress?.setValue(-1, animated: false)
         
         // update content
         (_contentView as? Displayable)?.willDisplay(with: item, orientation: orientation)
@@ -85,13 +77,27 @@ internal class BrowserDetailCell: UICollectionViewCell, Displayable {
     ///
     /// - parameter contentInset: new content inset
     ///
-    func apply(with contentInset: UIEdgeInsets) {
+    func apply(with contentInset: UIEdgeInsets, forceUpdate: Bool) {
         logger.trace?.write(contentInset)
         
         _contentInset = contentInset
         
         // need update layout
         setNeedsLayout()
+        
+        guard forceUpdate else {
+            return
+        }
+        layoutIfNeeded()
+    }
+    
+    // update subview layout
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        
+        // update utility view
+        _progress?.center = _progressCenter
+        _console?.center = _consoleCenter
     }
     
     private func _setup() {
@@ -116,14 +122,16 @@ internal class BrowserDetailCell: UICollectionViewCell, Displayable {
         }
         // setup detail view if needed
         if let detailView = _detailView {
+            //  content view
             let contentView = DisplayView(frame: detailView.bounds)
             _contentView = contentView
+            
             _detailView?.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-            // setup superview
             _containerView?.addSubview(contentView)
-            _contentView?.addSubview(detailView)
-            // set default background color
+            
             _contentView?.backgroundColor = Browser.ub_backgroundColor
+            _contentView?.clipsToBounds = true
+            _contentView?.addSubview(detailView)
             
             // If the detail to support the operation, set the operation delegate
             (_detailView as? Operable)?.delegate = self
@@ -231,6 +239,9 @@ extension BrowserDetailCell {
                 self._progress?.setValue(0.65, animated: true)
                 DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(3), execute: {
                     self._progress?.setValue(1.00, animated: true)
+                    DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(4), execute: {
+                        self._progress?.setValue(-1.00, animated: true)
+                    })
                 })
             })
         })

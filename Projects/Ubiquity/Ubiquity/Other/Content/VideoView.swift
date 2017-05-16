@@ -57,13 +57,6 @@ internal enum VideoPlayerStatus {
             return false
         }
     }
-    
-    //        var isStarted: Bool {
-    //            return false
-    //        }
-    //        var isPaused: Bool {
-    //            return false
-    //        }
 }
 
 internal class VideoView: UIView, Displayable, Operable, OperableDelegate {
@@ -160,6 +153,7 @@ internal extension VideoView {
         delegate?.operable(didPrepare: self, item: item)
         // prepare in a hidden the view
         addSubview(_playerView)
+        _thumbView.removeFromSuperview()
     }
     
     /// if you start playing the call this method
@@ -170,6 +164,7 @@ internal extension VideoView {
     func operable(didStop operable: Operable, item: Item) {
         delegate?.operable(didStop: self, item: item)
         // stop to clear
+        addSubview(_thumbView)
         _playerView.removeFromSuperview()
     }
     
@@ -194,6 +189,7 @@ internal extension VideoView {
     func operable(didOccur operable: Operable, item: Item, error: Error?) {
         delegate?.operable(didOccur: self, item: item, error: error)
         // stop to clear
+        addSubview(_thumbView)
         _playerView.removeFromSuperview()
     }
 }
@@ -397,7 +393,7 @@ internal class VideoPlayerView: UIView, Operable {
         
         // setup player layer relationship
         _playerLayer = layer as? AVPlayerLayer
-        _playerLayer?.backgroundColor = UIColor.black.cgColor
+        _playerLayer?.backgroundColor = UIColor.clear.cgColor
         
         // add observe item status
         addObserver(self, forKeyPath: #keyPath(_playerLayer.player.currentItem.status), options: [.new, .old], context: nil)

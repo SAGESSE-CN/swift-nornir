@@ -404,6 +404,7 @@ extension CanvasView {
         _containerView.addSubview(view)
     }
     
+    // update subview layout
     override func layoutSubviews() {
         super.layoutSubviews()
         
@@ -452,6 +453,9 @@ extension CanvasView {
         
         // reset center
         view.center = CGPoint(x: max(view.frame.width, bounds.width) / 2, y: max(view.frame.height, bounds.height) / 2)
+        
+        // need to notice delegate when update the bounds
+        scrollViewDidScroll(_containerView)
         
         // cache
         _bounds = bounds

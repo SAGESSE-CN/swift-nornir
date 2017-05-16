@@ -171,7 +171,7 @@ extension BrowserDetailController: UICollectionViewDelegateFlowLayout {
         guard let cell =  cell as? BrowserDetailCell else {
             return
         }
-        cell.apply(with: _systemContentInset)
+        cell.apply(with: _systemContentInset, forceUpdate: false)
         cell.willDisplay(with: container.item(at: indexPath), orientation: .up)
     }
     override func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
@@ -285,14 +285,16 @@ extension BrowserDetailController: UICollectionViewDelegateFlowLayout {
         // use percentage update index
         indicatorItem.indicatorView.updateIndexPath(from: _interactivingFromIndexPath, to: _interactivingToIndexPath, percent: percent)
     }
-    fileprivate func _updateSystemContentInsetIfNeeded() {
+    fileprivate func _updateSystemContentInsetIfNeeded(forceUpdate: Bool = false) {
         
         var contentInset  = UIEdgeInsets.zero
         
-        // have navigation bar?
-        contentInset.top = topLayoutGuide.length
-        // have toolbar?
-        contentInset.bottom = bottomLayoutGuide.length + indicatorItem.height
+        if !ub_isFullscreen {
+            // have navigation bar?
+            contentInset.top = topLayoutGuide.length
+            // have toolbar?
+            contentInset.bottom = bottomLayoutGuide.length + indicatorItem.height
+        }
         // is change?
         guard _systemContentInset != contentInset else {
             return
@@ -300,7 +302,7 @@ extension BrowserDetailController: UICollectionViewDelegateFlowLayout {
         logger.trace?.write(contentInset)
         // notice all displayed cell
         collectionView?.visibleCells.forEach {
-            ($0 as? BrowserDetailCell)?.apply(with: contentInset)
+            ($0 as? BrowserDetailCell)?.apply(with: contentInset, forceUpdate: forceUpdate)
         }
         // update cache
         _systemContentInset = contentInset
@@ -458,6 +460,8 @@ extension BrowserDetailController {
                 return
             }
             
+            self._updateSystemContentInsetIfNeeded(forceUpdate: true)
+            
             self.view.backgroundColor = .black
             self.collectionView?.backgroundColor = .black
             
@@ -474,6 +478,8 @@ extension BrowserDetailController {
             self.navigationController?.toolbar.isHidden =  true
             self.navigationController?.navigationBar.alpha = 1
             self.navigationController?.navigationBar.isHidden =  true
+            
+            self._updateSystemContentInsetIfNeeded()
         })
         
         return true
@@ -499,6 +505,8 @@ extension BrowserDetailController {
                 self.navigationController?.navigationBar.isHidden = false
             }
             
+            self._updateSystemContentInsetIfNeeded(forceUpdate: true)
+            
             self.view.backgroundColor = .white
             self.collectionView?.backgroundColor = .white
             
@@ -509,6 +517,8 @@ extension BrowserDetailController {
             
             self.view.backgroundColor = .white
             self.collectionView?.backgroundColor = .white
+            
+            self._updateSystemContentInsetIfNeeded()
         })
         
         return true

@@ -90,10 +90,13 @@ internal class DisplayView: UIView, Displayable {
         // setup content view
         _contentView.frame = bounds
         _contentView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        
         super.addSubview(_contentView)
     }
     
-    private lazy var _contentView: UIView = .init()
+    private lazy var _contentView: DisplayContentView = .init()
+}
+internal class DisplayContentView: UIView {
 }
 internal class DisplayReplicantView: UIView {
     
