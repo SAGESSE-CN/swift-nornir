@@ -444,6 +444,14 @@ extension BrowserDetailController {
 //    override var preferredStatusBarUpdateAnimation: UIStatusBarAnimation {
 //        return .none
 //    }
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+       // full screen mode shows white status bar
+        guard _isFullscreen else {
+            // default case
+            return super.preferredStatusBarStyle
+        }
+        return .lightContent
+    }
     
     override var ub_isFullscreen: Bool {
         return _isFullscreen
@@ -460,7 +468,7 @@ extension BrowserDetailController {
                 return
             }
             
-            self._updateSystemContentInsetIfNeeded(forceUpdate: true)
+            self.setNeedsStatusBarAppearanceUpdate()
             
             self.view.backgroundColor = .black
             self.collectionView?.backgroundColor = .black
@@ -468,12 +476,15 @@ extension BrowserDetailController {
             self.navigationController?.toolbar?.alpha = 0
             self.navigationController?.navigationBar.alpha = 0
             
+            self._updateSystemContentInsetIfNeeded(forceUpdate: true)
+            
         }, completion: { finished in
+            
+            self.setNeedsStatusBarAppearanceUpdate()
             
             self.view.backgroundColor = .black
             self.collectionView?.backgroundColor = .black
             
-//            self.setNeedsStatusBarAppearanceUpdate()
             self.navigationController?.toolbar?.alpha = 1
             self.navigationController?.toolbar.isHidden =  true
             self.navigationController?.navigationBar.alpha = 1
@@ -490,7 +501,6 @@ extension BrowserDetailController {
         logger.trace?.write(animated)
         
         _isFullscreen = false
-        
         _animate(with: 0.25, options: .curveEaseInOut, animations: {
             // need to add animation?
             guard animated else {
@@ -498,20 +508,21 @@ extension BrowserDetailController {
             }
             UIView.performWithoutAnimation {
                 
-//                self.setNeedsStatusBarAppearanceUpdate()
                 self.navigationController?.toolbar?.alpha = 0
                 self.navigationController?.toolbar.isHidden = false
                 self.navigationController?.navigationBar.alpha = 0
                 self.navigationController?.navigationBar.isHidden = false
             }
             
-            self._updateSystemContentInsetIfNeeded(forceUpdate: true)
+            self.setNeedsStatusBarAppearanceUpdate()
             
             self.view.backgroundColor = .white
             self.collectionView?.backgroundColor = .white
             
             self.navigationController?.toolbar?.alpha = 1
             self.navigationController?.navigationBar.alpha = 1
+            
+            self._updateSystemContentInsetIfNeeded(forceUpdate: true)
             
         }, completion: { finished in
             
@@ -562,15 +573,20 @@ extension BrowserDetailController: TransitioningDataSource {
             return true
         }
         UIView.performWithoutAnimation {
+            
             self.setNeedsStatusBarAppearanceUpdate()
+            
             self.navigationController?.toolbar?.alpha = 0
             self.navigationController?.toolbar?.isHidden = false
             self.navigationController?.navigationBar.alpha = 0
             self.navigationController?.navigationBar.isHidden = false
         }
         UIView.animate(withDuration: 0.25) {
+            
             self.navigationController?.toolbar?.alpha = 1
             self.navigationController?.navigationBar.alpha = 1
+            
+            self.setNeedsStatusBarAppearanceUpdate()
         }
         return true
     }
@@ -607,11 +623,13 @@ extension BrowserDetailController: TransitioningDataSource {
             return
         }
         UIView.performWithoutAnimation {
-//            self.setNeedsStatusBarAppearanceUpdate()
+            
             self.navigationController?.toolbar?.alpha = 1
             self.navigationController?.toolbar?.isHidden = true
             self.navigationController?.navigationBar.alpha = 1
             self.navigationController?.navigationBar.isHidden = true
+            
+            self.setNeedsStatusBarAppearanceUpdate()
         }
     }
 }

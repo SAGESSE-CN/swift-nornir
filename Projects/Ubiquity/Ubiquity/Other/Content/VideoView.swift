@@ -105,6 +105,7 @@ internal class VideoView: UIView, Displayable, Operable, OperableDelegate {
         
         // update image
         _thumbView.image = item.image
+        _thumbView.backgroundColor = Browser.ub_backgroundColor
     }
     ///
     /// end display content with item

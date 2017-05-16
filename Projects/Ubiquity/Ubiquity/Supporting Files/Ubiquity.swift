@@ -113,7 +113,7 @@ public extension UIViewController {
     public func ub_present(_ container: Container, animated flag: Bool, completion: (() -> Swift.Void)? = nil) {
         logger.trace?.write()
         // present operator must with NavigationController
-        let nav = UINavigationController(navigationBarClass: nil, toolbarClass: ExtendedToolbar.self)
+        let nav = NavigationController(navigationBarClass: nil, toolbarClass: ExtendedToolbar.self)
         nav.viewControllers = [container.viewController]
         nav.isToolbarHidden = false
         nav.isNavigationBarHidden = false

@@ -22,7 +22,8 @@ internal class ImageView: AnimatedImageView, Displayable {
         logger.trace?.write()
         
         // update image
-        image = item.image //?.ub_withOrientation(orientation)
+        image = item.image
+        backgroundColor = Browser.ub_backgroundColor
     }
     ///
     /// end display content with item

@@ -48,6 +48,9 @@ internal class BrowserItem: Item {
         //let url = URL(string: "http://v4.music.126.net/20170515021110/337ebc2471c25ccb1192a770facac8f7/web/cloudmusic/JiYxMSEgIyAiJiAwMiQwMA==/mv/5373013/b8517d36ac9170989eb899b6a6da36e5.mp4")!
         //let url = URL(string: "http://v4.music.126.net/20170515033630/c55e887cd510599c700624516e39caba/web/cloudmusic/ODE1MDgxMDg=/027190c853c462390e40008fa242362d/60a8d1ad5c0e03ff2d398d8df56782a1.mp4")!
         
+        //let base = "http://192.168.2.3"
+        let base = "http://192.168.0.107"
+        
         if (index == 0) {
             size = .init(width: 1600, height: 1200)
             image = __image1
@@ -55,20 +58,20 @@ internal class BrowserItem: Item {
         }
         if (index == 1) {
             size = .init(width: 848, height: 480)
-            url = URL(string: "http://192.168.2.3/a.mp4")!
+            url = URL(string: base + "/a.mp4")!
             type = .video
             return
         }
         if (index == 2) {
             size = .init(width: 1920, height: 1080)
-            url = URL(string: "http://192.168.2.3/b.mp4")!
+            url = URL(string: base + "/b.mp4")!
             image = __image2
             type = .video
             return
         }
         if (index == 3) {
             size = .init(width: 600, height: 338)
-            url = URL(string: "http://192.168.0.101/c.m4v")!
+            url = URL(string: base + "/c.m4v")!
             image = __image3
             type = .video
             return

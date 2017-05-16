@@ -129,7 +129,6 @@ internal class BrowserDetailCell: UICollectionViewCell, Displayable {
             _detailView?.autoresizingMask = [.flexibleWidth, .flexibleHeight]
             _containerView?.addSubview(contentView)
             
-            _contentView?.backgroundColor = Browser.ub_backgroundColor
             _contentView?.clipsToBounds = true
             _contentView?.addSubview(detailView)
             
