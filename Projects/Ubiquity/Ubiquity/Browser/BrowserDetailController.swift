@@ -10,7 +10,10 @@ import UIKit
 
 internal class BrowserDetailController: UICollectionViewController {
     
-    init(container: Container, at indexPath: IndexPath) {
+    init(source: Source, library: Library, at indexPath: IndexPath) {
+        _source = source
+        _library = library
+        
         let collectionViewLayout = BrowserDetailLayout()
         
         collectionViewLayout.scrollDirection = .horizontal
@@ -19,7 +22,6 @@ internal class BrowserDetailController: UICollectionViewController {
         collectionViewLayout.headerReferenceSize = CGSize(width: -extraContentInset.left, height: 0)
         collectionViewLayout.footerReferenceSize = CGSize(width: -extraContentInset.right, height: 0)
 
-        self.container = container
         super.init(collectionViewLayout: collectionViewLayout)
         // setup some default
         _currentIndexPath = indexPath
@@ -104,7 +106,6 @@ internal class BrowserDetailController: UICollectionViewController {
     
     // MARK: internal var
     
-    var container: Container
     var animator: Animator? {
         willSet {
             ub_transitioningDelegate = newValue
@@ -132,6 +133,9 @@ internal class BrowserDetailController: UICollectionViewController {
     
     // MARK: private ivar
     
+    fileprivate let _source: Source
+    fileprivate let _library: Library
+    
     // 转场
     fileprivate var _transitionIsInteractiving: Bool = false
     fileprivate var _transitionAtLocation: CGPoint = .zero
@@ -157,28 +161,35 @@ internal class BrowserDetailController: UICollectionViewController {
 extension BrowserDetailController: UICollectionViewDelegateFlowLayout {
     
     override func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return container.numberOfSections
+        return _source.numberOfSections
     }
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return container.numberOfItems(inSection: section)
+        return _source.numberOfItems(inSection: section)
     }
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let identifier = _identifier(with: container.item(at: indexPath).type)
+        // generate the reuse identifier
+        let type = _source.asset(at: indexPath)?.ub_mediaType ?? .unknown
+        let identifier = _identifier(with: type)
+        
         return collectionView.dequeueReusableCell(withReuseIdentifier: identifier, for: indexPath)
     }
     override func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        guard let cell =  cell as? BrowserDetailCell else {
+        // try fetch cell
+        // try fetch asset
+        guard let asset = _source.asset(at: indexPath), let cell = cell as? BrowserDetailCell else {
             return
         }
         cell.apply(with: _systemContentInset, forceUpdate: false)
-        cell.willDisplay(with: container.item(at: indexPath), orientation: .up)
+        cell.willDisplay(with: asset, orientation: .up)
     }
     override func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        guard let cell =  cell as? BrowserDetailCell else {
+        // try fetch cell
+        // try fetch asset
+        guard let asset = _source.asset(at: indexPath), let cell = cell as? BrowserDetailCell else {
             return
         }
-        cell.endDisplay(with: container.item(at: indexPath))
+        cell.endDisplay(with: asset)
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
@@ -230,10 +241,12 @@ extension BrowserDetailController: UICollectionViewDelegateFlowLayout {
     
     // MARK: private method
     
-    fileprivate func _identifier(with type: ItemType) -> String {
-        switch type {
+    fileprivate func _identifier(with mediaType: AssetMediaType) -> String {
+        switch mediaType {
         case .image: return "ASSET-DETAIL-IMAGE"
         case .video: return "ASSET-DETAIL-VIDEO"
+        case .audio: return "ASSET-DETAIL-IMAGE"
+        case .unknown: return "ASSET-DETAIL-IMAGE"
         }
     }
     
@@ -642,14 +655,15 @@ extension BrowserDetailController: IndicatorViewDataSource, IndicatorViewDelegat
     // MARK: IndicatorViewDataSource
     
     func numberOfSections(in indicator: IndicatorView) -> Int {
-        return container.numberOfSections
+        return _source.numberOfSections
     }
     func indicator(_ indicator: IndicatorView, numberOfItemsInSection section: Int) -> Int {
-        return container.numberOfItems(inSection: section)
+        return _source.numberOfItems(inSection: section)
     }
     
     func indicator(_ indicator: IndicatorView, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return container.item(at: indexPath).size
+        let asset = _source.asset(at: indexPath)
+        return .init(width: asset?.ub_pixelWidth ?? 0, height: asset?.ub_pixelHeight ?? 0)
     }
     
     func indicator(_ indicator: IndicatorView, cellForItemAt indexPath: IndexPath) -> IndicatorViewCell {
@@ -664,7 +678,7 @@ extension BrowserDetailController: IndicatorViewDataSource, IndicatorViewDelegat
         
         if let imageView = cell.contentView as? UIImageView {
             imageView.contentMode = .scaleAspectFill
-            imageView.image = container.item(at: indexPath).image
+            //imageView.image = container.item(at: indexPath).image
         }
         
         // set default background color

@@ -23,8 +23,8 @@ internal class BadgeView: UIView {
         static var timelapse    = Item(named: "ubiquity_badge_timelapse")
         static var video        = Item(named: "ubiquity_badge_video")
         
-        static var recentlyDeleted  = Item(named: "ubiquity_badge_recentlyDeleted")
-        static var lastImport       = Item(named: "ubiquity_badge_lastImport")
+        static var recently     = Item(named: "ubiquity_badge_recently")
+        static var lastImport   = Item(named: "ubiquity_badge_lastImport")
         
         static func text(_ value: String) -> Item {
             return Item(text: value)

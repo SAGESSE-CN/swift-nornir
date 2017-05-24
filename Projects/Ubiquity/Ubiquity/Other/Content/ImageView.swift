@@ -18,11 +18,11 @@ internal class ImageView: AnimatedImageView, Displayable {
     /// - parameter item: need display the item
     /// - parameter orientation: need display the orientation
     ///
-    func willDisplay(with item: Item, orientation: UIImageOrientation) {
+    func willDisplay(with item: Asset, orientation: UIImageOrientation) {
         logger.trace?.write()
         
         // update image
-        image = item.image
+        //image = item.image
         backgroundColor = Browser.ub_backgroundColor
     }
     ///
@@ -30,7 +30,7 @@ internal class ImageView: AnimatedImageView, Displayable {
     ///
     /// - parameter item: need display the item
     ///
-    func endDisplay(with item: Item) {
+    func endDisplay(with item: Asset) {
         logger.trace?.write()
         
         // stop animation if needed

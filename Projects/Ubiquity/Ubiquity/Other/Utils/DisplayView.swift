@@ -25,7 +25,7 @@ internal class DisplayView: UIView, Displayable {
     /// - parameter item: need display the item
     /// - parameter orientation: need display the orientation
     ///
-    func willDisplay(with item: Item, orientation: UIImageOrientation) {
+    func willDisplay(with item: Asset, orientation: UIImageOrientation) {
         // update rotation
         _contentView.transform = .init(rotationAngle: orientation.ub_angle)
     }
@@ -34,7 +34,7 @@ internal class DisplayView: UIView, Displayable {
     ///
     /// - parameter item: need display the item
     ///
-    func endDisplay(with item: Item) {
+    func endDisplay(with item: Asset) {
         // nothing
     }
     

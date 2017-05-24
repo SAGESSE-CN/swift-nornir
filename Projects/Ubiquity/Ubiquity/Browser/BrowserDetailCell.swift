@@ -35,15 +35,15 @@ internal class BrowserDetailCell: UICollectionViewCell, Displayable {
     /// - parameter item: need display the item
     /// - parameter orientation: need display the orientation
     ///
-    func willDisplay(with item: Item, orientation: UIImageOrientation) {
-        logger.trace?.write(item.size)
+    func willDisplay(with item: Asset, orientation: UIImageOrientation) {
+        logger.trace?.write(item)
         
         // update ata
         _item = item
         _orientation = orientation
         
         // update canvas view
-        _containerView?.contentSize = item.size
+        _containerView?.contentSize = .init(width: item.ub_pixelWidth, height: item.ub_pixelHeight)
         _containerView?.zoom(to: bounds , with: orientation, animated: false)
         
         // if it is a video view show control button
@@ -64,7 +64,7 @@ internal class BrowserDetailCell: UICollectionViewCell, Displayable {
     ///
     /// - parameter item: need display the item
     ///
-    func endDisplay(with item: Item) {
+    func endDisplay(with item: Asset) {
         logger.trace?.write()
         
         // update content
@@ -144,7 +144,7 @@ internal class BrowserDetailCell: UICollectionViewCell, Displayable {
     }
     
     // data
-    fileprivate var _item: Item?
+    fileprivate var _item: Asset?
     fileprivate var _orientation: UIImageOrientation = .up
     
     // config
@@ -485,43 +485,43 @@ extension BrowserDetailCell: OperableDelegate {
         detailView.stop()
     }
     
-    func operable(didPrepare operable: Operable, item: Item) {
+    func operable(didPrepare operable: Operable, item: Asset) {
         logger.trace?.write()
         
         operable.play()
     }
-    func operable(didStartPlay operable: Operable, item: Item) {
+    func operable(didStartPlay operable: Operable, item: Asset) {
         logger.trace?.write()
         
         _console?.setState(.playing, animated: true)
     }
-    func operable(didStop operable: Operable, item: Item) {
+    func operable(didStop operable: Operable, item: Asset) {
         logger.trace?.write()
         
         _console?.setState(.stop, animated: true)
     }
     
-    func operable(didStalled operable: Operable, item: Item) {
+    func operable(didStalled operable: Operable, item: Asset) {
         logger.trace?.write()
         
         _console?.setState(.waiting, animated: true)
     }
-    func operable(didSuspend operable: Operable, item: Item) {
+    func operable(didSuspend operable: Operable, item: Asset) {
         logger.trace?.write()
         // nothing
     }
-    func operable(didResume operable: Operable, item: Item) {
+    func operable(didResume operable: Operable, item: Asset) {
         logger.trace?.write()
         
         _console?.setState(.playing, animated: true)
     }
     
-    func operable(didFinish operable: Operable, item: Item) {
+    func operable(didFinish operable: Operable, item: Asset) {
         logger.trace?.write()
         
         _console?.setState(.stop, animated: true)
     }
-    func operable(didOccur operable: Operable, item: Item, error: Error?) {
+    func operable(didOccur operable: Operable, item: Asset, error: Error?) {
         logger.trace?.write()
         
         _console?.setState(.stop, animated: true)

@@ -33,22 +33,22 @@ class ViewController: UITableViewController, UIActionSheetDelegate {
         guard buttonIndex != actionSheet.cancelButtonIndex else {
             return
         }
-        switch buttonIndex {
-        case 1:
-            let browser = Ubiquity.Browser()
-            ub_present(browser, animated: true, completion: nil)
-            
-//        case 2:
-//            let browser = Ubiquity.Picker()
-//            present(browser, animated: true, completion: nil)
+//        switch buttonIndex {
+//        case 1:
+//            let browser = Ubiquity.Browser()
+//            ub_present(browser, animated: true, completion: nil)
 //            
-//        case 3:
-//            let browser = Ubiquity.Picker()
-//            present(browser, animated: true, completion: nil)
-//            
-        default:
-            break
-        }
+////        case 2:
+////            let browser = Ubiquity.Picker()
+////            present(browser, animated: true, completion: nil)
+////            
+////        case 3:
+////            let browser = Ubiquity.Picker()
+////            present(browser, animated: true, completion: nil)
+////            
+//        default:
+//            break
+//        }
     }
 }
 

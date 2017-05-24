@@ -9,15 +9,26 @@
 import UIKit
 
 /// a media browser
-public class Browser: NSObject, Container {
+public class Browser: NSObject {
     
     public var view: UIView {
         fatalError("no imp")
     }
     public var viewController: UIViewController {
-        return BrowserAlbumController(container: self)
-        //return BrowserGridController(container: self)
+        //return BrowserAlbumListController(container: self)
+        //return BrowserAlbumController(container: self)
+        fatalError()
     }
+    
+    //
+//    PUZoomableGridViewController
+//    PUAlbumListViewController
+//    PUPhotosAlbumViewController
+//    PUOneUpViewController
+//    
+//    PUPhotoEditViewController
+//    PUPhotoEditToolbar
+//    PUVideoEditViewController
     
     public var numberOfSections: Int {
         return 1
@@ -25,15 +36,15 @@ public class Browser: NSObject, Container {
     public func numberOfItems(inSection section: Int) -> Int {
         return items.count
     }
-    public func item(at indexPath: IndexPath) -> Item {
+    public func item(at indexPath: IndexPath) -> Asset {
         return items[indexPath.item]
     }
     
-    public var items: Array<Item> =  (0 ..< 120).map { BrowserItem($0) }
+    public var items: Array<Asset> = []// (0 ..< 120).map { BrowserItem($0) }
     
 }
 
-internal class BrowserItem: Item {
+internal class BrowserItem {
     
     init(_ index: Int) {
         
@@ -59,21 +70,21 @@ internal class BrowserItem: Item {
         if (index == 1) {
             size = .init(width: 848, height: 480)
             url = URL(string: base + "/a.mp4")!
-            type = .video
+//            type = .video
             return
         }
         if (index == 2) {
             size = .init(width: 1920, height: 1080)
             url = URL(string: base + "/b.mp4")!
             image = __image2
-            type = .video
+//            type = .video
             return
         }
         if (index == 3) {
             size = .init(width: 600, height: 338)
             url = URL(string: base + "/c.m4v")!
             image = __image3
-            type = .video
+//            type = .video
             return
         }
         if (index == 4) {
@@ -96,7 +107,7 @@ internal class BrowserItem: Item {
     var size: CGSize
     
     var image: UIImage?
-    var type: ItemType = .image
+    //var type: ItemType = .image
     
     var url: URL!
 }
@@ -177,12 +188,9 @@ public extension Browser {
 //browser.transitioningDelegate = nil
 //UIViewController().show(browser, sender: indexPath)
 
-// some default configure
 internal extension Browser {
-    
     static var ub_backgroundColor: UIColor? {
-        return UIColor(white: 0.94, alpha: 1)
+        return .ub_init(hex: 0xF0EFF5)
     }
-    
 }
 

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="12118" systemVersion="16D32" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="Ghq-4e-xjI">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="12118" systemVersion="16D32" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="nNR-sr-z16">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
@@ -216,6 +216,20 @@
             </objects>
             <point key="canvasLocation" x="2903" y="31"/>
         </scene>
+        <!--Photo Library Controller-->
+        <scene sceneID="xZW-Am-omF">
+            <objects>
+                <tabBarController storyboardIdentifier="PhotoLibraryController" useStoryboardIdentifierAsRestorationIdentifier="YES" id="nNR-sr-z16" customClass="PhotoLibraryController" customModule="Ubiquity_Example" customModuleProvider="target" sceneMemberID="viewController">
+                    <tabBar key="tabBar" contentMode="scaleToFill" id="osW-Kp-igz">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="49"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                    </tabBar>
+                </tabBarController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="rNe-qU-vpR" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="297" y="1412"/>
+        </scene>
         <!--Test Video Filmstrip View Controller-->
         <scene sceneID="zUz-Yr-iJN">
             <objects>
@@ -228,28 +242,40 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="XuB-cF-DmY">
+                                <rect key="frame" x="0.0" y="64" width="375" height="565"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            </view>
                             <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="lbf-VY-H4O">
                                 <rect key="frame" x="0.0" y="629" width="375" height="38"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="38" id="1B5-aS-5x6"/>
+                                    <constraint firstAttribute="height" constant="38" id="Pxn-sn-WXV"/>
                                 </constraints>
+                                <connections>
+                                    <outlet property="delegate" destination="3DQ-VI-cWG" id="6qD-ng-WSb"/>
+                                </connections>
                             </scrollView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
+                            <constraint firstItem="XuB-cF-DmY" firstAttribute="top" secondItem="qiR-z0-iKH" secondAttribute="bottom" id="BMx-OJ-Tza"/>
+                            <constraint firstItem="XuB-cF-DmY" firstAttribute="leading" secondItem="t3p-zx-Sf3" secondAttribute="leading" id="Igt-zX-FB1"/>
+                            <constraint firstAttribute="trailing" secondItem="XuB-cF-DmY" secondAttribute="trailing" id="PgJ-OE-wKz"/>
                             <constraint firstAttribute="trailing" secondItem="lbf-VY-H4O" secondAttribute="trailing" id="SUq-zp-idb"/>
+                            <constraint firstItem="lbf-VY-H4O" firstAttribute="top" secondItem="XuB-cF-DmY" secondAttribute="bottom" id="bfy-to-ARg"/>
                             <constraint firstItem="e3r-UZ-2VM" firstAttribute="top" secondItem="lbf-VY-H4O" secondAttribute="bottom" id="pSL-yG-zYQ"/>
                             <constraint firstItem="lbf-VY-H4O" firstAttribute="leading" secondItem="t3p-zx-Sf3" secondAttribute="leading" id="tT4-NB-pkz"/>
                         </constraints>
                     </view>
                     <nil key="simulatedBottomBarMetrics"/>
                     <connections>
+                        <outlet property="contentView" destination="XuB-cF-DmY" id="pQR-mm-bcm"/>
                         <outlet property="scrollView" destination="lbf-VY-H4O" id="Dc6-l0-aak"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="xK8-n1-B8J" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1305" y="797"/>
+            <point key="canvasLocation" x="1304.8" y="796.55172413793105"/>
         </scene>
         <!--Item-->
         <scene sceneID="s9a-KE-DGc">

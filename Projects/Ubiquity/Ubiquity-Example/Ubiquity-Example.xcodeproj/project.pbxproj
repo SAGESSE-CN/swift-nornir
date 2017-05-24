@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		0C16F87B1EA663E700C788C5 /* TestLayerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C16F87A1EA663E700C788C5 /* TestLayerViewController.swift */; };
 		0C224C421EAC55F7001ABB47 /* TestIndicatorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C224C411EAC55F7001ABB47 /* TestIndicatorViewController.swift */; };
+		0C2B78161ED4508E00925D18 /* PhotoLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C2B78151ED4508E00925D18 /* PhotoLibrary.swift */; };
+		0C2B78181ED4513300925D18 /* PhotoLibraryController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C2B78171ED4513300925D18 /* PhotoLibraryController.swift */; };
 		0C5DCB7C1EC0C45F009FA343 /* TestVideoFilmstripViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C5DCB7B1EC0C45F009FA343 /* TestVideoFilmstripViewController.swift */; };
 		0C7757B91EC9D09A00C38B36 /* rock.gif in Resources */ = {isa = PBXBuildFile; fileRef = 0C7757B81EC9D09A00C38B36 /* rock.gif */; };
 		0CDAD15E1EC882BF004CD4FB /* a.gif in Resources */ = {isa = PBXBuildFile; fileRef = 0CDAD15D1EC882BF004CD4FB /* a.gif */; };
@@ -39,7 +41,9 @@
 /* Begin PBXFileReference section */
 		0C16F87A1EA663E700C788C5 /* TestLayerViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestLayerViewController.swift; sourceTree = "<group>"; };
 		0C224C411EAC55F7001ABB47 /* TestIndicatorViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestIndicatorViewController.swift; sourceTree = "<group>"; };
-		0C5DCB7B1EC0C45F009FA343 /* TestVideoFilmstripViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestVideoFilmstripViewController.swift; sourceTree = "<group>"; };
+		0C2B78151ED4508E00925D18 /* PhotoLibrary.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotoLibrary.swift; sourceTree = "<group>"; };
+		0C2B78171ED4513300925D18 /* PhotoLibraryController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotoLibraryController.swift; sourceTree = "<group>"; };
+		0C5DCB7B1EC0C45F009FA343 /* TestVideoFilmstripViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestVideoFilmstripViewController.swift; sourceTree = "<group>"; wrapsLines = 0; };
 		0C7757B81EC9D09A00C38B36 /* rock.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = rock.gif; sourceTree = "<group>"; };
 		0CDAD15D1EC882BF004CD4FB /* a.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = a.gif; sourceTree = "<group>"; };
 		0CE49E1E1E7A3F690058F5F8 /* Ubiquity-Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Ubiquity-Example.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -65,9 +69,19 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0C2B78141ED4508700925D18 /* Photos */ = {
+			isa = PBXGroup;
+			children = (
+				0C2B78151ED4508E00925D18 /* PhotoLibrary.swift */,
+				0C2B78171ED4513300925D18 /* PhotoLibraryController.swift */,
+			);
+			path = Photos;
+			sourceTree = "<group>";
+		};
 		0CE49E151E7A3F690058F5F8 = {
 			isa = PBXGroup;
 			children = (
+				0C2B78141ED4508700925D18 /* Photos */,
 				0CE49E501E7A41310058F5F8 /* Frameworks */,
 				0CE49E201E7A3F690058F5F8 /* Example */,
 				0CE49E1F1E7A3F690058F5F8 /* Products */,
@@ -192,6 +206,8 @@
 				0C224C421EAC55F7001ABB47 /* TestIndicatorViewController.swift in Sources */,
 				0CE49EA91E7B97CE0058F5F8 /* TestCanvasViewController.swift in Sources */,
 				0CE49E221E7A3F690058F5F8 /* AppDelegate.swift in Sources */,
+				0C2B78161ED4508E00925D18 /* PhotoLibrary.swift in Sources */,
+				0C2B78181ED4513300925D18 /* PhotoLibraryController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

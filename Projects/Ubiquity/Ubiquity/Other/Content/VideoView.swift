@@ -90,7 +90,7 @@ internal class VideoView: UIView, Displayable, Operable, OperableDelegate {
         _playerView.resume()
     }
     
-    func prepare(with item: Item) {
+    func prepare(with item: Asset) {
         _playerView.prepare(with: item)
     }
     
@@ -100,11 +100,11 @@ internal class VideoView: UIView, Displayable, Operable, OperableDelegate {
     /// - parameter item: need display the item
     /// - parameter orientation: need display the orientation
     ///
-    func willDisplay(with item: Item, orientation: UIImageOrientation) {
+    func willDisplay(with item: Asset, orientation: UIImageOrientation) {
         logger.debug?.write()
         
         // update image
-        _thumbView.image = item.image
+        //_thumbView.image = item.image
         _thumbView.backgroundColor = Browser.ub_backgroundColor
     }
     ///
@@ -112,7 +112,7 @@ internal class VideoView: UIView, Displayable, Operable, OperableDelegate {
     ///
     /// - parameter item: need display the item
     ///
-    func endDisplay(with item: Item) {
+    func endDisplay(with item: Asset) {
         logger.trace?.write()
         
         // stop player if needed
@@ -150,7 +150,7 @@ internal class VideoView: UIView, Displayable, Operable, OperableDelegate {
 internal extension VideoView {
     
     /// if the data is prepared to do the call this method
-    func operable(didPrepare operable: Operable, item: Item) {
+    func operable(didPrepare operable: Operable, item: Asset) {
         delegate?.operable(didPrepare: self, item: item)
         // prepare in a hidden the view
         addSubview(_playerView)
@@ -158,11 +158,11 @@ internal extension VideoView {
     }
     
     /// if you start playing the call this method
-    func operable(didStartPlay operable: Operable, item: Item) {
+    func operable(didStartPlay operable: Operable, item: Asset) {
         delegate?.operable(didStartPlay: self, item: item)
     }
     /// if take the initiative to stop the play call this method
-    func operable(didStop operable: Operable, item: Item) {
+    func operable(didStop operable: Operable, item: Asset) {
         delegate?.operable(didStop: self, item: item)
         // stop to clear
         addSubview(_thumbView)
@@ -170,24 +170,24 @@ internal extension VideoView {
     }
     
     /// if the interruption due to lack of enough data to invoke this method
-    func operable(didStalled operable: Operable, item: Item) {
+    func operable(didStalled operable: Operable, item: Asset) {
         delegate?.operable(didStalled: self, item: item)
     }
     /// if play is interrupted call the method, example: pause, in background mode, in the call
-    func operable(didSuspend operable: Operable, item: Item) {
+    func operable(didSuspend operable: Operable, item: Asset) {
         delegate?.operable(didSuspend: self, item: item)
     }
     /// if interrupt restored to call this method
-    func operable(didResume operable: Operable, item: Item) {
+    func operable(didResume operable: Operable, item: Asset) {
         delegate?.operable(didResume: self, item: item)
     }
     
     /// if play completed call this method
-    func operable(didFinish operable: Operable, item: Item) {
+    func operable(didFinish operable: Operable, item: Asset) {
         delegate?.operable(didFinish: self, item: item)
     }
     /// if the occur error call the method
-    func operable(didOccur operable: Operable, item: Item, error: Error?) {
+    func operable(didOccur operable: Operable, item: Asset, error: Error?) {
         delegate?.operable(didOccur: self, item: item, error: error)
         // stop to clear
         addSubview(_thumbView)
@@ -212,7 +212,7 @@ internal class VideoPlayerView: UIView, Operable {
     weak var delegate: OperableDelegate?
     
     /// to prepare data you need
-    func prepare(with item: Item) {
+    func prepare(with item: Asset) {
         logger.trace?.write()
         
         // if has been started, stop & clean resource
@@ -566,7 +566,7 @@ internal class VideoPlayerView: UIView, Operable {
     }
     
     
-    private var _item: Item?
+    private var _item: Asset?
     private var _token: Int?
     private var _status: VideoPlayerStatus = .stop
     
