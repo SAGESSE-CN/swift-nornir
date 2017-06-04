@@ -399,7 +399,7 @@ internal class Logger {
         return $1.threshold
     }
     internal static var appender: Array<Appender> = [
-        Appender.File(),
+        //Appender.File(), // 暂不写入文件
         Appender.Console(threshold: .all),
     ]
 }
@@ -407,6 +407,9 @@ internal class Logger {
 internal let logger = Logger()
 internal extension NSObjectProtocol {
     internal var logger: Logger {
-        return Logger(class: type(of: self))
+        return type(of: self).logger
+    }
+    internal static var logger: Logger {
+        return Logger(class: self)
     }
 }

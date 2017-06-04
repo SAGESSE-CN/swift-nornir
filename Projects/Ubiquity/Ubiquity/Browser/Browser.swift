@@ -112,9 +112,9 @@ internal class BrowserItem {
     var url: URL!
 }
 fileprivate var __index = 0
-fileprivate var __image1 = UIImage(named: "t1")
-fileprivate var __image2 = UIImage(named: "t2")
-fileprivate var __image3 = UIImage(named: "t3")
+internal var __image1 = UIImage(named: "t1")
+internal var __image2 = UIImage(named: "t2")
+internal var __image3 = UIImage(named: "t3")
 
 /// data fetch & update
 public extension Browser {
@@ -187,10 +187,3 @@ public extension Browser {
 //
 //browser.transitioningDelegate = nil
 //UIViewController().show(browser, sender: indexPath)
-
-internal extension Browser {
-    static var ub_backgroundColor: UIColor? {
-        return .ub_init(hex: 0xF0EFF5)
-    }
-}
-

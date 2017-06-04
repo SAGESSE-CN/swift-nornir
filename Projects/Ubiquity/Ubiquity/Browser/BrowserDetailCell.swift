@@ -8,7 +8,13 @@
 
 import UIKit
 
-internal class BrowserDetailCell: UICollectionViewCell, Displayable {
+internal protocol BrowserDetailCellDelegate: class {
+    
+    func browserDetailCell(_ browserDetailCell: BrowserDetailCell, shouldBeginRotationing asset: Asset) -> Bool
+    func browserDetailCell(_ browserDetailCell: BrowserDetailCell, didEndRotationing asset: Asset, at orientation: UIImageOrientation)
+}
+
+internal class BrowserDetailCell: UICollectionViewCell {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -18,66 +24,57 @@ internal class BrowserDetailCell: UICollectionViewCell, Displayable {
         super.init(coder: aDecoder)
         _setup()
     }
-    
-    var detailView: UIView? {
-        return _detailView
-    }
-    var containerView: CanvasView? {
-        return _containerView
-    }
-    var draggingContentOffset: CGPoint? {
-        return _draggingContentOffset
+    deinit {
+        // on destory if not the end display, need to manually call it
+        guard let asset = _asset, let library = _library else {
+            return
+        }
+        // call end display
+        endDisplay(with: asset, in: library)
     }
     
-    ///
-    /// display container content with item
-    ///
-    /// - parameter item: need display the item
-    /// - parameter orientation: need display the orientation
-    ///
-    func willDisplay(with item: Asset, orientation: UIImageOrientation) {
-        logger.trace?.write(item)
+    // event delegate
+    weak var delegate: BrowserDetailCellDelegate?
+    
+    // display asset
+    func willDisplay(with asset: Asset, in library: Library, orientation: UIImageOrientation) {
+        logger.trace?.write(asset.ub_localIdentifier)
         
         // update ata
-        _item = item
+        _asset = asset
+        _library = library
         _orientation = orientation
         
-        // update canvas view
-        _containerView?.contentSize = .init(width: item.ub_pixelWidth, height: item.ub_pixelHeight)
-        _containerView?.zoom(to: bounds , with: orientation, animated: false)
-        
-        // if it is a video view show control button
-        if _detailView is VideoView {
+        // update util
+        if let progress = _progress {
+            // default is 1(auto hidden)
+            progress.setValue(1, animated: false)
+        }
+        if let console = _console, asset.ub_allowsPlay {
+            // if the asset allows play, display console
             // defaults is stop
-            _console?.setState(.stop, animated: false)
+            console.setState(.stop, animated: false)
         }
         
-        // update util view
-        _progress?.setValue(-1, animated: false)
+        // update canvas
+        _containerView?.contentSize = .init(width: asset.ub_pixelWidth, height: asset.ub_pixelHeight)
+        _containerView?.zoom(to: bounds , with: orientation, animated: false)
         
         // update content
-        (_contentView as? Displayable)?.willDisplay(with: item, orientation: orientation)
-        (_detailView as? Displayable)?.willDisplay(with: item, orientation: orientation)
+        (_contentView as? Displayable)?.willDisplay(with: asset, in: library, orientation: orientation)
+        (_detailView as? Displayable)?.willDisplay(with: asset, in: library, orientation: orientation)
     }
-    ///
-    /// end display content with item
-    ///
-    /// - parameter item: need display the item
-    ///
-    func endDisplay(with item: Asset) {
-        logger.trace?.write()
+    // end display asset
+    func endDisplay(with asset: Asset, in library: Library) {
+        logger.trace?.write(asset.ub_localIdentifier)
         
         // update content
-        (_contentView as? Displayable)?.endDisplay(with: item)
-        (_detailView as? Displayable)?.endDisplay(with: item)
+        (_contentView as? Displayable)?.endDisplay(with: asset, in: library)
+        (_detailView as? Displayable)?.endDisplay(with: asset, in: library)
     }
     
-    ///
-    /// update container content inset
-    ///
-    /// - parameter contentInset: new content inset
-    ///
-    func apply(with contentInset: UIEdgeInsets, forceUpdate: Bool) {
+    /// update content inset
+    func updateContentInset(_ contentInset: UIEdgeInsets, forceUpdate: Bool) {
         logger.trace?.write(contentInset)
         
         _contentInset = contentInset
@@ -133,7 +130,8 @@ internal class BrowserDetailCell: UICollectionViewCell, Displayable {
             _contentView?.addSubview(detailView)
             
             // If the detail to support the operation, set the operation delegate
-            (_detailView as? Operable)?.delegate = self
+            (_detailView as? Displayable)?.displayerDelegate = self
+            (_detailView as? Operable)?.operaterDelegate = self
         }
         // setup console
         _console = ConsoleProxy(frame: .init(x: 0, y: 0, width: 70, height: 70), owner: self)
@@ -144,7 +142,8 @@ internal class BrowserDetailCell: UICollectionViewCell, Displayable {
     }
     
     // data
-    fileprivate var _item: Asset?
+    fileprivate var _asset: Asset?
+    fileprivate var _library: Library?
     fileprivate var _orientation: UIImageOrientation = .up
     
     // config
@@ -225,25 +224,18 @@ extension BrowserDetailCell {
     }
 }
 
-
 /// event support
 extension BrowserDetailCell {
     
     fileprivate dynamic func _handleRetry(_ sender: Any) {
         logger.trace?.write()
-        self._progress?.setValue(0, animated: false)
-        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(1), execute: {
-            self._progress?.setValue(0.35, animated: true)
-            DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2), execute: {
-                self._progress?.setValue(0.65, animated: true)
-                DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(3), execute: {
-                    self._progress?.setValue(1.00, animated: true)
-                    DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(4), execute: {
-                        self._progress?.setValue(-1.00, animated: true)
-                    })
-                })
-            })
-        })
+        
+        // check the state of the data
+        guard let asset = _asset, let library = _library else {
+            return
+        }
+        // recall display, to refresh the data
+        (_detailView as? Displayable)?.willDisplay(with: asset, in: library, orientation: _orientation)
     }
     fileprivate dynamic func _handleCommand(_ sender: Any) {
         logger.trace?.write()
@@ -261,10 +253,10 @@ extension BrowserDetailCell {
     }
     fileprivate dynamic func _handleDoubleTap(_ sender: UITapGestureRecognizer) {
         logger.trace?.write()
-        guard let containerView = containerView else {
+        guard let containerView = _containerView else {
             return
         }
-        let location = sender.location(in: self.detailView)
+        let location = sender.location(in: _contentView)
         // zoome operator wait to next run loop
         DispatchQueue.main.async {
             if containerView.zoomScale != containerView.minimumZoomScale {
@@ -320,7 +312,7 @@ extension BrowserDetailCell: CanvasViewDelegate {
     func canvasViewShouldBeginRotationing(_ canvasView: CanvasView, with view: UIView?) -> Bool {
         logger.trace?.write()
         // if the item is nil, are not allowed to rotate
-        guard let _ = _item else {
+        guard let asset = _asset else {
             return false
         }
         // update canvas view status
@@ -331,8 +323,8 @@ extension BrowserDetailCell: CanvasViewDelegate {
         // update console status
         _console?.setIsHidden(true, animated: true)
         
-        // delegate?.browseDetailView?(self, canvasView, shouldBeginRotationing: view) ?? true
-        return true
+        // notice delegate
+        return delegate?.browserDetailCell(self, shouldBeginRotationing: asset) ?? true
     }
     
     func canvasViewDidEndDecelerating(_ canvasView: CanvasView) {
@@ -373,7 +365,7 @@ extension BrowserDetailCell: CanvasViewDelegate {
     func canvasViewDidEndRotationing(_ canvasView: CanvasView, with view: UIView?, atOrientation orientation: UIImageOrientation) {
         logger.trace?.write()
         // if the item is nil, are not allowed to rotate
-        guard let item = _item else {
+        guard let asset = _asset, let library = _library else {
             return
         }
         // update canvas view status
@@ -381,8 +373,8 @@ extension BrowserDetailCell: CanvasViewDelegate {
         // update content orientation
         _orientation = orientation
         // update display
-        (_contentView as? Displayable)?.willDisplay(with: item, orientation: orientation)
-        (_detailView as? Displayable)?.willDisplay(with: item, orientation: orientation)
+        (_contentView as? Displayable)?.willDisplay(with: asset, in: library, orientation: orientation)
+        (_detailView as? Displayable)?.willDisplay(with: asset, in: library, orientation: orientation)
         // update progress
         _progress?.center = _progressCenter
         _progress?.setIsHidden(false, animated: true)
@@ -390,7 +382,25 @@ extension BrowserDetailCell: CanvasViewDelegate {
         // update console status
         _console?.setIsHidden(false, animated: true)
         
-        // delegate?.browseDetailView?(self, canvasView, didEndRotationing: view, atOrientation: orientation)
+        // notice delegate
+        delegate?.browserDetailCell(self, didEndRotationing: asset, at: orientation)
+    }
+}
+
+/// provide public accessor support
+extension BrowserDetailCell {
+    
+    var ub_detailView: UIView? {
+        return _detailView
+    }
+    var ub_contentView: UIView? {
+        return _contentView
+    }
+    var ub_containerView: CanvasView? {
+        return _containerView
+    }
+    var ub_draggingContentOffset: CGPoint? {
+        return _draggingContentOffset
     }
 }
 
@@ -417,7 +427,7 @@ extension BrowserDetailCell: TransitioningView {
         return .init(origin: .zero, size: bounds.size)
     }
     var ub_transform: CGAffineTransform {
-        guard let containerView = containerView else {
+        guard let containerView = _containerView else {
             return .identity
         }
         return containerView.contentTransform.rotated(by: _orientation.ub_angle)
@@ -445,11 +455,44 @@ extension BrowserDetailCell: TransitioningView {
 }
 
 /// operation support
+extension BrowserDetailCell: DisplayableDelegate {
+    
+    /// Tell the delegate that the remote server requested.
+    func displayer(_ displayer: Displayable, didStartRequest asset: Asset) {
+        logger.trace?.write()
+        
+        // reset to default status
+        _progress?.setValue(0, animated: false)
+    }
+    
+    /// Periodically informs the delegate of the progress.
+    func displayer(_ displayer: Displayable, didReceive progress: Double) {
+        logger.trace?.write(progress)
+        
+        // update progress
+        _progress?.setValue(progress, animated: true)
+    }
+    
+    /// Tells the delegate that the task finished receive image.
+    func displayer(_ displayer: Displayable, didComplete error: Error?) {
+        logger.trace?.write()
+        
+        // check complete status
+        guard let error = error else {
+            return
+        }
+        logger.error?.write(error)
+        // -1 is error, enable tap event to retry
+        _progress?.setValue(-1, animated: false)
+    }
+}
+
+/// operation support
 extension BrowserDetailCell: OperableDelegate {
     
     func play() {
         // must provide the context
-        guard let console = _console, let detailView = _detailView as? Operable, let item = _item else {
+        guard let console = _console, let detailView = _detailView as? Operable else {
             return
         }
         // if is stopped, click goto prepare
@@ -466,7 +509,7 @@ extension BrowserDetailCell: OperableDelegate {
         
         // prepare player
         DispatchQueue.main.async {
-            detailView.prepare(with: item)
+            detailView.play()
         }
     }
     func stop() {
@@ -485,43 +528,43 @@ extension BrowserDetailCell: OperableDelegate {
         detailView.stop()
     }
     
-    func operable(didPrepare operable: Operable, item: Asset) {
+    func operable(didPrepare operable: Operable, asset: Asset) {
         logger.trace?.write()
         
         operable.play()
     }
-    func operable(didStartPlay operable: Operable, item: Asset) {
+    func operable(didStartPlay operable: Operable, asset: Asset) {
         logger.trace?.write()
         
         _console?.setState(.playing, animated: true)
     }
-    func operable(didStop operable: Operable, item: Asset) {
+    func operable(didStop operable: Operable, asset: Asset) {
         logger.trace?.write()
         
         _console?.setState(.stop, animated: true)
     }
     
-    func operable(didStalled operable: Operable, item: Asset) {
+    func operable(didStalled operable: Operable, asset: Asset) {
         logger.trace?.write()
         
         _console?.setState(.waiting, animated: true)
     }
-    func operable(didSuspend operable: Operable, item: Asset) {
+    func operable(didSuspend operable: Operable, asset: Asset) {
         logger.trace?.write()
         // nothing
     }
-    func operable(didResume operable: Operable, item: Asset) {
+    func operable(didResume operable: Operable, asset: Asset) {
         logger.trace?.write()
         
         _console?.setState(.playing, animated: true)
     }
     
-    func operable(didFinish operable: Operable, item: Asset) {
+    func operable(didFinish operable: Operable, asset: Asset) {
         logger.trace?.write()
         
         _console?.setState(.stop, animated: true)
     }
-    func operable(didOccur operable: Operable, item: Asset, error: Error?) {
+    func operable(didOccur operable: Operable, asset: Asset, error: Error?) {
         logger.trace?.write()
         
         _console?.setState(.stop, animated: true)

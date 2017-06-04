@@ -19,8 +19,18 @@ internal class BrowserAlbumListCell: UITableViewCell {
         _setup()
     }
     
-    func willDisplay(with collection: Collection, library: Library) {
+    // display asset
+    func willDisplay(with collection: Collection, in library: Library) {
         //logger.trace?.write(collection.ub_localIdentifier)
+        
+        // have any change?
+        guard _collection !== collection else {
+            return
+        }
+        
+        // save context
+        _library = library
+        _collection = collection
         
         let count = collection.ub_assetCount
         let assets = collection.ub_assets(at: max(count - 3, 0) ..< count)
@@ -32,24 +42,64 @@ internal class BrowserAlbumListCell: UITableViewCell {
         // setup badge icon & background
         if let icon = BadgeView.Item.ub_init(subtype: collection.ub_collectionSubtype) {
             // show icon
-            _badgeView.leftItems = [icon]
+            _badgeView.leftItem = icon
             _badgeView.backgroundImage = BadgeView.ub_backgroundImage
             
         } else {
             // hide icon
-            _badgeView.leftItems = nil
+            _badgeView.leftItem = nil
             _badgeView.backgroundImage = nil
         }
         
-        // setup thumb image
-        _thumbView.images = assets.map { asset in
-            
-            return nil
+        // make options
+        let size = _thumbView.bounds.size.ub_fitWithScreen
+        
+        // setup thumbnail image
+        _thumbView.images = assets.map { _ in nil }
+        _requests = assets.reversed().enumerated().flatMap { offset, asset in
+            // request thumbnail image
+            library.ub_requestImage(for: asset, targetSize: size, contentMode: .aspectFill, options: nil) { [weak self, weak collection] contents, response in
+                // if the asset is nil, the asset has been released
+                guard let collection = collection else {
+                    return
+                }
+                // update thumbnail image
+                self?._updateContents(contents, collection: collection, at: offset)
+            }
         }
     }
-    func endDisplay(with collection: Collection, library: Library) {
+    // end display asset
+    func endDisplay(with collection: Collection, in library: Library) {
         //logger.trace?.write(collection.ub_localIdentifier)
         
+        // if is requesting, need to cancel
+        _requests?.forEach { request in
+            // cancel
+            library.ub_cancelRequest(request)
+        }
+        
+        // clear context
+        _library = nil
+        _requests = nil
+        _collection = nil
+        
+        // clear content
+        _thumbView.images = [nil, nil, nil]
+    }
+
+    // update thumbnail image
+    private func _updateContents(_ contents: UIImage?, collection: Collection, at index: Int) {
+        // the current collection has been changed?
+        guard _collection === collection else {
+            // change, all reqeust is expire
+            logger.debug?.write("\(collection.ub_localIdentifier) image is expire")
+            return
+        }
+        //logger.trace?.write("\(collection.ub_localIdentifier) at \(index)")
+        // no change, update content
+        var images = _thumbView.images
+        images?[index] = contents
+        _thumbView.images = images
     }
     
     private func _setup() {
@@ -58,6 +108,7 @@ internal class BrowserAlbumListCell: UITableViewCell {
         _thumbView.frame = .init(x: 0, y: 0, width: 70, height: 70)
         _thumbView.backgroundColor = .white
         _thumbView.translatesAutoresizingMaskIntoConstraints = false
+        _thumbView.images = [nil, nil, nil]
         contentView.addSubview(_thumbView)
         
         // setup badge
@@ -93,8 +144,12 @@ internal class BrowserAlbumListCell: UITableViewCell {
             .ub_make(_subtitleLabel, .leading, .equal, _thumbView, .trailing, 8),
             .ub_make(_subtitleLabel, .trailing, .equal, contentView, .trailing),
         ])
-        
     }
+    
+    private var _library: Library?
+    private var _collection: Collection?
+    
+    private var _requests: Array<Request>?
     
     private lazy var _titleLabel: UILabel = .init()
     private lazy var _subtitleLabel: UILabel = .init()

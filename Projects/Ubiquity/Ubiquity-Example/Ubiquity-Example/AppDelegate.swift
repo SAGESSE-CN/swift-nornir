@@ -62,6 +62,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         
+        //window?.layer.speed = 0.5
+        
 //class A: NSObject {
 //    func xa () {
 //    }
@@ -105,6 +107,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 //            window.addSubview(l1)
 //            window.addSubview(l2)
 //        }
+        
+        DispatchQueue.main.async {
+            if let window = self.window {
+                let label = FPSLabel(frame: CGRect(x: window.bounds.width - 55 - 8, y: 20, width: 55, height: 20))
+                label.autoresizingMask = [.flexibleLeftMargin, .flexibleBottomMargin]
+                window.addSubview(label)
+                window.backgroundColor = .white
+            }
+        }
         
         return true
     }

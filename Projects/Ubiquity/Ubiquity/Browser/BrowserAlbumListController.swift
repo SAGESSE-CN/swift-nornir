@@ -8,12 +8,22 @@
 
 import UIKit
 
+public func BrowserAlbumListControllerMake(_ library: Library) -> UIViewController {
+    return BrowserAlbumListController(library: library)
+}
+public func NavigationControllerMake() -> UINavigationController.Type {
+    return NavigationController.self
+}
+public func ToolbarMake() -> UIToolbar.Type {
+    return ExtendedToolbar.self
+}
+
 internal class BrowserAlbumListController: UITableViewController {
     
     init(library: Library) {
-        _library = library
+        _library = library.ub_cache
         
-        super.init(style: .plain)
+        super.init(nibName: nil, bundle: nil)
     }
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -24,7 +34,7 @@ internal class BrowserAlbumListController: UITableViewController {
         // check for authorization status
         guard auth == .authorized else {
             // no permission
-            _showError(with: "没有权限", subtitle: "此应用程序没有权限访问您的照片\n在\"设置-隐私-图片\"中开启后即可查看")
+            _showError(with: "No Access Permissions", subtitle: "") // 此应用程序没有权限访问您的照片\n在\"设置-隐私-图片\"中开启后即可查看
             return
         }
         // get all photo albums
@@ -32,7 +42,7 @@ internal class BrowserAlbumListController: UITableViewController {
         // check for photos albums count
         guard !collections.isEmpty else {
             // no data
-            _showError(with: "没有图片或视频", subtitle: "拍点照片和朋友们分享吧")
+            _showError(with: "No Photos or Videos", subtitle: "")
             return
         }
         // clear error info & display album
@@ -49,6 +59,7 @@ internal class BrowserAlbumListController: UITableViewController {
         tableView.register(BrowserAlbumListCell.self, forCellReuseIdentifier: "ASSET")
         tableView.separatorStyle = .none
         tableView.backgroundColor = .white
+        
     }
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -58,6 +69,15 @@ internal class BrowserAlbumListController: UITableViewController {
             DispatchQueue.main.async {
                 self.reloadData(with: status)
             }
+        }
+    }
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        // if the selected cell, need to deselect
+        tableView.visibleCells.forEach { cell in
+            cell.setSelected(false, animated: animated)
+            cell.setHighlighted(false, animated: animated)
         }
     }
     override func viewWillLayoutSubviews() {
@@ -98,7 +118,7 @@ internal extension BrowserAlbumListController {
         cell.accessoryType = .disclosureIndicator
         cell.backgroundColor = .white
         // update data for displaying
-        cell.willDisplay(with: collection, library: _library)
+        cell.willDisplay(with: collection, in: _library)
     }
     override func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         // try fetch cell
@@ -107,7 +127,7 @@ internal extension BrowserAlbumListController {
             return
         }
         // clear data for end display
-        cell.endDisplay(with: collection, library: _library)
+        cell.endDisplay(with: collection, in: _library)
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -117,13 +137,15 @@ internal extension BrowserAlbumListController {
         guard let collection = _collections?.ub_get(at: indexPath.row) else {
             return
         }
+        logger.debug?.write("show album with: \(collection.ub_localizedTitle ?? "")")
+        
         let controller = BrowserAlbumController(source: .init(collection), library: _library)
         // push to next page
         show(controller, sender: indexPath)
     }
 }
 
-/// library load support
+/// library error display support
 internal extension BrowserAlbumListController {
     
     fileprivate func _showError(with title: String, subtitle: String) {
@@ -133,15 +155,16 @@ internal extension BrowserAlbumListController {
         _infoView?.removeFromSuperview()
         _infoView = nil
         
-        let infoView = ErrorInfoView()
-        
-        // show view
-        view.addSubview(infoView)
-        _infoView = infoView
+        let infoView = ErrorInfoView(frame: view.bounds)
         
         infoView.title = title
         infoView.subtitle = subtitle
         infoView.backgroundColor = .white
+        infoView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        
+        // show view
+        view.addSubview(infoView)
+        _infoView = infoView
         
         // disable scroll
         tableView.isScrollEnabled = false

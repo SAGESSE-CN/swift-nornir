@@ -19,13 +19,16 @@ internal class DisplayView: UIView, Displayable {
         _setup()
     }
     
+    /// displayer delegate
+    weak var displayerDelegate: DisplayableDelegate?
+    
     ///
     /// display container content with item
     ///
     /// - parameter item: need display the item
     /// - parameter orientation: need display the orientation
     ///
-    func willDisplay(with item: Asset, orientation: UIImageOrientation) {
+    func willDisplay(with item: Asset, in library: Library, orientation: UIImageOrientation) {
         // update rotation
         _contentView.transform = .init(rotationAngle: orientation.ub_angle)
     }
@@ -34,7 +37,7 @@ internal class DisplayView: UIView, Displayable {
     ///
     /// - parameter item: need display the item
     ///
-    func endDisplay(with item: Asset) {
+    func endDisplay(with item: Asset, in library: Library) {
         // nothing
     }
     
@@ -117,7 +120,7 @@ internal class DisplayReplicantView: UIView {
     override func willMove(toWindow newWindow: UIWindow?) {
         super.willMove(toWindow: newWindow)
         
-        logger.debug?.write("show is \(newWindow != nil)")
+        logger.trace?.write("show is \(newWindow != nil)")
         // need to display a snapshot?
         guard let contentView = _contentView else {
             return
@@ -150,6 +153,7 @@ internal class DisplayReplicantView: UIView {
     
     // cache frame before ownership transfer
     private var _caches: [(UIView, CGRect)]?
+    
     // need to manage the view
     private weak var _contentView: UIView?
 }

@@ -7,12 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		0C16F87B1EA663E700C788C5 /* TestLayerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C16F87A1EA663E700C788C5 /* TestLayerViewController.swift */; };
-		0C224C421EAC55F7001ABB47 /* TestIndicatorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C224C411EAC55F7001ABB47 /* TestIndicatorViewController.swift */; };
 		0C2B78161ED4508E00925D18 /* PhotoLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C2B78151ED4508E00925D18 /* PhotoLibrary.swift */; };
 		0C2B78181ED4513300925D18 /* PhotoLibraryController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C2B78171ED4513300925D18 /* PhotoLibraryController.swift */; };
-		0C5DCB7C1EC0C45F009FA343 /* TestVideoFilmstripViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C5DCB7B1EC0C45F009FA343 /* TestVideoFilmstripViewController.swift */; };
 		0C7757B91EC9D09A00C38B36 /* rock.gif in Resources */ = {isa = PBXBuildFile; fileRef = 0C7757B81EC9D09A00C38B36 /* rock.gif */; };
+		0CB1134F1EE1517E003A8EDF /* FPSLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB1134E1EE1517E003A8EDF /* FPSLabel.swift */; };
 		0CDAD15E1EC882BF004CD4FB /* a.gif in Resources */ = {isa = PBXBuildFile; fileRef = 0CDAD15D1EC882BF004CD4FB /* a.gif */; };
 		0CE49E221E7A3F690058F5F8 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE49E211E7A3F690058F5F8 /* AppDelegate.swift */; };
 		0CE49E271E7A3F690058F5F8 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0CE49E251E7A3F690058F5F8 /* Main.storyboard */; };
@@ -21,7 +19,6 @@
 		0CE49E4D1E7A411D0058F5F8 /* Ubiquity.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0CE49E4C1E7A411D0058F5F8 /* Ubiquity.framework */; };
 		0CE49E4E1E7A411D0058F5F8 /* Ubiquity.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 0CE49E4C1E7A411D0058F5F8 /* Ubiquity.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		0CE49EA71E7B978E0058F5F8 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE49EA61E7B978E0058F5F8 /* ViewController.swift */; };
-		0CE49EA91E7B97CE0058F5F8 /* TestCanvasViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE49EA81E7B97CE0058F5F8 /* TestCanvasViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -45,6 +42,7 @@
 		0C2B78171ED4513300925D18 /* PhotoLibraryController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotoLibraryController.swift; sourceTree = "<group>"; };
 		0C5DCB7B1EC0C45F009FA343 /* TestVideoFilmstripViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestVideoFilmstripViewController.swift; sourceTree = "<group>"; wrapsLines = 0; };
 		0C7757B81EC9D09A00C38B36 /* rock.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = rock.gif; sourceTree = "<group>"; };
+		0CB1134E1EE1517E003A8EDF /* FPSLabel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = FPSLabel.swift; path = ../../../../Librarys/FPSLabel.swift; sourceTree = "<group>"; };
 		0CDAD15D1EC882BF004CD4FB /* a.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = a.gif; sourceTree = "<group>"; };
 		0CE49E1E1E7A3F690058F5F8 /* Ubiquity-Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Ubiquity-Example.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		0CE49E211E7A3F690058F5F8 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -99,6 +97,7 @@
 		0CE49E201E7A3F690058F5F8 /* Example */ = {
 			isa = PBXGroup;
 			children = (
+				0CB1134E1EE1517E003A8EDF /* FPSLabel.swift */,
 				0CDAD15D1EC882BF004CD4FB /* a.gif */,
 				0C7757B81EC9D09A00C38B36 /* rock.gif */,
 				0CE49EA81E7B97CE0058F5F8 /* TestCanvasViewController.swift */,
@@ -200,11 +199,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0C16F87B1EA663E700C788C5 /* TestLayerViewController.swift in Sources */,
-				0C5DCB7C1EC0C45F009FA343 /* TestVideoFilmstripViewController.swift in Sources */,
+				0CB1134F1EE1517E003A8EDF /* FPSLabel.swift in Sources */,
 				0CE49EA71E7B978E0058F5F8 /* ViewController.swift in Sources */,
-				0C224C421EAC55F7001ABB47 /* TestIndicatorViewController.swift in Sources */,
-				0CE49EA91E7B97CE0058F5F8 /* TestCanvasViewController.swift in Sources */,
 				0CE49E221E7A3F690058F5F8 /* AppDelegate.swift in Sources */,
 				0C2B78161ED4508E00925D18 /* PhotoLibrary.swift in Sources */,
 				0C2B78181ED4513300925D18 /* PhotoLibraryController.swift in Sources */,

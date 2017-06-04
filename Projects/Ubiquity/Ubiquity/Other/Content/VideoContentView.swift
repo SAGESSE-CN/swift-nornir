@@ -1,5 +1,5 @@
 //
-//  VideoView.swift
+//  VideoContentView.swift
 //  Ubiquity
 //
 //  Created by SAGESSE on 4/22/17.
@@ -26,6 +26,8 @@ internal class VideoPlayerSettings {
 
 internal enum VideoPlayerStatus {
     
+    case none
+    
     case preparing
     case prepared
     
@@ -38,7 +40,8 @@ internal enum VideoPlayerStatus {
     
     var isPrepared: Bool {
         switch self {
-        case .preparing,
+        case .none,
+             .preparing,
              .stop,
              .failure:
             return false
@@ -59,7 +62,7 @@ internal enum VideoPlayerStatus {
     }
 }
 
-internal class VideoView: UIView, Displayable, Operable, OperableDelegate {
+internal class VideoContentView: UIView, Displayable, Operable, OperableDelegate {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -70,13 +73,25 @@ internal class VideoView: UIView, Displayable, Operable, OperableDelegate {
         _setup()
     }
     
-    weak var delegate: OperableDelegate? {
-        set { return _delegate = newValue }
-        get { return _delegate }
+    weak var operaterDelegate: OperableDelegate?
+    
+    weak var displayerDelegate: DisplayableDelegate? {
+        set { return _thumbView.displayerDelegate = newValue }
+        get { return _thumbView.displayerDelegate }
     }
     
-    
     func play() {
+        
+        guard _playerView.status.isPrepared else {
+            guard _playerView.status == .none else {
+                return
+            }
+            guard let asset = _asset, let library = _library else {
+                return
+            }
+            _playerView.prepare(with: asset, in: library)
+            return
+        }
         _playerView.play()
     }
     func stop() {
@@ -90,40 +105,31 @@ internal class VideoView: UIView, Displayable, Operable, OperableDelegate {
         _playerView.resume()
     }
     
-    func prepare(with item: Asset) {
-        _playerView.prepare(with: item)
-    }
-    
-    ///
-    /// display container content with item
-    ///
-    /// - parameter item: need display the item
-    /// - parameter orientation: need display the orientation
-    ///
-    func willDisplay(with item: Asset, orientation: UIImageOrientation) {
+    // display asset
+    func willDisplay(with asset: Asset, in library: Library, orientation: UIImageOrientation) {
         logger.debug?.write()
         
-        // update image
-        //_thumbView.image = item.image
-        _thumbView.backgroundColor = Browser.ub_backgroundColor
+        // save context
+        _asset = asset
+        _library = library
+        
+        // update large content
+        _thumbView.willDisplay(with: asset, in: library, orientation: orientation)
     }
-    ///
-    /// end display content with item
-    ///
-    /// - parameter item: need display the item
-    ///
-    func endDisplay(with item: Asset) {
+    // end display asset
+    func endDisplay(with asset: Asset, in library: Library) {
         logger.trace?.write()
+        
+        // clear context
+        _asset = nil
+        _request = nil
+        _library = nil
+        
+        // clear content
+        _thumbView.endDisplay(with: asset, in: library)
         
         // stop player if needed
         _playerView.stop()
-    }
-    
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        
-        _thumbView.frame = bounds//convert(bounds, to: _contentView)
-        _playerView.frame = bounds//convert(bounds, to: _contentView)
     }
     
     private func _setup() {
@@ -136,59 +142,66 @@ internal class VideoView: UIView, Displayable, Operable, OperableDelegate {
         
         // setup player view
         _playerView.frame = bounds
-        _playerView.delegate = self
+        _playerView.operaterDelegate = self
         _playerView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
     }
     
-    fileprivate lazy var _thumbView: UIImageView = .init()
+    fileprivate var _asset: Asset?
+    fileprivate var _library: Library?
+    
+    fileprivate var _request: Request?
+    
+    fileprivate lazy var _thumbView: PhotoContentView = .init()
     fileprivate lazy var _playerView: VideoPlayerView = .init()
     
-    fileprivate weak var _delegate: OperableDelegate?
+    fileprivate weak var _delegate: (DisplayableDelegate & OperableDelegate)?
 }
 
 /// provide player event forward support
-internal extension VideoView {
+internal extension VideoContentView {
     
     /// if the data is prepared to do the call this method
-    func operable(didPrepare operable: Operable, item: Asset) {
-        delegate?.operable(didPrepare: self, item: item)
+    func operable(didPrepare operable: Operable, asset: Asset) {
+        operaterDelegate?.operable(didPrepare: self, asset: asset)
         // prepare in a hidden the view
+        _playerView.frame = bounds
         addSubview(_playerView)
         _thumbView.removeFromSuperview()
     }
     
     /// if you start playing the call this method
-    func operable(didStartPlay operable: Operable, item: Asset) {
-        delegate?.operable(didStartPlay: self, item: item)
+    func operable(didStartPlay operable: Operable, asset: Asset) {
+        operaterDelegate?.operable(didStartPlay: self, asset: asset)
     }
     /// if take the initiative to stop the play call this method
-    func operable(didStop operable: Operable, item: Asset) {
-        delegate?.operable(didStop: self, item: item)
+    func operable(didStop operable: Operable, asset: Asset) {
+        operaterDelegate?.operable(didStop: self, asset: asset)
         // stop to clear
+        _thumbView.frame = bounds
         addSubview(_thumbView)
         _playerView.removeFromSuperview()
     }
     
     /// if the interruption due to lack of enough data to invoke this method
-    func operable(didStalled operable: Operable, item: Asset) {
-        delegate?.operable(didStalled: self, item: item)
+    func operable(didStalled operable: Operable, asset: Asset) {
+        operaterDelegate?.operable(didStalled: self, asset: asset)
     }
     /// if play is interrupted call the method, example: pause, in background mode, in the call
-    func operable(didSuspend operable: Operable, item: Asset) {
-        delegate?.operable(didSuspend: self, item: item)
+    func operable(didSuspend operable: Operable, asset: Asset) {
+        operaterDelegate?.operable(didSuspend: self, asset: asset)
     }
     /// if interrupt restored to call this method
-    func operable(didResume operable: Operable, item: Asset) {
-        delegate?.operable(didResume: self, item: item)
+    func operable(didResume operable: Operable, asset: Asset) {
+        operaterDelegate?.operable(didResume: self, asset: asset)
     }
     
     /// if play completed call this method
-    func operable(didFinish operable: Operable, item: Asset) {
-        delegate?.operable(didFinish: self, item: item)
+    func operable(didFinish operable: Operable, asset: Asset) {
+        operaterDelegate?.operable(didFinish: self, asset: asset)
     }
     /// if the occur error call the method
-    func operable(didOccur operable: Operable, item: Asset, error: Error?) {
-        delegate?.operable(didOccur: self, item: item, error: error)
+    func operable(didOccur operable: Operable, asset: Asset, error: Error?) {
+        operaterDelegate?.operable(didOccur: self, asset: asset, error: error)
         // stop to clear
         addSubview(_thumbView)
         _playerView.removeFromSuperview()
@@ -209,11 +222,16 @@ internal class VideoPlayerView: UIView, Operable {
     }
     
     /// operate event callback delegate
-    weak var delegate: OperableDelegate?
+    weak var operaterDelegate: OperableDelegate?
+    
+    
+    var status: VideoPlayerStatus {
+        return _status
+    }
     
     /// to prepare data you need
-    func prepare(with item: Asset) {
-        logger.trace?.write()
+    func prepare(with asset: Asset, in library: Library) {
+        logger.debug?.write()
         
         // if has been started, stop & clean resource
         if _player != nil {
@@ -223,28 +241,26 @@ internal class VideoPlayerView: UIView, Operable {
         
         // save data & status
         // only when loadedTimeRanges more than minimumBufferTime, prepare is completed
-        _item = item
+        _asset = asset
         _token = Int(CACurrentMediaTime())
         _status = .preparing
         
         // prepare data
-        
-        let url = (item as? BrowserItem)?.url
-        
-        let a = AVURLAsset(url: url!)
-        let o = AVPlayerItem(asset: a)
-        
-        _player = AVPlayer(playerItem: o)
+        library.ub_requestPlayerItem(forVideo: asset, options: nil) { item, response in
+            // continue
+            self._player = AVPlayer(playerItem: item)
+        }
     }
     
     /// play action, what must be after prepare otherwise this will not happen
     func play() {
+        logger.debug?.write()
+        
         // if the dta is ready, start
         // if then player is no playing, start
         guard _status.isPrepared && !_status.isPlaying else {
             return
         }
-        logger.trace?.write()
         
         // start play,
         _status = .playing
@@ -253,13 +269,15 @@ internal class VideoPlayerView: UIView, Operable {
     }
     /// stop action
     func stop() {
+        logger.debug?.write()
+        
         // there must be the item
-        guard let _ = _item else {
+        guard let _ = _asset else {
             return
         }
-        logger.trace?.write()
         
-        _status = .stop
+        _status = .none
+        _request = nil
         _player?.pause()
         
         let token = _token
@@ -275,11 +293,12 @@ internal class VideoPlayerView: UIView, Operable {
     
     /// suspend action
     func suspend() {
+        logger.debug?.write()
+        
         // there must be the item
-        guard let _ = _item else {
+        guard let _ = _asset else {
             return
         }
-        logger.trace?.write()
         
         _status = .pausing
         _player?.pause()
@@ -287,11 +306,12 @@ internal class VideoPlayerView: UIView, Operable {
     }
     /// resume suspend
     func resume() {
+        logger.debug?.write()
+        
         // there must be the item
-        guard let _ = _item else {
+        guard let _ = _asset else {
             return
         }
-        logger.trace?.write()
         
         _status = .playing
         _player?.play()
@@ -425,76 +445,75 @@ internal class VideoPlayerView: UIView, Operable {
         
         center.removeObserver(self, name: .AVPlayerItemDidPlayToEndTime, object: nil)
         center.removeObserver(self, name: .AVPlayerItemPlaybackStalled, object: nil)
+        
     }
-    
-    
     
     private func _cb_didPreare() {
         // must provide the item for the operation
-        guard let item = _item else {
+        guard let asset = _asset else {
             return
         }
-        delegate?.operable(didPrepare: self, item: item)
+        operaterDelegate?.operable(didPrepare: self, asset: asset)
     }
     private func _cb_didStartPlay() {
         // must provide the item for the operation
-        guard let item = _item else {
+        guard let asset = _asset else {
             return
         }
-        delegate?.operable(didStartPlay: self, item: item)
+        operaterDelegate?.operable(didStartPlay: self, asset: asset)
     }
     
     private func _cb_didSuspend() {
         // must provide the item for the operation
-        guard let item = _item else {
+        guard let asset = _asset else {
             return
         }
-        delegate?.operable(didSuspend: self, item: item)
+        operaterDelegate?.operable(didSuspend: self, asset: asset)
     }
     private func _cb_didStalled() {
         // must provide the item for the operation
-        guard let item = _item else {
+        guard let asset = _asset else {
             return
         }
-        delegate?.operable(didStalled: self, item: item)
+        operaterDelegate?.operable(didStalled: self, asset: asset)
     }
     private func _cb_didResume() {
         // must provide the item for the operation
-        guard let item = _item else {
+        guard let asset = _asset else {
             return
         }
-        delegate?.operable(didResume: self, item: item)
+        operaterDelegate?.operable(didResume: self, asset: asset)
     }
     
     private func _cb_didStop() {
         // must provide the item for the operation
-        guard let item = _item else {
+        guard let asset = _asset else {
             return
         }
-        delegate?.operable(didStop: self, item: item)
+        operaterDelegate?.operable(didStop: self, asset: asset)
     }
     private func _cb_didFinish() {
         // must provide the item for the operation
-        guard let item = _item else {
+        guard let asset = _asset else {
             return
         }
-        delegate?.operable(didFinish: self, item: item)
+        operaterDelegate?.operable(didFinish: self, asset: asset)
     }
     
     private func _cb_didOccurError(_ error: Error?) {
         logger.error?.write(String(describing: error))
         // must provide the data for the operation
-        guard let item = _item else {
+        guard let asset = _asset else {
             return
         }
         logger.error?.write(String(describing: error))
         
-        delegate?.operable(didOccur: self, item: item, error: error)
+        operaterDelegate?.operable(didOccur: self, asset: asset, error: error)
     }
     
     private dynamic func _ntf_interruptioned(_ sender: Notification) {
         // must provide the data for the operation
-        guard let _ = _item, let player = _player, player.currentItem === sender.object as? AVPlayerItem else {
+        guard let _ = _asset, let player = _player, player.currentItem === sender.object as? AVPlayerItem else {
             return
         }
         logger.debug?.write()
@@ -506,7 +525,7 @@ internal class VideoPlayerView: UIView, Operable {
     }
     private dynamic func _ntf_finished(_ sender: Notification) {
         // must provide the data for the operation
-        guard let _ = _item, let player = _player, player.currentItem === sender.object as? AVPlayerItem else {
+        guard let _ = _asset, let player = _player, player.currentItem === sender.object as? AVPlayerItem else {
             return
         }
         logger.debug?.write()
@@ -518,7 +537,7 @@ internal class VideoPlayerView: UIView, Operable {
     }
     private dynamic func _ntf_stalled(_ sender: Notification) {
         // must provide the data for the operation
-        guard let _ = _item, let player = _player, player.currentItem === sender.object as? AVPlayerItem else {
+        guard let _ = _asset, let player = _player, player.currentItem === sender.object as? AVPlayerItem else {
             return
         }
         logger.debug?.write()
@@ -530,7 +549,7 @@ internal class VideoPlayerView: UIView, Operable {
     
     private dynamic func _ntf_suspend(_ sender: Notification) {
         // must provide the data for the operation
-        guard let _ = _item, let _ = _player else {
+        guard let _ = _asset, let _ = _player else {
             return
         }
         // suspend player
@@ -548,7 +567,7 @@ internal class VideoPlayerView: UIView, Operable {
     }
     private dynamic func _ntf_resume(_ sender: Notification) {
         // must provide the data for the operation
-        guard let _ = _item, let _ = _player else {
+        guard let _ = _asset, let _ = _player else {
             return
         }
         // resume player
@@ -566,9 +585,11 @@ internal class VideoPlayerView: UIView, Operable {
     }
     
     
-    private var _item: Asset?
     private var _token: Int?
-    private var _status: VideoPlayerStatus = .stop
+    private var _asset: Asset?
+    private var _status: VideoPlayerStatus = .none
+    
+    private var _request: Request?
     
     private var _suspended: Bool = false
     

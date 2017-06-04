@@ -18,16 +18,10 @@ internal class BrowserAlbumLayout: UICollectionViewFlowLayout {
         }
         // recompute
         let rect = UIEdgeInsetsInsetRect(collectionView.bounds, collectionView.contentInset)
-        
-        let minimumSpacing = CGFloat(2)
-        let minimumItemSize = CGSize(width: 78, height: 78)
-        
-        let column = trunc((rect.width + minimumSpacing) / (minimumItemSize.width + minimumSpacing))
-        let width = trunc(((rect.width + minimumSpacing) / column - minimumSpacing) * 2) / 2
-        let spacing = (rect.width - width * column) / (column - 1)
+        let (size, spacing) = BrowserAlbumLayout._itemSize(with: rect)
         
         // setup
-        itemSize = CGSize(width: width, height: width)
+        itemSize = size
         minimumLineSpacing = spacing
         minimumInteritemSpacing = spacing
     }
@@ -41,7 +35,7 @@ internal class BrowserAlbumLayout: UICollectionViewFlowLayout {
         }
         let location = collectionView.convert(collectionView.center, from: collectionView.superview)
         // get center index path
-        invaildCenterIndexPath = collectionView.indexPathsForVisibleItems.reduce((nil, Int.max)) {
+        _invaildCenterIndexPath = collectionView.indexPathsForVisibleItems.reduce((nil, Int.max)) {
             // get the cell center
             guard let center = collectionView.layoutAttributesForItem(at: $1)?.center else {
                 return $0
@@ -63,7 +57,7 @@ internal class BrowserAlbumLayout: UICollectionViewFlowLayout {
     override func targetContentOffset(forProposedContentOffset proposedContentOffset: CGPoint) -> CGPoint {
         let offset = super.targetContentOffset(forProposedContentOffset: proposedContentOffset)
         // only the process screen rotation
-        guard let indexPath = invaildCenterIndexPath else {
+        guard let indexPath = _invaildCenterIndexPath else {
             return offset
         }
         // must get the center on new layout
@@ -85,5 +79,26 @@ internal class BrowserAlbumLayout: UICollectionViewFlowLayout {
         return super.finalLayoutAttributesForDisappearingItem(at: itemIndexPath)
     }
     
-    private var invaildCenterIndexPath: IndexPath?
+    private static func _itemSize(with rect: CGRect) -> (CGSize, CGFloat) {
+        
+        let column = trunc((rect.width + minimumItemSpacing) / (minimumItemSize.width + minimumItemSpacing))
+        let width = trunc(((rect.width + minimumItemSpacing) / column - minimumItemSpacing) * 2) / 2
+        let spacing = (rect.width - width * column) / (column - 1)
+        
+        return (.init(width: width, height: width), spacing)
+    }
+    
+    static let minimumItemSpacing: CGFloat = 2
+    static let minimumItemSize: CGSize = .init(width: 78, height: 78)
+    
+    static let thumbnailItemSize: CGSize = {
+        
+        let size = _itemSize(with: UIScreen.main.bounds).0
+        let scale = CGFloat(5)//UIScreen.main.scale
+        
+        return .init(width: size.width * scale, height: size.height * scale)
+    }()
+    
+    private var _invaildCenterIndexPath: IndexPath?
 }
+

@@ -53,10 +53,14 @@ internal class ThumbView: UIView {
             }
             return
         }
-        // show iamge
+        // show image
         imageViews.enumerated().forEach { index, imageView in
             // get the current thumbnails
-            imageView.image = images.ub_get(at: index) ?? nil
+            let image = images.ub_get(at: index) ?? nil
+            // if there is no change, ignored
+            if imageView.image !== image {
+                imageView.ub_setImage(image, animated: true)
+            }
             imageView.isHidden = !(index < images.count)
         }
     }
@@ -93,16 +97,17 @@ internal class ThumbView: UIView {
         
             return image
         }
+        logger.debug?.write("load `ubiquity_icon_empty_album`")
         
         let rect = CGRect(x: 0, y: 0, width: 70, height: 70)
         let tintColor = UIColor.ub_init(hex: 0xb4b3b9)
-        let backgroundColor = Browser.ub_backgroundColor
+        let backgroundColor = UIColor.ub_init(hex: 0xF0EFF5)
         // begin draw
         UIGraphicsBeginImageContextWithOptions(rect.size, true, UIScreen.main.scale)
         // check the current context
         if let context = UIGraphicsGetCurrentContext() {
             // set the background color
-            backgroundColor?.setFill()
+            backgroundColor.setFill()
             context.fill(rect)
             // draw icon
             if let image = UIImage.ub_init(named: "ubiquity_icon_empty_album") {
@@ -134,7 +139,7 @@ internal class ThumbView: UIView {
 
 internal class ThumbImageView: UIImageView {
     override var backgroundColor: UIColor? {
-        set { return super.backgroundColor = Browser.ub_backgroundColor }
+        set { return super.backgroundColor = .ub_init(hex: 0xF0EFF5) }
         get { return super.backgroundColor }
     }
 }

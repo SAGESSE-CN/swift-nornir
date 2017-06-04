@@ -8,7 +8,7 @@
 
 import UIKit
 
-internal class BrowserAlbumCell: UICollectionViewCell, Displayable {
+internal class BrowserAlbumCell: UICollectionViewCell {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -18,117 +18,182 @@ internal class BrowserAlbumCell: UICollectionViewCell, Displayable {
         super.init(coder: aDecoder)
         _setup()
     }
-    
-    private func _setup() {
-        // set default background color
-        contentView.backgroundColor = Browser.ub_backgroundColor
-        
-        _createBadgeView()
+    deinit {
+        // on destory if not the end display, need to manually call it
+        guard let asset = _asset, let library = _library else {
+            return
+        }
+        // call end display
+        endDisplay(with: asset, in: library)
     }
     
-    var orientation: UIImageOrientation = .up
-//    var orientation: UIImageOrientation = .left
-//    var orientation: UIImageOrientation = .down
-//    var orientation: UIImageOrientation = .right
+    var contents: AnyObject? {
+        set {
+            _imageView?.image = newValue as? UIImage
+        }
+        get {
+            return _imageView?.image
+        }
+    }
     
-    
-    var badgeView: BadgeView?
-//
-//    var asset: Browseable? {
-//        willSet {
-//            guard asset !== newValue else {
-//                return
-//            }
-//            _previewView.backgroundColor = newValue?.backgroundColor
-//            _previewView.image = newValue?.browseImage
-//            
-//            _badgeBar.backgroundImage = UIImage(named: "browse_background_gradient")
-//            _badgeBar.leftBarItems = [.init(style: .video)]
-//            //_badgeBar.rightBarItems = [.init(style: .loading)]
-//            _badgeBar.rightBarItems = [.init(title: "9:99")]
-//        }
-//    }
-//    
-//    var previewView: UIImageView {
-//        return _previewView
-//    }
-//    
-//    private func _commonInit() {
-//        
-//        _previewView.contentMode = .scaleAspectFill
-//        _previewView.frame = contentView.bounds
-//        _previewView.clipsToBounds = true
-//        _previewView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-//        
-//        _badgeBar.frame = CGRect(x: 0, y: contentView.bounds.height - 20, width: contentView.bounds.width, height: 20)
-//        _badgeBar.tintColor = .white
-//        _badgeBar.autoresizingMask = [.flexibleWidth, .flexibleTopMargin]
-//        _badgeBar.isUserInteractionEnabled = false
-//        
-//        contentView.addSubview(_previewView)
-//        contentView.addSubview(_badgeBar)
-//    }
-//    
-//    private lazy var _previewView = UIImageView(frame: .zero)
-//    private lazy var _badgeBar = IBBadgeBar(frame: .zero)
-    
-    ///
-    /// display container content with item
-    ///
-    /// - parameter asset: need display the item
-    /// - parameter orientation: need display the orientation
-    ///
-    func willDisplay(with asset: Asset, orientation: UIImageOrientation) {
+    // display asset
+    func willDisplay(with asset: Asset, in library: Library, orientation: UIImageOrientation) {
         
-        //backgroundColor = item.backgroundColor
+        // save context
+        _asset = asset
+        _library = library
+        _orientation = orientation
+       
+        _badgeView?.isHidden = true
         
-        if let imageView = contentView as? UIImageView {
-            imageView.clipsToBounds = true
-            imageView.contentMode = .scaleAspectFill
-            //imageView.image = item.image?.ub_withOrientation(orientation)
+        // setup content
+        _request = library.ub_requestImage(for: asset, targetSize: BrowserAlbumLayout.thumbnailItemSize, contentMode: .default, options: nil) { [weak self, weak asset] contents, response in
+            // if the asset is nil, the asset has been released
+            guard let asset = asset else {
+                return
+            }
+            // update contents
+            self?._updateContents(contents, response: response, asset: asset)
+        }
+    }
+    // end display asset
+    func endDisplay(with asset: Asset, in library: Library) {
+        
+        // if is requesting image, need to cancel
+        _request.map { request in
+            // cancel
+            library.ub_cancelRequest(request)
         }
         
-//        switch item.type {
-//        case .image:
-//            badgeView?.backgroundImage = nil
-//            badgeView?.leftItems = nil
-//            badgeView?.rightItems = nil
-//            
-//        case .video:
-//            badgeView?.backgroundImage = BadgeView.ub_backgroundImage
-//            badgeView?.leftItems = [
-//                .video
-//            ]
-//            badgeView?.rightItems = [
-//                .text("04:21")
-//            ]
-//        }
+        // clear context
+        _asset = nil
+        _request = nil
+        _library = nil
         
-        _contentSize = .init(width: asset.ub_pixelWidth, height: asset.ub_pixelHeight)
-    }
-    ///
-    /// end display content with item
-    ///
-    /// - parameter asset: need display the item
-    ///
-    func endDisplay(with asset: Asset) {
+        // clear contents
+        self.contents = nil
     }
     
-    func _createBadgeView() {
+    // update contents
+    private func _updateContents(_ contents: UIImage?, response: Response, asset: Asset) {
+        // the current asset has been changed?
+        guard _asset === asset else {
+            // change, all reqeust is expire
+            logger.debug?.write("\(asset.ub_localIdentifier) image is expire")
+            return
+        }
+        //logger.trace?.write("\(asset.ub_localIdentifier)")
         
-        let view = BadgeView()
+        // if the request status is completed or cancelled, clear the request
+        if response.ub_completed || response.ub_cancelled {
+            _request = nil
+        }
         
-        view.frame = CGRect(x: 0, y: contentView.bounds.height - 20, width: contentView.bounds.width, height: 20)
-        view.tintColor = .white
-        view.autoresizingMask = [.flexibleWidth, .flexibleTopMargin]
-        view.isUserInteractionEnabled = false
+        // update contents
+        self.contents = contents?.ub_withOrientation(_orientation)
         
+        // status is downloading
+        if _badgeView?.isHidden ?? false, response.ub_downloading {
+            _updateBadge(with: true)
+        }
         
-        addSubview(view)
-        badgeView = view
+        // if the `contents` is nil or `response.ub_donwloading` is true
+        // the image need download from remote server
+        guard contents != nil else {
+            return
+        }
+        // display the normal badge
+        _updateBadge(with: false)
+    }
+    private func _updateBadge(with downloading: Bool) {
+        
+        let mediaType = _asset?.ub_mediaType ?? .unknown
+        let mediaSubtypes = _asset?.ub_mediaSubtypes ?? []
+        
+        // setup badge item
+        switch mediaType {
+        case .video:
+            
+            // less than 1, the display of 1
+            let duration = ceil(_asset?.ub_duration ?? 0)
+            
+            _badgeView?.backgroundImage = BadgeView.ub_backgroundImage
+            _badgeView?.rightItem = .text(.init(format: "%d:%02d", Int(duration) / 60, Int(duration) % 60))
+            _badgeView?.leftItem = {
+                // high-frame-rate video.
+                if mediaSubtypes.contains(.videoHighFrameRate) {
+                    return .slomo
+                }
+                // time-lapse video.
+                if mediaSubtypes.contains(.videoTimelapse) {
+                    return .timelapse
+                }
+                // normal video.
+                return .video
+            }()
+            
+        case .image,
+             .audio,
+             .unknown:
+            
+            // large-format panorama photo.
+            if mediaSubtypes.contains(.photoPanorama) {
+                // show icon
+                _badgeView?.leftItem = .panorama
+                _badgeView?.rightItem = nil
+                _badgeView?.backgroundImage = BadgeView.ub_backgroundImage
+                
+            } else {
+                // hidden all
+                _badgeView?.leftItem = nil
+                _badgeView?.rightItem = nil
+                _badgeView?.backgroundImage = nil
+            }
+        }
+        
+        // the currently download?
+        if downloading {
+            // the icon is downloading
+            _badgeView?.rightItem = .downloading
+        }
+        
+        _badgeView?.isHidden = false
     }
     
-    fileprivate var _contentSize: CGSize = .zero
+    private func _setup() {
+        
+        
+        // setup badge view
+        let badgeView = BadgeView()
+        badgeView.frame = .init(x: 0, y: contentView.bounds.height - 20, width: contentView.bounds.width, height: 20)
+        badgeView.tintColor = .white
+        badgeView.autoresizingMask = [.flexibleWidth, .flexibleTopMargin]
+        badgeView.isUserInteractionEnabled = false
+        
+        // set default background color
+        contentView.backgroundColor = .ub_init(hex: 0xf0f0f0)
+        //contentView.clearsContextBeforeDrawing = false
+        contentView.clipsToBounds = true
+        contentView.contentMode = .scaleAspectFill
+        contentView.addSubview(badgeView)
+        
+        isOpaque = true
+        clipsToBounds = true
+        backgroundColor = contentView.backgroundColor
+        
+        // mapping
+        _imageView = contentView as? UIImageView
+        _badgeView = badgeView
+    }
+    
+    fileprivate var _asset: Asset?
+    fileprivate var _library: Library?
+    
+    fileprivate var _request: Request?
+    fileprivate var _orientation: UIImageOrientation = .up
+    
+    fileprivate var _imageView: UIImageView?
+    fileprivate var _badgeView: BadgeView?
 }
 
 /// custom transition support
@@ -138,10 +203,15 @@ extension BrowserAlbumCell: TransitioningView {
         return convert(bounds, to: window)
     }
     var ub_bounds: CGRect {
-        return contentView.bounds.ub_aligned(with: _contentSize)
+        // if the asset was not set
+        guard let asset = _asset else {
+            // can’t alignment
+            return contentView.bounds
+        }
+        return contentView.bounds.ub_aligned(with: .init(width: asset.ub_pixelWidth, height: asset.ub_pixelHeight))
     }
     var ub_transform: CGAffineTransform {
-        return contentView.transform.rotated(by: orientation.ub_angle)
+        return contentView.transform.rotated(by: _orientation.ub_angle)
     }
     
     func ub_snapshotView(with context: TransitioningContext) -> UIView? {

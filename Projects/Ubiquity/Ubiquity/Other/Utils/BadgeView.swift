@@ -35,10 +35,12 @@ internal class BadgeView: UIView {
         
         private init(text: String) {
             self.text = text
+            self.itemTpye = 0
             super.init()
         }
         private init(image: UIImage?) {
             self.image = image
+            self.itemTpye = 1
             super.init()
         }
         private convenience init(named: String, render: UIImageRenderingMode = .alwaysTemplate) {
@@ -48,6 +50,8 @@ internal class BadgeView: UIView {
         
         var text: String?
         var image: UIImage?
+        
+        var itemTpye: Int
     }
     
     override init(frame: CGRect) {
@@ -64,20 +68,51 @@ internal class BadgeView: UIView {
         _needUpdateVisableViews = true
     }
     
+    var leftItem: Item? {
+        set { return leftItems = newValue.map({ [$0] }) }
+        get { return leftItems?.first }
+    }
     var leftItems: Array<Item>? {
-        didSet {
+        set {
+            let oldValue = _leftItems
+            _leftItems = newValue ?? []
+            // no need update, check it any change
+            guard !_needUpdateVisableViews && !oldValue.elementsEqual(_leftItems) else {
+                return
+            }
             _needUpdateVisableViews = true
             setNeedsLayout()
         }
+        get {
+            return _leftItems
+        }
+    }
+    
+    var rightItem: Item? {
+        set { return rightItems = newValue.map({ [$0] }) }
+        get { return rightItems?.first }
     }
     var rightItems: Array<Item>? {
-        didSet {
+        set {
+            let oldValue = _rightItems
+            _rightItems = newValue ?? []
+            // no need update, check it any change
+            guard !_needUpdateVisableViews && !oldValue.elementsEqual(_rightItems) else {
+                return
+            }
             _needUpdateVisableViews = true
             setNeedsLayout()
         }
+        get {
+            return _rightItems
+        }
     }
+    
     var backgroundImage: UIImage? {
         didSet {
+            guard oldValue !== backgroundImage else {
+                return
+            }
             _updateBackgroundImage()
         }
     }
@@ -89,52 +124,93 @@ internal class BadgeView: UIView {
         _updateVisableViewLayoutIfNeeded()
     }
     
-    override func tintColorDidChange() {
-        super.tintColorDidChange()
-        
-        _leftViews.forEach { 
-            guard let label = $0 as? UILabel else {
-                return
-            }
-            label.textColor = tintColor
-        }
-        _rightViews.forEach { 
-            guard let label = $0 as? UILabel else {
-                return
-            }
-            label.textColor = tintColor
-        }
-    }
-    
     private func _updateBackgroundImage() {
         layer.contents = backgroundImage?.cgImage
     }
     private func _updateVisableViewsIfNeeded() {
+        // need update visable view?
         guard _needUpdateVisableViews else {
             return
         }
         _needUpdateVisableViews = false
         
-        _leftViews.forEach { 
-            $0.removeFromSuperview()
-        }
-        _rightViews.forEach { 
-            $0.removeFromSuperview()
+        // new list
+        var leftItemViews: [UIView] = []
+        var rightItemViews: [UIView] = []
+        
+        // left: create & remove & update
+        (0 ..< max(_leftItems.count, _leftItemViews.count)).forEach { index in
+            // check contains the item
+            if index < _leftItems.count {
+                let item = _leftItems[index]
+                // item view is already?
+                if index < _leftItemViews.count {
+                    // exist, check reuse
+                    let view = _leftItemViews[index]
+                    if view.tag == item.itemTpye {
+                        (view as AnyObject).apply?(item)
+                        leftItemViews.append(view)
+                        return // reuse
+                    }
+                }
+                // new
+                let view = _createView(with: item)
+                (view as AnyObject).apply?(item)
+                leftItemViews.append(view)
+            }
+            // item view is already?
+            if index < _leftItemViews.count {
+                // remove
+                let view = _leftItemViews[index]
+                view.isHidden = true
+                if view is ItemTextView {
+                    _reusequeueItemViews1.append(view)
+                } else if view is ItemImageView {
+                    _reusequeueItemViews2.append(view)
+                }
+            }
         }
         
-        _leftViews = leftItems?.map { item -> UIView in
-            let view = _createView(with: item)
-            addSubview(view)
-            return view
-        } ?? []
-        _rightViews = rightItems?.map { item -> UIView in
-            let view = _createView(with: item)
-            addSubview(view)
-            return view
-        } ?? []
+        // right: create & remove & update
+        (0 ..< max(_rightItems.count, _rightItemViews.count)).forEach { index in
+            // check contains the item
+            if index < _rightItems.count {
+                let item = _rightItems[index]
+                // item view is already?
+                if index < _rightItemViews.count {
+                    // exist, check reuse
+                    let view = _rightItemViews[index]
+                    if view.tag == item.itemTpye {
+                        (view as AnyObject).apply?(item)
+                        rightItemViews.append(view)
+                        return // reuse
+                    }
+                }
+                // new
+                let view = _createView(with: item)
+                (view as AnyObject).apply?(item)
+                rightItemViews.append(view)
+            }
+            // item view is already?
+            if index < _rightItemViews.count {
+                // remove
+                let view = _rightItemViews[index]
+                view.isHidden = true
+                if view is ItemTextView {
+                    _reusequeueItemViews1.append(view)
+                } else if view is ItemImageView {
+                    _reusequeueItemViews2.append(view)
+                }
+            }
+        }
+        
+        _leftItemViews = leftItemViews
+        _rightItemViews = rightItemViews
+        
         _cacheBounds = nil
     }
     private func _updateVisableViewLayoutIfNeeded() {
+        // need update visable view layout?
         guard _cacheBounds?.size != self.bounds.size else {
             return
         }
@@ -144,7 +220,7 @@ internal class BadgeView: UIView {
         let edg = UIEdgeInsetsMake(2, 4, 2, 4)
         let bounds = UIEdgeInsetsInsetRect(self.bounds, edg)
         
-        _ = _leftViews.reduce(bounds.minX) { x, view in
+        _ = _leftItemViews.reduce(bounds.minX) { x, view in
             var nframe = CGRect(x: x, y: bounds.minY, width: 0, height: 0)
             
             let size = view.sizeThatFits(bounds.size)
@@ -157,7 +233,7 @@ internal class BadgeView: UIView {
             view.frame = nframe
             return x + nframe.width + sp
         }
-        _ = _rightViews.reduce(bounds.maxX) { x, view in
+        _ = _rightItemViews.reduce(bounds.maxX) { x, view in
             var nframe = CGRect(x: x, y: bounds.minY, width: 0, height: 0)
             
             let size = view.sizeThatFits(bounds.size)
@@ -172,38 +248,77 @@ internal class BadgeView: UIView {
         }
     }
     
+    
     private func _createView(with item: Item) -> UIView {
-        if let image = item.image {
-            let view = UIImageView(image: image)
-            view.contentMode = .center
-            return view
-        }
-        if let title = item.text {
-            let label = UILabel()
-            
-            label.text = title
+        if item.itemTpye == 0 {
+            let label = _reusequeueItemViews1.last as? ItemTextView ?? ItemTextView()
+            if !_reusequeueItemViews1.isEmpty {
+                _reusequeueItemViews1.removeLast()
+            } else {
+                addSubview(label)
+            }
+            label.isHidden = false
             label.textColor = tintColor
             label.font = UIFont.systemFont(ofSize: 12)
             //label.adjustsFontSizeToFitWidth = true
             
             return label
         }
-        return UIView()
+        if item.itemTpye == 1 {
+            let view = _reusequeueItemViews2.last as? ItemImageView ?? ItemImageView()
+            if !_reusequeueItemViews2.isEmpty {
+                _reusequeueItemViews2.removeLast()
+            } else {
+                addSubview(view)
+            }
+            view.isHidden = false
+            view.contentMode = .center
+            return view
+        }
+        fatalError()
     }
     
     private var _cacheBounds: CGRect?
     private var _needUpdateVisableViews: Bool = true
     
-    private lazy var _leftViews: [UIView] = []
-    private lazy var _rightViews: [UIView] = []
+    private lazy var _leftItems: [Item] = []
+    private lazy var _rightItems: [Item] = []
+    
+    private lazy var _leftItemViews: [UIView] = []
+    private lazy var _rightItemViews: [UIView] = []
+    
+    private lazy var _reusequeueItemViews1: [UIView] = []
+    private lazy var _reusequeueItemViews2: [UIView] = []
 }
 
+
+
+extension BadgeView {
+    internal class ItemTextView: UILabel {
+        
+        func apply(_ item: Item) {
+            text = item.text
+        }
+        
+        override func tintColorDidChange() {
+            super.tintColorDidChange()
+            self.textColor = tintColor
+        }
+    }
+    internal class ItemImageView: UIImageView {
+        
+        func apply(_ item: Item) {
+            image = item.image
+        }
+    }
+}
 
 extension BadgeView {
     static var ub_backgroundImage: UIImage? {
         if let image = __backgroundImage {
             return image
         }
+        logger.debug?.write("load `ubiquity_background_gradient`")
         let image = UIImage.ub_init(named: "ubiquity_background_gradient")
         __backgroundImage = image
         return image

@@ -134,14 +134,6 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="KSA-pN-sIT">
-                                <rect key="frame" x="110" y="552" width="30" height="51"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="32"/>
-                                <state key="normal" title="-"/>
-                                <connections>
-                                    <action selector="b1:" destination="2sn-UF-eS6" eventType="touchUpInside" id="Ggk-2G-7gp"/>
-                                </connections>
-                            </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="T9L-ap-9jg">
                                 <rect key="frame" x="235" y="552" width="30" height="51"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="32"/>
@@ -162,6 +154,14 @@
                                     <action selector="radiusDidChange:" destination="2sn-UF-eS6" eventType="valueChanged" id="DKm-X3-HEg"/>
                                 </connections>
                             </slider>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="KSA-pN-sIT">
+                                <rect key="frame" x="110" y="552" width="30" height="51"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="32"/>
+                                <state key="normal" title="-"/>
+                                <connections>
+                                    <action selector="b1:" destination="2sn-UF-eS6" eventType="touchUpInside" id="Ggk-2G-7gp"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" red="0.87058823529411766" green="0.87058823529411766" blue="0.87058823529411766" alpha="1" colorSpace="calibratedRGB"/>
                         <constraints>
@@ -181,7 +181,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="y3T-w1-y0Y" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2513" y="797"/>
+            <point key="canvasLocation" x="2512.8000000000002" y="796.55172413793105"/>
         </scene>
         <!--Test Indicator View Controller-->
         <scene sceneID="nd9-fs-0d9">

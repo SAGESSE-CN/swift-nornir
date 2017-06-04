@@ -16,6 +16,7 @@ internal protocol TransitioningView: class {
     
     func ub_snapshotView(with context: TransitioningContext) -> UIView?
     
+    func ub_transitionWillStart(_ context: TransitioningContext)
     func ub_transitionDidStart(_ context: TransitioningContext)
     func ub_transitionDidEnd(_ didComplete: Bool)
 }
@@ -27,8 +28,8 @@ internal protocol TransitioningContext: class {
     
     var ub_operation: Animator.Operation { get }
     
+    var ub_snapshotView: UIView? { get }
     var ub_containerView: UIView { get }
-    var ub_transitioningView: UIView? { get }
     
     func ub_view(for key: Animator.Content) -> UIView?
     func ub_viewController(for key: Animator.Content) -> UIViewController?
@@ -354,7 +355,7 @@ extension Animator {
         var ub_containerView: UIView {
             return context.containerView
         }
-        var ub_transitioningView: UIView? {
+        var ub_snapshotView: UIView? {
             return snapshotView.containerView
         }
         
@@ -432,6 +433,9 @@ extension Animator {
             // notice delegate prepare
             animator.source?.ub_transitionDidPrepare(using: animator, context: self)
             animator.destination?.ub_transitionDidPrepare(using: animator, context: self)
+            // notice delegate will start
+            ub_transitioningView(for: .source)?.ub_transitionWillStart(self)
+            ub_transitioningView(for: .destination)?.ub_transitionWillStart(self)
             // setup transition context for snapshot view
             snapshotView.frame = context.containerView.bounds
             snapshotView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
@@ -553,12 +557,16 @@ extension Animator {
         }
         
         override func prepare(for key: Animator.Content) {
-            logger.trace?.write(context.containerView.layer.speed)
             super.prepare(for: key)
+            
+            // disable all tap event
+            self.context.containerView.window?.isUserInteractionEnabled = false
         }
         override func complete(_ completed: Bool) {
             super.complete(completed)
-            logger.trace?.write(context.containerView.layer.speed)
+            
+            // enable all tap event
+            self.context.containerView.window?.isUserInteractionEnabled = true
         }
         
         func cancel() {
@@ -602,6 +610,9 @@ extension Animator {
 
 internal extension TransitioningView {
     
+    func ub_transitionWillStart(_ context: TransitioningContext) {
+        // the default implementation is empty
+    }
     func ub_transitionDidStart(_ context: TransitioningContext) {
         // the default implementation is empty
     }

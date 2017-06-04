@@ -8,7 +8,7 @@
 
 import UIKit
 
-@testable import Ubiquity
+import Ubiquity
 
 class PhotoLibraryController: UITabBarController {
     
@@ -25,12 +25,22 @@ class PhotoLibraryController: UITabBarController {
         
         let library = PhotoLibrary()
         
-        let vc1 = Ubiquity.BrowserAlbumZoomableController(library: library)
-        let vc2 = Ubiquity.BrowserAlbumListController(library: library)
+        //let vc1 = Ubiquity.BrowserAlbumZoomableController(library: library)
+        let vc2 = BrowserAlbumListControllerMake(library)
+            //Ubiquity.BrowserAlbumListController(library: library)
+        
+        //vc1.hidesBottomBarWhenPushed = true
+        vc2.hidesBottomBarWhenPushed = true
+        
+//        let nav = NavigationController(navigationBarClass: nil, toolbarClass: ExtendedToolbar.self)
+//        nav.viewControllers = [container.viewController]
+        
+        let nav1  =  NavigationControllerMake().init(navigationBarClass: nil, toolbarClass: ToolbarMake())
+        nav1.viewControllers = [vc2]
+        nav1.isNavigationBarHidden = false
         
         viewControllers = [
-            UINavigationController(rootViewController: vc2),
-            UINavigationController(rootViewController: vc1),
+            nav1
         ]
     }
 
@@ -38,6 +48,7 @@ class PhotoLibraryController: UITabBarController {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
+        tabBar.isHidden = true
     }
     
 }

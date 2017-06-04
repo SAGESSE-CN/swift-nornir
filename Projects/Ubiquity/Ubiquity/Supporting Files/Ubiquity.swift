@@ -9,6 +9,12 @@
 import UIKit
 import AVFoundation
 
+/// Progress handler, called in an arbitrary serial queue. Only called when the data is not available locally and is retrieved from remote server.
+public typealias RequestProgressHandler = (Double, Response) -> Void
+/// A block to be called when image loading is complete, providing the requested asset or information about the status of the request.
+public typealias RequestResultHandler<Result> = (Result?, Response) -> Void
+
+
 /// Constants identifying the general type of an asset, such as image or video.
 public enum AssetMediaType: Int {
     
@@ -28,24 +34,20 @@ public struct AssetMediaSubtype: OptionSet {
     // Photo subtypes
     
     /// The asset is a large-format panorama photo.
-    public static var photoPanorama: AssetMediaSubtype = .init(rawValue: 0)
-    
+    public static var photoPanorama: AssetMediaSubtype      = .init(rawValue: 1 << 0)
     /// The asset is a High Dynamic Range photo.
-    public static var photoHDR: AssetMediaSubtype = .init(rawValue: 0)
-
+    public static var photoHDR: AssetMediaSubtype           = .init(rawValue: 1 << 1)
     /// The asset is an image captured with the device’s screenshot feature.
-    public static var photoScreenshot: AssetMediaSubtype = .init(rawValue: 0)
+    public static var photoScreenshot: AssetMediaSubtype    = .init(rawValue: 1 << 2)
 
     // Video subtypes
     
     /// The asset is a video whose contents are always streamed over a network connection.
-    public static var videoStreamed: AssetMediaSubtype = .init(rawValue: 0)
-
+    public static var videoStreamed: AssetMediaSubtype      = .init(rawValue: 1 << 16)
     /// The asset is a high-frame-rate video.
-    public static var videoHighFrameRate: AssetMediaSubtype = .init(rawValue: 0)
-
+    public static var videoHighFrameRate: AssetMediaSubtype = .init(rawValue: 1 << 17)
     /// The asset is a time-lapse video.
-    public static var videoTimelapse: AssetMediaSubtype = .init(rawValue: 0)
+    public static var videoTimelapse: AssetMediaSubtype     = .init(rawValue: 1 << 18)
     
     /// The element type of the option set.
     public let rawValue: UInt
@@ -121,6 +123,25 @@ public enum AuthorizationStatus : Int {
     case authorized = 3
 }
 
+/// Options for fitting an image's aspect ratio to a requested size
+public enum RequestContentMode: Int {
+    
+    /// Scales the image so that its larger dimension fits the target size.
+    ///
+    /// Use this option when you want the entire image to be visible, such as when presenting it in a view with the scaleAspectFit content mode.
+    case aspectFit = 0
+
+    /// Scales the image so that it completely fills the target size.
+    ///
+    /// Use this option when you want the image to completely fill an area, such as when presenting it in a view with the scaleAspectFill content mode.
+    case aspectFill = 1
+ 
+    /// Fits the image to the requested size using the default option, aspectFit.
+    ///
+    /// Use this content mode when requesting a full-sized image using the PHImageManagerMaximumSize value for the target size. In this case, the image manager does not scale or crop the image.
+    static var `default`: RequestContentMode = .aspectFill
+}
+
 /// A representation of an image, video
 public protocol Asset: class {
     
@@ -135,6 +156,9 @@ public protocol Asset: class {
     /// The duration, in seconds, of the video asset.
     /// For photo assets, the duration is always zero.
     var ub_duration: TimeInterval { get }
+    
+    /// The asset allows play operation
+    var ub_allowsPlay: Bool { get }
     
     /// The type of the asset, such as video or audio.
     var ub_mediaType: AssetMediaType { get }
@@ -163,10 +187,36 @@ public protocol Collection: class {
     func ub_assets(at range: Range<Int>) -> Array<Asset>
 }
 
+/// Uniquely identify a cancellable async request
+public protocol Request {
+}
+
+/// A set of options affecting the delivery of still image representations of Photos assets you request from an image manager.
+public protocol RequestOptions {
+    
+    /// if necessary will download the image from reomte
+    var isNetworkAccessAllowed: Bool { get }
+    
+    /// provide caller a way to be told how much progress has been made prior to delivering the data when it comes from remote server.
+    var progressHandler: RequestProgressHandler? { get }
+}
+
+/// the request response
+public protocol Response {
+    
+    /// An error that occurred when Photos attempted to load the image.
+    var ub_error: Error? { get }
+    
+    /// The result image is a low-quality substitute for the requested image.
+    var ub_degraded: Bool { get }
+    /// The image request was canceled. 
+    var ub_cancelled: Bool { get }
+    /// The photo asset data is stored on the local device or must be downloaded from remote server
+    var ub_downloading: Bool { get }
+}
 
 /// Provides methods for retrieving or generating preview thumbnails and full-size image or video data associated with Photos assets.
 public protocol Library: class {
-    
     
     /// Returns information about your app’s authorization for accessing the library.
     var ub_authorizationStatus: AuthorizationStatus { get }
@@ -178,58 +228,41 @@ public protocol Library: class {
     func ub_collections(with type: CollectionType) -> Array<Collection>
     
     
+    /// Cancels an asynchronous request
+    func ub_cancelRequest(_ requestID: Request)
     
-//    /// Cancels an asynchronous request
-//    ///
-//    /// When you perform an asynchronous request for image data using the requestImage(for:targetSize:contentMode:options:resultHandler:) method, or for a video object using one of the methods listed in Requesting Video Objects, the image manager returns a numeric identifier for the request. To cancel the request before it completes, provide this identifier when calling the cancelImageRequest(_:) method.
-//    /// - parameter requestID: The numeric identifier of the request to be canceled.
-//    func cancelRequest(_ requestID: Int)
-//    
-//    // If the asset's aspect ratio does not match that of the given targetSize, contentMode determines how the image will be resized.
-//    //      PHImageContentModeAspectFit: Fit the asked size by maintaining the aspect ratio, the delivered image may not necessarily be the asked targetSize (see PHImageRequestOptionsDeliveryMode and PHImageRequestOptionsResizeMode)
-//    //      PHImageContentModeAspectFill: Fill the asked size, some portion of the content may be clipped, the delivered image may not necessarily be the asked targetSize (see PHImageRequestOptionsDeliveryMode && PHImageRequestOptionsResizeMode)
-//    //      PHImageContentModeDefault: Use PHImageContentModeDefault when size is PHImageManagerMaximumSize (though no scaling/cropping will be done on the result)
-//    // If -[PHImageRequestOptions isSynchronous] returns NO (or options is nil), resultHandler may be called 1 or more times.
-//    //     Typically in this case, resultHandler will be called asynchronously on the main thread with the requested results.
-//    //     However, if deliveryMode = PHImageRequestOptionsDeliveryModeOpportunistic, resultHandler may be called synchronously on the calling thread if any image data is immediately available. If the image data returned in this first pass is of insufficient quality, resultHandler will be called again, asychronously on the main thread at a later time with the "correct" results.
-//    //     If the request is cancelled, resultHandler may not be called at all.
-//    // If -[PHImageRequestOptions isSynchronous] returns YES, resultHandler will be called exactly once, synchronously and on the calling thread. Synchronous requests cannot be cancelled. 
-//    // resultHandler for asynchronous requests, always called on main thread
-//    
-//    func requestImage(for asset: Asset, resultHandler: @escaping (UIImage?, [AnyHashable : Any]?) -> Void) -> Int
-//    //open func requestImage(for asset: PHAsset, targetSize: CGSize, contentMode: PHImageContentMode, options: PHImageRequestOptions?
-//
-////    
-////    // Request largest represented image as data bytes, resultHandler is called exactly once (deliveryMode is ignored).
-////    //     If PHImageRequestOptionsVersionCurrent is requested and the asset has adjustments then the largest rendered image data is returned
-////    //     In all other cases then the original image data is returned
-////    // resultHandler for asynchronous requests, always called on main thread
-////    open func requestImageData(for asset: PHAsset, options: PHImageRequestOptions?, resultHandler: @escaping (Data?, String?, UIImageOrientation, [AnyHashable : Any]?) -> Swift.Void) -> PHImageRequestID
-////    
-////    /// Requests a live photo representation of the asset. With PHImageRequestOptionsDeliveryModeOpportunistic (or if no options are specified), the resultHandler block may be called more than once (the first call may occur before the method returns). The PHImageResultIsDegradedKey key in the result handler's info parameter indicates when a temporary low-quality live photo is provided.
-////    @available(iOS 9.1, *)
-////    open func requestLivePhoto(for asset: PHAsset, targetSize: CGSize, contentMode: PHImageContentMode, options: PHLivePhotoRequestOptions?, resultHandler: @escaping (PHLivePhoto?, [AnyHashable : Any]?) -> Swift.Void) -> PHImageRequestID
-////
-////    
-////    // Playback only. The result handler is called on an arbitrary queue.
-//    func requestPlayerItem(forVideo asset: Asset, options: Any?, resultHandler: @escaping (AVPlayerItem?, [AnyHashable : Any]?) -> Void) -> Int
-//    
-////    // Everything else. The result handler is called on an arbitrary queue.
-////    func requestAVAsset(forVideo asset: Asset, options: Any?, resultHandler: @escaping (AVAsset?, AVAudioMix?, [AnyHashable : Any]?) -> Swift.Void) -> Int
-//    
-////
-////
-////    // Export. The result handler is called on an arbitrary queue.
-////    open func requestExportSession(forVideo asset: PHAsset, options: PHVideoRequestOptions?, exportPreset: String, resultHandler: @escaping (AVAssetExportSession?, [AnyHashable : Any]?) -> Swift.Void) -> PHImageRequestID
-////
-////    
+    /// If the asset's aspect ratio does not match that of the given targetSize, contentMode determines how the image will be resized.
+    @discardableResult
+    func ub_requestImage(for asset: Asset, targetSize: CGSize, contentMode: RequestContentMode, options: RequestOptions?, resultHandler: @escaping RequestResultHandler<UIImage>) -> Request?
+    
+    // Playback only. The result handler is called on an arbitrary queue.
+    @discardableResult
+    func ub_requestPlayerItem(forVideo asset: Asset, options: RequestOptions?, resultHandler: @escaping RequestResultHandler<AVPlayerItem>) -> Request?
+    
+    /// Cancels all image preparation that is currently in progress.
+    func ub_stopCachingImagesForAllAssets()
+    
+    /// Prepares image representations of the specified assets for later use.
+    ///
+    /// When you call this method, Photos begins to fetch image data and generates thumbnail images on a background thread. 
+    /// At any time afterward, you can use the ub_requestImage(for:targetSize:contentMode:options:resultHandler:) method to request individual images from the cache. 
+    /// If Photos has finished preparing a requested image, that method provides the image immediately.
+    func ub_startCachingImages(for assets: [Asset], targetSize: CGSize, contentMode: RequestContentMode, options: RequestOptions?)
+
+    /// Cancels image preparation for the specified assets and options.
+    ///
+    /// This method cancels image preparation for the specified assets with the specified options. 
+    /// Use it when image preparation that might be in progress is no longer needed. 
+    /// For example, if you prepare images for a collection view filled with photo thumbnails and then the user chooses a different thumbnail size for your collection view, 
+    /// call this method to cancel generating thumbnail images at the old size.
+    func ub_stopCachingImages(for assets: [Asset], targetSize: CGSize, contentMode: RequestContentMode, options: RequestOptions?)
 }
 
 /// can operate abstract protocol
 internal protocol Operable: class {
     
-    /// to prepare data you need
-    func prepare(with item: Asset)
+    /// operate event callback delegate
+    weak var operaterDelegate: OperableDelegate? { set get }
     
     /// play action, what must be after prepare otherwise this will not happen
     func play()
@@ -240,52 +273,61 @@ internal protocol Operable: class {
     func suspend()
     /// resume suspend
     func resume()
-    
-    /// operate event callback delegate
-    weak var delegate: OperableDelegate? { set get }
 }
 /// can operate abstract delegate
 internal protocol OperableDelegate: class {
     
     /// if the data is prepared to do the call this method
-    func operable(didPrepare operable: Operable, item: Asset)
+    func operable(didPrepare operable: Operable, asset: Asset)
     
     /// if you start playing the call this method
-    func operable(didStartPlay operable: Operable, item: Asset)
+    func operable(didStartPlay operable: Operable, asset: Asset)
     /// if take the initiative to stop the play call this method
-    func operable(didStop operable: Operable, item: Asset)
+    func operable(didStop operable: Operable, asset: Asset)
     
     /// if the interruption due to lack of enough data to invoke this method
-    func operable(didStalled operable: Operable, item: Asset)
+    func operable(didStalled operable: Operable, asset: Asset)
     /// if play is interrupted call the method, example: pause, in background mode, in the call
-    func operable(didSuspend operable: Operable, item: Asset)
+    func operable(didSuspend operable: Operable, asset: Asset)
     /// if interrupt restored to call this method
     /// automatically restore: in background mode to foreground mode, in call is end
-    func operable(didResume operable: Operable, item: Asset)
+    func operable(didResume operable: Operable, asset: Asset)
     
     /// if play completed call this method
-    func operable(didFinish operable: Operable, item: Asset)
+    func operable(didFinish operable: Operable, asset: Asset)
     /// if the occur error call the method
-    func operable(didOccur operable: Operable, item: Asset, error: Error?)
+    func operable(didOccur operable: Operable, asset: Asset, error: Error?)
 }
 
-/// can display abstract protocol
-internal protocol Displayable {
-    ///
+/// displayer protocol
+internal protocol Displayable: class {
+    
+    /// displayer delegate
+    weak var displayerDelegate: DisplayableDelegate? { set get }
+    
     /// display content with item
     ///
     /// - parameter item: need display the item
     /// - parameter orientation: need display the orientation
-    ///
-    func willDisplay(with item: Asset, orientation: UIImageOrientation)
-    ///
+    func willDisplay(with asset: Asset, in library: Library, orientation: UIImageOrientation)
+    
     /// end display content with item
     ///
     /// - parameter item: need display the item
-    ///
-    func endDisplay(with item: Asset)
+    func endDisplay(with asset: Asset, in library: Library)
 }
-
+/// displayer delegate
+internal protocol DisplayableDelegate: class {
+    
+    /// Tell the delegate that the remote server requested.
+    func displayer(_ displayer: Displayable, didStartRequest asset: Asset)
+    
+    /// Periodically informs the delegate of the progress.
+    func displayer(_ displayer: Displayable, didReceive progress: Double)
+    
+    /// Tells the delegate that the task finished receive image.
+    func displayer(_ displayer: Displayable, didComplete error: Error?)
+}
 
 /// Provide the container display support
 //public extension UIView {
@@ -345,4 +387,3 @@ internal extension BadgeView.Item {
 //        pushViewController(container.viewController, animated: animated)
 //    }
 //}
-//
