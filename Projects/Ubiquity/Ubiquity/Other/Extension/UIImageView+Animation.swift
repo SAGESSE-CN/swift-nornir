@@ -12,6 +12,9 @@ internal extension UIImageView {
     
     /// update iamge with animation
     func ub_setImage(_ newImage: UIImage?, animated: Bool) {
+        guard newImage !== image else {
+            return
+        }
         // update content
         let oldImage = image
         image = newImage

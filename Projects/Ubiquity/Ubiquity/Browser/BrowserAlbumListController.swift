@@ -21,7 +21,7 @@ public func ToolbarMake() -> UIToolbar.Type {
 internal class BrowserAlbumListController: UITableViewController {
     
     init(library: Library) {
-        _library = library.ub_cache
+        _library = library
         
         super.init(nibName: nil, bundle: nil)
     }

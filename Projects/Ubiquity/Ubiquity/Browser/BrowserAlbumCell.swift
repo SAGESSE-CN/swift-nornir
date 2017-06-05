@@ -27,15 +27,6 @@ internal class BrowserAlbumCell: UICollectionViewCell {
         endDisplay(with: asset, in: library)
     }
     
-    var contents: AnyObject? {
-        set {
-            _imageView?.image = newValue as? UIImage
-        }
-        get {
-            return _imageView?.image
-        }
-    }
-    
     // display asset
     func willDisplay(with asset: Asset, in library: Library, orientation: UIImageOrientation) {
         
@@ -44,10 +35,14 @@ internal class BrowserAlbumCell: UICollectionViewCell {
         _library = library
         _orientation = orientation
        
+        _badgeViewIsInit = false
         _badgeView?.isHidden = true
         
+        // make options
+        let options = DataSourceOptions()
+        
         // setup content
-        _request = library.ub_requestImage(for: asset, targetSize: BrowserAlbumLayout.thumbnailItemSize, contentMode: .default, options: nil) { [weak self, weak asset] contents, response in
+        _request = library.ub_requestImage(for: asset, targetSize: BrowserAlbumLayout.thumbnailItemSize, contentMode: .default, options: options) { [weak self, weak asset] contents, response in
             // if the asset is nil, the asset has been released
             guard let asset = asset else {
                 return
@@ -59,7 +54,7 @@ internal class BrowserAlbumCell: UICollectionViewCell {
     // end display asset
     func endDisplay(with asset: Asset, in library: Library) {
         
-        // if is requesting image, need to cancel
+        // when are requesting an image, please cancel it
         _request.map { request in
             // cancel
             library.ub_cancelRequest(request)
@@ -71,7 +66,7 @@ internal class BrowserAlbumCell: UICollectionViewCell {
         _library = nil
         
         // clear contents
-        self.contents = nil
+        _imageView?.image = nil
     }
     
     // update contents
@@ -82,28 +77,18 @@ internal class BrowserAlbumCell: UICollectionViewCell {
             logger.debug?.write("\(asset.ub_localIdentifier) image is expire")
             return
         }
-        //logger.trace?.write("\(asset.ub_localIdentifier)")
+        logger.trace?.write("\(asset.ub_localIdentifier) => \(contents?.size ?? .zero)")
         
         // if the request status is completed or cancelled, clear the request
-        if response.ub_completed || response.ub_cancelled {
+        if response.ub_completed {
             _request = nil
         }
         
         // update contents
-        self.contents = contents?.ub_withOrientation(_orientation)
+        _imageView?.image = contents?.ub_withOrientation(_orientation)
         
-        // status is downloading
-        if _badgeView?.isHidden ?? false, response.ub_downloading {
-            _updateBadge(with: true)
-        }
-        
-        // if the `contents` is nil or `response.ub_donwloading` is true
-        // the image need download from remote server
-        guard contents != nil else {
-            return
-        }
-        // display the normal badge
-        _updateBadge(with: false)
+        // update badge icon
+        _updateBadge(with: contents == nil)
     }
     private func _updateBadge(with downloading: Bool) {
         
@@ -157,6 +142,7 @@ internal class BrowserAlbumCell: UICollectionViewCell {
             _badgeView?.rightItem = .downloading
         }
         
+        // show badge
         _badgeView?.isHidden = false
     }
     
@@ -193,7 +179,9 @@ internal class BrowserAlbumCell: UICollectionViewCell {
     fileprivate var _orientation: UIImageOrientation = .up
     
     fileprivate var _imageView: UIImageView?
+    
     fileprivate var _badgeView: BadgeView?
+    fileprivate var _badgeViewIsInit: Bool = false
 }
 
 /// custom transition support

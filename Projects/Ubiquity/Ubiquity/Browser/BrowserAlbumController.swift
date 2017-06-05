@@ -10,9 +10,9 @@ import UIKit
 
 internal class BrowserAlbumController: UICollectionViewController {
     
-    init(source: Source, library: Library) {
+    init(source: DataSource, library: Library) {
         _source = source
-        _library = library.ub_cache
+        _library = library
         
         super.init(collectionViewLayout: BrowserAlbumLayout())
     }
@@ -44,13 +44,13 @@ internal class BrowserAlbumController: UICollectionViewController {
         // clear error info & display asset
         _authorized = true
         _clearError()
-        _resetCachedAssets()
     }
     
     override func loadView() {
         super.loadView()
         // setup controller
         title = "Collection"
+        view.backgroundColor = .white
         
         // setup colleciton view
         collectionView?.register(BrowserAlbumCell.dynamic(with: UIImageView.self), forCellWithReuseIdentifier: "ASSET-IMAGE")
@@ -81,14 +81,8 @@ internal class BrowserAlbumController: UICollectionViewController {
             infoView.frame = view.bounds
         }
     }
-//    override func viewDidAppear(_ animated: Bool) {
-//        super.viewDidAppear(animated)
-//        
-//        // update the cache
-//        _updateCachedAssets()
-//    }
     
-    fileprivate let _source: Source
+    fileprivate let _source: DataSource
     fileprivate let _library: Library
     
     fileprivate var _authorized: Bool = false
@@ -147,15 +141,6 @@ extension BrowserAlbumController: UICollectionViewDelegateFlowLayout {
     
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         logger.trace?.write(indexPath)
-        
-        // try fetch cell
-        // try fetch asset
-        guard let asset = _source.asset(at: indexPath), let cell = collectionView.cellForItem(at: indexPath) as? BrowserAlbumCell else {
-            return
-        }
-        // cache contents
-        (_library as? CacheLibrary)?.fastCache(for: asset, contents: cell.contents)
-        
         logger.debug?.write("show detail with: \(indexPath)")
         
         // make
@@ -164,10 +149,10 @@ extension BrowserAlbumController: UICollectionViewDelegateFlowLayout {
         show(controller, sender: indexPath)
     }
     
-//    override func scrollViewDidScroll(_ scrollView: UIScrollView) {
-//        // update the cache
-//        _updateCachedAssets()
-//    }
+    override func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        // update the cache
+        _updateCachedAssets()
+    }
 }
 
 ///
@@ -270,43 +255,42 @@ extension BrowserAlbumController: TransitioningDataSource {
 internal extension BrowserAlbumController {
     
     fileprivate func _resetCachedAssets() {
-//        // clean all cache
-//        _library.ub_stopCachingImagesForAllAssets()
-//        _previousPreheatRect = .zero
+        // clean all cache
+        _library.ub_stopCachingImagesForAllAssets()
+        _previousPreheatRect = .zero
     }
 
     fileprivate func _updateCachedAssets() {
-//        // Update only if the view is visible.
-//        guard let collectionView = collectionView, isViewLoaded && view.window != nil, _authorized else {
-//            return
-//        }
-//        // The preheat window is twice the height of the visible rect.
-//        let visibleRect = CGRect(origin: collectionView.contentOffset, size: collectionView.bounds.size)
-//        let preheatRect = visibleRect.insetBy(dx: 0, dy: -0.5 * visibleRect.height)
-//
-//        // Update only if the visible area is significantly different from the last preheated area.
-//        let delta = abs(preheatRect.midY - _previousPreheatRect.midY)
-//        guard delta > view.bounds.height / 3 else {
-//            return
-//        }
-//        logger.debug?.write("\(_previousPreheatRect) => \(preheatRect)")
-//        // Compute the assets to start caching and to stop caching.
-//        let (addedRects, removedRects) = _differencesBetweenRects(_previousPreheatRect, preheatRect)
-//        let addedAssets = addedRects
-//            .flatMap { _indexPathsForElements(in: $0) }
-//            .flatMap { _source.asset(at: $0) }
-//        let removedAssets = removedRects
-//            .flatMap { _indexPathsForElements(in: $0) }
-//            .flatMap { _source.asset(at: $0) }
-//
-//        // Update the assets the PHCachingImageManager is caching.
-//        DispatchQueue.main.async { [weak _library] in
-//            _library?.ub_stopCachingImages(for: removedAssets, targetSize: BrowserAlbumLayout.thumbnailItemSize, contentMode: .aspectFill, options: nil)
-//            _library?.ub_startCachingImages(for: addedAssets, targetSize: BrowserAlbumLayout.thumbnailItemSize, contentMode: .aspectFill, options: nil)
-//        }
-//        
-//        // Store the preheat rect to compare against in the future.
-//        _previousPreheatRect = preheatRect
+        // Update only if the view is visible.
+        guard let collectionView = collectionView, isViewLoaded && view.window != nil, _authorized else {
+            return
+        }
+        // The preheat window is twice the height of the visible rect.
+        let visibleRect = CGRect(origin: collectionView.contentOffset, size: collectionView.bounds.size)
+        let preheatRect = visibleRect.insetBy(dx: 0, dy: -0.5 * visibleRect.height)
+
+        // Update only if the visible area is significantly different from the last preheated area.
+        let delta = abs(preheatRect.midY - _previousPreheatRect.midY)
+        guard delta > view.bounds.height / 3 else {
+            return
+        }
+        logger.debug?.write("\(_previousPreheatRect) => \(preheatRect)")
+
+        // Compute the assets to start caching and to stop caching.
+        let (addedRects, removedRects) = _differencesBetweenRects(_previousPreheatRect, preheatRect)
+        let addedAssets = addedRects
+            .flatMap { self._indexPathsForElements(in: $0) }
+            .flatMap { self._source.asset(at: $0) }
+        let removedAssets = removedRects
+            .flatMap { self._indexPathsForElements(in: $0) }
+            .flatMap { self._source.asset(at: $0) }
+        
+        // Update the assets the PHCachingImageManager is caching.
+        _library.ub_startCachingImages(for: addedAssets, targetSize: BrowserAlbumLayout.thumbnailItemSize, contentMode: .aspectFill, options: nil)
+        _library.ub_stopCachingImages(for: removedAssets, targetSize: BrowserAlbumLayout.thumbnailItemSize, contentMode: .aspectFill, options: nil)
+        
+        // Store the preheat rect to compare against in the future.
+        _previousPreheatRect = preheatRect
     }
 
     fileprivate func _differencesBetweenRects(_ old: CGRect, _ new: CGRect) -> (added: [CGRect], removed: [CGRect]) {
@@ -373,9 +357,20 @@ internal extension BrowserAlbumController {
         // enable scroll
         collectionView?.isScrollEnabled = true
         collectionView?.reloadData()
+        collectionView?.alpha = 0
+        
+        if let section = collectionView?.numberOfSections, let count = collectionView?.numberOfItems(inSection: max(section - 1, 0)) {
+            // scroll to bottom
+            collectionView?.scrollToItem(at: .init(item: count - 1, section: section - 1), at: .bottom, animated: false)
+        }
         
         // clear view
         _infoView?.removeFromSuperview()
         _infoView = nil
+        
+        // show animation
+        UIView.animate(withDuration: 0.25) {  [weak collectionView] in
+            collectionView?.alpha = 1
+        }
     }
 }

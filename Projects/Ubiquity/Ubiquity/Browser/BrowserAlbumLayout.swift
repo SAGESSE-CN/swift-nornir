@@ -94,7 +94,7 @@ internal class BrowserAlbumLayout: UICollectionViewFlowLayout {
     static let thumbnailItemSize: CGSize = {
         
         let size = _itemSize(with: UIScreen.main.bounds).0
-        let scale = CGFloat(5)//UIScreen.main.scale
+        let scale = UIScreen.main.scale
         
         return .init(width: size.width * scale, height: size.height * scale)
     }()

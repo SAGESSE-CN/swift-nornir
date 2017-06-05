@@ -14,6 +14,7 @@ internal class PhotoLibrary: NSObject, Ubiquity.Library {
     
     override init() {
         _manager = PHCachingImageManager.default() as! PHCachingImageManager
+        _cacheQueue = .init(label: "ubiquity-image-cache")
         super.init()
     }
     
@@ -62,7 +63,11 @@ internal class PhotoLibrary: NSObject, Ubiquity.Library {
         guard let asset = asset as? PHAsset else {
             return nil
         }
-        return _manager.requestPlayerItem(forVideo: asset, options: nil) { item, info in
+        
+        let newOptions = PHVideoRequestOptions(options: options)
+        
+        // send player item request
+        return _manager.requestPlayerItem(forVideo: asset, options: newOptions) { item, info in
             // convert result info to response
             let response = Response(info: info)
             // callback
@@ -72,21 +77,31 @@ internal class PhotoLibrary: NSObject, Ubiquity.Library {
     
     /// Cancels all image preparation that is currently in progress.
     func ub_stopCachingImagesForAllAssets() {
-        return _manager.stopCachingImagesForAllAssets()
+        // forward
+        DispatchQueue.main.async { [_manager] in
+            _manager.stopCachingImagesForAllAssets()
+        }
     }
     /// Prepares image representations of the specified assets for later use.
     func ub_startCachingImages(for assets: [Asset], targetSize: CGSize, contentMode: RequestContentMode, options: RequestOptions?) {
         guard let assets = assets as? [PHAsset] else {
             return
         }
-        _manager.startCachingImages(for: assets, targetSize: targetSize, contentMode: .default, options: nil)
+        // forward
+        DispatchQueue.main.async { [_manager] in
+            _manager.startCachingImages(for: assets, targetSize: targetSize, contentMode: .default, options: nil)
+        }
     }
     /// Cancels image preparation for the specified assets and options.
     func ub_stopCachingImages(for assets: [Asset], targetSize: CGSize, contentMode: RequestContentMode, options: RequestOptions?) {
-        guard let assets = assets as? [PHAsset] else {
-            return
-        }
-        _manager.stopCachingImages(for: assets, targetSize: targetSize, contentMode: .default, options: nil)
+//        guard let assets = assets as? [PHAsset] else {
+//            return
+//        }
+//        // forward
+//        DispatchQueue.main.async { [_manager] in
+//            // NOTE: high speed scrolling can cause deadlock
+//            _manager.stopCachingImages(for: assets, targetSize: targetSize, contentMode: .default, options: nil)
+//        }
     }
     
     /// Get collections with type
@@ -146,6 +161,7 @@ internal class PhotoLibrary: NSObject, Ubiquity.Library {
     
     
     private var _manager: PHCachingImageManager
+    private var _cacheQueue: DispatchQueue
 }
 
 internal extension PhotoLibrary {
@@ -253,11 +269,34 @@ extension PHImageRequestOptions {
         }
         self.init()
         self.isNetworkAccessAllowed = options.isNetworkAccessAllowed
+        guard let progressHandler = options.progressHandler else {
+            return
+        }
         self.progressHandler = { progress, _, _, info in
             // convert result info to response
             let response = PhotoLibrary.Response(info: info)
             // callback
-            options.progressHandler?(progress, response)
+            progressHandler(progress, response)
+        }
+    }
+}
+extension PHVideoRequestOptions {
+    
+    convenience init?(options: Ubiquity.RequestOptions?) {
+        // if the option is nil, create a failure
+        guard let options = options else {
+            return nil
+        }
+        self.init()
+        self.isNetworkAccessAllowed = options.isNetworkAccessAllowed
+        guard let progressHandler = options.progressHandler else {
+            return
+        }
+        self.progressHandler = { progress, _, _, info in
+            // convert result info to response
+            let response = PhotoLibrary.Response(info: info)
+            // callback
+            progressHandler(progress, response)
         }
     }
 }

@@ -245,10 +245,14 @@ extension BrowserDetailCell {
     fileprivate dynamic func _handleTap(_ sender: UITapGestureRecognizer) {
         logger.trace?.write()
         
-        if !ub_isFullscreen {
-            ub_enterFullscreen(animated: true)
+        guard let detailView = _detailView else {
+            return
+        }
+        
+        if !detailView.ub_isFullscreen {
+            detailView.ub_enterFullscreen(animated: true)
         } else {
-            ub_exitFullscreen(animated: true)
+            detailView.ub_exitFullscreen(animated: true)
         }
     }
     fileprivate dynamic func _handleDoubleTap(_ sender: UITapGestureRecognizer) {
@@ -552,6 +556,7 @@ extension BrowserDetailCell: OperableDelegate {
     func operable(didSuspend operable: Operable, asset: Asset) {
         logger.trace?.write()
         // nothing
+        _console?.setState(.stop, animated: true)
     }
     func operable(didResume operable: Operable, asset: Asset) {
         logger.trace?.write()

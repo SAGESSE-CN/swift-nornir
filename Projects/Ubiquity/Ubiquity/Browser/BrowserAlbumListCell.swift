@@ -53,12 +53,13 @@ internal class BrowserAlbumListCell: UITableViewCell {
         
         // make options
         let size = _thumbView.bounds.size.ub_fitWithScreen
+        let options = DataSourceOptions()
         
         // setup thumbnail image
         _thumbView.images = assets.map { _ in nil }
         _requests = assets.reversed().enumerated().flatMap { offset, asset in
             // request thumbnail image
-            library.ub_requestImage(for: asset, targetSize: size, contentMode: .aspectFill, options: nil) { [weak self, weak collection] contents, response in
+            library.ub_requestImage(for: asset, targetSize: size, contentMode: .aspectFill, options: options) { [weak self, weak collection] contents, response in
                 // if the asset is nil, the asset has been released
                 guard let collection = collection else {
                     return
@@ -72,7 +73,7 @@ internal class BrowserAlbumListCell: UITableViewCell {
     func endDisplay(with collection: Collection, in library: Library) {
         //logger.trace?.write(collection.ub_localIdentifier)
         
-        // if is requesting, need to cancel
+        // when are requesting an image, please cancel it
         _requests?.forEach { request in
             // cancel
             library.ub_cancelRequest(request)

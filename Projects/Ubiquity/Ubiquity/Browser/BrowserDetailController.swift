@@ -10,9 +10,9 @@ import UIKit
 
 internal class BrowserDetailController: UICollectionViewController {
     
-    init(source: Source, library: Library, at indexPath: IndexPath) {
+    init(source: DataSource, library: Library, at indexPath: IndexPath) {
         _source = source
-        _library = library.ub_cache
+        _library = library
         
         let collectionViewLayout = BrowserDetailLayout()
         
@@ -61,11 +61,11 @@ internal class BrowserDetailController: UICollectionViewController {
         collectionView?.register(BrowserDetailCell.dynamic(with: PhotoContentView.self), forCellWithReuseIdentifier: _identifier(with: .image))
         collectionView?.register(BrowserDetailCell.dynamic(with: VideoContentView.self), forCellWithReuseIdentifier: _identifier(with: .video))
         
-        // setup indicator 
+//        // setup indicator 
 //        indicatorItem.indicatorView.delegate = self
 //        indicatorItem.indicatorView.dataSource = self
-        indicatorItem.indicatorView.register(IndicatorViewCell.dynamic(with: UIImageView.self), forCellWithReuseIdentifier: "ASSET-IMAGE")
-        //indicatorItem.indicatorView.register(IndicatorViewCell.dynamic(with: UIScrollView.self), forCellWithReuseIdentifier: "ASSET-IMAGE")
+//        indicatorItem.indicatorView.register(IndicatorViewCell.dynamic(with: UIImageView.self), forCellWithReuseIdentifier: "ASSET-IMAGE")
+//        //indicatorItem.indicatorView.register(IndicatorViewCell.dynamic(with: UIScrollView.self), forCellWithReuseIdentifier: "ASSET-IMAGE")
         
         // setup toolbar items
         let toolbarItems = [
@@ -153,7 +153,7 @@ internal class BrowserDetailController: UICollectionViewController {
     
     // MARK: private ivar
     
-    fileprivate let _source: Source
+    fileprivate let _source: DataSource
     fileprivate let _library: Library
     
     // transition
@@ -708,20 +708,24 @@ extension BrowserDetailController: IndicatorViewDataSource, IndicatorViewDelegat
     func indicator(_ indicator: IndicatorView, willDisplay cell: IndicatorViewCell, forItemAt indexPath: IndexPath) {
         logger.trace?.write(indexPath)
         
-//        guard let asset = _source.asset(at: indexPath) else {
-//            return
-//        }
-//        
-//        let size = CGSize(width: 20, height: 38)
-//        if let imageView = cell.contentView as? UIImageView {
-//            imageView.contentMode = .scaleAspectFill
-//            //imageView.image = container.item(at: indexPath).image
-//            
-//            imageView.ub_setImage(nil, animated: false)
-//            _library.ub_requestImage(for: asset, targetSize: size.ub_fitWithScreen, contentMode: .aspectFill, options: nil) { image, info in
-//                imageView.ub_setImage(image, animated: true)
-//            }
-//        }
+        guard let asset = _source.asset(at: indexPath) else {
+            return
+        }
+        
+        let size = CGSize(width: 20, height: 38).ub_fitWithScreen
+        let options = DataSourceOptions()
+        
+        if let imageView = cell.contentView as? UIImageView {
+            imageView.contentMode = .scaleAspectFill
+            //imageView.image = container.item(at: indexPath).image
+            
+            //imageView.ub_setImage(nil, animated: false)
+            imageView.image = nil
+            _library.ub_requestImage(for: asset, targetSize: size, contentMode: .aspectFill, options: options) { image, info in
+                imageView.image = image
+                //imageView.ub_setImage(image, animated: true)
+            }
+        }
         
         // set default background color
         cell.contentView.backgroundColor = .ub_init(hex: 0xf0f0f0)

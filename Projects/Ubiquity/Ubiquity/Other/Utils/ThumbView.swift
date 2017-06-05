@@ -59,7 +59,7 @@ internal class ThumbView: UIView {
             let image = images.ub_get(at: index) ?? nil
             // if there is no change, ignored
             if imageView.image !== image {
-                imageView.ub_setImage(image, animated: true)
+                imageView.image = image
             }
             imageView.isHidden = !(index < images.count)
         }

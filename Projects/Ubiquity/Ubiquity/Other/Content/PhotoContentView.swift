@@ -14,11 +14,6 @@ import UIKit
 internal class PhotoContentView: AnimatedImageView, Displayable {
 
     
-    var contents: AnyObject? {
-        set { return image = newValue as? UIImage }
-        get { return image }
-    }
-    
     // displayer delegate
     weak var displayerDelegate: DisplayableDelegate?
     
@@ -38,9 +33,10 @@ internal class PhotoContentView: AnimatedImageView, Displayable {
         // update image
         backgroundColor = .ub_init(hex: 0xf0f0f0)
         
-        //image = item.image
-        let size = CGSize(width: asset.ub_pixelWidth, height: asset.ub_pixelHeight)
-        let options = CacheLibrary.Options(progressHandler: { [weak self, weak asset] progress, response in
+        let thumbSize = BrowserAlbumLayout.thumbnailItemSize
+        let thumbOptions = DataSourceOptions()
+        let largeSize = CGSize(width: asset.ub_pixelWidth, height: asset.ub_pixelHeight)
+        let largeOptions = DataSourceOptions(progressHandler: { [weak self, weak asset] progress, response in
             DispatchQueue.main.async {
                 // if the asset is nil, the asset has been released
                 guard let asset = asset else {
@@ -51,36 +47,65 @@ internal class PhotoContentView: AnimatedImageView, Displayable {
             }
         })
         
-        // update default contents
-        self.contents = (_library as? CacheLibrary)?.fastCache(for: asset) as? UIImage
-        
-        // request large image
-        _request = library.ub_requestImage(for: asset, targetSize: size, contentMode: .aspectFill, options: options) { [weak self, weak asset] image, response in
-            // if the asset is nil, the asset has been released
-            guard let asset = asset else {
-                return
+        _requests = [
+            // request thumb iamge
+            library.ub_requestImage(for: asset, targetSize: thumbSize, contentMode: .aspectFill, options: thumbOptions) { [weak self, weak asset] contents, response in
+                // if the asset is nil, the asset has been released
+                guard let asset = asset else {
+                    return
+                }
+                // the request is complete?
+                if self?._asset === asset && response.ub_completed {
+                    self?._requests?[0] = nil
+                }
+                // the image is vaild?
+                guard (self?.image?.size.width ?? 0) < (contents?.size.width ?? 0) else {
+                    return
+                }
+                // update contents
+                self?._updateContents(contents, response: response, asset: asset)
+                
+                
+                
+            },
+            // request large image
+            library.ub_requestImage(for: asset, targetSize: largeSize, contentMode: .aspectFill, options: largeOptions) { [weak self, weak asset] contents, response in
+                // if the asset is nil, the asset has been released
+                guard let asset = asset else {
+                    return
+                }
+                // the request is complete?
+                if self?._asset === asset && response.ub_completed {
+                    self?._requests?[1] = nil
+                }
+                // the image is vaild?
+                guard (self?.image?.size.width ?? 0) < (contents?.size.width ?? 0) else {
+                    return
+                }
+                // update contents
+                self?._updateContents(contents, response: response, asset: asset)
             }
-            // update contents
-            self?._updateContents(image, response: response, asset: asset)
-        }
+        ]
     }
     // end display asset
     func endDisplay(with asset: Asset, in library: Library) {
         logger.trace?.write()
         
-        // if is requesting image, need to cancel
-        _request.map { request in
-            // cancel
-            library.ub_cancelRequest(request)
+        // when are requesting an image, please cancel it
+        _requests?.forEach { request in
+            request.map { request in
+                // reveal cancel
+                library.ub_cancelRequest(request)
+            }
         }
         
         // clear context
         _asset = nil
-        _request = nil
+        _requests = nil
         _library = nil
         
         // clear contents
-        self.contents = nil
+        self.image = nil
         
         // stop animation if needed
         stopAnimating()
@@ -93,10 +118,10 @@ internal class PhotoContentView: AnimatedImageView, Displayable {
             logger.debug?.write("\(asset.ub_localIdentifier) image is expire")
             return
         }
-        logger.trace?.write("\(asset.ub_localIdentifier)")
+        logger.trace?.write("\(asset.ub_localIdentifier) => \(contents?.size ?? .zero)")
         
         // update contents
-        self.contents = contents ?? self.contents
+        ub_setImage(contents ?? self.image, animated: true)
         
     }
     private func _updateContentsProgress(_ progress: Double, response: Response, asset: Asset) {
@@ -128,9 +153,7 @@ internal class PhotoContentView: AnimatedImageView, Displayable {
     
     private var _asset: Asset?
     private var _library: Library?
-    
-    private var _request: Request?
-    
+    private var _requests: [Request?]?
     private var _donwloading: Bool = false
 }
 

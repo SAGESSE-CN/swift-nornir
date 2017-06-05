@@ -10,11 +10,11 @@ import UIKit
 
 
 /// add a full screen support
-internal extension UIResponder {
+public extension UIResponder {
     
     /// the current fullscreen state
     /// default is false, must override return true
-    var ub_isFullscreen: Bool {
+    open var ub_isFullscreen: Bool {
         return next?.ub_isFullscreen ?? false
     }
 
@@ -25,7 +25,7 @@ internal extension UIResponder {
     /// - Returns: true is enter success, false is fail
     ///
     @discardableResult
-    func ub_enterFullscreen(animated: Bool) -> Bool {
+    open func ub_enterFullscreen(animated: Bool) -> Bool {
         return next?.ub_enterFullscreen(animated: animated) ?? false
     }
     
@@ -36,7 +36,7 @@ internal extension UIResponder {
     /// - Returns: true is exit success, false is fail
     ///
     @discardableResult
-    func ub_exitFullscreen(animated: Bool) -> Bool {
+    open func ub_exitFullscreen(animated: Bool) -> Bool {
         return next?.ub_exitFullscreen(animated: animated) ?? false
     }
 }

@@ -387,3 +387,12 @@ internal extension BadgeView.Item {
 //        pushViewController(container.viewController, animated: animated)
 //    }
 //}
+
+
+internal extension Response {
+    // the request complete status
+    internal var ub_completed: Bool {
+        return (ub_error == nil && !ub_degraded) || ub_cancelled
+    }
+}
+
