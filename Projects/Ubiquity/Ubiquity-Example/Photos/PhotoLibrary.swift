@@ -77,10 +77,10 @@ internal class PhotoLibrary: NSObject, Ubiquity.Library {
     
     /// Cancels all image preparation that is currently in progress.
     func ub_stopCachingImagesForAllAssets() {
-        // forward
-        DispatchQueue.main.async { [_manager] in
-            _manager.stopCachingImagesForAllAssets()
-        }
+//        // forward
+//        DispatchQueue.main.async { [_manager] in
+//            _manager.stopCachingImagesForAllAssets()
+//        }
     }
     /// Prepares image representations of the specified assets for later use.
     func ub_startCachingImages(for assets: [Asset], targetSize: CGSize, contentMode: RequestContentMode, options: RequestOptions?) {
