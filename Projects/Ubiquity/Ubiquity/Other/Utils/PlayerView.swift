@@ -54,7 +54,6 @@ internal class PlayerView: UIView {
             switch self {
             case .none,
                  .preparing,
-                 .stop,
                  .failure:
                 return false
                 
@@ -133,9 +132,15 @@ internal class PlayerView: UIView {
             return
         }
         
+        // if is stop, replay
+        if _status == .stop {
+            _player?.seek(to: .init(seconds: 0, preferredTimescale: 1))
+        }
+        
         // start play,
         _status = .playing
         
+        // active audio session, but it very low
         DispatchQueue.global().async {
             self._setActive(true)
             self._player?.play()
