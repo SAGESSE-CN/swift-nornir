@@ -1,0 +1,497 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 48;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0C7791F31FDE3A720058FF8A /* Debugger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C7791F01FDE3A720058FF8A /* Debugger.swift */; };
+		0C7791F41FDE3A720058FF8A /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C7791F11FDE3A720058FF8A /* Logger.swift */; };
+		0C7791F51FDE3A720058FF8A /* UIColor+Random.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C7791F21FDE3A720058FF8A /* UIColor+Random.swift */; };
+		0CD3ECF21FDE289E00985E56 /* Ubiquity.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0CD3EC6D1FDE224400985E56 /* Ubiquity.framework */; };
+		0CD3ECF31FDE289E00985E56 /* Verdandi.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0CD3ECAC1FDE247200985E56 /* Verdandi.framework */; };
+		0CD3ECFD1FDE2A0800985E56 /* Nornir.h in Headers */ = {isa = PBXBuildFile; fileRef = 0CD3EB1D1FDE1F9700985E56 /* Nornir.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		0CD530401FDE537800EE43E8 /* ChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CD5303F1FDE537800EE43E8 /* ChatViewController.swift */; };
+		0CD530431FDE547B00EE43E8 /* ChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CD530421FDE547B00EE43E8 /* ChatView.swift */; };
+		0CD530451FDE548E00EE43E8 /* ChatViewLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CD530441FDE548E00EE43E8 /* ChatViewLayout.swift */; };
+		0CD530471FDE594F00EE43E8 /* ChatViewPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CD530461FDE594F00EE43E8 /* ChatViewPresenter.swift */; };
+		0CD530491FDE5AF600EE43E8 /* ChatViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CD530481FDE5AF600EE43E8 /* ChatViewCell.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		0CD3EC6C1FDE224400985E56 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0CD3EC671FDE224400985E56 /* Ubiquity.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 0CE49D781E7A3DAA0058F5F8;
+			remoteInfo = Ubiquity;
+		};
+		0CD3EC6E1FDE224400985E56 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0CD3EC671FDE224400985E56 /* Ubiquity.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 0CE49E371E7A3FE50058F5F8;
+			remoteInfo = Ubiquity.Tests;
+		};
+		0CD3ECAB1FDE247200985E56 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0CD3ECA71FDE247200985E56 /* Verdandi.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 0CD3EC941FDE243000985E56;
+			remoteInfo = Verdandi;
+		};
+		0CD3ED041FDE314F00985E56 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0CD3EC671FDE224400985E56 /* Ubiquity.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 0CE49D771E7A3DAA0058F5F8;
+			remoteInfo = Ubiquity;
+		};
+		0CD3ED061FDE314F00985E56 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0CD3ECA71FDE247200985E56 /* Verdandi.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 0CD3EC931FDE243000985E56;
+			remoteInfo = Verdandi;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		0C7791F01FDE3A720058FF8A /* Debugger.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Debugger.swift; sourceTree = "<group>"; };
+		0C7791F11FDE3A720058FF8A /* Logger.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
+		0C7791F21FDE3A720058FF8A /* UIColor+Random.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIColor+Random.swift"; sourceTree = "<group>"; };
+		0CD3EB101FDE1F5E00985E56 /* Nornir.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Nornir.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		0CD3EB1C1FDE1F9700985E56 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		0CD3EB1D1FDE1F9700985E56 /* Nornir.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Nornir.h; sourceTree = "<group>"; };
+		0CD3EC671FDE224400985E56 /* Ubiquity.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Ubiquity.xcodeproj; path = Ubiquity/Ubiquity.xcodeproj; sourceTree = "<group>"; };
+		0CD3ECA71FDE247200985E56 /* Verdandi.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Verdandi.xcodeproj; path = Verdandi/Verdandi.xcodeproj; sourceTree = "<group>"; };
+		0CD5303F1FDE537800EE43E8 /* ChatViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatViewController.swift; sourceTree = "<group>"; };
+		0CD530421FDE547B00EE43E8 /* ChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatView.swift; sourceTree = "<group>"; };
+		0CD530441FDE548E00EE43E8 /* ChatViewLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatViewLayout.swift; sourceTree = "<group>"; };
+		0CD530461FDE594F00EE43E8 /* ChatViewPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatViewPresenter.swift; sourceTree = "<group>"; };
+		0CD530481FDE5AF600EE43E8 /* ChatViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatViewCell.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		0CD3EB0C1FDE1F5D00985E56 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0CD3ECF21FDE289E00985E56 /* Ubiquity.framework in Frameworks */,
+				0CD3ECF31FDE289E00985E56 /* Verdandi.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		0C7791ED1FDE3A0E0058FF8A /* Classes */ = {
+			isa = PBXGroup;
+			children = (
+				0CD530421FDE547B00EE43E8 /* ChatView.swift */,
+				0CD530481FDE5AF600EE43E8 /* ChatViewCell.swift */,
+				0CD530441FDE548E00EE43E8 /* ChatViewLayout.swift */,
+				0CD530461FDE594F00EE43E8 /* ChatViewPresenter.swift */,
+				0CD5303F1FDE537800EE43E8 /* ChatViewController.swift */,
+			);
+			path = Classes;
+			sourceTree = "<group>";
+		};
+		0C7791EF1FDE3A720058FF8A /* Debug */ = {
+			isa = PBXGroup;
+			children = (
+				0C7791F01FDE3A720058FF8A /* Debugger.swift */,
+				0C7791F11FDE3A720058FF8A /* Logger.swift */,
+				0C7791F21FDE3A720058FF8A /* UIColor+Random.swift */,
+			);
+			name = Debug;
+			path = "Nornir/Librarys/Ubiquity/Ubiquity/Supporting Files/Debug";
+			sourceTree = SOURCE_ROOT;
+		};
+		0CD3EB061FDE1F5D00985E56 = {
+			isa = PBXGroup;
+			children = (
+				0CD3EB121FDE1F5E00985E56 /* Nornir */,
+				0CD3EB111FDE1F5E00985E56 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		0CD3EB111FDE1F5E00985E56 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				0CD3EB101FDE1F5E00985E56 /* Nornir.framework */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		0CD3EB121FDE1F5E00985E56 /* Nornir */ = {
+			isa = PBXGroup;
+			children = (
+				0C7791ED1FDE3A0E0058FF8A /* Classes */,
+				0CD3EB201FDE203600985E56 /* Librarys */,
+				0CD3EB1B1FDE1F9700985E56 /* Supporting Files */,
+			);
+			path = Nornir;
+			sourceTree = "<group>";
+		};
+		0CD3EB1B1FDE1F9700985E56 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				0C7791EF1FDE3A720058FF8A /* Debug */,
+				0CD3EB1C1FDE1F9700985E56 /* Info.plist */,
+				0CD3EB1D1FDE1F9700985E56 /* Nornir.h */,
+			);
+			path = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		0CD3EB201FDE203600985E56 /* Librarys */ = {
+			isa = PBXGroup;
+			children = (
+				0CD3EC671FDE224400985E56 /* Ubiquity.xcodeproj */,
+				0CD3ECA71FDE247200985E56 /* Verdandi.xcodeproj */,
+			);
+			path = Librarys;
+			sourceTree = "<group>";
+		};
+		0CD3EC681FDE224400985E56 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				0CD3EC6D1FDE224400985E56 /* Ubiquity.framework */,
+				0CD3EC6F1FDE224400985E56 /* Ubiquity.Tests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		0CD3ECA81FDE247200985E56 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				0CD3ECAC1FDE247200985E56 /* Verdandi.framework */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		0CD3EB0D1FDE1F5D00985E56 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0CD3ECFD1FDE2A0800985E56 /* Nornir.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		0CD3EB0F1FDE1F5D00985E56 /* Nornir */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 0CD3EB181FDE1F5E00985E56 /* Build configuration list for PBXNativeTarget "Nornir" */;
+			buildPhases = (
+				0CD3EB0B1FDE1F5D00985E56 /* Sources */,
+				0CD3EB0C1FDE1F5D00985E56 /* Frameworks */,
+				0CD3EB0D1FDE1F5D00985E56 /* Headers */,
+				0CD3EB0E1FDE1F5D00985E56 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				0CD3ED051FDE314F00985E56 /* PBXTargetDependency */,
+				0CD3ED071FDE314F00985E56 /* PBXTargetDependency */,
+			);
+			name = Nornir;
+			productName = Nornir;
+			productReference = 0CD3EB101FDE1F5E00985E56 /* Nornir.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		0CD3EB071FDE1F5D00985E56 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0920;
+				ORGANIZATIONNAME = SAGESSE;
+				TargetAttributes = {
+					0CD3EB0F1FDE1F5D00985E56 = {
+						CreatedOnToolsVersion = 9.2;
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = 0CD3EB0A1FDE1F5D00985E56 /* Build configuration list for PBXProject "Nornir" */;
+			compatibilityVersion = "Xcode 8.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 0CD3EB061FDE1F5D00985E56;
+			productRefGroup = 0CD3EB111FDE1F5E00985E56 /* Products */;
+			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 0CD3EC681FDE224400985E56 /* Products */;
+					ProjectRef = 0CD3EC671FDE224400985E56 /* Ubiquity.xcodeproj */;
+				},
+				{
+					ProductGroup = 0CD3ECA81FDE247200985E56 /* Products */;
+					ProjectRef = 0CD3ECA71FDE247200985E56 /* Verdandi.xcodeproj */;
+				},
+			);
+			projectRoot = "";
+			targets = (
+				0CD3EB0F1FDE1F5D00985E56 /* Nornir */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		0CD3EC6D1FDE224400985E56 /* Ubiquity.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = Ubiquity.framework;
+			remoteRef = 0CD3EC6C1FDE224400985E56 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		0CD3EC6F1FDE224400985E56 /* Ubiquity.Tests.xctest */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = Ubiquity.Tests.xctest;
+			remoteRef = 0CD3EC6E1FDE224400985E56 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		0CD3ECAC1FDE247200985E56 /* Verdandi.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = Verdandi.framework;
+			remoteRef = 0CD3ECAB1FDE247200985E56 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
+
+/* Begin PBXResourcesBuildPhase section */
+		0CD3EB0E1FDE1F5D00985E56 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		0CD3EB0B1FDE1F5D00985E56 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0CD530491FDE5AF600EE43E8 /* ChatViewCell.swift in Sources */,
+				0CD530451FDE548E00EE43E8 /* ChatViewLayout.swift in Sources */,
+				0C7791F31FDE3A720058FF8A /* Debugger.swift in Sources */,
+				0C7791F51FDE3A720058FF8A /* UIColor+Random.swift in Sources */,
+				0CD530471FDE594F00EE43E8 /* ChatViewPresenter.swift in Sources */,
+				0CD530431FDE547B00EE43E8 /* ChatView.swift in Sources */,
+				0CD530401FDE537800EE43E8 /* ChatViewController.swift in Sources */,
+				0C7791F41FDE3A720058FF8A /* Logger.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		0CD3ED051FDE314F00985E56 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = Ubiquity;
+			targetProxy = 0CD3ED041FDE314F00985E56 /* PBXContainerItemProxy */;
+		};
+		0CD3ED071FDE314F00985E56 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = Verdandi;
+			targetProxy = 0CD3ED061FDE314F00985E56 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		0CD3EB161FDE1F5E00985E56 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		0CD3EB171FDE1F5E00985E56 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				VALIDATE_PRODUCT = YES;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		0CD3EB191FDE1F5E00985E56 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
+				CODE_SIGN_STYLE = Automatic;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = FN2B5W3WWQ;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				INFOPLIST_FILE = "$(SRCROOT)/Nornir/Supporting Files/Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks ";
+				PRODUCT_BUNDLE_IDENTIFIER = SA.Librarys.Nornir;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 3.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		0CD3EB1A1FDE1F5E00985E56 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
+				CODE_SIGN_STYLE = Automatic;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = FN2B5W3WWQ;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				INFOPLIST_FILE = "$(SRCROOT)/Nornir/Supporting Files/Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks ";
+				PRODUCT_BUNDLE_IDENTIFIER = SA.Librarys.Nornir;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 3.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		0CD3EB0A1FDE1F5D00985E56 /* Build configuration list for PBXProject "Nornir" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0CD3EB161FDE1F5E00985E56 /* Debug */,
+				0CD3EB171FDE1F5E00985E56 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		0CD3EB181FDE1F5E00985E56 /* Build configuration list for PBXNativeTarget "Nornir" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0CD3EB191FDE1F5E00985E56 /* Debug */,
+				0CD3EB1A1FDE1F5E00985E56 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 0CD3EB071FDE1F5D00985E56 /* Project object */;
+}

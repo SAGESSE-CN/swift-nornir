@@ -1,0 +1,4 @@
+[submodule "Nornir/Librarys/Ubiquity"]
+	path = Nornir/Librarys/Ubiquity
+	url = https://github.com/sagesse-cn/swift-ubiquity
+	branch = develop
