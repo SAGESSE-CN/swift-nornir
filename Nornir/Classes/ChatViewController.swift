@@ -8,7 +8,7 @@
 
 import UIKit
 
-open class ChatViewController: UIViewController {
+open class ChatViewController: UIViewController, CALayerDelegate {
     
     open override func loadView() {
         super.loadView()

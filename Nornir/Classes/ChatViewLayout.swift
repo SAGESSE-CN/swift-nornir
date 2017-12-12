@@ -8,6 +8,8 @@
 
 import UIKit
 
+
+
 internal class ChatViewLayout: UICollectionViewFlowLayout {
     
     override func prepare() {

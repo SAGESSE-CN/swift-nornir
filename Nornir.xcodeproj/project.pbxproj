@@ -10,6 +10,7 @@
 		0C7791F31FDE3A720058FF8A /* Debugger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C7791F01FDE3A720058FF8A /* Debugger.swift */; };
 		0C7791F41FDE3A720058FF8A /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C7791F11FDE3A720058FF8A /* Logger.swift */; };
 		0C7791F51FDE3A720058FF8A /* UIColor+Random.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C7791F21FDE3A720058FF8A /* UIColor+Random.swift */; };
+		0C97C0111FE0F29B00C1B240 /* ChatViewLayoutNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C97C0101FE0F29B00C1B240 /* ChatViewLayoutNode.swift */; };
 		0CD3ECF21FDE289E00985E56 /* Ubiquity.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0CD3EC6D1FDE224400985E56 /* Ubiquity.framework */; };
 		0CD3ECF31FDE289E00985E56 /* Verdandi.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0CD3ECAC1FDE247200985E56 /* Verdandi.framework */; };
 		0CD3ECFD1FDE2A0800985E56 /* Nornir.h in Headers */ = {isa = PBXBuildFile; fileRef = 0CD3EB1D1FDE1F9700985E56 /* Nornir.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -62,6 +63,7 @@
 		0C7791F01FDE3A720058FF8A /* Debugger.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Debugger.swift; sourceTree = "<group>"; };
 		0C7791F11FDE3A720058FF8A /* Logger.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
 		0C7791F21FDE3A720058FF8A /* UIColor+Random.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIColor+Random.swift"; sourceTree = "<group>"; };
+		0C97C0101FE0F29B00C1B240 /* ChatViewLayoutNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatViewLayoutNode.swift; sourceTree = "<group>"; };
 		0CD3EB101FDE1F5E00985E56 /* Nornir.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Nornir.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		0CD3EB1C1FDE1F9700985E56 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		0CD3EB1D1FDE1F9700985E56 /* Nornir.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Nornir.h; sourceTree = "<group>"; };
@@ -93,6 +95,7 @@
 				0CD530421FDE547B00EE43E8 /* ChatView.swift */,
 				0CD530481FDE5AF600EE43E8 /* ChatViewCell.swift */,
 				0CD530441FDE548E00EE43E8 /* ChatViewLayout.swift */,
+				0C97C0101FE0F29B00C1B240 /* ChatViewLayoutNode.swift */,
 				0CD530461FDE594F00EE43E8 /* ChatViewPresenter.swift */,
 				0CD5303F1FDE537800EE43E8 /* ChatViewController.swift */,
 			);
@@ -288,6 +291,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0C97C0111FE0F29B00C1B240 /* ChatViewLayoutNode.swift in Sources */,
 				0CD530491FDE5AF600EE43E8 /* ChatViewCell.swift in Sources */,
 				0CD530451FDE548E00EE43E8 /* ChatViewLayout.swift in Sources */,
 				0C7791F31FDE3A720058FF8A /* Debugger.swift in Sources */,

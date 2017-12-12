@@ -1,4 +1,4 @@
-# swift-chat
+# Nornir
 
 [![Support](https://img.shields.io/badge/support-iOS%208%2B%20-blue.svg?style=flat)](https://www.apple.com/nl/ios/)
 [![Language](http://img.shields.io/badge/language-swift-brightgreen.svg?style=flat
@@ -6,7 +6,7 @@
 [![License](http://img.shields.io/badge/license-MIT-lightgrey.svg?style=flat
 		)](http://mit-license.org)
 
-![Screen](https://github.com/sagesse-cn/swift-chat/blob/develop/Documents/Snapshoot.gif)
+![Screen](https://github.com/sagesse-cn/swift-nornir/blob/master/Documents/Snapshoot.gif)
 
 该库目前只是纯UI库, 后面将会添加第三方的聊天服务(例如:融云,百川,腾讯云)使用示例, 再后面将会实现网络部分(swift/XMPP)
 
