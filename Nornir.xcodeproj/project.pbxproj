@@ -7,10 +7,15 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0C4828C71FE16C10006DD717 /* NNMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C4828C51FE16C10006DD717 /* NNMessage.swift */; };
+		0C4828C81FE16C10006DD717 /* NNUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C4828C61FE16C10006DD717 /* NNUser.swift */; };
+		0C4828CB1FE173DB006DD717 /* CustomLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C4828CA1FE173DB006DD717 /* CustomLayout.swift */; };
 		0C7791F31FDE3A720058FF8A /* Debugger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C7791F01FDE3A720058FF8A /* Debugger.swift */; };
 		0C7791F41FDE3A720058FF8A /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C7791F11FDE3A720058FF8A /* Logger.swift */; };
 		0C7791F51FDE3A720058FF8A /* UIColor+Random.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C7791F21FDE3A720058FF8A /* UIColor+Random.swift */; };
-		0C97C0111FE0F29B00C1B240 /* ChatViewLayoutNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C97C0101FE0F29B00C1B240 /* ChatViewLayoutNode.swift */; };
+		0C8BC3041FE17523004E80A5 /* Session.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C8BC3031FE17523004E80A5 /* Session.swift */; };
+		0C97C0161FE1062600C1B240 /* Message.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C97C0151FE1062600C1B240 /* Message.swift */; };
+		0C97C0181FE1063D00C1B240 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C97C0171FE1063D00C1B240 /* User.swift */; };
 		0CD3ECF21FDE289E00985E56 /* Ubiquity.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0CD3EC6D1FDE224400985E56 /* Ubiquity.framework */; };
 		0CD3ECF31FDE289E00985E56 /* Verdandi.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0CD3ECAC1FDE247200985E56 /* Verdandi.framework */; };
 		0CD3ECFD1FDE2A0800985E56 /* Nornir.h in Headers */ = {isa = PBXBuildFile; fileRef = 0CD3EB1D1FDE1F9700985E56 /* Nornir.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -60,16 +65,21 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		0C4828C51FE16C10006DD717 /* NNMessage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NNMessage.swift; path = "Nornir-Example/Nornir-Example/NNMessage.swift"; sourceTree = SOURCE_ROOT; };
+		0C4828C61FE16C10006DD717 /* NNUser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NNUser.swift; path = "Nornir-Example/Nornir-Example/NNUser.swift"; sourceTree = SOURCE_ROOT; };
+		0C4828CA1FE173DB006DD717 /* CustomLayout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomLayout.swift; sourceTree = "<group>"; };
 		0C7791F01FDE3A720058FF8A /* Debugger.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Debugger.swift; sourceTree = "<group>"; };
 		0C7791F11FDE3A720058FF8A /* Logger.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
 		0C7791F21FDE3A720058FF8A /* UIColor+Random.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIColor+Random.swift"; sourceTree = "<group>"; };
-		0C97C0101FE0F29B00C1B240 /* ChatViewLayoutNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatViewLayoutNode.swift; sourceTree = "<group>"; };
+		0C8BC3031FE17523004E80A5 /* Session.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Session.swift; sourceTree = "<group>"; };
+		0C97C0151FE1062600C1B240 /* Message.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Message.swift; sourceTree = "<group>"; };
+		0C97C0171FE1063D00C1B240 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		0CD3EB101FDE1F5E00985E56 /* Nornir.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Nornir.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		0CD3EB1C1FDE1F9700985E56 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		0CD3EB1D1FDE1F9700985E56 /* Nornir.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Nornir.h; sourceTree = "<group>"; };
 		0CD3EC671FDE224400985E56 /* Ubiquity.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Ubiquity.xcodeproj; path = Ubiquity/Ubiquity.xcodeproj; sourceTree = "<group>"; };
 		0CD3ECA71FDE247200985E56 /* Verdandi.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Verdandi.xcodeproj; path = Verdandi/Verdandi.xcodeproj; sourceTree = "<group>"; };
-		0CD5303F1FDE537800EE43E8 /* ChatViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatViewController.swift; sourceTree = "<group>"; };
+		0CD5303F1FDE537800EE43E8 /* ChatViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatViewController.swift; sourceTree = "<group>"; wrapsLines = 0; };
 		0CD530421FDE547B00EE43E8 /* ChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatView.swift; sourceTree = "<group>"; };
 		0CD530441FDE548E00EE43E8 /* ChatViewLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatViewLayout.swift; sourceTree = "<group>"; };
 		0CD530461FDE594F00EE43E8 /* ChatViewPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatViewPresenter.swift; sourceTree = "<group>"; };
@@ -89,13 +99,29 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0C4828BF1FE16B0F006DD717 /* Extension */ = {
+			isa = PBXGroup;
+			children = (
+				0C4828C51FE16C10006DD717 /* NNMessage.swift */,
+				0C4828C61FE16C10006DD717 /* NNUser.swift */,
+			);
+			path = Extension;
+			sourceTree = "<group>";
+		};
+		0C4828C91FE173DB006DD717 /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				0C4828CA1FE173DB006DD717 /* CustomLayout.swift */,
+			);
+			path = Utils;
+			sourceTree = "<group>";
+		};
 		0C7791ED1FDE3A0E0058FF8A /* Classes */ = {
 			isa = PBXGroup;
 			children = (
 				0CD530421FDE547B00EE43E8 /* ChatView.swift */,
 				0CD530481FDE5AF600EE43E8 /* ChatViewCell.swift */,
 				0CD530441FDE548E00EE43E8 /* ChatViewLayout.swift */,
-				0C97C0101FE0F29B00C1B240 /* ChatViewLayoutNode.swift */,
 				0CD530461FDE594F00EE43E8 /* ChatViewPresenter.swift */,
 				0CD5303F1FDE537800EE43E8 /* ChatViewController.swift */,
 			);
@@ -112,6 +138,26 @@
 			name = Debug;
 			path = "Nornir/Librarys/Ubiquity/Ubiquity/Supporting Files/Debug";
 			sourceTree = SOURCE_ROOT;
+		};
+		0C97C0131FE105D800C1B240 /* Other */ = {
+			isa = PBXGroup;
+			children = (
+				0C4828C91FE173DB006DD717 /* Utils */,
+				0C4828BF1FE16B0F006DD717 /* Extension */,
+				0C97C0141FE105D800C1B240 /* Protocol */,
+			);
+			path = Other;
+			sourceTree = "<group>";
+		};
+		0C97C0141FE105D800C1B240 /* Protocol */ = {
+			isa = PBXGroup;
+			children = (
+				0C97C0171FE1063D00C1B240 /* User.swift */,
+				0C8BC3031FE17523004E80A5 /* Session.swift */,
+				0C97C0151FE1062600C1B240 /* Message.swift */,
+			);
+			path = Protocol;
+			sourceTree = "<group>";
 		};
 		0CD3EB061FDE1F5D00985E56 = {
 			isa = PBXGroup;
@@ -133,6 +179,7 @@
 			isa = PBXGroup;
 			children = (
 				0C7791ED1FDE3A0E0058FF8A /* Classes */,
+				0C97C0131FE105D800C1B240 /* Other */,
 				0CD3EB201FDE203600985E56 /* Librarys */,
 				0CD3EB1B1FDE1F9700985E56 /* Supporting Files */,
 			);
@@ -291,15 +338,20 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0C97C0111FE0F29B00C1B240 /* ChatViewLayoutNode.swift in Sources */,
+				0C8BC3041FE17523004E80A5 /* Session.swift in Sources */,
 				0CD530491FDE5AF600EE43E8 /* ChatViewCell.swift in Sources */,
 				0CD530451FDE548E00EE43E8 /* ChatViewLayout.swift in Sources */,
 				0C7791F31FDE3A720058FF8A /* Debugger.swift in Sources */,
 				0C7791F51FDE3A720058FF8A /* UIColor+Random.swift in Sources */,
+				0C4828CB1FE173DB006DD717 /* CustomLayout.swift in Sources */,
 				0CD530471FDE594F00EE43E8 /* ChatViewPresenter.swift in Sources */,
+				0C4828C81FE16C10006DD717 /* NNUser.swift in Sources */,
 				0CD530431FDE547B00EE43E8 /* ChatView.swift in Sources */,
+				0C4828C71FE16C10006DD717 /* NNMessage.swift in Sources */,
+				0C97C0161FE1062600C1B240 /* Message.swift in Sources */,
 				0CD530401FDE537800EE43E8 /* ChatViewController.swift in Sources */,
 				0C7791F41FDE3A720058FF8A /* Logger.swift in Sources */,
+				0C97C0181FE1063D00C1B240 /* User.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

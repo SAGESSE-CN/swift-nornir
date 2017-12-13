@@ -8,5 +8,6 @@
 
 import UIKit
 
-internal class ChatView: UICollectionView {
+
+open class ChatView: UICollectionView {
 }

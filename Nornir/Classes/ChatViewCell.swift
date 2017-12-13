@@ -8,11 +8,16 @@
 
 import UIKit
 
-internal class ChatViewCell: UICollectionViewCell {
+open class ChatViewCell: UICollectionViewCell {
     
-    override func preferredLayoutAttributesFitting(_ layoutAttributes: UICollectionViewLayoutAttributes) -> UICollectionViewLayoutAttributes {
-        let newLayoutAttributes = super.preferredLayoutAttributesFitting(layoutAttributes)
-        newLayoutAttributes.frame.size.height = 120
-        return newLayoutAttributes
+    open override func preferredLayoutAttributesFitting(_ layoutAttributes: UICollectionViewLayoutAttributes) -> UICollectionViewLayoutAttributes {
+        return presenter.map {
+            let layout = $0.preferredLayoutFitting(at: layoutAttributes.indexPath)
+            let newLayoutAttributes = super.preferredLayoutAttributesFitting(layoutAttributes)
+            newLayoutAttributes.frame.size.height = layout.box.height
+            return newLayoutAttributes
+        } ?? layoutAttributes
     }
+    
+    internal weak var presenter: ChatViewPresenter?
 }
