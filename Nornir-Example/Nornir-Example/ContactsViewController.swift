@@ -58,7 +58,8 @@ class ContactsViewController: UITableViewController {
 //        var manager: SACManager = SACManager(user: SACUser(name: "Support"))
 //        let conversation = manager.conversation(with: SACUser(name: "Editing"))
 //        let vc = SACChatViewController(conversation: conversation)
-        let vc = Nornir.ChatViewController()
+        
+        let vc = Nornir.ChatViewController(conversation: Nornir.Conversation())
         
         show(vc, sender: nil)
     }

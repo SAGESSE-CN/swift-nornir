@@ -13,7 +13,9 @@
 		0C7791F31FDE3A720058FF8A /* Debugger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C7791F01FDE3A720058FF8A /* Debugger.swift */; };
 		0C7791F41FDE3A720058FF8A /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C7791F11FDE3A720058FF8A /* Logger.swift */; };
 		0C7791F51FDE3A720058FF8A /* UIColor+Random.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C7791F21FDE3A720058FF8A /* UIColor+Random.swift */; };
-		0C8BC3041FE17523004E80A5 /* Session.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C8BC3031FE17523004E80A5 /* Session.swift */; };
+		0C83A85F1FE27376006E76FE /* Library.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C83A85E1FE27376006E76FE /* Library.swift */; };
+		0C83A8621FE36C72006E76FE /* ChatViewLayoutAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C83A8611FE36C72006E76FE /* ChatViewLayoutAttributes.swift */; };
+		0C8BC3041FE17523004E80A5 /* Conversation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C8BC3031FE17523004E80A5 /* Conversation.swift */; };
 		0C97C0161FE1062600C1B240 /* Message.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C97C0151FE1062600C1B240 /* Message.swift */; };
 		0C97C0181FE1063D00C1B240 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C97C0171FE1063D00C1B240 /* User.swift */; };
 		0CD3ECF21FDE289E00985E56 /* Ubiquity.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0CD3EC6D1FDE224400985E56 /* Ubiquity.framework */; };
@@ -71,7 +73,9 @@
 		0C7791F01FDE3A720058FF8A /* Debugger.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Debugger.swift; sourceTree = "<group>"; };
 		0C7791F11FDE3A720058FF8A /* Logger.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
 		0C7791F21FDE3A720058FF8A /* UIColor+Random.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIColor+Random.swift"; sourceTree = "<group>"; };
-		0C8BC3031FE17523004E80A5 /* Session.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Session.swift; sourceTree = "<group>"; };
+		0C83A85E1FE27376006E76FE /* Library.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Library.swift; sourceTree = "<group>"; };
+		0C83A8611FE36C72006E76FE /* ChatViewLayoutAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatViewLayoutAttributes.swift; sourceTree = "<group>"; };
+		0C8BC3031FE17523004E80A5 /* Conversation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Conversation.swift; sourceTree = "<group>"; };
 		0C97C0151FE1062600C1B240 /* Message.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Message.swift; sourceTree = "<group>"; };
 		0C97C0171FE1063D00C1B240 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		0CD3EB101FDE1F5E00985E56 /* Nornir.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Nornir.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -122,6 +126,7 @@
 				0CD530421FDE547B00EE43E8 /* ChatView.swift */,
 				0CD530481FDE5AF600EE43E8 /* ChatViewCell.swift */,
 				0CD530441FDE548E00EE43E8 /* ChatViewLayout.swift */,
+				0C83A8611FE36C72006E76FE /* ChatViewLayoutAttributes.swift */,
 				0CD530461FDE594F00EE43E8 /* ChatViewPresenter.swift */,
 				0CD5303F1FDE537800EE43E8 /* ChatViewController.swift */,
 			);
@@ -153,8 +158,9 @@
 			isa = PBXGroup;
 			children = (
 				0C97C0171FE1063D00C1B240 /* User.swift */,
-				0C8BC3031FE17523004E80A5 /* Session.swift */,
+				0C83A85E1FE27376006E76FE /* Library.swift */,
 				0C97C0151FE1062600C1B240 /* Message.swift */,
+				0C8BC3031FE17523004E80A5 /* Conversation.swift */,
 			);
 			path = Protocol;
 			sourceTree = "<group>";
@@ -338,14 +344,16 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0C8BC3041FE17523004E80A5 /* Session.swift in Sources */,
+				0C8BC3041FE17523004E80A5 /* Conversation.swift in Sources */,
 				0CD530491FDE5AF600EE43E8 /* ChatViewCell.swift in Sources */,
+				0C83A85F1FE27376006E76FE /* Library.swift in Sources */,
 				0CD530451FDE548E00EE43E8 /* ChatViewLayout.swift in Sources */,
 				0C7791F31FDE3A720058FF8A /* Debugger.swift in Sources */,
 				0C7791F51FDE3A720058FF8A /* UIColor+Random.swift in Sources */,
 				0C4828CB1FE173DB006DD717 /* CustomLayout.swift in Sources */,
 				0CD530471FDE594F00EE43E8 /* ChatViewPresenter.swift in Sources */,
 				0C4828C81FE16C10006DD717 /* NNUser.swift in Sources */,
+				0C83A8621FE36C72006E76FE /* ChatViewLayoutAttributes.swift in Sources */,
 				0CD530431FDE547B00EE43E8 /* ChatView.swift in Sources */,
 				0C4828C71FE16C10006DD717 /* NNMessage.swift in Sources */,
 				0C97C0161FE1062600C1B240 /* Message.swift in Sources */,

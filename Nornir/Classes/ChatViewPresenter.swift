@@ -58,6 +58,5 @@ internal class ChatViewPresenter: NSObject, UICollectionViewDelegate, UICollecti
     }
     
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        cell.contentView.backgroundColor = .random
     }
 }

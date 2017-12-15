@@ -10,6 +10,17 @@ import UIKit
 
 open class ChatViewController: UIViewController, ChatViewPresenterDelegate {
     
+    public init(conversation: Conversation) {
+        self.conversation = conversation
+        
+        super.init(nibName: nil, bundle: nil)
+    }
+    public required init?(coder aDecoder: NSCoder) {
+        fatalError()
+    }
+    
+    public let conversation: Conversation
+    
     open var chatView: ChatView {
         return _chatView
     }
@@ -40,6 +51,26 @@ open class ChatViewController: UIViewController, ChatViewPresenterDelegate {
         title = "Chat"
     }
     
+    // MARK:
+    
+    open func conversation(_ conversation: Conversation, didSend messages: Array<Message>) {
+        logger.trace?.write()
+
+    }
+    
+    open func conversation(_ conversation: Conversation, didReceive messages: Array<Message>) {
+        logger.trace?.write()
+
+    }
+    
+    open func conversation(_ conversation: Conversation, didRevoke messages: Array<Message>) {
+        logger.trace?.write()
+
+    }
+    
+    open func conversation(_ conversation: Conversation, didRemove messages: Array<Message>) {
+        logger.trace?.write()
+    }
 
     // MARK: Chat View Layout
     
@@ -47,15 +78,15 @@ open class ChatViewController: UIViewController, ChatViewPresenterDelegate {
         switch identifier {
         case "<Card>":
             // The card for the prominent style message.
-            return .init(width: size.width, height: 20)
+            return .init(width: size.width, height: 18)
             
         case "<Avatar>":
             // The avatar for the prominent & minimal style message.
-            return .init(width: 40, height: 40)
+            return .init(width: 39, height: 39)
             
         case "<Contents>":
             // The avatar for the prominent & minimal & notice style message.
-            return .init(width: size.width, height: 120)
+            return .init(width: 182, height: 18 * 4) // line height: 18
             
         default:
             // The item is custom, default is zero.
@@ -63,7 +94,6 @@ open class ChatViewController: UIViewController, ChatViewPresenterDelegate {
             return .zero
         }
     }
-    
     
     private lazy var _chatView: ChatView = ChatView(frame: self.view.bounds, collectionViewLayout: self.chatViewLayout)
     private lazy var _chatViewLayout: ChatViewLayout = ChatViewLayout()

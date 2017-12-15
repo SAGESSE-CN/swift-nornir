@@ -107,6 +107,10 @@ public class CustomLayout: NSObject {
         @discardableResult
         func computing(_ computed: ComputedCustomLayout, _ box: CGSize, _ eval: (String?, CGSize) -> CGSize) -> CGSize {
             
+            //  Calculate calculates the size of the remainder available.
+            let fixed = CGSize(width: box.width - computed.margin.right - computed.margin.left,
+                               height: box.height - computed.margin.bottom - computed.margin.top)
+            
             if computed.children.isEmpty {
                 // The node is compute finish.
                 guard computed.frame.size.width < 0 || computed.frame.size.height < 0 else {
@@ -114,12 +118,12 @@ public class CustomLayout: NSObject {
                 }
                 
                 // This is the leaf node, for evaluation.
-                computed._frame.size = eval(computed.identifier, box)
+                computed._frame.size = eval(computed.identifier, fixed)
                 
             } else {
                 // This is the normal node, foreach all child node for the priority.
                 let children = computed.children.sorted {
-                    return $0.priority < $1.priority
+                    return $0.priority > $1.priority
                 }
                 
                 var adjustment: CGSize = .zero
@@ -128,8 +132,8 @@ public class CustomLayout: NSObject {
                 computed._frame.size = children.reduce(.zero) {
                     
                     // Recalculate the available areas.
-                    let nsize = CGSize(width: max(box.width - adjustment.width, 0),
-                                       height: max(box.height - adjustment.height, 0))
+                    let nsize = CGSize(width: max(fixed.width - adjustment.width, 0),
+                                       height: max(fixed.height - adjustment.height, 0))
                     
                     // Calculate the area that is actually used and modify the resize.
                     let nadjustment = computing($1, nsize, eval)
@@ -184,12 +188,8 @@ public class CustomLayout: NSObject {
         // Calculate the fixed size of the node and generate the computed layout.
         let computed = precomputing(self)
         
-        //  Calculate calculates the size of the remainder available.
-        let remaining = CGSize(width: max(max(box.width, 0) - computed.used.width, -1),
-                               height: max(max(box.height, 0) - computed.used.height, -1))
-        
         // Calculate the size of the fiexible node and update the used area.
-        computing(computed, remaining, eval)
+        computing(computed, box, eval)
         
         // Update layout position.
         updating(computed, .zero)
