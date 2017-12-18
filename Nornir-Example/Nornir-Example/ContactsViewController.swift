@@ -50,6 +50,7 @@ class ContactsViewController: UITableViewController {
     }
     */
     
+
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
@@ -58,9 +59,10 @@ class ContactsViewController: UITableViewController {
 //        var manager: SACManager = SACManager(user: SACUser(name: "Support"))
 //        let conversation = manager.conversation(with: SACUser(name: "Editing"))
 //        let vc = SACChatViewController(conversation: conversation)
-        
-        let vc = Nornir.ChatViewController(conversation: Nornir.Conversation())
-        
+
+        let vc = ViewController()
+//        let vc = Nornir.ChatViewController(conversation: Nornir.Conversation())
+//
         show(vc, sender: nil)
     }
 

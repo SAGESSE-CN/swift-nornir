@@ -86,7 +86,7 @@ open class ChatViewController: UIViewController, ChatViewPresenterDelegate {
             
         case "<Contents>":
             // The avatar for the prominent & minimal & notice style message.
-            return .init(width: 182, height: 18 * 4) // line height: 18
+            return .init(width: size.width, height: 18 * 4) // line height: 18
             
         default:
             // The item is custom, default is zero.

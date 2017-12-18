@@ -15,6 +15,7 @@
 		0C7791F51FDE3A720058FF8A /* UIColor+Random.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C7791F21FDE3A720058FF8A /* UIColor+Random.swift */; };
 		0C83A85F1FE27376006E76FE /* Library.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C83A85E1FE27376006E76FE /* Library.swift */; };
 		0C83A8621FE36C72006E76FE /* ChatViewLayoutAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C83A8611FE36C72006E76FE /* ChatViewLayoutAttributes.swift */; };
+		0C83A8661FE75D54006E76FE /* TextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C83A8651FE75D54006E76FE /* TextView.swift */; };
 		0C8BC3041FE17523004E80A5 /* Conversation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C8BC3031FE17523004E80A5 /* Conversation.swift */; };
 		0C97C0161FE1062600C1B240 /* Message.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C97C0151FE1062600C1B240 /* Message.swift */; };
 		0C97C0181FE1063D00C1B240 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C97C0171FE1063D00C1B240 /* User.swift */; };
@@ -75,6 +76,7 @@
 		0C7791F21FDE3A720058FF8A /* UIColor+Random.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIColor+Random.swift"; sourceTree = "<group>"; };
 		0C83A85E1FE27376006E76FE /* Library.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Library.swift; sourceTree = "<group>"; };
 		0C83A8611FE36C72006E76FE /* ChatViewLayoutAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatViewLayoutAttributes.swift; sourceTree = "<group>"; };
+		0C83A8651FE75D54006E76FE /* TextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextView.swift; sourceTree = "<group>"; };
 		0C8BC3031FE17523004E80A5 /* Conversation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Conversation.swift; sourceTree = "<group>"; };
 		0C97C0151FE1062600C1B240 /* Message.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Message.swift; sourceTree = "<group>"; };
 		0C97C0171FE1063D00C1B240 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
@@ -116,6 +118,7 @@
 			isa = PBXGroup;
 			children = (
 				0C4828CA1FE173DB006DD717 /* CustomLayout.swift */,
+				0C83A8651FE75D54006E76FE /* TextView.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -349,6 +352,7 @@
 				0C83A85F1FE27376006E76FE /* Library.swift in Sources */,
 				0CD530451FDE548E00EE43E8 /* ChatViewLayout.swift in Sources */,
 				0C7791F31FDE3A720058FF8A /* Debugger.swift in Sources */,
+				0C83A8661FE75D54006E76FE /* TextView.swift in Sources */,
 				0C7791F51FDE3A720058FF8A /* UIColor+Random.swift in Sources */,
 				0C4828CB1FE173DB006DD717 /* CustomLayout.swift in Sources */,
 				0CD530471FDE594F00EE43E8 /* ChatViewPresenter.swift in Sources */,

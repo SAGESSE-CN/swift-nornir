@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Nornir
 
 
 class ViewController: UIViewController {
@@ -14,6 +15,10 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
+        
+        view.backgroundColor = .white
+        
+        TextStorage.compute(with: "", in: CGSize(width: 320, height: 1024), view: self.view)
     }
 
     override func didReceiveMemoryWarning() {
