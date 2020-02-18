@@ -367,6 +367,12 @@ open class SAIInputBar: UIView {
         view.addSubview(_inputAccessoryView)
         view.addSubview(_inputView)
         
+        if #available(iOS 11.0, *) {
+            _ = _SAInputLayoutConstraintMake(_inputAccessoryView, .bottom, .equal, view.safeAreaLayoutGuide, .bottom, output: &_inputAccessoryViewBottom)
+        } else {
+            _ = _SAInputLayoutConstraintMake(_inputAccessoryView, .bottom, .equal, view, .bottom, output: &_inputAccessoryViewBottom)
+        }
+        
         // add the constraints
         _containerView = view
         _constraints = [
@@ -374,7 +380,7 @@ open class SAIInputBar: UIView {
             _SAInputLayoutConstraintMake(_inputAccessoryView, .left, .equal, view, .left),
             _SAInputLayoutConstraintMake(_inputAccessoryView, .right, .equal, view, .right),
             //_SAInputLayoutConstraintMake(_inputAccessoryView, .Bottom, .Equal, view, .Bottom),
-            _SAInputLayoutConstraintMake(_inputAccessoryView, .bottom, .equal, view, .bottom, output: &_inputAccessoryViewBottom),
+            _inputAccessoryViewBottom!,
             
             _SAInputLayoutConstraintMake(_inputView, .top, .equal, _inputAccessoryView, .bottom),
             _SAInputLayoutConstraintMake(_inputView, .left, .equal, view, .left),
@@ -453,6 +459,9 @@ open class SAIInputBar: UIView {
         // Append the keyboard size
         if _inputMode.isSelecting {
             size.height += _cacheCustomKeyboardSize.height //_inputView.intrinsicContentSize.height
+        }
+        if #available(iOS 11.0, *) {
+            size.height += safeAreaInsets.bottom
         }
         return size
     }
