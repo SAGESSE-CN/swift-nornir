@@ -168,27 +168,27 @@ fileprivate extension SAPPickerInternal {
         // 后退
         dismiss(animated: true, completion: nil)
     }
-    dynamic func cancelHandler(_ sender: Any) {
+    @objc dynamic func cancelHandler(_ sender: Any) {
         // 取消
         dismiss(animated: true, completion: nil)
         delegater?.picker?(picker, cancel: _selectedPhotos)
     }
-    dynamic func confirmHandler(_ sender: Any) {
+    @objc dynamic func confirmHandler(_ sender: Any) {
         // 确认
         dismiss(animated: true, completion: nil)
         delegater?.picker?(picker, confrim: _selectedPhotos)
     }
     
     
-    dynamic func previewHandler(_ sender: Any) {
+    @objc dynamic func previewHandler(_ sender: Any) {
         // 显示预览
         preview(with: SAPPickerOptions(photos: _selectedPhotos), animated: true)
     }
-    dynamic func originHandler(_ sender: Any) {
+    @objc dynamic func originHandler(_ sender: Any) {
         // 切换选项
         alwaysSelectOriginal = !alwaysSelectOriginal
     }
-    dynamic func editHandler(_ sender: Any) {
+    @objc dynamic func editHandler(_ sender: Any) {
         _logger.trace()
     }
     
@@ -418,7 +418,7 @@ extension SAPPickerInternal: UINavigationControllerDelegate, UIViewControllerTra
         return nil
     }
     
-    func navigationController(_ navigationController: UINavigationController, animationControllerFor operation: UINavigationControllerOperation, from fromVC: UIViewController, to toVC: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+    func navigationController(_ navigationController: UINavigationController, animationControllerFor operation: UINavigationController.Operation, from fromVC: UIViewController, to toVC: UIViewController) -> UIViewControllerAnimatedTransitioning? {
         switch operation {
         case .pop:
             guard let previewer = fromVC as? SAPPreviewer, let previewing = previewer.previewingDelegate, let item = previewer.previewingItem else {

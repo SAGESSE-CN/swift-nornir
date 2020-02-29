@@ -100,12 +100,12 @@ public extension NSObject {
 ///
 public extension NSObject {
     
-    open dynamic func addProgressiveChangeObserver(_ observer: ProgressiveChangeObserver, context: String) {
+    @objc open dynamic func addProgressiveChangeObserver(_ observer: ProgressiveChangeObserver, context: String) {
         guard let _ = self as? Progressiveable else {
             return
         }
-        let index = _progressiveObservers.indexOfObject(options: .init(rawValue: 0)) { 
-            guard let ob = $0.0 as? ProgressiveChangeObserverTarget else {
+        let index = _progressiveObservers.indexOfObject { (asset, _, _) in
+            guard let ob = asset as? ProgressiveChangeObserverTarget else {
                 return false
             }
             guard ob.observer !== observer && ob.context != context else {
@@ -118,12 +118,12 @@ public extension NSObject {
         }
         _progressiveObservers.add(ProgressiveChangeObserverTarget(observer, context))
     }
-    open dynamic func removeProgressiveChangeObserver(_ observer: ProgressiveChangeObserver, context: String) {
+    @objc open dynamic func removeProgressiveChangeObserver(_ observer: ProgressiveChangeObserver, context: String) {
         guard let _ = self as? Progressiveable else {
             return
         }
-        let indexes = _progressiveObservers.indexesOfObjects(options: .init(rawValue: 0)) {
-            guard let ob = $0.0 as? ProgressiveChangeObserverTarget else {
+        let indexes = _progressiveObservers.indexesOfObjects { (asset, _, _) in
+            guard let ob = asset as? ProgressiveChangeObserverTarget else {
                 return false
             }
             guard ob.observer !== nil else {

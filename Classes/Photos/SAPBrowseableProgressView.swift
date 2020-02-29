@@ -47,7 +47,7 @@ open class SAPBrowseableProgressView: UIView {
     private func _updateOval(with progress: Double, animated: Bool) {
         
         let st: CGFloat = 2
-        let frame = UIEdgeInsetsInsetRect(bounds, UIEdgeInsetsMake(st, st, st, st))
+        let frame = bounds.inset(by: UIEdgeInsets(top: st, left: st, bottom: st, right: st))
         
         if _mask1.bounds.size != bounds.size {
             let path = UIBezierPath()
@@ -67,7 +67,7 @@ open class SAPBrowseableProgressView: UIView {
             
             _oval1.frame = bounds
             _oval1.path = path.cgPath
-            _oval1.fillRule = kCAFillRuleEvenOdd
+            _oval1.fillRule = CAShapeLayerFillRule.evenOdd
             
             _oval2.frame = bounds
             _oval2.path = UIBezierPath(roundedRect: frame, cornerRadius: frame.width / 2).cgPath

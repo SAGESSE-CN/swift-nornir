@@ -26,7 +26,7 @@ open class SACMessageVoiceContent: NSObject, SACMessageContentType {
         // |  ))) 99'59''  |
         // +---------------+
         
-        attributedText = NSAttributedString(string: "99'59''", attributes: [NSFontAttributeName: UIFont.systemFont(ofSize: 12)])
+        attributedText = NSAttributedString(string: "99'59''", attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 12)])
         
         let w1 = attributedText?.size().width ?? 0
         return .init(width: 20 + 8 + w1, height: 20)

@@ -143,7 +143,7 @@ internal class SAIEmoticonInputViewLayout: UICollectionViewLayout {
         let columns = CGFloat(numberOfColumns(in: index))
         
         let bounds = CGRect(origin: .zero, size: collectionView?.frame.size ?? .zero)
-        let rect = UIEdgeInsetsInsetRect(bounds, inset)
+        let rect = bounds.inset(by: inset)
         
         let type = group.type
         let size = CGSize(width: min(trunc((rect.width - 8 * columns) / columns), 80),

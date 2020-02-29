@@ -12,14 +12,14 @@ import AVFoundation
 
 public extension AVAudioSession {
     
-    public func sm_setActive(_ active: Bool, context: AnyObject? = nil) throws {
+    func sm_setActive(_ active: Bool, context: AnyObject? = nil) throws {
         try _AVAudioSessionPerformTask(active, context: context) {
             try AVAudioSession.sharedInstance().setActive(active)
         }
     }
-    public func sm_setActive(_ active: Bool, with options: AVAudioSessionSetActiveOptions, context: AnyObject? = nil) throws {
+    func sm_setActive(_ active: Bool, with options: AVAudioSession.SetActiveOptions, context: AnyObject? = nil) throws {
         try _AVAudioSessionPerformTask(active, context: context) {
-            try AVAudioSession.sharedInstance().setActive(active, with: options)
+            try AVAudioSession.sharedInstance().setActive(active, options: options)
         }
     }
 }
@@ -27,7 +27,7 @@ public extension AVAudioSession {
 private func _AVAudioSessionPerformTask(_ newValue: Bool, context: AnyObject?, task body: @escaping () throws -> Void) rethrows {
     
     let newTaskId = UUID().uuidString
-    let newContextHash = context?.hashValue
+    let newContextHash = context?.hash
     
     objc_sync_enter(AVAudioSession.self)
     

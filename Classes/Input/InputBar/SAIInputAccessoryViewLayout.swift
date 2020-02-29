@@ -182,7 +182,7 @@ internal class SAIInputAccessoryViewLayout: UICollectionViewLayout {
     var minimumLineSpacing: CGFloat = 8
     var minimumInteritemSpacing: CGFloat = 8
     
-    var contentInsets: UIEdgeInsets = UIEdgeInsetsMake(8, 10, 8, 10)
+    var contentInsets: UIEdgeInsets = UIEdgeInsets(top: 8, left: 10, bottom: 8, right: 10)
     
     // MARK: Invalidate
     

@@ -130,7 +130,7 @@ internal class SAIAudioStatusView: UIView {
     private func _updateText(_ str: String, _ bounds: CGRect? = nil) {
         if let bounds = bounds {
             let at = NSTextAttachment()
-            at.bounds = UIEdgeInsetsInsetRect(bounds, UIEdgeInsetsMake(0, 0, bounds.height, -8))
+            at.bounds = bounds.inset(by: UIEdgeInsets(top: 0, left: 0, bottom: bounds.height, right: -8))
             let mas = NSMutableAttributedString(string: str)
             mas.insert(NSAttributedString(attachment: at), at: 0)
             
@@ -172,7 +172,7 @@ internal class SAIAudioStatusView: UIView {
     
     fileprivate lazy var _textLabel: UILabel = UILabel()
     fileprivate lazy var _spectrumView: SAIAudioSpectrumView = SAIAudioSpectrumView()
-    fileprivate lazy var _activityIndicatorView: UIActivityIndicatorView = UIActivityIndicatorView(activityIndicatorStyle: .gray)
+    fileprivate lazy var _activityIndicatorView: UIActivityIndicatorView = UIActivityIndicatorView(style: .gray)
     
     override init(frame: CGRect) {
         super.init(frame: frame)

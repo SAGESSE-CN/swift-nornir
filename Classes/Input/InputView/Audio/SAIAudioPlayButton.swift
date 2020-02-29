@@ -16,10 +16,10 @@ internal class SAIAudioPlayButton: UIButton {
         guard _progressLayer.frame != bounds else {
             return
         }
-        let edg = UIEdgeInsetsMake(1, 1, 1, 1)
+        let edg = UIEdgeInsets(top: 1, left: 1, bottom: 1, right: 1)
         
         _progressLayer.frame = bounds
-        _progressLayer.path = UIBezierPath(ovalIn: UIEdgeInsetsInsetRect(bounds, edg)).cgPath
+        _progressLayer.path = UIBezierPath(ovalIn: bounds.inset(by: edg)).cgPath
     }
     
     func setProgress(_ progress: CGFloat, animated: Bool) {

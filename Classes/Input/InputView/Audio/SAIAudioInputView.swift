@@ -112,10 +112,10 @@ open class SAIAudioInputView: UIView {
     private func _init() {
         _logger.trace()
         
-        backgroundColor = UIColor(colorLiteralRed: 0xec / 0xff, green: 0xed / 0xff, blue: 0xf1 / 0xff, alpha: 1)
+        backgroundColor = UIColor(red: 0xec / 0xff, green: 0xed / 0xff, blue: 0xf1 / 0xff, alpha: 1)
         
         _tabbar.delegate = self
-        _tabbar.indicatorColor = UIColor(colorLiteralRed: 0x18 / 255.0, green: 0xb4 / 255.0, blue: 0xed / 255.0, alpha: 1)
+        _tabbar.indicatorColor = UIColor(red: 0x18 / 255.0, green: 0xb4 / 255.0, blue: 0xed / 255.0, alpha: 1)
         _tabbar.textHighlightedColor = _tabbar.indicatorColor
         _tabbar.translatesAutoresizingMaskIntoConstraints = false
         

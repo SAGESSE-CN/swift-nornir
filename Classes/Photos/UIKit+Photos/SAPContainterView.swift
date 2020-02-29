@@ -38,8 +38,8 @@ import UIKit
     @objc optional func containterViewDidEndZooming(_ containterView: SAPContainterView, with view: UIView?, atScale scale: CGFloat) // scale between minimum and maximum. called after any 'bounce' animations
 
     @objc optional func containterViewShouldBeginRotationing(_ containterView: SAPContainterView, with view: UIView?) -> Bool // called before the scroll view begins zooming its content
-    @objc optional func containterViewWillEndRotationing(_ containterView: SAPContainterView, with view: UIView?, atOrientation orientation: UIImageOrientation)
-    @objc optional func containterViewDidEndRotationing(_ containterView: SAPContainterView, with view: UIView?, atOrientation orientation: UIImageOrientation) // scale between minimum and maximum. called after any 'bounce' animations
+    @objc optional func containterViewWillEndRotationing(_ containterView: SAPContainterView, with view: UIView?, atOrientation orientation: UIImage.Orientation)
+    @objc optional func containterViewDidEndRotationing(_ containterView: SAPContainterView, with view: UIView?, atOrientation orientation: UIImage.Orientation) // scale between minimum and maximum. called after any 'bounce' animations
 }
 
 
@@ -98,12 +98,12 @@ import UIKit
         get { return _scrollView.scrollIndicatorInsets }
     }
     // default is UIScrollViewIndicatorStyleDefault
-    public var indicatorStyle: UIScrollViewIndicatorStyle {
+    public var indicatorStyle: UIScrollView.IndicatorStyle {
         set { return _scrollView.indicatorStyle = newValue }
         get { return _scrollView.indicatorStyle }
     }
     
-    public var decelerationRate: CGFloat {
+    public var decelerationRate: UIScrollView.DecelerationRate {
         set { return _scrollView.decelerationRate = newValue }
         get { return _scrollView.decelerationRate }
     }
@@ -144,8 +144,8 @@ import UIKit
         get { return _scrollView.scrollsToTop }
     }
     
-    // default is UIImageOrientationUp
-    public var orientation: UIImageOrientation {
+    // default is UIImage.OrientationUp
+    public var orientation: UIImage.Orientation {
         set { return _updateOrientation(with: _angle(for: orientation), animated: false) }
         get { return _orientation }
     }
@@ -188,7 +188,7 @@ import UIKit
             _scrollView.contentOffset = CGPoint(x: x, y: y)
         })
     }
-    public func zoom(to rect: CGRect, with orientation: UIImageOrientation, animated: Bool) {
+    public func zoom(to rect: CGRect, with orientation: UIImage.Orientation, animated: Bool) {
         guard let view = _contentView else {
             return
         }
@@ -219,7 +219,7 @@ import UIKit
         _orientation = orientation
     }
     
-    public func setOrientation(_ orientation: UIImageOrientation, animated: Bool) {
+    public func setOrientation(_ orientation: UIImage.Orientation, animated: Bool) {
         _updateOrientation(with: _angle(for: orientation), animated: animated)
     }
     
@@ -278,7 +278,7 @@ import UIKit
     fileprivate var _bounds: CGRect?
     fileprivate var _isRotationing: Bool = false
     
-    fileprivate var _orientation: UIImageOrientation = .up {
+    fileprivate var _orientation: UIImage.Orientation = .up {
         didSet {
             delegate?.containterViewDidRotation?(self)
         }
@@ -337,7 +337,7 @@ fileprivate extension SAPContainterView {
     }
     
     /// get content with orientation
-    fileprivate func _contentSize(for orientation: UIImageOrientation) -> CGSize {
+    fileprivate func _contentSize(for orientation: UIImage.Orientation) -> CGSize {
         if _isLandscape(for: orientation) {
             return CGSize(width: contentSize.height, height: contentSize.width)
         }
@@ -345,7 +345,7 @@ fileprivate extension SAPContainterView {
     }
     
     /// convert orientation to angle
-    fileprivate func _angle(for orientation: UIImageOrientation) -> CGFloat {
+    fileprivate func _angle(for orientation: UIImage.Orientation) -> CGFloat {
         switch orientation {
         case .up,
              .upMirrored:
@@ -363,7 +363,7 @@ fileprivate extension SAPContainterView {
     }
     
     /// convert angle to orientation
-    fileprivate func _orientation(for angle: CGFloat) -> UIImageOrientation {
+    fileprivate func _orientation(for angle: CGFloat) -> UIImage.Orientation {
         switch Int(angle / CGFloat(M_PI_2)) % 4 {
         case 0:     return .up
         case 1, -3: return .right
@@ -372,7 +372,7 @@ fileprivate extension SAPContainterView {
         default:    return .up
         }
     }
-    fileprivate func _isLandscape(for orientation: UIImageOrientation) -> Bool {
+    fileprivate func _isLandscape(for orientation: UIImage.Orientation) -> Bool {
         switch orientation {
         case .left, .leftMirrored: return true
         case .right, .rightMirrored: return true
@@ -445,7 +445,7 @@ fileprivate extension SAPContainterView {
     }
     
     /// rotation handler
-    dynamic func rotationHandler(_ sender: UIRotationGestureRecognizer) {
+    @objc dynamic func rotationHandler(_ sender: UIRotationGestureRecognizer) {
         // is opened rotation?
         guard _isRotationing else {
             return 

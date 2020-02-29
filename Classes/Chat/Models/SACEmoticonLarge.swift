@@ -16,8 +16,8 @@ open class SACEmoticonLarge: SACEmoticon {
             return
         }
         
-        var nframe1 = UIEdgeInsetsInsetRect(rect, UIEdgeInsetsMake(0, 0, 20, 0))
-        var nframe2 = UIEdgeInsetsInsetRect(rect, UIEdgeInsetsMake(nframe1.height, 0, 0, 0))
+        var nframe1 = rect.inset(by: UIEdgeInsets(top: 0, left: 0, bottom: 20, right: 0))
+        var nframe2 = rect.inset(by: UIEdgeInsets(top: nframe1.height, left: 0, bottom: 0, right: 0))
         
         // 图标
         let scale = min(min(nframe1.width / image.size.width, nframe1.height / image.size.height), 1)
@@ -31,11 +31,11 @@ open class SACEmoticonLarge: SACEmoticon {
         image.draw(in: nframe1)
         
         // 标题
-        let cfg = [NSFontAttributeName: UIFont.systemFont(ofSize: 12),
-                   NSForegroundColorAttributeName: UIColor.gray]
+        let cfg = [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 12),
+                   NSAttributedString.Key.foregroundColor: UIColor.gray]
         let name = title as NSString
         
-        let titleSize = name.size(attributes: cfg)
+        let titleSize = name.size(withAttributes: cfg)
         
         nframe2.origin.x = nframe2.minX + (nframe2.width - titleSize.width) / 2
         nframe2.origin.y = nframe2.minY + (nframe2.height - titleSize.height) / 2

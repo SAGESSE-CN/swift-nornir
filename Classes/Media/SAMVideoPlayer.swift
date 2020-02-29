@@ -114,7 +114,7 @@ open class SAMVideoPlayer: NSObject, SAMPlayerProtocol {
     }
     @discardableResult open func play(at time: TimeInterval) -> Bool {
         let scale = _player.currentTime().timescale
-        let tm = CMTimeMakeWithSeconds(Float64(trunc(time * 10) / 10), scale)
+        let tm = CMTimeMakeWithSeconds(Float64(trunc(time * 10) / 10), preferredTimescale: scale)
         // 如果正在播放
         guard !_status.isPlayed else {
             _player.pause()
@@ -136,7 +136,7 @@ open class SAMVideoPlayer: NSObject, SAMPlayerProtocol {
             return false
         }
         let scale = _player.currentTime().timescale
-        let tm = CMTimeMakeWithSeconds(Float64(trunc(time * 10) / 10), scale)
+        let tm = CMTimeMakeWithSeconds(Float64(trunc(time * 10) / 10), preferredTimescale: scale)
         _player.seek(to: tm)
         return true
     }
@@ -161,7 +161,7 @@ open class SAMVideoPlayer: NSObject, SAMPlayerProtocol {
             return
         }
         
-        _item?.seek(to: CMTimeMake(0, 1))
+        _item?.seek(to: CMTimeMake(value: 0, timescale: 1))
         _player.replaceCurrentItem(with: nil)
         
         _status = .stop
@@ -206,12 +206,12 @@ open class SAMVideoPlayer: NSObject, SAMPlayerProtocol {
     }
     
     // 播放器发生错误
-    open func playerDecodeErrorDidOccur(_ sender: Notification) {
+    @objc open func playerDecodeErrorDidOccur(_ sender: Notification) {
         // 检查是不是自己的通知
         guard let item = sender.object as? AVPlayerItem, item === player.currentItem else {
             return
         }
-        _item?.seek(to: CMTimeMake(0, 1))
+        _item?.seek(to: CMTimeMake(value: 0, timescale: 1))
         _player.replaceCurrentItem(with: nil)
         _status = .error
         _deactive()
@@ -221,12 +221,12 @@ open class SAMVideoPlayer: NSObject, SAMPlayerProtocol {
         _delegate?.player?(didOccur: self, error: error)
     }
     // 播入完成
-    open func playerDidFinishPlaying(_ sender: Notification) {
+    @objc open func playerDidFinishPlaying(_ sender: Notification) {
         // 检查是不是自己的通知
         guard let item = sender.object as? AVPlayerItem, item === player.currentItem else {
             return
         }
-        _item?.seek(to: CMTimeMake(0, 1))
+        _item?.seek(to: CMTimeMake(value: 0, timescale: 1))
         _player.replaceCurrentItem(with: nil)
         _status = .stop
         _deactive()
@@ -266,7 +266,7 @@ open class SAMVideoPlayer: NSObject, SAMPlayerProtocol {
         _delegate?.player?(didRestorePlaying: self)
     }
     // 播放中断(网络原因)
-    open func playerDidStalled(_ sender: Notification) {
+    @objc open func playerDidStalled(_ sender: Notification) {
         // 检查是不是自己的通知
         guard let item = sender.object as? AVPlayerItem, item === player.currentItem else {
             return
@@ -276,7 +276,7 @@ open class SAMVideoPlayer: NSObject, SAMPlayerProtocol {
         _delegate?.player?(didStalled: self)
     }
     // 播放中断(系统原因)
-    open func sessionDidInterruption(_ sender: Notification) {
+    @objc open func sessionDidInterruption(_ sender: Notification) {
         
         _status = .interruptioning
         _deactive()
@@ -303,13 +303,13 @@ private extension SAMVideoPlayer {
     
     func _addObservers() {
         
-        NotificationCenter.default.addObserver(self, selector: #selector(sessionDidInterruption(_:)), name: .AVAudioSessionInterruption, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(sessionDidInterruption(_:)), name: AVAudioSession.interruptionNotification, object: nil)
         
         NotificationCenter.default.addObserver(self, selector: #selector(playerDidFinishPlaying(_:)), name: .AVPlayerItemDidPlayToEndTime, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(playerDecodeErrorDidOccur(_:)), name: .AVPlayerItemFailedToPlayToEndTime, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(playerDidStalled(_:)), name: .AVPlayerItemPlaybackStalled, object: nil)
         
-        _changeTask = _player.addPeriodicTimeObserver(forInterval: CMTimeMake(1, 1), queue: .main) { [weak self](time) in
+        _changeTask = _player.addPeriodicTimeObserver(forInterval: CMTimeMake(value: 1, timescale: 1), queue: .main) { [weak self](time) in
             guard let `self` = self else {
                 return
             }
@@ -337,7 +337,7 @@ private extension SAMVideoPlayer {
         _isActived = true
         do {
             
-            try AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback)
+            try AVAudioSession.sharedInstance().setCategory(AVAudioSession.Category.playback)
             try AVAudioSession.sharedInstance().sm_setActive(true, context: self)
             return true
         } catch {
@@ -359,7 +359,7 @@ private extension SAMVideoPlayer {
     }
     
     
-    func _performForPrepare(with handler: ((Void) -> Bool)?) -> Bool {
+    func _performForPrepare(with handler: (() -> Bool)?) -> Bool {
         // 己经准备过了?
         guard !_status.isPrepared else {
             return handler?() ?? true
@@ -416,7 +416,7 @@ private extension SAMVideoPlayer {
         
         return task()
     }
-    func _performForPlay(with handler: ((Void) -> Bool)?) -> Bool {
+    func _performForPlay(with handler: (() -> Bool)?) -> Bool {
         guard _status != .playing else {
             // 如果是正在播放中, 忽略
             return true

@@ -39,9 +39,9 @@ internal class SAPPickerAssets: UICollectionViewController, UIGestureRecognizerD
         collectionView?.allowsSelection = false
         collectionView?.allowsMultipleSelection = false
         collectionView?.alwaysBounceVertical = true
-        collectionView?.contentInset = UIEdgeInsetsMake(10, 0, 10, 0)
+        collectionView?.contentInset = UIEdgeInsets(top: 10, left: 0, bottom: 10, right: 0)
         collectionView?.register(SAPPickerAssetsCell.self, forCellWithReuseIdentifier: "Item")
-        collectionView?.register(SAPPickerAssetsFooter.self, forSupplementaryViewOfKind: UICollectionElementKindSectionFooter, withReuseIdentifier: "Footer")
+        collectionView?.register(SAPPickerAssetsFooter.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter, withReuseIdentifier: "Footer")
         
         // 添加手势
         let pan = UIPanGestureRecognizer(target: self, action: #selector(panHandler(_:)))
@@ -398,7 +398,7 @@ internal class SAPPickerAssets: UICollectionViewController, UIGestureRecognizerD
 
 extension SAPPickerAssets {
     
-    func didSelectItem(_ sender: Notification) {
+    @objc func didSelectItem(_ sender: Notification) {
         guard let photo = sender.object as? SAPAsset else {
             return
         }
@@ -411,7 +411,7 @@ extension SAPPickerAssets {
             cell?.photoView.updateSelection()
         }
     }
-    func didDeselectItem(_ sender: Notification) {
+    @objc func didDeselectItem(_ sender: Notification) {
         guard let _ = sender.object as? SAPAsset else {
             return
         }
@@ -459,7 +459,7 @@ extension SAPPickerAssets: UICollectionViewDelegateFlowLayout {
         guard let layout = collectionView.collectionViewLayout as? UICollectionViewFlowLayout else {
             return .zero
         }
-        let rect = UIEdgeInsetsInsetRect(collectionView.bounds, collectionView.contentInset)
+        let rect = collectionView.bounds.inset(by: collectionView.contentInset)
         guard _cacheBounds?.width != rect.width else {
             return _itemSize
         }

@@ -17,7 +17,7 @@ internal class SAPPickerAssetsFooter: UICollectionReusableView {
     
     private func _init() {
         
-        _titleLabel.frame = UIEdgeInsetsInsetRect(bounds, UIEdgeInsetsMake(10, 0, 0, 0))
+        _titleLabel.frame = bounds.inset(by: UIEdgeInsets(top: 10, left: 0, bottom: 0, right: 0))
         _titleLabel.textAlignment = .center
         _titleLabel.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         

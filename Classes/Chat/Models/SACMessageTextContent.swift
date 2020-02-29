@@ -31,7 +31,7 @@ open class SACMessageTextContent: NSObject, SACMessageContentType {
         // | +-------------+ |
         // +-+-------------+-+
                          
-        let attr = NSAttributedString(string: text, attributes: [NSFontAttributeName: UIFont.systemFont(ofSize: 16) ])
+        let attr = NSAttributedString(string: text, attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 16) ])
         attributedText = YYTextLayout(containerSize: size, text: attr)
 //        @property (nonatomic, readonly) NSRange visibleRange;
 //        ///< Bounding rect (glyphs)

@@ -31,7 +31,7 @@ class TXPContainterViewController: UIViewController, SAPContainterViewDelegate {
         containterView.addGestureRecognizer(tap)
     }
     
-    func tapHandler(_ sender: UITapGestureRecognizer) {
+    @objc func tapHandler(_ sender: UITapGestureRecognizer) {
         
         let pt = sender.location(in: imageView)
         
@@ -57,7 +57,7 @@ class TXPContainterViewController: UIViewController, SAPContainterViewDelegate {
     func containterViewShouldBeginRotationing(_ containterView: SAPContainterView, with view: UIView?) -> Bool {
         return true
     }
-    func containterViewDidEndRotationing(_ containterView: SAPContainterView, with view: UIView?, atOrientation orientation: UIImageOrientation) {
+    func containterViewDidEndRotationing(_ containterView: SAPContainterView, with view: UIView?, atOrientation orientation: UIImage.Orientation) {
 //        imageView.image = imageView.image?.withOrientation(orientation)
     }
     

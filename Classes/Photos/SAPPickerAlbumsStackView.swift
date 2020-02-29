@@ -102,7 +102,7 @@ internal class SAPPickerAlbumsStackView: UIView {
             guard $0.offset < photos.count else {
                 // 这个相册并没有3张图片
                 $0.element.isHidden = true
-                $0.element.contentsGravity = kCAGravityResizeAspectFill
+                $0.element.contentsGravity = CALayerContentsGravity.resizeAspectFill
                 
                 setProgressiveValue(nil, forKey: "\($0.offset)")
                 return
@@ -149,7 +149,7 @@ internal class SAPPickerAlbumsStackView: UIView {
             il.masksToBounds = true
             il.borderWidth = 0.5
             il.borderColor = UIColor.white.cgColor
-            il.contentsGravity = kCAGravityResizeAspectFill
+            il.contentsGravity = CALayerContentsGravity.resizeAspectFill
             
             layer.insertSublayer(il, at: 0)
             

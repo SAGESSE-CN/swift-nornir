@@ -38,8 +38,8 @@ open class SACMessage: NSObject, SACMessageType {
         fatalError()
     }
     
-    open let content: SACMessageContentType
+    public let content: SACMessageContentType
     
-    open let options: SACMessageOptions
+    public let options: SACMessageOptions
 }
 

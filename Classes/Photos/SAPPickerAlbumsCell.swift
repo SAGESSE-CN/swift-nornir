@@ -61,7 +61,7 @@ internal class SAPPickerAlbumsCell: UITableViewCell {
     private lazy var _titleLabel: UILabel = UILabel()
     private lazy var _descriptionLabel: UILabel = UILabel()
     
-    override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
+    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         _init()
     }

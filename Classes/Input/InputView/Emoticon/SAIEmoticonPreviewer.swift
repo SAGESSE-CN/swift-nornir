@@ -61,7 +61,7 @@ internal class SAIEmoticonPreviewer: UIView {
     }
     
     private var _type: SAIEmoticonType = .small
-    private var _inset: UIEdgeInsets = UIEdgeInsetsMake(0, 4, 0, 4)
+    private var _inset: UIEdgeInsets = UIEdgeInsets(top: 0, left: 4, bottom: 0, right: 4)
     private var _popoverFrame: CGRect = .zero
     private var _presenterFrame: CGRect = .zero
     

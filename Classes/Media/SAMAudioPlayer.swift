@@ -103,7 +103,7 @@ import AVFoundation
     }
  
     fileprivate func addObservers() {
-        NotificationCenter.default.addObserver(self, selector: #selector(audioSessionDidInterruption(_:)), name: .AVAudioSessionInterruption, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(audioSessionDidInterruption(_:)), name: AVAudioSession.interruptionNotification, object: nil)
     }
     fileprivate func removeObservers() {
         NotificationCenter.default.removeObserver(self)
@@ -169,7 +169,7 @@ import AVFoundation
         }
         _isActived = true
         do {
-            try AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback)
+            try AVAudioSession.sharedInstance().setCategory(AVAudioSession.Category.playback)
             try AVAudioSession.sharedInstance().sm_setActive(true, context: self)
             return true
         } catch {
@@ -315,7 +315,7 @@ import AVFoundation
         delegate?.audioPlayer?(didOccur: self, error: error)
     }
     
-    open func audioSessionDidInterruption(_ sender: Notification) {
+    @objc open func audioSessionDidInterruption(_ sender: Notification) {
         
         _isPlaying = false
         

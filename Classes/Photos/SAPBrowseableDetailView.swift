@@ -47,7 +47,7 @@ class TestVideo: NSObject, SAPBrowseable {
         //return CGSize(width: 1600, height: 1200)
         return CGSize(width: 1920, height: 1080)
     }
-    var browseOrientation: UIImageOrientation  {
+    var browseOrientation: UIImage.Orientation  {
         return .up
     }
     
@@ -202,7 +202,7 @@ internal class SAPBrowseableDetailView: UIView {
         _logger.trace()
         
     }
-    dynamic func doubleTapHandler(_ sender: UITapGestureRecognizer) {
+    @objc dynamic func doubleTapHandler(_ sender: UITapGestureRecognizer) {
         
         if _containterView.zoomScale != _containterView.minimumZoomScale {
             _containterView.setZoomScale(_containterView.minimumZoomScale, at: sender.location(in: _contentView), animated: true)
@@ -240,7 +240,7 @@ internal class SAPBrowseableDetailView: UIView {
 //        _containterView.contentSize = image?.size ?? CGSize(width: 1600, height: 1200)
 //        _contentView = view
         
-        _contentInset = UIEdgeInsetsMake(64, 0, 0, 0)
+        _contentInset = UIEdgeInsets(top: 64, left: 0, bottom: 0, right: 0)
     }
     
     @IBAction func reload() {
@@ -249,7 +249,7 @@ internal class SAPBrowseableDetailView: UIView {
         }
     }
     
-    fileprivate dynamic var _image: Any? {
+    @objc fileprivate dynamic var _image: Any? {
         set {
             
             _logger.trace(newValue)
@@ -258,7 +258,7 @@ internal class SAPBrowseableDetailView: UIView {
         }
         get { return _contentView.image }
     }
-    fileprivate dynamic var _content: AVPlayerItem? {
+    @objc fileprivate dynamic var _content: AVPlayerItem? {
         set {
             _logger.trace(newValue)
             
@@ -407,9 +407,9 @@ fileprivate extension SAPBrowseableDetailView {
     }
     fileprivate func _updateProgressViewLayout() {
         
-        let edg = UIEdgeInsetsMake(8, 8, 8, 8)
-        let nframe = UIEdgeInsetsInsetRect(_contentView.frame, edg)
-        let nbounds = UIEdgeInsetsInsetRect(self.bounds, _contentInset)
+        let edg = UIEdgeInsets(top: 8, left: 8, bottom: 8, right: 8)
+        let nframe = _contentView.frame.inset(by: edg)
+        let nbounds = self.bounds.inset(by: _contentInset)
         
         let width_2 = _progressView.frame.width / 2
         let height_2 = _progressView.frame.height / 2
@@ -491,7 +491,7 @@ extension SAPBrowseableDetailView: SAPContainterViewDelegate {
             _updateControlViewIsHidden(false, animated: true)
         }
     }
-    func containterViewDidEndRotationing(_ containterView: SAPContainterView, with view: UIView?, atOrientation orientation: UIImageOrientation) {
+    func containterViewDidEndRotationing(_ containterView: SAPContainterView, with view: UIView?, atOrientation orientation: UIImage.Orientation) {
         _canChangeProgressView = true
         _contentView.orientation = orientation
         

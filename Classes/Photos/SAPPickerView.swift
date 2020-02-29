@@ -131,7 +131,7 @@ import Photos
         _contentView.allowsMultipleSelection = false
         _contentView.alwaysBounceHorizontal = true
         _contentView.register(SAPPickerViewCell.self, forCellWithReuseIdentifier: "Item")
-        _contentView.contentInset = UIEdgeInsetsMake(0, 4, 0, 4)
+        _contentView.contentInset = UIEdgeInsets(top: 0, left: 4, bottom: 0, right: 4)
         _contentView.dataSource = self
         _contentView.delegate = self
         
@@ -200,7 +200,7 @@ private extension SAPPickerView {
         delegate?.pickerView?(self, didDeselectItemFor: photo)
     }
     
-    dynamic func didSelectItem(_ sender: Notification?) {
+    @objc dynamic func didSelectItem(_ sender: Notification?) {
         guard let photo = sender?.object as? SAPAsset else {
             return
         }
@@ -213,7 +213,7 @@ private extension SAPPickerView {
             cell?.photoView.updateSelection()
         }
     }
-    dynamic func didDeselectItem(_ sender: Notification?) {
+    @objc dynamic func didDeselectItem(_ sender: Notification?) {
         
         _logger.trace()
         _contentView.visibleCells.forEach {

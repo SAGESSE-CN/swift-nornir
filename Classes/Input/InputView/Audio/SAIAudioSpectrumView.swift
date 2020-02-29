@@ -70,7 +70,7 @@ open class SAIAudioSpectrumView: UIView {
         
         _link = CADisplayLink(target: self, selector: #selector(tack(_:)))
         _link?.frameInterval = 3
-        _link?.add(to: .main, forMode: .commonModes)
+        _link?.add(to: .main, forMode: .common)
         
     }
     open func stopAnimating() {
@@ -79,7 +79,7 @@ open class SAIAudioSpectrumView: UIView {
         }
         //_logger.trace()
         
-        _link?.remove(from: .main, forMode: .commonModes)
+        _link?.remove(from: .main, forMode: .common)
         _link = nil
     }
     
@@ -159,7 +159,7 @@ open class SAIAudioSpectrumView: UIView {
             layer.addSublayer(r)
         }
         
-        color = UIColor(colorLiteralRed: 0xfb / 255.0, green: 0x7a / 255.0, blue: 0x0d / 255.0, alpha: 1.0)
+        color = UIColor(red: 0xfb / 255.0, green: 0x7a / 255.0, blue: 0x0d / 255.0, alpha: 1.0)
     }
     
     private var _link: CADisplayLink?

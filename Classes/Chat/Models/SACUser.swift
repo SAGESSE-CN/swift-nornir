@@ -16,7 +16,7 @@ open class SACUser: NSObject, SACUserType {
     }
     
     /// 用户ID(唯一标识符)
-    open let identifier: String = UUID().uuidString
+    public let identifier: String = UUID().uuidString
     
     /// 昵称
     open var name: String?

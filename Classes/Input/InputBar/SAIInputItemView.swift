@@ -127,7 +127,7 @@ internal class SAIInputItemButton: UIButton {
         }
         get { return super.isHighlighted }
     }
-    override var state: UIControlState {
+    override var state: UIControl.State {
         // 永远禁止系统的选中
         return super.state.subtracting(.selected)
     }
@@ -135,8 +135,8 @@ internal class SAIInputItemButton: UIButton {
     func setSelected(selected: Bool, animated: Bool) {
         //logger.trace(selected)
         
-        let op1: UIControlState = [(selected ? .selected : .normal), .normal]
-        let op2: UIControlState = [(selected ? .selected : .normal), .highlighted]
+        let op1: UIControl.State = [(selected ? .selected : .normal), .normal]
+        let op2: UIControl.State = [(selected ? .selected : .normal), .highlighted]
         
         let n = barItem?.image(for: op1) ?? barItem?.image(for: .normal)
         let h = barItem?.image(for: op2)
@@ -159,10 +159,10 @@ internal class SAIInputItemButton: UIButton {
         let ani = CATransition()
         
         ani.duration = 0.35
-        ani.fillMode = kCAFillModeBackwards
-        ani.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionLinear)
-        ani.type = kCATransitionFade
-        ani.subtype = kCATransitionFromTop
+        ani.fillMode = CAMediaTimingFillMode.backwards
+        ani.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.linear)
+        ani.type = CATransitionType.fade
+        ani.subtype = CATransitionSubtype.fromTop
         
         layer.add(ani, forKey: key)
     }
@@ -179,7 +179,7 @@ internal class SAIInputItemButton: UIButton {
     
     func _updateBarItem(_ item: SAIInputItem) {
         
-        let states: [UIControlState] = [
+        let states: [UIControl.State] = [
             [.normal],
             [.highlighted],
             [.disabled],

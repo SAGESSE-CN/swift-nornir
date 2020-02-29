@@ -15,7 +15,7 @@ open class SAIEmoticon: NSObject {
     }
     
     /// 退格
-    open static let backspace: SAIEmoticon = {
+    public static let backspace: SAIEmoticon = {
         let em = SAIEmoticon()
         em.contents = "⌫"
         return em
@@ -35,8 +35,8 @@ open class SAIEmoticon: NSObject {
             image.draw(in: nrect)
             
         case let str as NSString:
-            let cfg = [NSFontAttributeName: UIFont.systemFont(ofSize: 32)]
-            let size = str.size(attributes: cfg)
+            let cfg = [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 32)]
+            let size = str.size(withAttributes: cfg)
             let nrect = CGRect(x: rect.minX + (rect.width - size.width + 3) / 2,
                               y: rect.minY + (rect.height - size.height) / 2,
                               width: size.width,
@@ -64,7 +64,7 @@ open class SAIEmoticon: NSObject {
         if let image = contents as? UIImage {
             imageView.bounds = CGRect(origin: .zero, size: image.size)
             imageView.center = CGPoint(x: view.frame.width / 2, y: view.frame.height / 2)
-            //imageView.frame =  UIEdgeInsetsInsetRect(view.bounds, UIEdgeInsetsMake(8, 8, 8, 8))
+            //imageView.frame =  view.bounds.inset(by: UIEdgeInsets(top: 8, left: 8, bottom: 8, right: 8))
             imageView.image = contents as? UIImage
         }
     }

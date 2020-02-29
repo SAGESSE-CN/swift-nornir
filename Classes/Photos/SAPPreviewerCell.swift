@@ -15,7 +15,7 @@ internal protocol SAPPreviewerCellDelegate: NSObjectProtocol {
     func previewerCell(_ previewerCell: SAPPreviewerCell, didDoubleTap photo: SAPAsset)
     
     func previewerCell(_ previewerCell: SAPPreviewerCell, shouldRotation photo: SAPAsset) -> Bool
-    func previewerCell(_ previewerCell: SAPPreviewerCell, didRotation photo: SAPAsset, orientation: UIImageOrientation)
+    func previewerCell(_ previewerCell: SAPPreviewerCell, didRotation photo: SAPAsset, orientation: UIImage.Orientation)
 }
 
 internal class SAPPreviewerCell: UICollectionViewCell, SAPContainterViewDelegate {
@@ -25,7 +25,7 @@ internal class SAPPreviewerCell: UICollectionViewCell, SAPContainterViewDelegate
         get { return _delegate }
     }
     
-    var orientation: UIImageOrientation  {
+    var orientation: UIImage.Orientation  {
         set { return _orientation = newValue }
         get { return _orientation }
     }
@@ -42,7 +42,7 @@ internal class SAPPreviewerCell: UICollectionViewCell, SAPContainterViewDelegate
     
     // MARK: - Events
     
-    dynamic func tapHandler(_ sender: AnyObject) {
+    @objc dynamic func tapHandler(_ sender: AnyObject) {
         guard let photo = photo else {
             return
         }
@@ -60,7 +60,7 @@ internal class SAPPreviewerCell: UICollectionViewCell, SAPContainterViewDelegate
         super.addSubview(_contentView)
     }
     
-    private var _orientation: UIImageOrientation = .up
+    private var _orientation: UIImage.Orientation = .up
     
     private weak var _delegate: SAPPreviewerCellDelegate?
     private lazy var _contentView: SAPBrowseableDetailView = SAPBrowseableDetailView()
@@ -88,10 +88,10 @@ extension SAPPreviewerCell: SAPPreviewable {
         return SAPhotoMaximumSize
     }
     
-    var previewingContentMode: UIViewContentMode {
+    var previewingContentMode: UIView.ContentMode {
         return .scaleAspectFit
     }
-    var previewingContentOrientation: UIImageOrientation {
+    var previewingContentOrientation: UIImage.Orientation {
         return orientation
     }
     
@@ -106,7 +106,7 @@ extension SAPPreviewerCell: SAPPreviewable {
 //internal class SAPBrowserView: UIView, SAPPreviewable {
 //    
 //    
-//    var photoContentOrientation: UIImageOrientation {
+//    var photoContentOrientation: UIImage.Orientation {
 //        set { return _orientation = newValue }
 //        get { return _orientation }
 //    }
@@ -132,7 +132,7 @@ extension SAPPreviewerCell: SAPPreviewable {
 //////            _cacheBounds = bounds
 //////        }
 ////    }
-////    private func _rotation(for orientation: UIImageOrientation) -> CGFloat {
+////    private func _rotation(for orientation: UIImage.Orientation) -> CGFloat {
 ////        switch orientation {
 ////        case .up,
 ////             .upMirrored:
@@ -148,7 +148,7 @@ extension SAPPreviewerCell: SAPPreviewable {
 ////            return 3 * CGFloat(M_PI_2)
 ////        }
 ////    }
-////    private func _orientation(for rotation: CGFloat) -> UIImageOrientation {
+////    private func _orientation(for rotation: CGFloat) -> UIImage.Orientation {
 ////        switch Int(rotation / CGFloat(M_PI_2)) % 4 {
 ////        case 0:     return .up
 ////        case 1, -3: return .right
@@ -316,7 +316,7 @@ extension SAPPreviewerCell: SAPPreviewable {
 ////    private var _cacheBounds: CGRect?
 ////    
 //    
-//    fileprivate var _orientation: UIImageOrientation = .up
+//    fileprivate var _orientation: UIImage.Orientation = .up
 //    
 //    fileprivate weak var _delegate: SAPBrowserViewDelegate?
 //

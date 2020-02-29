@@ -143,7 +143,7 @@ internal class SAIAudioSimulateView: SAIAudioView {
     private func _init() {
         _logger.trace()
         
-        let hcolor = UIColor(colorLiteralRed: 0x18 / 255.0, green: 0xb4 / 255.0, blue: 0xed / 255.0, alpha: 1)
+        let hcolor = UIColor(red: 0x18 / 255.0, green: 0xb4 / 255.0, blue: 0xed / 255.0, alpha: 1)
         
         _statusView.text = "按住变声"
         _statusView.delegate = self
@@ -163,7 +163,7 @@ internal class SAIAudioSimulateView: SAIAudioView {
         _simulateView.register(SAIAudioEffectView.self, forCellWithReuseIdentifier: "Item")
         _simulateView.showsVerticalScrollIndicator = false
         _simulateView.showsHorizontalScrollIndicator = false
-        _simulateView.contentInset = UIEdgeInsetsMake(18, 10, 18 + 44, 10)
+        _simulateView.contentInset = UIEdgeInsets(top: 18, left: 10, bottom: 18 + 44, right: 10)
         
         _playToolbar.isHidden = true
         _playToolbar.translatesAutoresizingMaskIntoConstraints = false

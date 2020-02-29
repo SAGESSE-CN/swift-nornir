@@ -55,7 +55,7 @@ internal class SAIEmoticonPageView: UICollectionViewCell, UIGestureRecognizerDel
         }
     }
     
-    func onPress(_ sender: UITapGestureRecognizer) {
+    @objc func onPress(_ sender: UITapGestureRecognizer) {
         guard let idx = _index(at: sender.location(in: self)) else {
             
             return // no index
@@ -68,7 +68,7 @@ internal class SAIEmoticonPageView: UICollectionViewCell, UIGestureRecognizerDel
             delegate?.emoticon(didSelectFor: emoticon)
         }
     }
-    func onLongPress(_ sender: UITapGestureRecognizer) {
+    @objc func onLongPress(_ sender: UITapGestureRecognizer) {
         guard let page = page else {
             return
         }
@@ -129,7 +129,7 @@ internal class SAIEmoticonPageView: UICollectionViewCell, UIGestureRecognizerDel
             delegate?.emoticon(didPreviewFor: emoticon)
         }
     }
-    func onBackspace(_ sender: UIButton) {
+    @objc func onBackspace(_ sender: UIButton) {
         //_logger.trace()
         
         if delegate?.emoticon(shouldSelectFor: SAIEmoticon.backspace) ?? true {

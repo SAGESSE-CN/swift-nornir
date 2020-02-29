@@ -29,7 +29,7 @@ open class SAPBrowser: UIViewController {
 //        _contentViewLayout.headerReferenceSize = CGSize(width: ts, height: 0)
 //        _contentViewLayout.footerReferenceSize = CGSize(width: ts, height: 0)
 //        
-//        _contentView.frame = UIEdgeInsetsInsetRect(view.bounds, UIEdgeInsetsMake(0, -ts, 0, -ts))
+//        _contentView.frame = view.bounds.inset(by: UIEdgeInsets(top: 0, left: -ts, bottom: 0, right: -ts))
 //        _contentView.backgroundColor = .clear
 //        _contentView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
 //        _contentView.showsVerticalScrollIndicator = false
@@ -90,14 +90,14 @@ open class SAPBrowser: UIViewController {
 //        navigationController?.setToolbarHidden(true, animated: true)
 //    }
 //    
-//    func browserView(_ browserView: SAPBrowserView, shouldRotation orientation: UIImageOrientation) -> Bool {
+//    func browserView(_ browserView: SAPBrowserView, shouldRotation orientation: UIImage.Orientation) -> Bool {
 //        _logger.trace()
 //        
 //        _contentView.isScrollEnabled = false
 //        return true
 //    }
 //    
-//    func browserView(_ browserView: SAPBrowserView, didRotation orientation: UIImageOrientation) {
+//    func browserView(_ browserView: SAPBrowserView, didRotation orientation: UIImage.Orientation) {
 //        _logger.trace()
 //        
 //        _contentView.isScrollEnabled = true

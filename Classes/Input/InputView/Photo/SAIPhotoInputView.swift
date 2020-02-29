@@ -46,8 +46,8 @@ public class SAIPhotoInputView: UIView {
     
     private func _init() {
         _logger.trace()
-        
-        let color = UIColor(colorLiteralRed: 0x18 / 255.0, green: 0xb4 / 255.0, blue: 0xed / 255.0, alpha: 1)
+
+        let color = UIColor(red: 0x18 / 255.0, green: 0xb4 / 255.0, blue: 0xed / 255.0, alpha: 1)
         tintColor = color
         
         _pickBarItem = SAPButtonBarItem(title: "相册", type: .normal, target: self, action: #selector(pickerHandler(_:)))
@@ -107,27 +107,27 @@ public class SAIPhotoInputView: UIView {
 
 extension SAIPhotoInputView {
     
-    func onSendForPicker(_ sender: Any) {
+    @objc func onSendForPicker(_ sender: Any) {
         _logger.trace()
         
         //_picker?.dismiss(animated: true, completion: nil)
         
         //_contentView.updateSelectionOfItems()
     }
-    func onChangeOriginal(_ sender: UIButton) {
+    @objc func onChangeOriginal(_ sender: UIButton) {
         _logger.trace()
         
         _contentView.alwaysSelectOriginal = !_contentView.alwaysSelectOriginal
         _originalBarItem.isSelected = _contentView.alwaysSelectOriginal
     }
     
-    func pickerHandler(_ sender: Any) {
+    @objc func pickerHandler(_ sender: Any) {
         _logger.trace()
         
         _showPicker()
     }
     
-    func onEditor(_ sender: Any) {
+    @objc func onEditor(_ sender: Any) {
         _logger.trace(sender)
     }
     

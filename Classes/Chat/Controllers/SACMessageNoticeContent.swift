@@ -28,13 +28,13 @@ open class SACMessageNoticeContent: NSObject, SACMessageContentType {
     
     open func sizeThatFits(_ size: CGSize) -> CGSize {
         let attr = NSMutableAttributedString(string: text, attributes: [
-            NSFontAttributeName: UIFont.systemFont(ofSize: 12),
-            NSForegroundColorAttributeName: UIColor(white: 0.48, alpha: 1),
+            NSAttributedString.Key.font: UIFont.systemFont(ofSize: 12),
+            NSAttributedString.Key.foregroundColor: UIColor(white: 0.48, alpha: 1),
             ])
         attributedText = YYTextLayout(containerSize: size, text: attr)
         return attributedText?.textBoundingSize ?? .zero
     }
     
     
-    open static let unsupport: SACMessageNoticeContent = SACMessageNoticeContent(text: "The message does not support")
+    public static let unsupport: SACMessageNoticeContent = SACMessageNoticeContent(text: "The message does not support")
 }

@@ -63,7 +63,7 @@ internal class SAPBrowseableContentView: UIView {
         
     }
     
-    var orientation: UIImageOrientation = .up {
+    var orientation: UIImage.Orientation = .up {
         willSet {
             guard newValue != orientation else {
                 return
@@ -86,7 +86,7 @@ internal class SAPBrowseableContentView: UIView {
         return UIColor(white: 0.94, alpha: 1)
     }
     
-    private func _angle(orientation: UIImageOrientation) -> CGFloat {
+    private func _angle(orientation: UIImage.Orientation) -> CGFloat {
         switch orientation {
         case .up, .upMirrored:  return 0 * CGFloat(M_PI_2)
         case .right, .rightMirrored: return 1 * CGFloat(M_PI_2)

@@ -29,7 +29,7 @@ import UIKit
 //    public override var size: CGSize {
 //        return _content?.size ?? .zero
 //    }
-//    public override var imageOrientation: UIImageOrientation {
+//    public override var imageOrientation: UIImage.Orientation {
 //        return _orientation
 //    }
 //    
@@ -79,7 +79,7 @@ import UIKit
 //        _parent = nil
 //    }
 //    
-//    public override func withOrientation(_ orientation: UIImageOrientation) -> UIImage? {
+//    public override func withOrientation(_ orientation: UIImage.Orientation) -> UIImage? {
 //        guard imageOrientation != orientation else {
 //            return self
 //        }
@@ -105,7 +105,7 @@ import UIKit
 //    
 //    private var _parent: ProgressiveableImage?  // 如果不强引用, 当parent释放后就获取不到通知了
 //    
-//    private var _orientation: UIImageOrientation = .up
+//    private var _orientation: UIImage.Orientation = .up
 //    private var _content: UIImage?
 //    
 //    private let _observers = NSHashTable<ProgressiveableObserver>.weakObjects()
@@ -117,7 +117,7 @@ import UIKit
 /////
 //extension UIImage {
 //    
-//    public func withOrientation(_ orientation: UIImageOrientation) -> UIImage? {
+//    public func withOrientation(_ orientation: UIImage.Orientation) -> UIImage? {
 //        guard imageOrientation != orientation else {
 //            return self
 //        }

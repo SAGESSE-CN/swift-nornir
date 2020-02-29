@@ -111,7 +111,7 @@ open class SAMAudioRecorder: NSObject, AVAudioRecorderDelegate {
     }
 
     fileprivate func addObservers() {
-        NotificationCenter.default.addObserver(self, selector: #selector(audioSessionDidInterruption(_:)), name: .AVAudioSessionInterruption, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(audioSessionDidInterruption(_:)), name: AVAudioSession.interruptionNotification, object: nil)
     }
     fileprivate func removeObservers() {
         NotificationCenter.default.removeObserver(self)
@@ -150,7 +150,7 @@ open class SAMAudioRecorder: NSObject, AVAudioRecorderDelegate {
             // continue process
             return handler?(hasPermission) ?? true
         }
-        let recordPermission = AVAudioSession.sharedInstance().recordPermission()
+        let recordPermission = AVAudioSession.sharedInstance().recordPermission
         // is ask user?
         guard recordPermission == .undetermined else {
             return handler2(recordPermission == .granted)
@@ -214,7 +214,7 @@ open class SAMAudioRecorder: NSObject, AVAudioRecorderDelegate {
         }
         _isActived = true
         do {
-            try AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryRecord)
+            try AVAudioSession.sharedInstance().setCategory(AVAudioSession.Category.record)
             try AVAudioSession.sharedInstance().sm_setActive(true, context: self)
             return true
         } catch {
@@ -312,7 +312,7 @@ open class SAMAudioRecorder: NSObject, AVAudioRecorderDelegate {
         delegate?.audioRecorder?(didOccur: self, error: error)
     }
     
-    open func audioSessionDidInterruption(_ sender: Notification) {
+    @objc open func audioSessionDidInterruption(_ sender: Notification) {
         
         _isRecording = false
         _isPrepared = false

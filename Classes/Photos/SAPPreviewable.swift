@@ -24,6 +24,6 @@ import UIKit
     var previewingContent: Progressiveable? { get }
     var previewingContentSize: CGSize { get }
     
-    var previewingContentMode: UIViewContentMode { get }
-    var previewingContentOrientation: UIImageOrientation { get }
+    var previewingContentMode: UIView.ContentMode { get }
+    var previewingContentOrientation: UIImage.Orientation { get }
 }

@@ -17,7 +17,7 @@ import Photos
     var browseType: SAPBrowseableType { get }
     
     var browseSize: CGSize { get }
-    var browseOrientation: UIImageOrientation  { get }
+    var browseOrientation: UIImage.Orientation  { get }
     
     var browseImage: Progressiveable? { get }
     var browseContent: Progressiveable? { get }  // 这个参数只用于视频和音频

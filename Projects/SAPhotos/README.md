@@ -1,5 +1,5 @@
 
-# 关于SAPContainterView使用UIImageOrientation的原因
+# 关于SAPContainterView使用UIImage.Orientation的原因
 
 1. 旋转后scrollView的滑动手势方向也会反转
 

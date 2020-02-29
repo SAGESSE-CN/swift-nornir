@@ -188,7 +188,7 @@ public class SAPLibrary: NSObject {
         return image
     }
     
-    public func data(with photo: SAPAsset, resultHandler: @escaping (Data?, String?, UIImageOrientation, [AnyHashable : Any]?) -> Void) {
+    public func data(with photo: SAPAsset, resultHandler: @escaping (Data?, String?, UIImage.Orientation, [AnyHashable : Any]?) -> Void) {
         //_logger.trace(photo.identifier)
         
         _requestImageData(photo, nil, resultHandler: resultHandler)
@@ -245,7 +245,7 @@ public class SAPLibrary: NSObject {
 //        let im = PHCachingImageManager.default()
 //        return im.requestImage(for: photo.asset, targetSize: targetSize, contentMode: contentMode, options: options, resultHandler: resultHandler)
 //    }
-//    public static func requestImageData(for photo: SAPAsset, options: PHImageRequestOptions? = nil, resultHandler: @escaping (Data?, String?, UIImageOrientation, [AnyHashable : Any]?) -> Swift.Void) {
+//    public static func requestImageData(for photo: SAPAsset, options: PHImageRequestOptions? = nil, resultHandler: @escaping (Data?, String?, UIImage.Orientation, [AnyHashable : Any]?) -> Swift.Void) {
 //        let im = PHCachingImageManager.default()
 //        im.requestImageData(for: photo.asset, options: options, resultHandler: resultHandler)
 //    }
@@ -397,7 +397,7 @@ public class SAPLibrary: NSObject {
         im.requestPlayerItem(forVideo: photo.asset, options: options, resultHandler: resultHandler)
     }
     
-    private func _requestImageData(_ photo: SAPAsset, _ options: PHImageRequestOptions?, resultHandler: @escaping (Data?, String?, UIImageOrientation, [AnyHashable : Any]?) -> Void) {
+    private func _requestImageData(_ photo: SAPAsset, _ options: PHImageRequestOptions?, resultHandler: @escaping (Data?, String?, UIImage.Orientation, [AnyHashable : Any]?) -> Void) {
         let im = PHCachingImageManager.default()
         im.requestImageData(for: photo.asset, options: options, resultHandler: resultHandler)
     }

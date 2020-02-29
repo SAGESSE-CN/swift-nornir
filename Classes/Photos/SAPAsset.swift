@@ -70,9 +70,6 @@ public class SAPAsset: NSObject {
     public override var hash: Int {
         return identifier.hash
     }
-    public override var hashValue: Int {
-        return identifier.hashValue
-    }
     public override var description: String {
         return asset.description
     }
@@ -80,7 +77,7 @@ public class SAPAsset: NSObject {
     public var size: CGSize {
         return CGSize(width: pixelWidth, height: pixelHeight)
     }
-    public func size(with orientation: UIImageOrientation) -> CGSize {
+    public func size(with orientation: UIImage.Orientation) -> CGSize {
         switch orientation {
         case .left, .leftMirrored, .right, .rightMirrored:
             return CGSize(width: pixelHeight, height: pixelWidth)
@@ -146,7 +143,7 @@ extension SAPAsset: SAPBrowseable {
     public var browseSize: CGSize {
         return size
     }
-    public var browseOrientation: UIImageOrientation  {
+    public var browseOrientation: UIImage.Orientation  {
         return .up
     }
     

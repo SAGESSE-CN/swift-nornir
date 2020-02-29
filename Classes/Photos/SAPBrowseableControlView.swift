@@ -43,7 +43,7 @@ internal class SAPBrowseableControlView: UIView {
         _state = state
     }
     
-    func tapHandler(_ sender: Any) {
+    @objc func tapHandler(_ sender: Any) {
         
         state = .playing
         delegate?.controlView(self, didChange: .playing)

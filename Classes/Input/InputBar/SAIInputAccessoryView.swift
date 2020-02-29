@@ -303,7 +303,7 @@ internal class SAIInputAccessoryView: UIView {
         _textField.scrollsToTop = false
         _textField.returnKeyType = .send
         _textField.backgroundColor = .clear
-        _textField.scrollIndicatorInsets = UIEdgeInsetsMake(2, 0, 2, 0)
+        _textField.scrollIndicatorInsets = UIEdgeInsets(top: 2, left: 0, bottom: 2, right: 0)
         _textField.translatesAutoresizingMaskIntoConstraints = false
         _textField.backgroundView.translatesAutoresizingMaskIntoConstraints = false
         
@@ -323,10 +323,10 @@ internal class SAIInputAccessoryView: UIView {
         _collectionView.dataSource = self
         _collectionView.delegate = self
         _collectionView.translatesAutoresizingMaskIntoConstraints = false
-        _collectionView.setContentHuggingPriority(700, for: .horizontal)
-        _collectionView.setContentHuggingPriority(700, for: .vertical)
-        _collectionView.setContentCompressionResistancePriority(200, for: .horizontal)
-        _collectionView.setContentCompressionResistancePriority(200, for: .vertical)
+        _collectionView.setContentHuggingPriority(UILayoutPriority(rawValue: 700), for: .horizontal)
+        _collectionView.setContentHuggingPriority(UILayoutPriority(rawValue: 700), for: .vertical)
+        _collectionView.setContentCompressionResistancePriority(UILayoutPriority(rawValue: 200), for: .horizontal)
+        _collectionView.setContentCompressionResistancePriority(UILayoutPriority(rawValue: 200), for: .vertical)
         
         // update center bar item
         _setBarItems([], atPosition: .center)

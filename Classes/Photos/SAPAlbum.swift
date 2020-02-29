@@ -31,9 +31,6 @@ public class SAPAlbum: NSObject {
     public override var hash: Int {
         return identifier.hash
     }
-    public override var hashValue: Int {
-        return identifier.hashValue
-    }
     public override var description: String {
         return collection.description
     }
@@ -64,10 +61,10 @@ public class SAPAlbum: NSObject {
     }
     public func photos(with result: PHFetchResult<PHAsset>) -> [SAPAsset] {
         var photos: [SAPAsset] = []
-        result.enumerateObjects({
-            let photo = SAPAsset(asset: $0.0, album: self)
+        result.enumerateObjects { (asset, _, _) in
+            let photo = SAPAsset(asset: asset, album: self)
             photos.append(photo)
-        })
+        }
         return photos
     }
     public func photos(with result: PHFetchResult<PHAsset>, in range: NSRange) -> [SAPAsset] {
@@ -75,12 +72,10 @@ public class SAPAlbum: NSObject {
             return []
         }
         var photos: [SAPAsset] = []
-        
-        result.enumerateObjects(at: IndexSet(integersIn: range), options: .init(rawValue: 0), using: {
-            let photo = SAPAsset(asset: $0.0, album: self)
+        result.enumerateObjects(at: IndexSet(integersIn: range)) { (asset, _, _) in
+            let photo = SAPAsset(asset: asset, album: self)
             photos.append(photo)
-        })
-        
+        }
         return photos
     }
     
@@ -153,13 +148,13 @@ extension SAPAlbum {
     }
     fileprivate static func _fetchAssetCollections(with type: PHAssetCollectionType, subtype: PHAssetCollectionSubtype, options: PHFetchOptions? = nil, canEmpty: Bool = true) -> [SAPAlbum] {
         var albums: [SAPAlbum] = []
-        PHAssetCollection.fetchAssetCollections(with: type, subtype: subtype, options: nil).enumerateObjects({
-            let album = SAPAlbum(collection: $0.0)
+        PHAssetCollection.fetchAssetCollections(with: type, subtype: subtype, options: nil).enumerateObjects { (asset, _, _) in
+            let album = SAPAlbum(collection: asset)
             guard canEmpty || album.count != 0 else {
                 return
             }
             albums.append(album)
-        })
+        }
         return albums
     }
 }

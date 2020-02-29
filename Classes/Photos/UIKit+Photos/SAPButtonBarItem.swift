@@ -106,7 +106,7 @@ open class SAPButtonBarItem: UIBarButtonItem {
                 
             case .original:
                 let view = _makeNormalButton(title)
-                view.titleEdgeInsets = UIEdgeInsetsMake(0, 4, 0, -4)
+                view.titleEdgeInsets = UIEdgeInsets(top: 0, left: 4, bottom: 0, right: -4)
                 if !isSelected {
                     
                     view.setImage(UIImage.sap_init(named: "photo_small_checkbox_normal"), for: .normal)
@@ -153,7 +153,7 @@ open class SAPButtonBarItem: UIBarButtonItem {
         button.titleLabel?.font = UIFont.systemFont(ofSize: 14)
         button.setTitleColor(.white, for: .normal)
         button.setTitleColor(.lightGray, for: .disabled)
-        button.contentEdgeInsets = UIEdgeInsetsMake(4, 8, 4, 8)
+        button.contentEdgeInsets = UIEdgeInsets(top: 4, left: 8, bottom: 4, right: 8)
         button.setBackgroundImage(UIImage.sap_init(named: "photo_button_confirm_nor"), for: .normal)
         button.setBackgroundImage(UIImage.sap_init(named: "photo_button_confirm_press"), for: .highlighted)
         button.setBackgroundImage(UIImage.sap_init(named: "photo_button_confirm_disabled"), for: .disabled)

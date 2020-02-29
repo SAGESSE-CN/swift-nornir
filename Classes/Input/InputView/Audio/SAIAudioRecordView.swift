@@ -150,7 +150,7 @@ internal class SAIAudioRecordView: SAIAudioView {
     private func _init() {
         _logger.trace()
         
-        let hcolor = UIColor(colorLiteralRed: 0x18 / 255.0, green: 0xb4 / 255.0, blue: 0xed / 255.0, alpha: 1)
+        let hcolor = UIColor(red: 0x18 / 255.0, green: 0xb4 / 255.0, blue: 0xed / 255.0, alpha: 1)
         
         _statusView.text = "点击录音"
         _statusView.delegate = self

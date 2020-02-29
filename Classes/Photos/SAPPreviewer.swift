@@ -79,7 +79,7 @@ internal class SAPPreviewer: UIViewController {
         _contentViewLayout.headerReferenceSize = CGSize(width: ts, height: 0)
         _contentViewLayout.footerReferenceSize = CGSize(width: ts, height: 0)
         
-        _contentView.frame = UIEdgeInsetsInsetRect(view.bounds, UIEdgeInsetsMake(0, -ts, 0, -ts))
+        _contentView.frame = view.bounds.inset(by: UIEdgeInsets(top: 0, left: -ts, bottom: 0, right: -ts))
         _contentView.backgroundColor = .clear
         _contentView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         _contentView.showsVerticalScrollIndicator = false
@@ -224,7 +224,7 @@ internal class SAPPreviewer: UIViewController {
             
             a.values = [0.8, 1.2, 1]
             a.duration = 0.25
-            a.calculationMode = kCAAnimationCubic
+            a.calculationMode = CAAnimationCalculationMode.cubic
             
             _selectedView.layer.add(a, forKey: "v")
         }
@@ -322,14 +322,14 @@ internal class SAPPreviewer: UIViewController {
     
     fileprivate var _ascending: Bool = true
     
-    fileprivate var _allPhotoInfos: [Int: UIImageOrientation] = [:]
+    fileprivate var _allPhotoInfos: [Int: UIImage.Orientation] = [:]
 }
 
 // MARK: - Events
 
 extension SAPPreviewer {
     
-    func didSelectItem(_ sender: Notification) {
+    @objc func didSelectItem(_ sender: Notification) {
         guard let photo = sender.object as? SAPAsset else {
             return
         }
@@ -340,7 +340,7 @@ extension SAPPreviewer {
         _logger.trace()
         _updateSelection(at: _currentIndex, animated: true)
     }
-    func didDeselectItem(_ sender: Notification) {
+    @objc func didDeselectItem(_ sender: Notification) {
         guard let photo = sender.object as? SAPAsset else {
             return
         }
@@ -417,11 +417,11 @@ extension SAPPreviewer: SAPPreviewerCellDelegate {
         return true
     }
     
-    func previewerCell(_ previewerCell: SAPPreviewerCell, didRotation photo: SAPAsset, orientation: UIImageOrientation) {
+    func previewerCell(_ previewerCell: SAPPreviewerCell, didRotation photo: SAPAsset, orientation: UIImage.Orientation) {
         _logger.trace()
         
         _contentView.isScrollEnabled = true
-        _allPhotoInfos[photo.hashValue] = orientation
+        _allPhotoInfos[photo.hash] = orientation
     }
 }
 
@@ -459,7 +459,7 @@ extension SAPPreviewer: UICollectionViewDataSource, UICollectionViewDelegateFlow
         let photo = _photos[indexPath.item]
         
         cell.delegate = self
-        cell.orientation = _allPhotoInfos[photo.hashValue] ?? .up
+        cell.orientation = _allPhotoInfos[photo.hash] ?? .up
         cell.photo = photo
     }
     

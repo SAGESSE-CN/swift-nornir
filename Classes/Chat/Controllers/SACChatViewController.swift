@@ -71,7 +71,7 @@ open class SACChatViewController: UIViewController {
                     }
                     
                     for contentType: Int in (0 ..< 4) {
-                        let content = { Void -> SACMessageContentType in
+                        let content = { () -> SACMessageContentType in
                             switch contentType {
                             case 0: return SACMessageTextContent()
                             case 1: return SACMessageImageContent()
@@ -107,7 +107,7 @@ open class SACChatViewController: UIViewController {
         
         
         
-        let color = UIColor(colorLiteralRed: 0xec / 0xff, green: 0xed / 0xff, blue: 0xf1 / 0xff, alpha: 1)
+        let color = UIColor(red: 0xec / 0xff, green: 0xed / 0xff, blue: 0xf1 / 0xff, alpha: 1)
         view.backgroundColor = color
         
         _toolbar.delegate = self
@@ -160,7 +160,7 @@ open class SACChatViewController: UIViewController {
     private func _init() {
         
         _emoticonSendBtn.titleLabel?.font = UIFont.systemFont(ofSize: 15)
-        _emoticonSendBtn.contentEdgeInsets = UIEdgeInsetsMake(0, 10 + 8, 0, 8)
+        _emoticonSendBtn.contentEdgeInsets = UIEdgeInsets(top: 0, left: 10 + 8, bottom: 0, right: 8)
         _emoticonSendBtn.setTitle("Send", for: .normal)
         _emoticonSendBtn.setTitleColor(.white, for: .normal)
         _emoticonSendBtn.setTitleColor(.lightGray, for: .highlighted)
@@ -170,7 +170,7 @@ open class SACChatViewController: UIViewController {
         //_emoticonSendBtn.addTarget(self, action: #selector(onEmoticonSend(_:)), for: .touchUpInside)
         _emoticonSendBtn.isEnabled = false
         
-        _emoticonSettingBtn.contentEdgeInsets = UIEdgeInsetsMake(0, 10, 0, 0)
+        _emoticonSettingBtn.contentEdgeInsets = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 0)
         _emoticonSettingBtn.setImage(UIImage.sac_init(named: "chat_emoticon_btn_setting"), for: .normal)
         _emoticonSettingBtn.setBackgroundImage(UIImage.sac_init(named: "chat_emoticon_btn_send_gray"), for: .normal)
         _emoticonSettingBtn.setBackgroundImage(UIImage.sac_init(named: "chat_emoticon_btn_send_gray"), for: .highlighted)
@@ -304,14 +304,14 @@ extension SACChatViewController: UICollectionViewDataSource, SACChatViewLayoutDe
             // 20 04          04 20
             // |  +-----04-----+ |
             // \--------16-------/
-            return .init(top: 8 + 2, left: 10 + 2, bottom: 8 + 2, right: 10 + 2)
+            return UIEdgeInsets(top: 8 + 2, left: 10 + 2, bottom: 8 + 2, right: 10 + 2)
             
         case .notice:
             // notice edg
             // /------4-------\
             // 10             10
             // \------4-------/
-            return .init(top: 4, left: 10, bottom: 4, right: 10)
+            return UIEdgeInsets(top: 4, left: 10, bottom: 4, right: 10)
             
         }
     }
@@ -485,9 +485,9 @@ extension SACChatViewController: SAIEmoticonInputViewDataSource, SAIEmoticonInpu
     
     open func emoticon(_ emoticon: SAIEmoticonInputView, insetForGroupAt index: Int) -> UIEdgeInsets {
         if isLandscape {
-            return UIEdgeInsetsMake(4, 12, 4 + 24, 12)
+            return UIEdgeInsets(top: 4, left: 12, bottom: 4 + 24, right: 12)
         }
-        return UIEdgeInsetsMake(12, 10, 12 + 24, 10)
+        return UIEdgeInsets(top: 12, left: 10, bottom: 12 + 24, right: 10)
     }
     
     open func emoticon(_ emoticon: SAIEmoticonInputView, shouldSelectFor item: SAIEmoticon) -> Bool {
@@ -551,9 +551,9 @@ extension SACChatViewController: SAIToolboxInputViewDataSource, SAIToolboxInputV
     
     open func toolbox(_ toolbox: SAIToolboxInputView, insetForSectionAt index: Int) -> UIEdgeInsets {
         if isLandscape {
-            return UIEdgeInsetsMake(4, 12, 4, 12)
+            return UIEdgeInsets(top: 4, left: 12, bottom: 4, right: 12)
         }
-        return UIEdgeInsetsMake(12, 10, 12, 10)
+        return UIEdgeInsets(top: 12, left: 10, bottom: 12, right: 10)
     }
     
     open func toolbox(_ toolbox: SAIToolboxInputView, shouldSelectFor item: SAIToolboxItem) -> Bool {

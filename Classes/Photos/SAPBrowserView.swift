@@ -16,7 +16,7 @@ internal protocol SAPBrowserViewDelegate: NSObjectProtocol {
     @objc optional func browserView(_ browserView: SAPBrowserView, photo: SAPAsset, didDoubleTapWith sender: AnyObject)
     
     @objc optional func browserView(_ browserView: SAPBrowserView, shouldRotation photo: SAPAsset) -> Bool
-    @objc optional func browserView(_ browserView: SAPBrowserView, didRotation photo: SAPAsset, orientation: UIImageOrientation)
+    @objc optional func browserView(_ browserView: SAPBrowserView, didRotation photo: SAPAsset, orientation: UIImage.Orientation)
 }
 
 internal class SAPBrowserViewFastPreviewing: NSObject, SAPPreviewable {
@@ -52,10 +52,10 @@ internal class SAPBrowserViewFastPreviewing: NSObject, SAPPreviewable {
         return photo.size
     }
     
-    var previewingContentMode: UIViewContentMode {
+    var previewingContentMode: UIView.ContentMode {
         return .scaleAspectFit
     }
-    var previewingContentOrientation: UIImageOrientation {
+    var previewingContentOrientation: UIImage.Orientation {
         return .up
     }
     
@@ -79,10 +79,10 @@ internal class SAPBrowserView: UIView, SAPPreviewable {
         return SAPhotoMaximumSize
     }
     
-    var previewingContentMode: UIViewContentMode {
+    var previewingContentMode: UIView.ContentMode {
         return .scaleAspectFit
     }
-    var previewingContentOrientation: UIImageOrientation {
+    var previewingContentOrientation: UIImage.Orientation {
         return photoContentOrientation
     }
     
@@ -93,7 +93,7 @@ internal class SAPBrowserView: UIView, SAPPreviewable {
         return view.convert(_imageView.frame, to: window)
     }
     
-    var photoContentOrientation: UIImageOrientation {
+    var photoContentOrientation: UIImage.Orientation {
         set { return _orientation = newValue }
         get { return _orientation }
     }
@@ -128,7 +128,7 @@ internal class SAPBrowserView: UIView, SAPPreviewable {
 ////            _cacheBounds = bounds
 ////        }
 //    }
-//    private func _rotation(for orientation: UIImageOrientation) -> CGFloat {
+//    private func _rotation(for orientation: UIImage.Orientation) -> CGFloat {
 //        switch orientation {
 //        case .up,
 //             .upMirrored:
@@ -144,7 +144,7 @@ internal class SAPBrowserView: UIView, SAPPreviewable {
 //            return 3 * CGFloat(M_PI_2)
 //        }
 //    }
-//    private func _orientation(for rotation: CGFloat) -> UIImageOrientation {
+//    private func _orientation(for rotation: CGFloat) -> UIImage.Orientation {
 //        switch Int(rotation / CGFloat(M_PI_2)) % 4 {
 //        case 0:     return .up
 //        case 1, -3: return .right
@@ -316,7 +316,7 @@ internal class SAPBrowserView: UIView, SAPPreviewable {
 //    private var _cacheBounds: CGRect?
 //    
     
-    fileprivate var _orientation: UIImageOrientation = .up
+    fileprivate var _orientation: UIImage.Orientation = .up
     
     fileprivate weak var _delegate: SAPBrowserViewDelegate?
 
@@ -338,7 +338,7 @@ internal class SAPBrowserView: UIView, SAPPreviewable {
 //
 //private extension SAPBrowserView {
 //    
-    dynamic func tapHandler(_ sender: AnyObject) {
+    @objc dynamic func tapHandler(_ sender: AnyObject) {
         guard let photo = photo else {
             return
         }
@@ -369,7 +369,7 @@ internal class SAPBrowserView: UIView, SAPPreviewable {
 //        _isRotationing = false
 //        _updateOrientation(for: sender.rotation, animated: true)
 //    }
-    dynamic func doubleTapHandler(_ sender: UITapGestureRecognizer) {
+    @objc dynamic func doubleTapHandler(_ sender: UITapGestureRecognizer) {
         guard let photo = photo else {
             return
         }
@@ -408,7 +408,7 @@ extension SAPBrowserView: SAPContainterViewDelegate {
         }
         return _delegate?.browserView?(self, shouldRotation: photo) ?? true
     }
-    func containterViewDidEndRotationing(_ containterView: SAPContainterView, with view: UIView?, atOrientation orientation: UIImageOrientation) {
+    func containterViewDidEndRotationing(_ containterView: SAPContainterView, with view: UIView?, atOrientation orientation: UIImage.Orientation) {
         guard let photo = photo else {
             return
         }

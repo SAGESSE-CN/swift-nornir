@@ -27,7 +27,7 @@ internal class SAIAudioPlayToolbar: UIView {
         let nImage = UIImage.sai_init(named: "keyboard_audio_toolbar_btn_nor")
         let hImage = UIImage.sai_init(named: "keyboard_audio_toolbar_btn_press")
         
-        _confirmButton.setTitle("发送", for: UIControlState())
+        _confirmButton.setTitle("发送", for: UIControl.State())
         _confirmButton.setTitleColor(.gray, for: .normal)
         _confirmButton.setTitleColor(.gray, for: .disabled)
         _confirmButton.setBackgroundImage(nImage, for: .normal)
@@ -35,8 +35,8 @@ internal class SAIAudioPlayToolbar: UIView {
         _confirmButton.setBackgroundImage(hImage, for: .highlighted)
         _confirmButton.translatesAutoresizingMaskIntoConstraints = false
         
-        _cancelButton.setTitle("取消", for: UIControlState())
-        _cancelButton.setTitleColor(.gray, for: UIControlState())
+        _cancelButton.setTitle("取消", for: UIControl.State())
+        _cancelButton.setTitleColor(.gray, for: UIControl.State())
         _cancelButton.setBackgroundImage(nImage, for: .normal)
         _cancelButton.setBackgroundImage(hImage, for: .highlighted)
         _cancelButton.translatesAutoresizingMaskIntoConstraints = false

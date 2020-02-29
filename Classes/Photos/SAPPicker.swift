@@ -112,7 +112,7 @@ import Photos
     public dynamic var alwaysSelectOriginal: Bool
     
     /// 选择器的代理
-    public dynamic weak var delegate: SAPPickerDelegate?  {
+    @objc public dynamic weak var delegate: SAPPickerDelegate?  {
         @objc(delegater) get { fatalError() }
         @objc(setDelegater:) set { fatalError() }
     }
@@ -139,19 +139,19 @@ import Photos
     ///
     /// 类初始化
     ///
-    public override class func initialize() {
-        // 替换类方法
-        guard let metaClass = objc_getMetaClass(NSStringFromClass(self).cString(using: .utf8)) as? AnyClass else {
-            return
-        }
-        let s1 = Selector(String("allocWithZone:"))
-        let s2 = Selector(String("_allocWithZone:"))
-        
-        let m1 = class_getClassMethod(self, s1)
-        let m2 = class_getClassMethod(self, s2)
-        
-        class_replaceMethod(metaClass, s1, method_getImplementation(m2), method_getTypeEncoding(m1))
-    }
+//    public override class func initialize() {
+//        // 替换类方法
+//        guard let metaClass = objc_getMetaClass(NSStringFromClass(self).cString(using: .utf8)) as? AnyClass else {
+//            return
+//        }
+//        let s1 = Selector(String("allocWithZone:"))
+//        let s2 = Selector(String("_allocWithZone:"))
+//
+//        let m1 = class_getClassMethod(self, s1)
+//        let m2 = class_getClassMethod(self, s2)
+//
+//        class_replaceMethod(metaClass, s1, method_getImplementation(m2), method_getTypeEncoding(m1))
+//    }
     /// 创建方法
     private dynamic class func _alloc(zone: NSZone) -> AnyObject? {
         // 使用的是类簇

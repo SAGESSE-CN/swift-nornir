@@ -11,14 +11,14 @@ import AVFoundation
 
 open class SAIAudioSession {
     
-    open static func setCategory(_ category: String) throws {
+    public static func setCategory(_ category: AVAudioSession.Category) throws {
         try AVAudioSession.sharedInstance().setCategory(category)
     }
-    open static func setCategory(_ category: String, with options: AVAudioSessionCategoryOptions) throws {
-        try AVAudioSession.sharedInstance().setCategory(category, with: options)
+    public static func setCategory(_ category: AVAudioSession.Category, with options: AVAudioSession.CategoryOptions) throws {
+        try AVAudioSession.sharedInstance().setCategory(category, options: options)
     }
     
-    open static func setActive(_ active: Bool, context: AnyObject? = nil) throws {
+    public static func setActive(_ active: Bool, context: AnyObject? = nil) throws {
         
         objc_sync_enter(SAIAudioSession.self)
         defer {
@@ -35,7 +35,7 @@ open class SAIAudioSession {
             _ = try? AVAudioSession.sharedInstance().setActive(active)
         }
     }
-    open static func setActive(_ active: Bool, with options: AVAudioSessionSetActiveOptions, context: AnyObject? = nil) throws {
+    public static func setActive(_ active: Bool, with options: AVAudioSession.SetActiveOptions, context: AnyObject? = nil) throws {
         
         objc_sync_enter(SAIAudioSession.self)
         defer {
@@ -45,15 +45,15 @@ open class SAIAudioSession {
         guard !active else {
             _task = NSUUID().uuidString
             _context = context
-            try AVAudioSession.sharedInstance().setActive(active, with: options)
+            try AVAudioSession.sharedInstance().setActive(active, options: options)
             return
         }
-        deactive(delay: 1, context: context) {
-            _ = try? AVAudioSession.sharedInstance().setActive(active, with: options)
+        deactive(delay: 1, context: context) { 
+            _ = try? AVAudioSession.sharedInstance().setActive(active, options: options)
         }
     }
     
-    open static func deactive(delay: TimeInterval, context: AnyObject?, execute: @escaping (Void) -> Void) {
+    public static func deactive(delay: TimeInterval, context: AnyObject?, execute: @escaping () -> Void) {
         
         objc_sync_enter(SAIAudioSession.self)
         defer {

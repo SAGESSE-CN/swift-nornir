@@ -72,7 +72,7 @@ internal class SAIInputBackgroundView: UIToolbar {
 //        if let view = view {
 //            let v = SAIInputBackgroundView()
 //            
-//            //v.frame = UIEdgeInsetsInsetRect(view.bounds, UIEdgeInsetsMake(0, 0, inputBar.frame.height, 0))
+//            //v.frame = view.bounds.inset(by: UIEdgeInsets(top: 0, left: 0, bottom: inputBar.frame.height, right: 0))
 //            v.frame = inputBar.convertRect(inputBar.bounds, toView: self)
 //            
 //            view.insertSubview(v, atIndex: 0) //addSubview(v)

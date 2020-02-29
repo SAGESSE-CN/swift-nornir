@@ -30,14 +30,14 @@ internal class SAPPreviewableView: UIView {
         }
     }
     
-    var imageOrientation: UIImageOrientation = .up {
+    var imageOrientation: UIImage.Orientation = .up {
         didSet {
             setNeedsLayout()
             
             transform = CGAffineTransform(rotationAngle: angle(orientation: imageOrientation))
         }
     }
-    var imageContentMode: UIViewContentMode = .scaleToFill {
+    var imageContentMode: UIView.ContentMode = .scaleToFill {
         didSet {
             setNeedsLayout()
         }
@@ -62,7 +62,7 @@ internal class SAPPreviewableView: UIView {
         contentView.frame = align(bounds, to: imageSize, with: imageContentMode)
     }
     
-    func align(_ rect: CGRect, to size: CGSize, with contentMode: UIViewContentMode) -> CGRect {
+    func align(_ rect: CGRect, to size: CGSize, with contentMode: UIView.ContentMode) -> CGRect {
         // if contentMode is scale is used in all rect
         if contentMode == .scaleToFill {
             return rect
@@ -113,7 +113,7 @@ internal class SAPPreviewableView: UIView {
         }
         return CGRect(x: x, y: y, width: width, height: height)
     }
-    func angle(orientation: UIImageOrientation) -> CGFloat {
+    func angle(orientation: UIImage.Orientation) -> CGFloat {
         switch orientation {
         case .up, .upMirrored:  return 0 * CGFloat(M_PI_2)
         case .right, .rightMirrored: return 1 * CGFloat(M_PI_2)

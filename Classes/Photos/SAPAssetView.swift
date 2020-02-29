@@ -23,10 +23,10 @@ internal class SAPAssetView: UIImageView, SAPPreviewable {
         return bounds.size
     }
     
-    var previewingContentMode: UIViewContentMode {
+    var previewingContentMode: UIView.ContentMode {
         return contentMode
     }
-    var previewingContentOrientation: UIImageOrientation {
+    var previewingContentOrientation: UIImage.Orientation {
         return .up
     }
     
@@ -97,7 +97,7 @@ internal class SAPAssetView: UIImageView, SAPPreviewable {
         guard _selectedView.isUserInteractionEnabled else {
             return self
         }
-        let rect = UIEdgeInsetsInsetRect(_selectedView.frame, UIEdgeInsetsMake(-8, -8, -8, -8))
+        let rect = _selectedView.frame.inset(by: UIEdgeInsets(top: -8, left: -8, bottom: -8, right: -8))
         if rect.contains(point) {
             return _selectedView
         }
@@ -194,7 +194,7 @@ internal class SAPAssetView: UIImageView, SAPPreviewable {
             
             a.values = [0.8, 1.2, 1]
             a.duration = 0.25
-            a.calculationMode = kCAAnimationCubic
+            a.calculationMode = CAAnimationCalculationMode.cubic
             
             _selectedView.layer.add(a, forKey: "v")
         }
@@ -248,7 +248,7 @@ internal class SAPAssetView: UIImageView, SAPPreviewable {
     private lazy var _selectedView: UIButton = UIButton()
     private lazy var _hightlightLayer: CALayer = CALayer()
     
-    private lazy var _contentInset: UIEdgeInsets = UIEdgeInsetsMake(4.5, 4.5, 4.5, 4.5)
+    private lazy var _contentInset: UIEdgeInsets = UIEdgeInsets(top: 4.5, left: 4.5, bottom: 4.5, right: 4.5)
     
     
     init() {

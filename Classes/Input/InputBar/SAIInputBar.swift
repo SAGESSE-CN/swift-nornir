@@ -38,7 +38,7 @@ public enum SAIInputMode: CustomStringConvertible {
     public var description: String {
         switch self {
         case .none: return "None"
-        case .editing(_): return "Editing"
+        case .editing: return "Editing"
         case .selecting(_): return "Selecting"
         }
     }
@@ -344,8 +344,8 @@ open class SAIInputBar: UIView {
         let center = NotificationCenter.default
         
         // keyboard
-        center.addObserver(self, selector:#selector(ntf_keyboard(willShow:)), name:NSNotification.Name.UIKeyboardWillShow, object:nil)
-        center.addObserver(self, selector:#selector(ntf_keyboard(willHide:)), name:NSNotification.Name.UIKeyboardWillHide, object:nil)
+        center.addObserver(self, selector:#selector(ntf_keyboard(willShow:)), name:UIResponder.keyboardWillShowNotification, object:nil)
+        center.addObserver(self, selector:#selector(ntf_keyboard(willHide:)), name:UIResponder.keyboardWillHideNotification, object:nil)
         
         // accessory
         center.addObserver(self, selector: #selector(ntf_accessory(didChangeFrame:)), name: NSNotification.Name(rawValue: SAIAccessoryDidChangeFrameNotification), object: nil)
@@ -411,7 +411,7 @@ open class SAIInputBar: UIView {
         autoresizingMask = .flexibleHeight
         backgroundColor = .clear
         
-        let color = UIColor(colorLiteralRed: 0xec / 0xff, green: 0xed / 0xff, blue: 0xf1 / 0xff, alpha: 1)
+        let color = UIColor(red: 0xec / 0xff, green: 0xed / 0xff, blue: 0xf1 / 0xff, alpha: 1)
         
         //_inputView.backgroundColor = color
         //_inputView.clipsToBounds = true
@@ -420,14 +420,14 @@ open class SAIInputBar: UIView {
         
         _inputAccessoryView.delegate = self
         _inputAccessoryView.translatesAutoresizingMaskIntoConstraints = false
-        _inputAccessoryView.setContentHuggingPriority(UILayoutPriorityRequired, for: .vertical)
-        _inputAccessoryView.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .vertical)
+        _inputAccessoryView.setContentHuggingPriority(UILayoutPriority.required, for: .vertical)
+        _inputAccessoryView.setContentCompressionResistancePriority(UILayoutPriority.required, for: .vertical)
         //_inputAccessoryView.backgroundColor = color
         _inputAccessoryView.backgroundColor = .clear
         
         _backgroundView.translatesAutoresizingMaskIntoConstraints = false
-        _backgroundView.setContentHuggingPriority(1, for: .vertical)
-        _backgroundView.setContentCompressionResistancePriority(1, for: .vertical)
+        _backgroundView.setContentHuggingPriority(UILayoutPriority(rawValue: 1), for: .vertical)
+        _backgroundView.setContentCompressionResistancePriority(UILayoutPriority(rawValue: 1), for: .vertical)
         _backgroundView.barTintColor = color
         _backgroundView.isTranslucent = false // 毛玻璃效果还有bug
         //_backgroundView.barStyle = .black
@@ -503,16 +503,15 @@ open class SAIInputBar: UIView {
     fileprivate var _cacheKeyboardIsInitialized: Bool = false
     
     // MARK: - 
-    
-    open override class func initialize() {
-        _ = _ib_inputBar_once
-    }
+
     
     public override init(frame: CGRect) {
+        _ = _ib_inputBar_once
         super.init(frame: frame)
         _init()
     }
     public required init?(coder aDecoder: NSCoder) {
+        _ = _ib_inputBar_once
         super.init(coder: aDecoder)
         _init()
     }
@@ -532,7 +531,7 @@ extension SAIInputBar {
             return
         }
         _ntf_animation(sender) { bf, ef in
-            let ef1 = UIEdgeInsetsInsetRect(window.frame, UIEdgeInsetsMake(ef.minY, 0, 0, 0))
+            let ef1 = window.frame.inset(by: UIEdgeInsets(top: ef.minY, left: 0, bottom: 0, right: 0))
             _logger.debug("\(bf) => \(ef) | \(ef1)")
             _updateSystemKeyboard(ef1.size, animated: false)
             
@@ -545,7 +544,7 @@ extension SAIInputBar {
             return
         }
         _ntf_animation(sender) { bf, ef in
-            let ef1 = UIEdgeInsetsInsetRect(window.frame, UIEdgeInsetsMake(ef.minY, 0, 0, 0))
+            let ef1 = window.frame.inset(by: UIEdgeInsets(top: ef.minY, left: 0, bottom: 0, right: 0))
             _logger.debug("\(bf) => \(ef) | \(ef1)")
             
             _cacheSystemKeyboardSize = ef1.size
@@ -618,21 +617,21 @@ extension SAIInputBar {
         _displayable?.ib_inputBar(self, didChangeFrame: _frameInWindow)
     }
     
-    private func _ntf_flatMap(_ ntf: Notification, handler: (CGRect, CGRect, TimeInterval, UIViewAnimationCurve) -> ()) {
+    private func _ntf_flatMap(_ ntf: Notification, handler: (CGRect, CGRect, TimeInterval, UIView.AnimationCurve) -> ()) {
         guard let u = (ntf as NSNotification).userInfo,
-            let bf = (u[UIKeyboardFrameBeginUserInfoKey] as? NSValue)?.cgRectValue,
-            let ef = (u[UIKeyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue,
-            let cv = (u[UIKeyboardAnimationCurveUserInfoKey] as? Int),
-            let dr = (u[UIKeyboardAnimationDurationUserInfoKey] as? TimeInterval) else {
+            let bf = (u[UIResponder.keyboardFrameBeginUserInfoKey] as? NSValue)?.cgRectValue,
+            let ef = (u[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue,
+            let cv = (u[UIResponder.keyboardAnimationCurveUserInfoKey] as? Int),
+            let dr = (u[UIResponder.keyboardAnimationDurationUserInfoKey] as? TimeInterval) else {
                 return
         }
-        let edg = UIEdgeInsetsMake(intrinsicContentSize.height, 0, 0, 0)
+        let edg = UIEdgeInsets(top: intrinsicContentSize.height, left: 0, bottom: 0, right: 0)
         
         // rect correction
-        let bf1 = UIEdgeInsetsInsetRect(bf, edg)
-        let ef1 = UIEdgeInsetsInsetRect(ef, edg)
+        let bf1 = bf.inset(by: edg)
+        let ef1 = ef.inset(by: edg)
         
-        let cv1 = UIViewAnimationCurve(rawValue: cv) ?? _SAInputDefaultAnimateCurve
+        let cv1 = UIView.AnimationCurve(rawValue: cv) ?? _SAInputDefaultAnimateCurve
         
         handler(bf1, ef1, dr, cv1)
     }
@@ -967,7 +966,7 @@ internal func SAIInputBarLoad() {
 }
 
 @inline(__always)
-internal func _SAInputLayoutConstraintMake(_ item: AnyObject, _ attr1: NSLayoutAttribute, _ related: NSLayoutRelation, _ toItem: AnyObject? = nil, _ attr2: NSLayoutAttribute = .notAnAttribute, _ constant: CGFloat = 0, _ multiplier: CGFloat = 1, output: UnsafeMutablePointer<NSLayoutConstraint?>? = nil) -> NSLayoutConstraint {
+internal func _SAInputLayoutConstraintMake(_ item: AnyObject, _ attr1: NSLayoutConstraint.Attribute, _ related: NSLayoutConstraint.Relation, _ toItem: AnyObject? = nil, _ attr2: NSLayoutConstraint.Attribute = .notAnAttribute, _ constant: CGFloat = 0, _ multiplier: CGFloat = 1, output: UnsafeMutablePointer<NSLayoutConstraint?>? = nil) -> NSLayoutConstraint {
     
     let c = NSLayoutConstraint(item:item, attribute:attr1, relatedBy:related, toItem:toItem, attribute:attr2, multiplier:multiplier, constant:constant)
     if output != nil {
@@ -986,7 +985,7 @@ internal func _SAInputExchangeSelector(_ cls: AnyClass?, _ sel1: Selector, _ sel
     guard let cls = cls else {
         return
     }
-    method_exchangeImplementations(class_getInstanceMethod(cls, sel1), class_getInstanceMethod(cls, sel2))
+    method_exchangeImplementations(class_getInstanceMethod(cls, sel1)!, class_getInstanceMethod(cls, sel2)!)
 }
 
 private var _ib_inputBar_once: Bool = {
@@ -1005,7 +1004,7 @@ private var _SAInputUIResponderNextResponderOverride = "_SAInputUIResponderNextR
 
 
 internal var _SAInputDefaultAnimateDuration: TimeInterval = 0.25
-internal var _SAInputDefaultAnimateCurve: UIViewAnimationCurve = UIViewAnimationCurve(rawValue: 7) ?? .easeInOut
+internal var _SAInputDefaultAnimateCurve: UIView.AnimationCurve = UIView.AnimationCurve(rawValue: 7) ?? .easeInOut
 
 internal var _SAInputDefaultTextFieldBackgroundImage: UIImage? = {
     // 生成默认图片
@@ -1025,6 +1024,6 @@ internal var _SAInputDefaultTextFieldBackgroundImage: UIImage? = {
     
     UIGraphicsEndImageContext()
     
-    return image?.resizableImage(withCapInsets: UIEdgeInsetsMake(radius, radius, radius, radius))
+    return image?.resizableImage(withCapInsets: UIEdgeInsets(top: radius, left: radius, bottom: radius, right: radius))
 }()
 

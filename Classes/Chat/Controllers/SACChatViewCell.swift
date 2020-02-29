@@ -156,18 +156,18 @@ open class SACChatViewCell: UICollectionViewCell, UIGestureRecognizerDelegate {
         if let view = _bubbleView {
             switch options.alignment {
             case .left:
-                let edg = UIEdgeInsetsMake(25, 25, 25, 25)
+                let edg = UIEdgeInsets(top: 25, left: 25, bottom: 25, right: 25)
                 
                 view.image = UIImage.sac_init(named: "chat_bubble_recive_nor")?.resizableImage(withCapInsets: edg)
                 view.highlightedImage = UIImage.sac_init(named: "chat_bubble_recive_press")?.resizableImage(withCapInsets: edg)
                 
             case .right:
-                let edg = UIEdgeInsetsMake(25, 25, 25, 25)
+                let edg = UIEdgeInsets(top: 25, left: 25, bottom: 25, right: 25)
                 view.image = UIImage.sac_init(named: "chat_bubble_send_nor")?.resizableImage(withCapInsets: edg)
                 view.highlightedImage = UIImage.sac_init(named: "chat_bubble_send_press")?.resizableImage(withCapInsets: edg)
                 
             case .center:
-                let edg = UIEdgeInsetsMake(11, 11, 11, 11)
+                let edg = UIEdgeInsets(top: 11, left: 11, bottom: 11, right: 11)
                 
                 view.image = UIImage.sac_init(named: "chat_bubble_tips_nor")?.resizableImage(withCapInsets: edg)
                 view.highlightedImage = nil
@@ -191,14 +191,14 @@ open class SACChatViewCell: UICollectionViewCell, UIGestureRecognizerDelegate {
         return true
     }
     
-    private dynamic func _menuDismissed(_ sender: Notification) {
+    @objc private dynamic func _menuDismissed(_ sender: Notification) {
         //logger.trace()
         
         isHighlighted = false
         
         _removeObserverForMenu()
     }
-    private dynamic func _handleMenuGesture(_ sender: UILongPressGestureRecognizer) {
+    @objc private dynamic func _handleMenuGesture(_ sender: UILongPressGestureRecognizer) {
         guard sender.state == .began else {
             return
         }
@@ -209,7 +209,7 @@ open class SACChatViewCell: UICollectionViewCell, UIGestureRecognizerDelegate {
         }
         //logger.trace()
        
-        let rect = UIEdgeInsetsInsetRect(info.layoutedRect(with: .content), { edg -> UIEdgeInsets in
+        let rect = info.layoutedRect(with: .content).inset(by: { edg -> UIEdgeInsets in
             return .init(top: -edg.top,
                          left: -edg.left,
                          bottom: -edg.bottom,
@@ -239,7 +239,7 @@ open class SACChatViewCell: UICollectionViewCell, UIGestureRecognizerDelegate {
         _observingMenu = true
         
         let center = NotificationCenter.default
-        center.addObserver(self, selector: #selector(_menuDismissed(_:)), name: .UIMenuControllerWillHideMenu, object: nil)
+        center.addObserver(self, selector: #selector(_menuDismissed(_:)), name: UIMenuController.willHideMenuNotification, object: nil)
     }
     private func _removeObserverForMenu() {
         guard _observingMenu else {
@@ -249,7 +249,7 @@ open class SACChatViewCell: UICollectionViewCell, UIGestureRecognizerDelegate {
         _observingMenu = false
         
         let center = NotificationCenter.default
-        center.removeObserver(self, name: .UIMenuControllerWillHideMenu, object: nil)
+        center.removeObserver(self, name: UIMenuController.willHideMenuNotification, object: nil)
     }
     
     open override func canPerformAction(_ action: Selector, withSender sender: Any?) -> Bool {

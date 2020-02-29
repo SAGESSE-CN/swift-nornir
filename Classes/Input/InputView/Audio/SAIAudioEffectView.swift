@@ -49,7 +49,7 @@ internal class SAIAudioEffectView: UICollectionViewCell {
         }
     }
     
-    func onTap(_ sender: Any) {
+    @objc func onTap(_ sender: Any) {
         guard let effect = effect else {
             return
         }
@@ -131,7 +131,7 @@ internal class SAIAudioEffectView: UICollectionViewCell {
     private func _init() {
         _logger.trace()
         
-        let hcolor = UIColor(colorLiteralRed: 0x18 / 255.0, green: 0xb4 / 255.0, blue: 0xed / 255.0, alpha: 1)
+        let hcolor = UIColor(red: 0x18 / 255.0, green: 0xb4 / 255.0, blue: 0xed / 255.0, alpha: 1)
         
         
         _backgroundView.translatesAutoresizingMaskIntoConstraints = false
@@ -152,7 +152,7 @@ internal class SAIAudioEffectView: UICollectionViewCell {
         _titleButton.setBackgroundImage(UIImage.sai_init(named: "keyboard_audio_simulate_text_select"), for: .selected)
         _titleButton.isUserInteractionEnabled = false
         _titleButton.translatesAutoresizingMaskIntoConstraints = false
-        _titleButton.contentEdgeInsets = UIEdgeInsetsMake(0, 8, 0, 8)
+        _titleButton.contentEdgeInsets = UIEdgeInsets(top: 0, left: 8, bottom: 0, right: 8)
         
         _tipsLabel.isHidden = true
         _tipsLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -213,7 +213,7 @@ internal class SAIAudioEffectView: UICollectionViewCell {
     
     fileprivate lazy var _tipsLabel: UILabel = UILabel()
     fileprivate lazy var _spectrumView: SAIAudioSpectrumMiniView = SAIAudioSpectrumMiniView()
-    fileprivate lazy var _activityIndicatorView: UIActivityIndicatorView = UIActivityIndicatorView(activityIndicatorStyle: .white)
+    fileprivate lazy var _activityIndicatorView: UIActivityIndicatorView = UIActivityIndicatorView(style: .white)
     
     override init(frame: CGRect) {
         super.init(frame: frame)
